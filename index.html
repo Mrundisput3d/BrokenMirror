@@ -3,159 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Broken Mirror - Clan Dashboard</title>
+    <title>Broken Mirror | L2 Clan Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-gold: #c5a059;
-            --bg-dark: #0a0c0e;
-            --card-bg: #161a1f;
-            --accent-blue: #4e9af1;
-            --border: #2d3238;
+            --gold: #d4af37;
+            --dark-gold: #8a6d3b;
+            --bg-overlay: rgba(10, 12, 15, 0.85);
+            --panel-bg: rgba(26, 30, 35, 0.9);
+            --border-style: 2px solid var(--dark-gold);
         }
 
         body { 
-            font-family: 'Segoe UI', sans-serif; 
-            background-color: var(--bg-dark); 
-            color: #e0e0e0; 
+            font-family: 'Open Sans', sans-serif; 
+            background: url('https://images.alphacoders.com/133/1335334.png') no-repeat center center fixed; 
+            background-size: cover;
+            color: #eee; 
             margin: 0; padding: 20px;
-            display: flex; flex-direction: column; align-items: center;
         }
 
-        header { text-align: center; width: 100%; max-width: 1200px; margin-bottom: 30px; }
-        .banner { width: 100%; border: 1px solid var(--primary-gold); border-radius: 8px; box-shadow: 0 0 20px rgba(197,160,89,0.3); }
-        h1 { color: var(--primary-gold); letter-spacing: 4px; text-transform: uppercase; }
+        /* Overlay για να διαβάζεται το κείμενο πάνω από την εικόνα */
+        body::before {
+            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle, transparent 20%, var(--bg-overlay) 80%);
+            z-index: -1;
+        }
+
+        h1, h2, .column-header, .cp-trigger span {
+            font-family: 'Cinzel', serif;
+        }
+
+        header { text-align: center; margin-bottom: 40px; }
+        
+        .main-title { 
+            font-size: 4rem; color: var(--gold); text-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
+            margin: 10px 0; text-transform: uppercase; letter-spacing: 8px;
+        }
 
         .dashboard-container { 
-            display: grid; grid-template-columns: 1fr 1fr; gap: 30px; 
-            width: 100%; max-width: 1200px; height: 600px; /* Σταθερό ύψος για να δουλέψει το scroll */
+            display: grid; grid-template-columns: 1fr 1fr; gap: 40px; 
+            width: 100%; max-width: 1300px; margin: 0 auto;
         }
 
         .clan-column {
-            background: var(--card-bg); border: 1px solid var(--border);
-            border-radius: 10px; display: flex; flex-direction: column; overflow: hidden;
+            background: var(--panel-bg); 
+            border: var(--border-style);
+            box-shadow: 0 0 20px rgba(0,0,0,0.8), inset 0 0 50px rgba(138, 109, 59, 0.1);
+            border-radius: 5px; height: 650px; display: flex; flex-direction: column;
         }
 
-        .column-header { background: #1e2329; padding: 15px; color: var(--primary-gold); font-weight: bold; text-align: center; border-bottom: 1px solid var(--border); }
-
-        /* SCROLLBAR STYLE */
-        .scroll-area { overflow-y: auto; flex-grow: 1; padding: 10px; scrollbar-width: thin; scrollbar-color: var(--primary-gold) transparent; }
-        .scroll-area::-webkit-scrollbar { width: 6px; }
-        .scroll-area::-webkit-scrollbar-thumb { background: var(--primary-gold); border-radius: 10px; }
-
-        /* ACCORDION STYLES */
-        .cp-item { border-bottom: 1px solid var(--border); margin-bottom: 5px; }
-        .cp-trigger { 
-            width: 100%; background: none; border: none; color: white; padding: 12px;
-            text-align: left; cursor: pointer; display: flex; justify-content: space-between;
-            font-size: 1rem; transition: 0.3s;
+        .column-header { 
+            background: linear-gradient(to bottom, #2c3136, #1a1e23);
+            padding: 20px; color: var(--gold); font-size: 1.4rem;
+            text-align: center; border-bottom: var(--border-style);
+            text-shadow: 1px 1px 2px black;
         }
-        .cp-trigger:hover { background: #252a30; color: var(--primary-gold); }
-        
-        .cp-details { display: none; background: #0f1215; padding: 15px; font-size: 0.85rem; }
-        .active .cp-details { display: block; border-top: 1px dashed var(--primary-gold); }
 
-        .boss-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
-        .boss-stat { color: #aaa; border-bottom: 1px solid #222; padding: 2px 0; display: flex; justify-content: space-between; }
-        .boss-count { color: var(--accent-blue); font-weight: bold; }
-
-        .points-badge { background: #28a745; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; }
-
-        /* EPIC TABLE */
-        .epic-section { width: 100%; max-width: 1200px; margin-top: 40px; }
-        table { width: 100%; border-collapse: collapse; background: var(--card-bg); margin-top: 10px; }
-        th, td { padding: 12px; border: 1px solid var(--border); text-align: left; }
-        th { color: var(--primary-gold); background: #1e2329; }
-
-        @media (max-width: 900px) { .dashboard-container { grid-template-columns: 1fr; height: auto; } }
-    </style>
-</head>
-<body>
-
-    <header>
-        <img src="https://images.alphacoders.com/134/1341144.png" class="banner" alt="Broken Mirror Banner">
-        <h1>Broken Mirror</h1>
-    </header>
-
-    <div class="dashboard-container">
-        
-        <div class="clan-column">
-            <div class="column-header">Noldor Clan Structure</div>
-            <div class="scroll-area">
-                <div class="cp-item">
-                    <button class="cp-trigger" onclick="toggleCP(this)">
-                        <span>CP 1</span>
-                        <span class="points-badge">1200 Pts</span>
-                    </button>
-                    <div class="cp-details">
-                        <strong>Weekly Participations: 15</strong>
-                        <div class="boss-grid">
-                            <div class="boss-stat">Valakas <span class="boss-count">2</span></div>
-                            <div class="boss-stat">Antharas <span class="boss-count">1</span></div>
-                            <div class="boss-stat">Baium <span class="boss-count">3</span></div>
-                            <div class="boss-stat">Zaken <span class="boss-count">5</span></div>
-                            <div class="boss-stat">Frintezza <span class="boss-count">2</span></div>
-                            <div class="boss-stat">Ant Queen <span class="boss-count">2</span></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="cp-item">
-                    <button class="cp-trigger" onclick="toggleCP(this)"><span>Noldor Archer</span> <span class="points-badge">950 Pts</span></button>
-                    <div class="cp-details"><div class="boss-grid"><div class="boss-stat">Valakas <span class="boss-count">1</span></div></div></div>
-                </div>
-                </div>
-        </div>
-
-        <div class="clan-column">
-            <div class="column-header">Kriminalides Main Clan</div>
-            <div class="scroll-area">
-                <div class="cp-item">
-                    <button class="cp-trigger" onclick="toggleCP(this)">
-                        <span>Hattrick CP</span>
-                        <span class="points-badge">1450 Pts</span>
-                    </button>
-                    <div class="cp-details">
-                        <strong>Weekly Participations: 20</strong>
-                        <div class="boss-grid">
-                            <div class="boss-stat">Valakas <span class="boss-count">3</span></div>
-                            <div class="boss-stat">Antharas <span class="boss-count">2</span></div>
-                            <div class="boss-stat">Core <span class="boss-count">5</span></div>
-                            <div class="boss-stat">Orfen <span class="boss-count">4</span></div>
-                        </div>
-                    </div>
-                </div>
-                </div>
-        </div>
-
-    </div>
-
-    <div class="epic-section">
-        <h2 style="color:var(--primary-gold)">Epic Jewels Log</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Jewel</th>
-                    <th>Receiver CP</th>
-                    <th>Clan</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>12/03/2026</td>
-                    <td style="color:#ff79c6">Valakas Necklace</td>
-                    <td>Hattrick CP</td>
-                    <td>Kriminalides</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-
-    <script>
-        function toggleCP(element) {
-            const parent = element.parentElement;
-            parent.classList.toggle('active');
-        }
-    </script>
-
-</body>
-</html>
+        .scroll-area { overflow-y: auto; padding: 15px; flex-grow: 1; }
+        .scroll-area::-webkit-scrollbar { width: 8px; }
+        .scroll-area::-webkit-scrollbar-
