@@ -3,31 +3,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Το Προφίλ μου</title>
+    <title>Broken Mirror - L2 Dashboard</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f4f4f9; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .card { background: white; padding: 2rem; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; max-width: 350px; }
-        img { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid #007bff; }
-        h1 { color: #333; margin: 10px 0; }
-        p { color: #666; font-size: 0.9rem; }
-        .links { margin-top: 20px; }
-        .btn { display: block; background: #007bff; color: white; text-decoration: none; padding: 10px; margin: 5px 0; border-radius: 5px; transition: 0.3s; }
-        .btn:hover { background: #0056b3; }
+        :root {
+            --primary-gold: #c5a059;
+            --bg-dark: #0f1215;
+            --card-bg: #1a1e23;
+            --text-gray: #b0b3b8;
+        }
+
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: var(--bg-dark); 
+            color: white; 
+            margin: 0; padding: 20px;
+        }
+
+        header { text-align: center; padding: 40px 0; }
+        
+        .logo-container img {
+            width: 100%; max-width: 800px; border-radius: 10px;
+            box-shadow: 0 0 30px rgba(197, 160, 89, 0.2);
+            border: 1px solid var(--primary-gold);
+        }
+
+        h1 { font-size: 3rem; color: var(--primary-gold); text-transform: uppercase; letter-spacing: 5px; margin-top: 20px; }
+
+        .section-title {
+            border-left: 5px solid var(--primary-gold);
+            padding-left: 15px; margin: 40px 0 20px;
+            color: var(--primary-gold); text-transform: uppercase;
+        }
+
+        table { width: 100%; border-collapse: collapse; background: var(--card-bg); margin-bottom: 30px; border-radius: 8px; overflow: hidden; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #2d3238; }
+        th { background-color: #252a30; color: var(--primary-gold); }
+        tr:hover { background-color: #252a30; }
+
+        .cp-tag { font-weight: bold; color: #4e9af1; }
+        .points { color: #50fa7b; font-weight: bold; }
+        
+        .epic-icon { color: #ff79c6; font-size: 0.9rem; margin-right: 5px; }
+
+        .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media (max-width: 800px) { .grid-container { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <img src="https://via.placeholder.com/100" alt="Avatar">
-        <h1>Το Όνομά Σου</h1>
-        <p>Web Developer | Ερασιτέχνης Φωτογράφος | Gamer</p>
-        <hr>
-        <div class="links">
-            <a href="#" class="btn">LinkedIn</a>
-            <a href="#" class="btn">GitHub</a>
-            <a href="mailto:email@example.com" class="btn">Επικοινωνία</a>
+    <header>
+        <div class="logo-container">
+            <img src="https://images.alphacoders.com/134/1341144.png" alt="Broken Mirror Banner">
+        </div>
+        <h1>Broken Mirror</h1>
+    </header>
+
+    <div class="grid-container">
+        <div>
+            <h2 class="section-title">Noldor Clan Statistics</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Command Party</th>
+                        <th>Participations</th>
+                        <th>Total Points</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td class="cp-tag">CP 1</td><td>45</td><td class="points">1200</td></tr>
+                    <tr><td class="cp-tag">Noldor Archer</td><td>38</td><td class="points">950</td></tr>
+                    <tr><td class="cp-tag">Kriminalides CP</td><td>50</td><td class="points">1500</td></tr>
+                    </tbody>
+            </table>
+        </div>
+
+        <div>
+            <h2 class="section-title">Kriminalides Main Clan</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Command Party</th>
+                        <th>Participations</th>
+                        <th>Total Points</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td class="cp-tag">Hattrick CP</td><td>48</td><td class="points">1400</td></tr>
+                    <tr><td class="cp-tag">Legion CP</td><td>42</td><td class="points">1100</td></tr>
+                    <tr><td class="cp-tag">Sinaloa CP</td><td>35</td><td class="points">800</td></tr>
+                </tbody>
+            </table>
         </div>
     </div>
+
+    <h2 class="section-title">Epic Jewels Distribution</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Epic Jewel</th>
+                <th>Recipient CP</th>
+                <th>Clan</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>12/03/2026</td>
+                <td><span class="epic-icon">◆</span> Valakas Necklace</td>
+                <td class="cp-tag">Kriminalides CP</td>
+                <td>Noldor</td>
+            </tr>
+            <tr>
+                <td>10/03/2026</td>
+                <td><span class="epic-icon">◆</span> Baium Ring</td>
+                <td class="cp-tag">Hattrick CP</td>
+                <td>Kriminalides Main</td>
+            </tr>
+            <tr>
+                <td>08/03/2026</td>
+                <td><span class="epic-icon">◆</span> Antharas Earring</td>
+                <td class="cp-tag">Ronin CP</td>
+                <td>Noldor</td>
+            </tr>
+        </tbody>
+    </table>
 
 </body>
 </html>
