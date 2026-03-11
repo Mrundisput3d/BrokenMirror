@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Broken Mirror | L2 Clan Management</title>
+    <title>Broken Mirror | Clan Management</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
             --gold: #d4af37;
             --dark-gold: #8a6d3b;
-            --bg-overlay: rgba(10, 12, 15, 0.85);
-            --panel-bg: rgba(26, 30, 35, 0.9);
+            --bg-overlay: rgba(10, 12, 15, 0.9);
+            --panel-bg: rgba(20, 24, 28, 0.95);
             --border-style: 2px solid var(--dark-gold);
         }
 
@@ -18,175 +18,140 @@
             font-family: 'Open Sans', sans-serif; 
             background: url('https://images.alphacoders.com/133/1335334.png') no-repeat center center fixed; 
             background-size: cover;
-            color: #eee; 
-            margin: 0; padding: 20px;
+            color: #eee; margin: 0; padding: 20px;
         }
 
-        /* Overlay για να διαβάζεται το κείμενο πάνω από την εικόνα */
         body::before {
             content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle, transparent 20%, var(--bg-overlay) 80%);
+            background: radial-gradient(circle, transparent 10%, var(--bg-overlay) 90%);
             z-index: -1;
         }
 
-        h1, h2, .column-header, .cp-trigger span {
-            font-family: 'Cinzel', serif;
-        }
+        h1, h2, .column-header, .cp-trigger span { font-family: 'Cinzel', serif; }
 
-        header { text-align: center; margin-bottom: 40px; }
-        
-        .main-title { 
-            font-size: 4rem; color: var(--gold); text-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
-            margin: 10px 0; text-transform: uppercase; letter-spacing: 8px;
-        }
+        header { text-align: center; margin-bottom: 30px; }
+        .main-title { font-size: 3.5rem; color: var(--gold); text-shadow: 0 0 15px rgba(212, 175, 55, 0.5); margin: 0; letter-spacing: 6px; }
 
         .dashboard-container { 
-            display: grid; grid-template-columns: 1fr 1fr; gap: 40px; 
+            display: grid; grid-template-columns: 1fr 1fr; gap: 30px; 
             width: 100%; max-width: 1300px; margin: 0 auto;
         }
 
         .clan-column {
-            background: var(--panel-bg); 
-            border: var(--border-style);
-            box-shadow: 0 0 20px rgba(0,0,0,0.8), inset 0 0 50px rgba(138, 109, 59, 0.1);
-            border-radius: 5px; height: 650px; display: flex; flex-direction: column;
+            background: var(--panel-bg); border: var(--border-style);
+            border-radius: 5px; height: 600px; display: flex; flex-direction: column;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
         .column-header { 
-            background: linear-gradient(to bottom, #2c3136, #1a1e23);
-            padding: 20px; color: var(--gold); font-size: 1.4rem;
+            background: linear-gradient(to bottom, #2c3136, #111);
+            padding: 15px; color: var(--gold); font-size: 1.2rem;
             text-align: center; border-bottom: var(--border-style);
-            text-shadow: 1px 1px 2px black;
         }
 
-        .scroll-area { overflow-y: auto; padding: 15px; flex-grow: 1; }
+        /* SCROLLBAR AREA */
+        .scroll-area { overflow-y: scroll; padding: 10px; flex-grow: 1; scrollbar-width: thin; scrollbar-color: var(--dark-gold) #111; }
         .scroll-area::-webkit-scrollbar { width: 8px; }
         .scroll-area::-webkit-scrollbar-thumb { background: var(--dark-gold); border-radius: 4px; }
 
-        /* CP ITEM STYLE */
-        .cp-item { 
-            margin-bottom: 10px; border: 1px solid rgba(138, 109, 59, 0.3);
-            background: rgba(0,0,0,0.3); transition: 0.3s;
-        }
-        .cp-item:hover { border-color: var(--gold); box-shadow: 0 0 10px rgba(212, 175, 55, 0.2); }
+        .cp-item { margin-bottom: 8px; border: 1px solid rgba(138, 109, 59, 0.2); background: rgba(0,0,0,0.4); }
+        .cp-item:hover { border-color: var(--gold); }
 
         .cp-trigger { 
-            width: 100%; background: none; border: none; color: #fff; padding: 15px;
+            width: 100%; background: none; border: none; color: #fff; padding: 12px;
             text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center;
         }
 
-        .cp-trigger span { font-size: 1.1rem; letter-spacing: 1px; }
-
         .points-badge { 
-            background: linear-gradient(45deg, #8a6d3b, #d4af37); color: #000; 
-            padding: 3px 10px; border-radius: 3px; font-weight: bold; font-size: 0.8rem;
-            box-shadow: 0 0 5px rgba(212, 175, 55, 0.5);
+            background: var(--dark-gold); color: #000; padding: 2px 8px; 
+            border-radius: 3px; font-weight: bold; font-size: 0.75rem;
         }
 
-        /* BOSS DETAILS */
-        .cp-details { display: none; background: rgba(0,0,0,0.5); padding: 20px; border-top: 1px solid var(--dark-gold); }
-        .active .cp-details { display: block; animation: fadeIn 0.4s; }
+        .cp-details { display: none; background: rgba(0,0,0,0.6); padding: 15px; border-top: 1px solid var(--dark-gold); }
+        .active .cp-details { display: block; animation: fadeIn 0.3s; }
 
-        .boss-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center; }
-        .boss-stat { background: rgba(255,255,255,0.05); padding: 8px; border-radius: 4px; font-size: 0.8rem; border: 1px solid #333; }
-        .boss-name { display: block; color: var(--gold); margin-bottom: 4px; font-weight: bold; }
-        .boss-val { color: #fff; font-size: 1rem; }
+        .boss-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        .boss-stat { background: rgba(255,255,255,0.05); padding: 5px; border-radius: 3px; text-align: center; border: 1px solid #333; }
+        .boss-name { display: block; color: var(--gold); font-size: 0.7rem; font-weight: bold; }
+        .boss-val { color: #fff; font-size: 0.9rem; }
 
-        /* EPIC TABLE */
-        .epic-section { width: 100%; max-width: 1300px; margin: 50px auto; background: var(--panel-bg); border: var(--border-style); padding: 20px; box-sizing: border-box; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th { font-family: 'Cinzel', serif; color: var(--gold); border-bottom: 2px solid var(--dark-gold); padding: 15px; text-align: left; }
-        td { padding: 12px; border-bottom: 1px solid rgba(138, 109, 59, 0.2); }
-        .epic-name { color: #ff79c6; font-weight: bold; text-shadow: 0 0 5px rgba(255, 121, 198, 0.3); }
+        .epic-section { width: 100%; max-width: 1300px; margin: 40px auto; background: var(--panel-bg); border: var(--border-style); padding: 20px; box-sizing: border-box; }
+        table { width: 100%; border-collapse: collapse; }
+        th { color: var(--gold); border-bottom: 2px solid var(--dark-gold); padding: 10px; text-align: left; font-family: 'Cinzel'; }
+        td { padding: 10px; border-bottom: 1px solid rgba(138, 109, 59, 0.1); }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-        @media (max-width: 1000px) { .dashboard-container { grid-template-columns: 1fr; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @media (max-width: 900px) { .dashboard-container { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
 
     <header>
         <h1 class="main-title">Broken Mirror</h1>
-        <p style="color: var(--gold); letter-spacing: 2px;">COMMUNITY DASHBOARD</p>
+        <p style="color: var(--gold); letter-spacing: 2px; margin-top: 5px;">CLAN LEADERSHIP PANEL</p>
     </header>
 
     <div class="dashboard-container">
         
         <div class="clan-column">
-            <div class="column-header">Noldor Clan</div>
-            <div class="scroll-area">
-                
-                <div class="cp-item">
-                    <button class="cp-trigger" onclick="toggleCP(this)">
-                        <span>Noldor Archer</span>
-                        <span class="points-badge">1240 PTS</span>
-                    </button>
-                    <div class="cp-details">
-                        <div class="boss-grid">
-                            <div class="boss-stat"><span class="boss-name">VAL</span><span class="boss-val">2</span></div>
-                            <div class="boss-stat"><span class="boss-name">ANT</span><span class="boss-val">1</span></div>
-                            <div class="boss-stat"><span class="boss-name">BAI</span><span class="boss-val">4</span></div>
-                            <div class="boss-stat"><span class="boss-name">ZAK</span><span class="boss-val">6</span></div>
-                            <div class="boss-stat"><span class="boss-name">FRI</span><span class="boss-val">2</span></div>
-                            <div class="boss-stat"><span class="boss-name">AQ</span><span class="boss-val">3</span></div>
-                            <div class="boss-stat"><span class="boss-name">ORFEN</span><span class="boss-val">1</span></div>
-                            <div class="boss-stat"><span class="boss-name">CORE</span><span class="boss-val">0</span></div>
-                        </div>
-                    </div>
-                </div>
+            <div class="column-header">Noldor Clan Structure</div>
+            <div class="scroll-area" id="noldor-list">
                 </div>
         </div>
 
         <div class="clan-column">
-            <div class="column-header">Kriminalides Main</div>
-            <div class="scroll-area">
-                <div class="cp-item">
-                    <button class="cp-trigger" onclick="toggleCP(this)">
-                        <span>Hattrick CP</span>
-                        <span class="points-badge">1500 PTS</span>
-                    </button>
-                    <div class="cp-details">
-                        <div class="boss-grid">
-                            <div class="boss-stat"><span class="boss-name">VAL</span><span class="boss-val">3</span></div>
-                            <div class="boss-stat"><span class="boss-name">ANT</span><span class="boss-val">2</span></div>
-                            <div class="boss-stat"><span class="boss-name">BAI</span><span class="boss-val">5</span></div>
-                        </div>
-                    </div>
+            <div class="column-header">Kriminalides Main Clan</div>
+            <div class="scroll-area" id="krim-list">
                 </div>
-            </div>
         </div>
 
     </div>
 
     <div class="epic-section">
-        <h2 style="color:var(--gold); text-align: center; letter-spacing: 3px;">EPIC JEWELS DISTRIBUTION LOG</h2>
+        <h2 style="color:var(--gold); text-align: center;">EPIC JEWELS DISTRIBUTION LOG</h2>
         <table>
             <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Epic Jewel</th>
-                    <th>Recipient CP</th>
-                    <th>Clan</th>
-                </tr>
+                <tr><th>Date</th><th>Jewel</th><th>Recipient CP</th><th>Clan</th></tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>12/03/2026</td>
-                    <td><span class="epic-name">Valakas Necklace</span></td>
-                    <td>Hattrick CP</td>
-                    <td>Kriminalides</td>
-                </tr>
+                <tr><td>12/03/2026</td><td style="color:#ff79c6">Valakas Necklace</td><td>Hattrick CP</td><td>Kriminalides</td></tr>
+                <tr><td>11/03/2026</td><td style="color:#ff79c6">Antharas Earring</td><td>Noldor Archer</td><td>Noldor</td></tr>
             </tbody>
         </table>
     </div>
 
     <script>
-        function toggleCP(element) {
-            const parent = element.parentElement;
-            // Κλείνει τα υπόλοιπα αν θες, ή απλά ανοίγει το τρέχον
-            parent.classList.toggle('active');
+        const noldorCPs = ["CP 1", "Noldor Archer", "Noldor Archer 2", "Noldor Dummy", "Noldor Tank", "Κriminalides CP", "Outlaw CP", "Ronin CP", "Brazilians CP", "Brazilians 2 CP", "I am Groot CP"];
+        const krimCPs = ["Hattrick CP", "55 Room CP", "Legion CP", "Criminal Record CP", "Avalanche CP", "Gankly Crew CP", "Furious Wolves CP", "Animals CP", "Dracaris CP", "Sinaloa CP", "Knockout CP", "VaBank CP"];
+
+        function createCPItem(name) {
+            return `
+                <div class="cp-item">
+                    <button class="cp-trigger" onclick="toggleCP(this)">
+                        <span>${name}</span>
+                        <span class="points-badge">0 PTS</span>
+                    </button>
+                    <div class="cp-details">
+                        <div class="boss-grid">
+                            <div class="boss-stat"><span class="boss-name">VAL</span><span class="boss-val">0</span></div>
+                            <div class="boss-stat"><span class="boss-name">ANT</span><span class="boss-val">0</span></div>
+                            <div class="boss-stat"><span class="boss-name">BAI</span><span class="boss-val">0</span></div>
+                            <div class="boss-stat"><span class="boss-name">ZAK</span><span class="boss-val">0</span></div>
+                            <div class="boss-stat"><span class="boss-name">FRI</span><span class="boss-val">0</span></div>
+                            <div class="boss-stat"><span class="boss-name">AQ</span><span class="boss-val">0</span></div>
+                            <div class="boss-stat"><span class="boss-name">ORFEN</span><span class="boss-val">0</span></div>
+                            <div class="boss-stat"><span class="boss-name">CORE</span><span class="boss-val">0</span></div>
+                        </div>
+                    </div>
+                </div>`;
+        }
+
+        document.getElementById('noldor-list').innerHTML = noldorCPs.map(createCPItem).join('');
+        document.getElementById('krim-list').innerHTML = krimCPs.map(createCPItem).join('');
+
+        function toggleCP(btn) {
+            btn.parentElement.classList.toggle('active');
         }
     </script>
-
 </body>
 </html>
