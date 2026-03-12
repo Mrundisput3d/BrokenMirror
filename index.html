@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Broken Mirror Alliance | Dashboard</title>
+    <title>Broken Mirror Alliance | Pro Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -18,77 +18,68 @@
         }
         body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-overlay); z-index: -1; }
 
-        /* GENERAL UI */
-        .page-section { min-height: 100vh; padding: 20px; position: relative; border-bottom: 1px solid rgba(212,175,55,0.1); }
-        .server-time { position: absolute; top: 20px; right: 40px; color: var(--gold); font-family: 'Cinzel'; border: 1px solid var(--gold); padding: 5px 15px; border-radius: 5px; background: rgba(0,0,0,0.5); font-size: 0.8rem; }
+        /* UI COMPONENTS */
+        .page-section { min-height: 100vh; padding: 40px 20px; position: relative; border-bottom: 1px solid rgba(212,175,55,0.1); }
+        .server-time { position: absolute; top: 20px; right: 40px; color: var(--gold); font-family: 'Cinzel'; border: 1px solid var(--gold); padding: 5px 15px; border-radius: 5px; background: rgba(0,0,0,0.5); }
 
-        /* LEADERS & CP LISTS */
+        /* SECTION 1: DASHBOARD */
         .top-header { text-align: center; margin-bottom: 30px; }
         .ally-logo { width: 150px; filter: drop-shadow(0 0 15px var(--gold)); }
         .ally-title { font-family: 'Cinzel Decorative'; font-size: 2.2rem; color: var(--gold); display: block; }
-        .leaders-row { display: flex; justify-content: center; flex-wrap: wrap; gap: 40px; margin-top: 20px; }
-        .leader-card { text-align: center; cursor: pointer; }
-        .img-frame { width: 90px; height: 90px; border: 2px solid var(--gold); border-radius: 50%; overflow: hidden; margin: 0 auto; background: #000; }
+        .leaders-row { display: flex; justify-content: center; gap: 40px; margin-top: 20px; }
+        .img-frame { width: 85px; height: 85px; border: 2px solid var(--gold); border-radius: 50%; overflow: hidden; margin: 0 auto; background: #000; }
         .leader-img { width: 100%; height: 100%; object-fit: contain; }
 
         .main-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; max-width: 1500px; margin: 20px auto; }
-        .clan-column { background: rgba(15, 18, 22, 0.95); height: 700px; display: flex; flex-direction: column; border-radius: 10px; border-top: 4px solid var(--gold); border: 1px solid #333; }
+        .clan-column { background: rgba(15, 18, 22, 0.95); height: 650px; display: flex; flex-direction: column; border-radius: 10px; border-top: 4px solid var(--gold); border: 1px solid #333; }
         .scroll-area { overflow-y: auto; padding: 10px; flex-grow: 1; }
-        .scroll-area::-webkit-scrollbar { width: 5px; }
-        .scroll-area::-webkit-scrollbar-thumb { background: var(--gold); }
-
         .cp-box { margin-bottom: 8px; border: 1px solid #333; background: rgba(0,0,0,0.3); border-radius: 6px; overflow: hidden; }
         .top-cp { border: 1px solid var(--gold); background: rgba(212, 175, 55, 0.05); }
-        .cp-btn { width: 100%; background: none; border: none; padding: 12px; color: #fff; display: flex; justify-content: space-between; cursor: pointer; font-weight: 600; }
-        
-        .member-list { display: none; background: rgba(0,0,0,0.5); border-top: 1px solid #222; }
+        .cp-btn { width: 100%; background: none; border: none; padding: 12px; color: #fff; display: flex; justify-content: space-between; cursor: pointer; }
+        .member-list { display: none; background: rgba(0,0,0,0.5); border-top: 1px solid #222; padding: 10px; }
         .active > .member-list { display: block; }
-        .member-item { border-bottom: 1px solid rgba(255,255,255,0.03); padding: 10px 20px; font-size: 0.85rem; color: #ccc; }
-        .leader-crown { color: var(--gold); margin-right: 8px; }
+        .loot-toggle-btn { width: 100%; background: none; border: 1px solid var(--gold); color: var(--gold); padding: 5px; cursor: pointer; font-size: 0.7rem; margin-top: 10px; }
+        .loot-content { display: none; padding: 10px; font-size: 0.8rem; color: #888; border-left: 2px solid var(--gold); }
 
-        .loot-section { padding: 10px; background: rgba(212, 175, 55, 0.03); }
-        .loot-toggle-btn { width: 100%; background: none; border: 1px solid var(--gold); color: var(--gold); padding: 6px; cursor: pointer; font-family: 'Cinzel'; font-size: 0.7rem; border-radius: 4px; }
-        .loot-content { display: none; margin-top: 8px; font-size: 0.8rem; color: #888; border-left: 2px solid var(--gold); padding-left: 10px; }
+        /* SECTION 2: MARKETPLACE */
+        .marketplace-flex { display: flex; flex-wrap: wrap; gap: 20px; max-width: 1400px; margin: 0 auto; }
+        .epic-table { flex: 1; background: rgba(0,0,0,0.6); border: 2px solid var(--gold); border-radius: 10px; padding: 20px; min-width: 350px; }
+        .epic-table table { width: 100%; border-collapse: collapse; }
+        .epic-table td { padding: 10px; border-bottom: 1px solid #222; }
+        .mini-icon { width: 24px; vertical-align: middle; margin-right: 10px; }
 
-        /* VIRTUAL PAGES (VIDEOS & ANALYTICS) */
-        .virtual-page { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#0a0c0f; z-index:10000; overflow-y:auto; padding:40px; box-sizing:border-box; }
-        .close-btn { background:var(--gold); color:#000; border:none; padding:10px 25px; font-family:'Cinzel'; font-weight:bold; cursor:pointer; margin-bottom:30px; border-radius:4px; }
+        /* VIRTUAL PAGES */
+        .virtual-page { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#0a0c0f; z-index:10000; overflow-y:auto; padding:40px; }
+        .close-btn { background:var(--gold); color:#000; border:none; padding:10px 30px; font-family:'Cinzel'; font-weight:bold; cursor:pointer; margin-bottom:30px; border-radius:4px; }
         
-        /* VIDEO GRID */
-        .video-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap:30px; max-width:1400px; margin: 0 auto; }
-        .video-card { background:#111; border: 1px solid #333; padding:15px; border-radius:10px; transition: 0.3s; }
-        .video-card:hover { border-color: var(--gold); }
-        .video-card iframe { width: 100%; height: 215px; border-radius: 5px; border: 1px solid #222; }
+        /* ANALYTICS TABLES */
+        .ana-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; max-width: 1400px; margin: 0 auto; }
+        .leaderboard-card { background: rgba(15, 18, 22, 0.95); border: 1px solid #333; border-top: 3px solid var(--gold); padding: 20px; border-radius: 8px; }
+        .ana-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .ana-table tr:nth-child(even) { background: rgba(255,255,255,0.02); }
+        .ana-table td { padding: 12px; border-bottom: 1px solid #222; font-size: 0.85rem; }
+        .pos { color: var(--gold); font-weight: bold; width: 30px; }
+        .val { text-align: right; font-weight: bold; color: #00ff88; }
 
-        /* ANALYTICS LEADERBOARDS */
-        .analytics-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 25px; max-width: 1400px; margin: 0 auto; }
-        .leaderboard-box { background: rgba(15, 18, 22, 0.9); border: 1px solid #333; border-top: 3px solid var(--gold); padding: 20px; border-radius: 8px; }
-        .leaderboard-box h3 { font-family: 'Cinzel'; color: var(--gold); text-align: center; margin-top: 0; border-bottom: 1px solid #222; padding-bottom: 10px; }
-        
-        .ana-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-        .ana-table th { color: #555; font-size: 0.7rem; text-transform: uppercase; text-align: left; padding: 10px; }
-        .ana-table td { padding: 12px 10px; border-bottom: 1px solid rgba(255,255,255,0.03); }
-        .pos-num { color: var(--gold); font-weight: bold; width: 30px; }
-        .val-num { text-align: right; font-weight: bold; font-family: 'Cinzel'; }
+        .video-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap:30px; }
+        .video-card iframe { width: 100%; height: 215px; border: 1px solid #333; }
     </style>
 </head>
 <body>
 
     <div class="page-section" id="section1">
-        <div class="server-time" id="clock">SERVER TIME: 00:00:00</div>
+        <div class="server-time" id="clock">SERVER TIME: --:--:--</div>
         <div class="top-header">
             <img src="https://i.ibb.co/6R9q5PGv/ALLIANCE-LOGO.png" class="ally-logo">
             <span class="ally-title">BROKEN MIRROR ALLIANCE</span>
             <div class="leaders-row">
                 <div class="leader-card">
                     <div class="img-frame"><img src="https://i.ibb.co/5X3NDQFR/niklaus.png" class="leader-img"></div>
-                    <span style="color:var(--gold); display:block; font-family:Cinzel; margin-top:10px;">NIKLAUS</span>
-                    <small style="color:#888; letter-spacing:1px;">ALLY LEADER</small>
+                    <span style="color:var(--gold); font-family:Cinzel; display:block; margin-top:5px;">NIKLAUS</span>
                 </div>
                 <div class="leader-card">
                     <div class="img-frame"><img src="https://i.ibb.co/xSVgzBPB/tsaknorris.png" class="leader-img"></div>
-                    <span style="color:var(--gold); display:block; font-family:Cinzel; margin-top:10px;">TSAKNORRIS</span>
-                    <small style="color:#888; letter-spacing:1px;">SHOT CALLER</small>
+                    <span style="color:var(--gold); font-family:Cinzel; display:block; margin-top:5px;">TSAKNORRIS</span>
                 </div>
             </div>
         </div>
@@ -99,127 +90,96 @@
         </div>
     </div>
 
-    <div class="page-section" id="section3" style="min-height: auto; padding: 60px 0;">
-        <div style="display:flex; justify-content:center; gap:30px;">
-            <button onclick="openPage('video-page')" style="background:var(--krim-red); color:white; border:none; padding:20px 50px; font-family:Cinzel; cursor:pointer; border-radius:5px; font-weight:bold; box-shadow: 0 0 20px rgba(255,51,51,0.2);">🎬 PVP VIDEOS</button>
-            <button onclick="openPage('analytics-page')" style="background:var(--gold); color:black; border:none; padding:20px 50px; font-family:Cinzel; cursor:pointer; border-radius:5px; font-weight:bold; box-shadow: 0 0 20px rgba(212,175,55,0.2);">📊 DATA ANALYTICS</button>
+    <div class="page-section" id="section2">
+        <h2 style="text-align:center; font-family:Cinzel; color:var(--gold);">MARKETPLACE & RULES</h2>
+        <div class="marketplace-flex">
+            <div class="epic-table">
+                <table>
+                    <tbody id="price-list">
+                        </tbody>
+                </table>
+            </div>
+            <div style="flex:1.2; background:rgba(255,255,255,0.03); padding:20px; border-radius:10px; border-left:4px solid var(--gold);">
+                <h4 style="color:var(--gold); margin-top:0;">ALLIANCE PROTOCOL</h4>
+                <p>1. No PK within Alliance members.<br>2. Discord mandatory during raids.<br>3. Loot priority based on CP Activity.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="page-section" id="section3" style="min-height:auto;">
+        <div style="display:flex; justify-content:center; gap:30px; padding:40px;">
+            <button onclick="showPage('video-page')" style="background:var(--krim-red); color:white; border:none; padding:15px 40px; font-family:Cinzel; cursor:pointer; border-radius:4px;">🎬 PVP VIDEOS</button>
+            <button onclick="showPage('analytics-page')" style="background:var(--gold); color:black; border:none; padding:15px 40px; font-family:Cinzel; cursor:pointer; border-radius:4px;">📊 DATA ANALYTICS</button>
         </div>
     </div>
 
     <div id="video-page" class="virtual-page">
-        <button class="close-btn" onclick="closePage('video-page')">⬅ BACK TO DASHBOARD</button>
-        <h1 style="font-family:Cinzel Decorative; color:var(--gold); text-align:center; font-size:2.5rem; margin-bottom:50px;">ALLIANCE WAR ARCHIVES</h1>
-        
+        <button class="close-btn" onclick="hidePage('video-page')">⬅ BACK</button>
+        <h1 style="text-align:center; font-family:Cinzel; color:var(--gold);">WAR ARCHIVES</h1>
         <div class="video-grid">
-            <div class="video-card">
-                <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allowfullscreen></iframe>
-                <h4 style="color:var(--gold); font-family:Cinzel; margin:15px 0 5px;">Siege of Aden - March 2024</h4>
-                <p style="color:#666; font-size:0.75rem;">POV: Noldor Archer CP</p>
-            </div>
-            <div class="video-card">
-                <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allowfullscreen></iframe>
-                <h4 style="color:var(--gold); font-family:Cinzel; margin:15px 0 5px;">Valakas Epic Fight</h4>
-                <p style="color:#666; font-size:0.75rem;">POV: Kriminalides Mages</p>
-            </div>
-            </div>
+            <div class="video-card"><iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ"></iframe><h4 style="color:var(--gold);">Aden Siege POV</h4></div>
+            <div class="video-card"><iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ"></iframe><h4 style="color:var(--gold);">Antharas War</h4></div>
+        </div>
     </div>
 
     <div id="analytics-page" class="virtual-page">
-        <button class="close-btn" onclick="closePage('analytics-page')">⬅ BACK TO DASHBOARD</button>
-        <h1 style="font-family:Cinzel Decorative; color:var(--gold); text-align:center; font-size:2.5rem; margin-bottom:50px;">ALLIANCE ANALYTICS</h1>
-
-        <div class="analytics-container">
-            <div class="leaderboard-box">
-                <h3>IN-WEEK ACTIVITY %</h3>
-                <table class="ana-table">
-                    <thead><tr><th>#</th><th>CP NAME</th><th style="text-align:right;">ZAK/ORF/AQ</th></tr></thead>
-                    <tbody>
-                        <tr><td class="pos-num">1</td><td>Hattrick CP</td><td class="val-num" style="color:#00ff88">98%</td></tr>
-                        <tr><td class="pos-num">2</td><td>Noldor Archer</td><td class="val-num" style="color:#00ff88">94%</td></tr>
-                        <tr><td class="pos-num">3</td><td>Legion CP</td><td class="val-num" style="color:var(--gold)">89%</td></tr>
-                    </tbody>
-                </table>
+        <button class="close-btn" onclick="hidePage('analytics-page')">⬅ BACK</button>
+        <h1 style="text-align:center; font-family:Cinzel; color:var(--gold);">ALLIANCE PERFORMANCE (22 CPs)</h1>
+        
+        <div class="ana-grid">
+            <div class="leaderboard-card">
+                <h3 style="color:var(--gold); text-align:center;">IN-WEEK ACTIVITY %</h3>
+                <table class="ana-table" id="inweek-table"></table>
             </div>
-
-            <div class="leaderboard-box">
-                <h3>WEEKEND ACTIVITY %</h3>
-                <table class="ana-table">
-                    <thead><tr><th>#</th><th>CP NAME</th><th style="text-align:right;">VAL/ANT/SIEGE</th></tr></thead>
-                    <tbody>
-                        <tr><td class="pos-num">1</td><td>Hattrick CP</td><td class="val-num" style="color:#00ff88">100%</td></tr>
-                        <tr><td class="pos-num">2</td><td>Criminal Record</td><td class="val-num" style="color:#00ff88">96%</td></tr>
-                        <tr><td class="pos-num">3</td><td>Noldor Arc 2</td><td class="val-num" style="color:var(--gold)">91%</td></tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="leaderboard-box">
-                <h3>TOP ACTIVE CP (MONTH)</h3>
-                <table class="ana-table">
-                    <thead><tr><th>#</th><th>CP NAME</th><th style="text-align:right;">TOTAL RAIDS</th></tr></thead>
-                    <tbody>
-                        <tr><td class="pos-num">1</td><td>Hattrick CP</td><td class="val-num">48</td></tr>
-                        <tr><td class="pos-num">2</td><td>Noldor Archer</td><td class="val-num">45</td></tr>
-                        <tr><td class="pos-num">3</td><td>Legion CP</td><td class="val-num">42</td></tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="leaderboard-box">
-                <h3>TOP PLAYERS (MONTH)</h3>
-                <table class="ana-table">
-                    <thead><tr><th>#</th><th>PLAYER</th><th style="text-align:right;">PTS EARNED</th></tr></thead>
-                    <tbody>
-                        <tr><td class="pos-num">1</td><td>Niklaus</td><td class="val-num">1250</td></tr>
-                        <tr><td class="pos-num">2</td><td>Tsaknorris</td><td class="val-num">1180</td></tr>
-                        <tr><td class="pos-num">3</td><td>ShadowElite</td><td class="val-num">950</td></tr>
-                    </tbody>
-                </table>
+            <div class="leaderboard-card">
+                <h3 style="color:var(--gold); text-align:center;">WEEKEND ACTIVITY %</h3>
+                <table class="ana-table" id="weekend-table"></table>
             </div>
         </div>
     </div>
 
     <script>
-        const noldorCPs = ["Noldor Clan", "Noldor Archer", "Noldor Archer 2", "Noldor Dummy"];
-        const krimCPs = ["Hattrick CP", "55 Room CP", "Legion CP", "Criminal Record CP"];
+        const noldorNames = ["Noldor Clan", "Noldor Archer", "Noldor Archer 2", "Noldor Dummy", "Noldor Tank", "Kriminalides CP", "Outlaw CP", "Ronin CP", "Brazilians CP", "Brazilians 2 CP", "I am Groot CP"];
+        const krimNames = ["Hattrick CP", "55 Room CP", "Legion CP", "Criminal Record CP", "Avalanche CP", "Gankly Crew CP", "Furious Wolves CP", "Animals CP", "Dracaris CP", "Sinaloa CP", "Knockout CP"];
+        const allCPs = [...noldorNames, ...krimNames];
 
-        function renderLists() {
-            const createCP = (names, elId) => {
-                document.getElementById(elId).innerHTML = names.map((name, index) => {
-                    const isTop3 = index < 3;
-                    return `
-                    <div class="cp-box ${isTop3 ? 'top-cp' : ''}">
-                        <button class="cp-btn" onclick="this.parentElement.classList.toggle('active')">
-                            <span>${isTop3 ? '⭐ ' : ''}${name}</span>
-                            <span style="color:var(--gold)">2500 PTS</span>
-                        </button>
-                        <div class="member-list">
-                            <div class="member-item"><span class="leader-crown">👑</span>CP Leader</div>
-                            <div class="member-item">👤 Member A</div>
-                            <div class="member-item">👤 Member B</div>
-                            <div class="loot-section">
-                                <button class="loot-toggle-btn" onclick="toggleLoot(event)">VIEW CP LOOT HISTORY</button>
-                                <div class="loot-content">1x Ring of Baium (12/03)<br>1x Earring of Zaken (05/03)</div>
-                            </div>
-                        </div>
-                    </div>`;
-                }).join('');
-            };
-            createCP(noldorCPs, 'noldor-list');
-            createCP(krimCPs, 'krim-list');
+        function renderDashboard() {
+            const createCP = (name, i) => `
+                <div class="cp-box ${i<3?'top-cp':''}">
+                    <button class="cp-btn" onclick="this.parentElement.classList.toggle('active')">
+                        <span>${i<3?'⭐ ':''}${name}</span><span>2500 PTS</span>
+                    </button>
+                    <div class="member-list">
+                        <div>👑 CP Leader</div>
+                        <button class="loot-toggle-btn" onclick="this.nextElementSibling.style.display='block'">VIEW LOOT HISTORY</button>
+                        <div class="loot-content">1x Ring of Baium (12/03)</div>
+                    </div>
+                </div>`;
+            document.getElementById('noldor-list').innerHTML = noldorNames.map((n, i) => createCP(n, i)).join('');
+            document.getElementById('krim-list').innerHTML = krimNames.map((n, i) => createCP(n, i)).join('');
         }
 
-        function toggleLoot(e) {
-            const content = e.target.nextElementSibling;
-            content.style.display = content.style.display === 'block' ? 'none' : 'block';
-            e.stopPropagation();
+        function renderAnalytics() {
+            const row = (name, i) => `<tr><td class="pos">${i+1}</td><td>${name}</td><td class="val">${90 - i}%</td></tr>`;
+            document.getElementById('inweek-table').innerHTML = allCPs.map((n, i) => row(n, i)).join('');
+            document.getElementById('weekend-table').innerHTML = allCPs.map((n, i) => row(n, i)).join('');
         }
 
-        function openPage(id) { document.getElementById(id).style.display = 'block'; document.body.style.overflow = 'hidden'; }
-        function closePage(id) { document.getElementById(id).style.display = 'none'; document.body.style.overflow = 'auto'; }
+        const prices = [
+            {n: "Queen Ant Ring", p: 150, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/ring-of-queen-ant.png?raw=true"},
+            {n: "Zaken Earring", p: 175, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/zaken-earring.png?raw=true"},
+            {n: "Baium Ring", p: 950, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/ring-of-baium.png?raw=true"},
+            {n: "Valakas Necklace", p: 3100, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/necklace-valakas.png?raw=true"}
+        ];
+
+        document.getElementById('price-list').innerHTML = prices.map(i => `<tr><td><img src="${i.img}" class="mini-icon">${i.n}</td><td style="color:var(--gold); font-weight:bold;">${i.p} PTS</td></tr>`).join('');
+
+        function showPage(id) { document.getElementById(id).style.display = 'block'; document.body.style.overflow='hidden'; }
+        function hidePage(id) { document.getElementById(id).style.display = 'none'; document.body.style.overflow='auto'; }
 
         setInterval(() => { document.getElementById('clock').innerText = "SERVER TIME: " + new Date().toLocaleTimeString('el-GR'); }, 1000);
-        renderLists();
+        renderDashboard();
+        renderAnalytics();
     </script>
 </body>
 </html>
