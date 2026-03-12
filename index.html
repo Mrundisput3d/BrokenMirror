@@ -3,16 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Broken Mirror | Clan Roster</title>
+    <title>Broken Mirror | Clan Management</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
             --gold: #d4af37;
             --dark-gold: #8a6d3b;
-            --bg-overlay: rgba(10, 12, 15, 0.92);
+            --bg-overlay: rgba(10, 12, 15, 0.94);
             --panel-bg: rgba(20, 24, 28, 0.98);
             --border-style: 2px solid var(--dark-gold);
             --member-bg: rgba(255, 255, 255, 0.03);
+            --epic-pink: #ff79c6;
         }
 
         body { 
@@ -28,7 +29,7 @@
             z-index: -1;
         }
 
-        h1, h2, .column-header, .cp-trigger span, .leader-label { font-family: 'Cinzel', serif; }
+        h1, h2, .column-header, .cp-trigger span, .leader-label, .stat-title { font-family: 'Cinzel', serif; }
 
         header { text-align: center; margin-bottom: 30px; }
         .main-title { font-size: 3.5rem; color: var(--gold); text-shadow: 0 0 15px rgba(212, 175, 55, 0.5); margin: 0; letter-spacing: 6px; }
@@ -50,41 +51,44 @@
             text-align: center; border-bottom: var(--border-style);
         }
 
-        .scroll-area { overflow-y: auto; padding: 15px; flex-grow: 1; scrollbar-width: thin; scrollbar-color: var(--dark-gold) #111; }
-        .scroll-area::-webkit-scrollbar { width: 8px; }
-        .scroll-area::-webkit-scrollbar-thumb { background: var(--dark-gold); border-radius: 4px; }
+        .scroll-area { overflow-y: auto; padding: 15px; flex-grow: 1; }
+        .scroll-area::-webkit-scrollbar { width: 6px; }
+        .scroll-area::-webkit-scrollbar-thumb { background: var(--dark-gold); }
 
-        .cp-item { margin-bottom: 10px; border: 1px solid rgba(138, 109, 59, 0.2); background: rgba(0,0,0,0.4); border-radius: 3px; }
-        .cp-item:hover { border-color: var(--gold); }
-
+        /* CP ITEM */
+        .cp-item { margin-bottom: 10px; border: 1px solid rgba(138, 109, 59, 0.2); background: rgba(0,0,0,0.4); }
         .cp-trigger { 
-            width: 100%; background: none; border: none; color: #fff; padding: 15px;
-            text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+            width: 100%; background: none; border: none; color: var(--gold); padding: 15px;
+            text-align: left; cursor: pointer; display: flex; justify-content: space-between;
         }
 
-        .cp-trigger span { font-size: 1.1rem; letter-spacing: 1px; color: var(--gold); }
+        /* MEMBER ITEM (Nested) */
+        .cp-details { display: none; background: rgba(0,0,0,0.5); border-top: 1px solid var(--dark-gold); }
+        .active > .cp-details { display: block; }
 
-        /* ROSTER DETAILS */
-        .cp-details { display: none; background: rgba(0,0,0,0.7); padding: 0; border-top: 1px solid var(--dark-gold); }
-        .active .cp-details { display: block; animation: slideDown 0.3s ease-out; }
-
-        .roster-list { max-height: 200px; overflow-y: auto; padding: 10px; }
-        .roster-list::-webkit-scrollbar { width: 4px; }
-        .roster-list::-webkit-scrollbar-thumb { background: var(--dark-gold); }
-
-        .member-row { 
-            display: flex; justify-content: space-between; padding: 8px 12px; 
-            margin-bottom: 4px; background: var(--member-bg); border-left: 2px solid transparent;
+        .member-item { border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .member-trigger {
+            width: 100%; background: none; border: none; color: #fff; padding: 10px 20px;
+            text-align: left; cursor: pointer; font-size: 0.9rem; display: flex; justify-content: space-between;
         }
-        .member-row:hover { border-left-color: var(--gold); background: rgba(212, 175, 55, 0.05); }
+        .member-trigger:hover { background: rgba(212, 175, 55, 0.1); }
 
-        .leader-row { background: rgba(212, 175, 55, 0.1) !important; border-left: 2px solid var(--gold) !important; }
-        .leader-label { color: var(--gold); font-size: 0.7rem; font-weight: bold; text-transform: uppercase; }
-        
-        .member-name { color: #fff; font-size: 0.95rem; }
-        .member-class { color: #888; font-size: 0.8rem; font-style: italic; }
+        /* MEMBER STATS (Nested deeper) */
+        .member-stats { display: none; background: #0a0c0e; padding: 15px; border-left: 3px solid var(--gold); margin: 5px 20px; }
+        .member-item.active .member-stats { display: block; animation: slideIn 0.3s forwards; }
 
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
+        .stat-box { background: #161a1f; padding: 8px; text-align: center; border: 1px solid #333; font-size: 0.75rem; }
+        .stat-name { display: block; color: var(--gold); font-weight: bold; }
+
+        /* EPIC LOG TABLE */
+        .epic-section { width: 100%; max-width: 1300px; margin: 40px auto; background: var(--panel-bg); border: var(--border-style); padding: 20px; box-sizing: border-box; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th { color: var(--gold); border-bottom: 2px solid var(--dark-gold); padding: 12px; text-align: left; font-family: 'Cinzel'; }
+        td { padding: 12px; border-bottom: 1px solid rgba(138, 109, 59, 0.1); }
+        .jewel-name { color: var(--epic-pink); font-weight: bold; }
+
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
         @media (max-width: 900px) { .dashboard-container { grid-template-columns: 1fr; } }
     </style>
 </head>
@@ -92,40 +96,53 @@
 
     <header>
         <h1 class="main-title">Broken Mirror</h1>
-        <p style="color: var(--gold); letter-spacing: 2px; margin-top: 5px;">CLAN ROSTER & HIERARCHY</p>
+        <p style="color: var(--gold); letter-spacing: 2px;">CLAN MANAGEMENT SYSTEM</p>
     </header>
 
     <div class="dashboard-container">
         <div class="clan-column">
-            <div class="column-header">Noldor Clan Members</div>
+            <div class="column-header">Noldor Clan</div>
             <div class="scroll-area" id="noldor-list"></div>
         </div>
 
         <div class="clan-column">
-            <div class="column-header">Kriminalides Main Members</div>
+            <div class="column-header">Kriminalides Main</div>
             <div class="scroll-area" id="krim-list"></div>
         </div>
     </div>
 
+    <div class="epic-section">
+        <h2 style="color:var(--gold); text-align: center; letter-spacing: 3px;">EPIC JEWELS DISTRIBUTION LOG</h2>
+        <table>
+            <thead>
+                <tr><th>Date</th><th>Epic Jewel</th><th>Recipient CP</th><th>Clan</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>12/03/2026</td><td class="jewel-name">Valakas Necklace</td><td>Hattrick CP</td><td>Kriminalides</td></tr>
+                <tr><td>10/03/2026</td><td class="jewel-name">Antharas Earring</td><td>Noldor Archer</td><td>Noldor</td></tr>
+                <tr><td>08/03/2026</td><td class="jewel-name">Baium Ring</td><td>Ronin CP</td><td>Noldor</td></tr>
+            </tbody>
+        </table>
+    </div>
+
     <script>
-        // ΕΔΩ ΟΡΙΖΕΙΣ ΤΑ CP ΚΑΙ ΤΟΥΣ ΠΑΙΚΤΕΣ
         const noldorData = [
-            { name: "CP 1", leader: "Player1", members: ["MemberA", "MemberB", "MemberC", "MemberD", "MemberE", "MemberF", "MemberG", "MemberH"] },
-            { name: "Noldor Archer", leader: "Artemis", members: ["Legolas", "Sylvanas", "Robin", "Hawkeye", "Windrunner"] },
-            { name: "Noldor Archer 2", leader: "Apollo", members: ["ArcherX", "ArcherY", "ArcherZ"] },
-            { name: "Noldor Dummy", leader: "DummyLead", members: ["D1", "D2", "D3"] },
-            { name: "Noldor Tank", leader: "Aegis", members: ["Wall", "Shield", "Fortress"] },
-            { name: "Κriminalides CP", leader: "Boss", members: ["Thug1", "Thug2", "Thug3"] },
+            { name: "CP 1", leader: "Player1", members: ["MemberA", "MemberB", "MemberC"] },
+            { name: "Noldor Archer", leader: "Artemis", members: ["Legolas", "Sylvanas"] },
+            { name: "Noldor Archer 2", leader: "Apollo", members: ["ArcherX", "ArcherY"] },
+            { name: "Noldor Dummy", leader: "DummyLead", members: ["D1", "D2"] },
+            { name: "Noldor Tank", leader: "Aegis", members: ["Wall", "Shield"] },
+            { name: "Κriminalides CP", leader: "Boss", members: ["Thug1", "Thug2"] },
             { name: "Outlaw CP", leader: "Renegade", members: ["O1", "O2"] },
             { name: "Ronin CP", leader: "Samurai", members: ["Katana", "Bushido"] },
             { name: "Brazilians CP", leader: "Ronaldo", members: ["Neymar", "Pele"] },
             { name: "Brazilians 2 CP", leader: "Kaka", members: ["Cafu", "Zico"] },
-            { name: "I am Groot CP", leader: "Groot", members: ["Rocket", "StarLord", "Gamora", "Drax"] }
+            { name: "I am Groot CP", leader: "Groot", members: ["Rocket", "StarLord"] }
         ];
 
         const krimData = [
-            { name: "Hattrick CP", leader: "Captain", members: ["Striker", "Goalie", "Midfielder"] },
-            { name: "55 Room CP", leader: "Master55", members: ["P1", "P2", "P3"] },
+            { name: "Hattrick CP", leader: "Captain", members: ["Striker", "Goalie"] },
+            { name: "55 Room CP", leader: "Master55", members: ["P1", "P2"] },
             { name: "Legion CP", leader: "Centurion", members: ["Soldier1", "Soldier2"] },
             { name: "Criminal Record CP", leader: "Judge", members: ["Lawyer", "Jury"] },
             { name: "Avalanche CP", leader: "Snow", members: ["Ice", "Frost"] },
@@ -138,30 +155,37 @@
             { name: "VaBank CP", leader: "Dealer", members: ["Card1", "Card2"] }
         ];
 
+        const bosses = ["VAL", "ANT", "BAI", "ZAK", "FRI", "AQ", "ORFEN", "CORE", "BELETH"];
+
+        function createMemberHTML(name, isLeader = false) {
+            return `
+                <div class="member-item">
+                    <button class="member-trigger" onclick="toggleItem(event, this)">
+                        <span>${isLeader ? '👑 ' : ''}${name}</span>
+                        <small style="color:#666">Stats ▼</small>
+                    </button>
+                    <div class="member-stats">
+                        <span class="stat-title" style="font-size:0.8rem; color:var(--gold)">Epic Participations</span>
+                        <div class="stat-grid">
+                            ${bosses.map(b => `<div class="stat-box"><span class="stat-name">${b}</span>0</div>`).join('')}
+                        </div>
+                    </div>
+                </div>`;
+        }
+
         function createCPItem(cp) {
-            const memberListHTML = cp.members.map(m => `
-                <div class="member-row">
-                    <span class="member-name">${m}</span>
-                    <span class="member-class">Member</span>
-                </div>
-            `).join('');
+            const leaderHTML = createMemberHTML(cp.leader, true);
+            const membersHTML = cp.members.map(m => createMemberHTML(m)).join('');
 
             return `
                 <div class="cp-item">
-                    <button class="cp-trigger" onclick="toggleCP(this)">
+                    <button class="cp-trigger" onclick="toggleItem(event, this)">
                         <span>${cp.name}</span>
-                        <small style="color:#666">▼ Roster</small>
+                        <small>Roster ▼</small>
                     </button>
                     <div class="cp-details">
-                        <div class="roster-list">
-                            <div class="member-row leader-row">
-                                <div>
-                                    <span class="leader-label">CP Leader</span><br>
-                                    <span class="member-name">${cp.leader}</span>
-                                </div>
-                            </div>
-                            ${memberListHTML}
-                        </div>
+                        ${leaderHTML}
+                        ${membersHTML}
                     </div>
                 </div>`;
         }
@@ -169,7 +193,8 @@
         document.getElementById('noldor-list').innerHTML = noldorData.map(createCPItem).join('');
         document.getElementById('krim-list').innerHTML = krimData.map(createCPItem).join('');
 
-        function toggleCP(btn) {
+        function toggleItem(event, btn) {
+            event.stopPropagation();
             btn.parentElement.classList.toggle('active');
         }
     </script>
