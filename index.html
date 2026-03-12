@@ -17,121 +17,103 @@
         }
         body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-overlay); z-index: -1; }
 
-        /* CALLER MODALS */
+        /* MODAL ΓΙΑ CALLERS */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9998; backdrop-filter: blur(5px); }
         #caller-modal {
             display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
             width: 420px; background: #0f1216; border: 2px solid var(--gold); border-radius: 15px;
-            padding: 30px; z-index: 9999; box-shadow: 0 0 50px #000; text-align: center;
+            padding: 30px; z-index: 9999; text-align: center; box-shadow: 0 0 50px #000;
         }
 
-        .page-section { min-height: 100vh; padding: 20px; position: relative; }
-        .server-time { position: absolute; top: 20px; right: 40px; color: var(--gold); font-family: 'Cinzel'; border: 1px solid var(--gold); padding: 5px 15px; border-radius: 5px; background: rgba(0,0,0,0.5); font-size: 0.8rem; }
-
         /* HEADER */
-        .top-header { text-align: center; margin-bottom: 30px; }
-        .ally-logo { width: 150px; filter: drop-shadow(0 0 15px var(--gold)); }
-        .ally-title { font-family: 'Cinzel Decorative'; font-size: 2.2rem; color: var(--gold); display: block; }
+        .top-header { text-align: center; padding: 40px 20px; }
+        .ally-logo { width: 160px; filter: drop-shadow(0 0 15px var(--gold)); }
+        .ally-title { font-family: 'Cinzel Decorative'; font-size: 2.2rem; color: var(--gold); display: block; margin: 15px 0; }
         
-        .nav-buttons { display: flex; justify-content: center; gap: 20px; margin: 20px 0; }
-        .nav-btn { background: rgba(0,0,0,0.6); border: 1px solid var(--gold); color: var(--gold); padding: 10px 25px; font-family: 'Cinzel'; cursor: pointer; border-radius: 4px; font-weight: bold; }
-
-        .leaders-row { display: flex; justify-content: center; gap: 40px; }
-        .img-frame { width: 85px; height: 85px; border: 2px solid var(--gold); border-radius: 50%; overflow: hidden; margin: 0 auto; background: #000; }
+        .leaders-row { display: flex; justify-content: center; gap: 40px; margin-top: 20px; }
+        .img-frame { width: 95px; height: 95px; border: 2px solid var(--gold); border-radius: 50%; overflow: hidden; margin: 0 auto; cursor: pointer; transition: 0.3s; }
+        .img-frame:hover { transform: scale(1.1); box-shadow: 0 0 20px var(--gold); }
         .leader-img { width: 100%; height: 100%; object-fit: contain; }
 
         /* MAIN DASHBOARD */
-        .main-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; max-width: 1600px; margin: 40px auto; }
-        .clan-column { background: rgba(15, 18, 22, 0.95); height: 750px; display: flex; flex-direction: column; border-radius: 10px; border: 1px solid #333; }
+        .main-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; max-width: 1500px; margin: 0 auto; padding: 20px; }
+        .clan-column { background: rgba(15, 18, 22, 0.95); height: 750px; display: flex; flex-direction: column; border: 1px solid #333; border-radius: 10px; }
+        .column-header { padding: 20px; text-align: center; font-family: 'Cinzel'; font-size: 1.2rem; border-bottom: 1px solid #222; }
+        
         .scroll-area { overflow-y: auto; padding: 15px; flex-grow: 1; }
-        
-        .cp-box { margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.3); border-radius: 6px; overflow: hidden; }
-        .cp-btn { width: 100%; background: none; border: none; padding: 12px; color: #fff; display: flex; justify-content: space-between; cursor: pointer; font-weight: 600; }
-        
+        .scroll-area::-webkit-scrollbar { width: 5px; }
+        .scroll-area::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 5px; }
+
+        /* CP BOXES & MENUS */
+        .cp-box { margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.3); border-radius: 6px; overflow: hidden; }
+        .cp-btn { width: 100%; background: none; border: none; padding: 15px; color: #fff; display: flex; justify-content: space-between; cursor: pointer; font-family: 'Open Sans'; font-weight: 600; }
+        .cp-btn:hover { background: rgba(212,175,55,0.05); }
+
         .member-list { display: none; background: rgba(0,0,0,0.5); border-top: 1px solid #222; padding: 15px; }
         .active > .member-list { display: block; }
 
-        /* MARKETPLACE & RULES (CLEAN VERSION) */
-        .market-rules-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 30px; max-width: 1400px; margin: 60px auto; padding: 20px; }
+        /* MARKETPLACE & RULES */
+        .section-2 { max-width: 1400px; margin: 60px auto; padding: 0 20px; display: grid; grid-template-columns: 1fr 1.2fr; gap: 40px; }
         .market-card { background: rgba(0,0,0,0.7); border: 2px solid var(--gold); border-radius: 10px; padding: 25px; }
-        .rules-card { background: rgba(15,18,22,0.95); padding: 30px; border-radius: 10px; border-left: 4px solid var(--gold); }
-        .rule-line { margin-bottom: 15px; font-size: 0.95rem; }
+        .rules-card { background: rgba(15, 18, 22, 0.95); padding: 30px; border-radius: 10px; border-left: 5px solid var(--gold); }
+        .rule-item { margin-bottom: 20px; font-size: 1rem; line-height: 1.6; }
 
-        /* VIRTUAL PAGES */
-        .virtual-page { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#0a0c0f; z-index:10000; overflow-y:auto; padding:50px; }
+        .server-time { position: absolute; top: 20px; right: 40px; color: var(--gold); font-family: 'Cinzel'; border: 1px solid var(--gold); padding: 5px 15px; border-radius: 5px; background: rgba(0,0,0,0.5); }
     </style>
 </head>
 <body>
 
     <div class="modal-overlay" id="overlay" onclick="closeModal()"></div>
     <div id="caller-modal">
-        <img id="modal-img" src="" style="width:100px; height:100px; border-radius:50%; border:2px solid var(--gold); margin-bottom:15px;">
+        <img id="modal-img" src="" style="width:100px; height:100px; border-radius:50%; border:2px solid var(--gold); margin-bottom:15px; background:#000;">
         <h2 id="modal-name" style="font-family:'Cinzel Decorative'; color:var(--gold); margin:0;"></h2>
-        <div id="modal-stats" style="display:grid; grid-template-columns: repeat(3,1fr); gap:10px; margin-top:20px;"></div>
-        <button onclick="closeModal()" style="margin-top:20px; background:var(--gold); border:none; padding:10px 30px; cursor:pointer;">CLOSE</button>
+        <div id="modal-stats" style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; margin-top:25px;"></div>
+        <button onclick="closeModal()" style="margin-top:25px; background:var(--gold); border:none; padding:10px 30px; cursor:pointer; font-family:Cinzel; font-weight:bold;">CLOSE</button>
     </div>
 
-    <div class="page-section">
-        <div class="server-time" id="clock">TIME: --:--:--</div>
-        <div class="top-header">
-            <img src="https://i.ibb.co/6R9q5PGv/ALLIANCE-LOGO.png" class="ally-logo">
-            <span class="ally-title">BROKEN MIRROR ALLIANCE</span>
-            
-            <div class="nav-buttons">
-                <button class="nav-btn" onclick="openP('video-page')">🎬 PVP VIDEOS</button>
-                <button class="nav-btn" onclick="openP('analytics-page')">📊 DATA ANALYTICS</button>
-            </div>
+    <div class="server-time" id="clock">TIME: --:--:--</div>
 
-            <div class="leaders-row">
-                <div class="leader-card" onclick="openCaller('NIKLAUS', 'https://i.ibb.co/5X3NDQFR/niklaus.png')">
-                    <div class="img-frame"><img src="https://i.ibb.co/5X3NDQFR/niklaus.png" class="leader-img"></div>
-                    <span style="color:var(--gold); font-family:Cinzel; display:block; margin-top:5px;">NIKLAUS</span>
-                </div>
-                <div class="leader-card" onclick="openCaller('TSAKNORRIS', 'https://i.ibb.co/xSVgzBPB/tsaknorris.png')">
-                    <div class="img-frame"><img src="https://i.ibb.co/xSVgzBPB/tsaknorris.png" class="leader-img"></div>
-                    <span style="color:var(--gold); font-family:Cinzel; display:block; margin-top:5px;">TSAKNORRIS</span>
-                </div>
+    <div class="top-header">
+        <img src="https://i.ibb.co/6R9q5PGv/ALLIANCE-LOGO.png" class="ally-logo">
+        <span class="ally-title">BROKEN MIRROR ALLIANCE</span>
+        
+        <div class="leaders-row">
+            <div onclick="openCaller('NIKLAUS', 'https://i.ibb.co/5X3NDQFR/niklaus.png')">
+                <div class="img-frame"><img src="https://i.ibb.co/5X3NDQFR/niklaus.png" class="leader-img"></div>
+                <div style="color:var(--gold); font-family:Cinzel; margin-top:10px;">NIKLAUS</div>
             </div>
-        </div>
-
-        <div class="main-wrapper">
-            <div class="clan-column" style="border-top: 4px solid var(--noldor-sky);">
-                <div style="padding:15px; text-align:center; font-family:Cinzel; color:var(--noldor-sky);">NOLDOR CLAN</div>
-                <div class="scroll-area" id="noldor-list"></div>
-            </div>
-            <div class="clan-column" style="border-top: 4px solid var(--krim-red);">
-                <div style="padding:15px; text-align:center; font-family:Cinzel; color:var(--krim-red);">KRIMINALIDES CLAN</div>
-                <div class="scroll-area" id="krim-list"></div>
+            <div onclick="openCaller('TSAKNORRIS', 'https://i.ibb.co/xSVgzBPB/tsaknorris.png')">
+                <div class="img-frame"><img src="https://i.ibb.co/xSVgzBPB/tsaknorris.png" class="leader-img"></div>
+                <div style="color:var(--gold); font-family:Cinzel; margin-top:10px;">TSAKNORRIS</div>
             </div>
         </div>
     </div>
 
-    <div class="market-rules-grid">
+    <div class="main-wrapper">
+        <div class="clan-column" style="border-top: 5px solid var(--noldor-sky);">
+            <div class="column-header" style="color:var(--noldor-sky);">NOLDOR CLAN</div>
+            <div class="scroll-area" id="noldor-list"></div>
+        </div>
+
+        <div class="clan-column" style="border-top: 5px solid var(--krim-red);">
+            <div class="column-header" style="color:var(--krim-red);">KRIMINALIDES CLAN</div>
+            <div class="scroll-area" id="krim-list"></div>
+        </div>
+    </div>
+
+    <div class="section-2">
         <div class="market-card">
-            <h3 style="color:var(--gold); font-family:Cinzel; text-align:center;">MARKETPLACE</h3>
+            <h3 style="color:var(--gold); font-family:Cinzel; text-align:center; margin-top:0;">MARKETPLACE</h3>
             <table style="width:100%; border-collapse:collapse;" id="market-list"></table>
         </div>
+
         <div class="rules-card">
-            <h3 style="color:var(--gold); font-family:Cinzel;">ALLIANCE POLICIES</h3>
-            <div class="rule-line"><b style="color:var(--gold)">✦ Points:</b> Mid Epics: 1pt | Baium: 2pts | High Epics: 3pts.</div>
-            <div class="rule-line"><b style="color:var(--gold)">✦ Priority:</b> Archers → Baium | Mages → Valakas | Stoppers → Antharas.</div>
-            <div class="rule-line"><b style="color:var(--gold)">✦ Deduction:</b> Points are removed from CP balance upon receipt of item.</div>
-            <div class="rule-line"><b style="color:var(--gold)">✦ Callers:</b> Active callers receive a x9 point multiplier.</div>
+            <h3 style="color:var(--gold); font-family:Cinzel; margin-top:0;">ALLIANCE POLICIES</h3>
+            <div class="rule-item"><b>✦ Attendance Points:</b> Mid-Low Epics: 1pt | Baium: 2pts | High Epics & Sieges: 3pts.</div>
+            <div class="rule-item"><b>✦ Jewel Priority:</b> Baium for Archers | Valakas for Mages | Antharas for Stoppers.</div>
+            <div class="rule-item"><b>✦ Purchase Policy:</b> Points are deducted from the CP total balance upon receipt.</div>
+            <div class="rule-item"><b>✦ Caller Bonus:</b> Active shot-callers receive a x9 point multiplier.</div>
         </div>
-    </div>
-
-    <div id="video-page" class="virtual-page">
-        <button class="nav-btn" onclick="closeP('video-page')">⬅ BACK</button>
-        <h1 style="color:var(--gold); text-align:center; font-family:Cinzel;">WAR ARCHIVES</h1>
-        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap:20px;">
-            <iframe width="100%" height="250" src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allowfullscreen></iframe>
-        </div>
-    </div>
-
-    <div id="analytics-page" class="virtual-page">
-        <button class="nav-btn" onclick="closeP('analytics-page')">⬅ BACK</button>
-        <h1 style="color:var(--gold); text-align:center; font-family:Cinzel;">ALLIANCE PERFORMANCE</h1>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:30px;" id="ana-tables"></div>
     </div>
 
     <script>
@@ -146,36 +128,50 @@
         ];
 
         function render() {
-            const cpRow = (n) => `<div class="cp-box">
-                <button class="cp-btn" onclick="this.parentElement.classList.toggle('active')"><span>${n}</span><span>2500 PTS</span></button>
-                <div class="member-list"><div>👑 CP Leader</div><div style="margin-top:10px; color:var(--gold); font-size:0.7rem; cursor:pointer;">VIEW LOOT HISTORY</div></div>
-            </div>`;
+            const cpRow = (name) => `
+                <div class="cp-box">
+                    <button class="cp-btn" onclick="this.parentElement.classList.toggle('active')">
+                        <span>${name}</span><span>2500 PTS</span>
+                    </button>
+                    <div class="member-list">
+                        <div style="color:var(--gold); margin-bottom:10px;">👑 CP Leader</div>
+                        <div style="font-size:0.8rem; color:#888;">Loot History: 1x Ring of Baium (12/03)</div>
+                    </div>
+                </div>`;
+            
             document.getElementById('noldor-list').innerHTML = noldor.map(cpRow).join('');
             document.getElementById('krim-list').innerHTML = krim.map(cpRow).join('');
             
             document.getElementById('market-list').innerHTML = jewels.map(j => `
-                <tr><td style="padding:10px;"><img src="${j.img}" style="width:20px; vertical-align:middle; margin-right:10px;">${j.n}</td>
-                <td style="text-align:right; color:var(--gold); font-weight:bold;">${j.p}</td></tr>`).join('');
-
-            const anaRow = (n, i) => `<tr><td>${i+1}</td><td>${n}</td><td style="text-align:right; color:#00ff88;">${95-i}%</td></tr>`;
-            document.getElementById('ana-tables').innerHTML = `
-                <div><table style="width:100%">${[...noldor,...krim].map(anaRow).join('')}</table></div>
-                <div style="background:rgba(212,175,55,0.1); padding:20px;"><h3>TOP MONTHLY</h3><p>1. Hattrick CP</p><p>2. Niklaus</p></div>`;
+                <tr>
+                    <td style="padding:12px; border-bottom:1px solid #222;">
+                        <img src="${j.img}" style="width:22px; vertical-align:middle; margin-right:12px;">${j.n}
+                    </td>
+                    <td style="text-align:right; color:var(--gold); font-weight:bold; border-bottom:1px solid #222;">${j.p} PTS</td>
+                </tr>`).join('');
         }
 
-        function openP(id) { document.getElementById(id).style.display = 'block'; }
-        function closeP(id) { document.getElementById(id).style.display = 'none'; }
-        
         function openCaller(name, img) {
             document.getElementById('modal-name').innerText = name;
             document.getElementById('modal-img').src = img;
-            document.getElementById('modal-stats').innerHTML = ["BAI","VAL","SIEGE"].map(s => `<div style="background:#1a1a1a; padding:10px; border-radius:5px;"><small>${s}</small><br>0</div>`).join('');
+            document.getElementById('modal-stats').innerHTML = ["BAI", "VAL", "SIEGE"].map(s => `
+                <div style="background:#1a1a1a; padding:10px; border-radius:8px; border:1px solid #333;">
+                    <small style="color:var(--gold); display:block; font-size:0.6rem;">${s}</small>
+                    <span style="font-size:1.1rem;">0</span>
+                </div>`).join('');
             document.getElementById('caller-modal').style.display = 'block';
             document.getElementById('overlay').style.display = 'block';
         }
-        function closeModal() { document.getElementById('caller-modal').style.display = 'none'; document.getElementById('overlay').style.display = 'none'; }
 
-        setInterval(() => { document.getElementById('clock').innerText = "TIME: " + new Date().toLocaleTimeString('el-GR'); }, 1000);
+        function closeModal() {
+            document.getElementById('caller-modal').style.display = 'none';
+            document.getElementById('overlay').style.display = 'none';
+        }
+
+        setInterval(() => {
+            document.getElementById('clock').innerText = "TIME: " + new Date().toLocaleTimeString('el-GR');
+        }, 1000);
+
         render();
     </script>
 </body>
