@@ -10,86 +10,103 @@
             --gold: #d4af37;
             --noldor-sky: #00d9ff;
             --krim-red: #ff3333;
-            --bg-overlay: rgba(10, 12, 15, 0.98);
-            --panel-bg: rgba(15, 18, 22, 1);
+            --bg-overlay: rgba(10, 12, 15, 0.9);
+            --panel-bg: rgba(15, 18, 22, 0.98);
             --top1: #ffd700; --top2: #c0c0c0; --top3: #cd7f32;
         }
 
         body { 
             font-family: 'Open Sans', sans-serif; 
-            background: #0a0c0f url('https://images.alphacoders.com/133/1335334.png') no-repeat center center fixed; 
-            background-size: cover; color: #eee; margin: 0; padding: 20px;
+            /* BACKGROUND LOGO */
+            background: #0a0c0f url('https://i.ibb.co/LzfXmKxV/background.jpg') no-repeat center center fixed; 
+            background-size: cover; 
+            color: #eee; margin: 0; padding: 20px;
+        }
+
+        body::before { 
+            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: radial-gradient(circle, transparent 20%, var(--bg-overlay) 100%); 
+            z-index: -1; 
         }
 
         .top-header { text-align: center; margin-bottom: 30px; }
-        .ally-logo { width: 120px; height: 120px; border: 3px solid var(--gold); box-shadow: 0 0 20px var(--gold); margin-bottom: 10px; }
-        .ally-title { font-family: 'Cinzel'; font-size: 2.2rem; color: var(--gold); display: block; letter-spacing: 5px; text-shadow: 0 0 10px #000; }
         
-        .leaders-row { display: flex; justify-content: center; gap: 30px; margin-top: 20px; }
-        .leader-card { text-align: center; width: 150px; }
-        .leader-img { width: 110px; height: 110px; border-radius: 50%; border: 3px solid #fff; object-fit: cover; }
-        .leader-name { font-family: 'Cinzel'; font-size: 1.4rem; color: #fff; display: block; margin-top: 5px; }
-
-        .main-wrapper { display: flex; gap: 20px; max-width: 1600px; margin: 0 auto; align-items: flex-start; }
-
-        /* COLUMNS */
-        .dashboard-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; flex-grow: 1; }
-        .clan-column { background: var(--panel-bg); height: 650px; display: flex; flex-direction: column; border: 1px solid #444; border-radius: 5px; }
-        .column-header { padding: 15px; text-align: center; font-family: 'Cinzel'; font-size: 1.1rem; border-bottom: 1px solid #333; }
+        /* ALLIANCE LOGO */
+        .ally-logo { 
+            width: 160px; height: 160px; border: 3px solid var(--gold); 
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.5); margin-bottom: 10px; 
+            object-fit: contain; background: rgba(0,0,0,0.5); border-radius: 10px;
+        }
+        .ally-title { font-family: 'Cinzel'; font-size: 2.8rem; color: var(--gold); display: block; letter-spacing: 5px; text-shadow: 2px 2px 10px #000; }
         
-        .noldor-col { border-color: var(--noldor-sky); }
-        .krim-col { border-color: var(--krim-red); }
+        .leaders-row { display: flex; justify-content: center; gap: 50px; margin-top: 30px; }
+        .leader-card { text-align: center; width: 180px; }
+        
+        /* NIKLAUS PHOTO */
+        .leader-img { 
+            width: 140px; height: 140px; border-radius: 50%; border: 3px solid #fff; 
+            object-fit: cover; box-shadow: 0 0 20px rgba(255,255,255,0.2); 
+            background: #222;
+        }
+        .leader-name { font-family: 'Cinzel'; font-size: 1.8rem; color: #fff; display: block; margin-top: 10px; text-shadow: 2px 2px 5px #000; }
 
-        .scroll-area { overflow-y: scroll; padding: 10px; flex-grow: 1; scrollbar-width: auto; }
+        .main-wrapper { display: flex; gap: 20px; max-width: 1650px; margin: 0 auto; align-items: flex-start; }
+
+        /* DASHBOARD */
+        .dashboard-container { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; flex-grow: 1; }
+        .clan-column { background: var(--panel-bg); height: 700px; display: flex; flex-direction: column; border: 1px solid #444; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .column-header { padding: 15px; text-align: center; font-family: 'Cinzel'; font-size: 1.2rem; border-bottom: 1px solid #333; }
+        
+        .noldor-col { border-top: 4px solid var(--noldor-sky); }
+        .krim-col { border-top: 4px solid var(--krim-red); }
+
+        .scroll-area { overflow-y: scroll; padding: 10px; flex-grow: 1; scrollbar-color: #444 transparent; }
         .scroll-area::-webkit-scrollbar { width: 8px; }
-        .scroll-area::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
+        .scroll-area::-webkit-scrollbar-thumb { background: #555; border-radius: 4px; }
 
-        /* CP & RANKING STYLE */
-        .cp-box { margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.6); position: relative; }
-        .cp-btn { width: 100%; background: none; border: none; padding: 12px; color: #fff; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; }
+        /* CP & MEMBERS */
+        .cp-box { margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.6); border-radius: 4px; transition: 0.3s; }
+        .cp-box:hover { background: rgba(255,255,255,0.05); }
+        .cp-btn { width: 100%; background: none; border: none; padding: 15px; color: #fff; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
         
-        /* TOP 3 HIGHLIGHTS */
-        .rank-1 { border: 1px solid var(--top1); box-shadow: inset 0 0 10px rgba(255,215,0,0.2); }
-        .rank-2 { border: 1px solid var(--top2); }
-        .rank-3 { border: 1px solid var(--top3); }
-        .badge { font-weight: bold; padding: 2px 8px; border-radius: 3px; font-size: 0.7rem; margin-right: 10px; }
+        .rank-1 { border: 1px solid var(--top1); box-shadow: inset 0 0 15px rgba(255,215,0,0.1); }
+        .points-tag { background: rgba(212, 175, 55, 0.15); padding: 4px 12px; border-radius: 15px; color: var(--gold); font-weight: bold; font-size: 0.8rem; border: 1px solid rgba(212, 175, 55, 0.3); }
 
-        .points-tag { background: rgba(255,255,255,0.1); padding: 2px 10px; border-radius: 10px; color: var(--gold); font-weight: bold; }
-
-        .member-list { display: none; background: rgba(10,10,10,0.9); padding: 5px; border-top: 1px solid #333; }
-        .member-item { border-bottom: 1px solid #222; }
-        .member-btn { width: 100%; background: none; border: none; padding: 8px 15px; color: #eee; text-align: left; cursor: pointer; display: flex; justify-content: space-between; font-size: 0.8rem; }
+        .member-list { display: none; background: rgba(0,0,0,0.9); border-top: 1px solid #222; }
+        .member-item { border-bottom: 1px solid #111; }
+        .member-btn { width: 100%; background: none; border: none; padding: 12px 25px; color: #ccc; text-align: left; cursor: pointer; display: flex; justify-content: space-between; font-size: 0.9rem; }
         
-        .stats-area { display: none; background: #000; padding: 10px; border-top: 1px solid var(--gold); }
-        .cp-box.active > .member-list, .member-item.active > .stats-area { display: block; }
+        .stats-area { display: none; background: #000; padding: 15px; border-top: 1px solid var(--gold); }
+        .active > .member-list, .active > .stats-area { display: block; animation: fadeIn 0.3s; }
 
-        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
-        .stat-box { background: #111; padding: 5px; text-align: center; border: 1px solid #222; font-size: 0.6rem; color: #aaa; }
-        .stat-name { display: block; color: var(--gold); font-weight: bold; font-size: 0.65rem; }
+        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+        .stat-box { background: #111; padding: 8px; text-align: center; border: 1px solid #222; border-radius: 3px; }
+        .stat-name { display: block; color: var(--gold); font-weight: bold; font-size: 0.75rem; margin-bottom: 3px; }
 
-        /* MINI DIST LOG */
-        .mini-dist { width: 260px; background: var(--panel-bg); border: 1px solid var(--gold); height: 650px; display: flex; flex-direction: column; }
-        .dist-header { background: #221a00; color: var(--gold); padding: 12px; text-align: center; font-family: 'Cinzel'; border-bottom: 1px solid var(--gold); }
+        /* SIDEBAR LOOT */
+        .mini-dist { width: 320px; background: var(--panel-bg); border: 1px solid var(--gold); height: 700px; display: flex; flex-direction: column; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .dist-header { background: linear-gradient(to bottom, #221a00, #000); color: var(--gold); padding: 15px; text-align: center; font-family: 'Cinzel'; border-bottom: 1px solid var(--gold); }
 
-        @media (max-width: 1100px) { .main-wrapper { flex-direction: column; } .mini-dist { width: 100%; height: 300px; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @media (max-width: 1200px) { .main-wrapper { flex-direction: column; } .mini-dist { width: 100%; height: 400px; } }
     </style>
 </head>
 <body>
 
     <div class="top-header">
-        <img src="https://via.placeholder.com/120/000/d4af37?text=ALLIANCE" class="ally-logo">
+        <img src="https://i.ibb.co/YCTxJLw/alliance-logo.png" class="ally-logo">
         <span class="ally-title">BROKEN MIRROR ALLIANCE</span>
         
         <div class="leaders-row">
             <div class="leader-card">
-                <img src="https://via.placeholder.com/110/222/fff?text=NIKLAUS" class="leader-img">
+                <img src="https://i.ibb.co/39kHvqVG/niklaus-logo.png" class="leader-img">
                 <span class="leader-name">NIKLAUS</span>
-                <small style="color:var(--gold)">ALLY LEADER</small>
+                <small style="color:var(--gold); letter-spacing: 3px; font-weight: bold;">ALLY LEADER</small>
             </div>
             <div class="leader-card">
-                <img src="https://via.placeholder.com/110/111/fff?text=TSAK" class="leader-img">
+                <img src="https://via.placeholder.com/140/111/fff?text=TSAK" class="leader-img">
                 <span class="leader-name">TSAKNORRIS</span>
-                <small style="color:var(--gold)">SHOTCALLER</small>
+                <small style="color:var(--gold); letter-spacing: 3px; font-weight: bold;">SHOTCALLER</small>
             </div>
         </div>
     </div>
@@ -97,17 +114,17 @@
     <div class="main-wrapper">
         <div class="dashboard-container">
             <div class="clan-column noldor-col">
-                <div class="column-header" style="color:var(--noldor-sky)">NOLDOR CLAN ROSTER</div>
+                <div class="column-header" style="color:var(--noldor-sky)">NOLDOR CLAN</div>
                 <div class="scroll-area" id="noldor-list"></div>
             </div>
             <div class="clan-column krim-col">
-                <div class="column-header" style="color:var(--krim-red)">KRIMINALIDES MAIN ROSTER</div>
+                <div class="column-header" style="color:var(--krim-red)">KRIMINALIDES MAIN</div>
                 <div class="scroll-area" id="krim-list"></div>
             </div>
         </div>
 
         <div class="mini-dist">
-            <div class="dist-header">LOOT ARCHIVE</div>
+            <div class="dist-header">EPIC DISTRIBUTION LOG</div>
             <div class="scroll-area" id="epic-dist-list"></div>
         </div>
     </div>
@@ -115,7 +132,6 @@
     <script>
         const bosses = ["VAL", "ANT", "BAI", "FRI", "ZAK", "ORF", "AQ", "CORE", "SIEGE"];
         
-        // Data με πόντους για το ranking
         const noldorData = [
             { name: "Noldor Archer", pts: 1500, lead: "Artemis", mems: ["Legolas", "Sylvanas", "Robin"] },
             { name: "Noldor Archer 2", pts: 1200, lead: "Apollo", mems: ["ArcherX", "ArcherY"] },
@@ -145,22 +161,18 @@
         ];
 
         function createCPItem(cp, color, rank) {
-            let rankClass = "";
-            let badge = "";
-            if (rank === 0) { rankClass = "rank-1"; badge = "<span class='badge' style='background:var(--top1); color:#000'>TOP 1</span>"; }
-            if (rank === 1) { rankClass = "rank-2"; badge = "<span class='badge' style='background:var(--top2); color:#000'>TOP 2</span>"; }
-            if (rank === 2) { rankClass = "rank-3"; badge = "<span class='badge' style='background:var(--top3); color:#000'>TOP 3</span>"; }
+            let rankClass = (rank === 0) ? "rank-1" : "";
+            const badge = rank < 3 ? `<span style="color:var(--gold); font-weight:bold; margin-right:8px;">#${rank+1}</span>` : "";
 
-            const memberHTML = [cp.lead, ...cp.mems].map((m, i) => `
+            const membersHTML = [cp.lead, ...cp.mems].map((m, i) => `
                 <div class="member-item">
                     <button class="member-btn" onclick="this.parentElement.classList.toggle('active')">
-                        <span>${i === 0 ? '👑 ' : ''}${m}</span><small>STATS ▼</small>
+                        <span>${i === 0 ? '👑 ' : ''}${m}</span><small>DETAILS ▼</small>
                     </button>
                     <div class="stats-area">
                         <div class="stat-grid">${bosses.map(b => `<div class="stat-box"><span class="stat-name">${b}</span>0</div>`).join('')}</div>
                     </div>
-                </div>
-            `).join('');
+                </div>`).join('');
 
             return `
                 <div class="cp-box ${rankClass}">
@@ -168,20 +180,22 @@
                         <span>${badge}<span style="color:var(${color})">${cp.name}</span></span>
                         <span class="points-tag">${cp.pts} PTS</span>
                     </button>
-                    <div class="member-list">${memberHTML}</div>
+                    <div class="member-list">${membersHTML}</div>
                 </div>`;
         }
 
-        // Sort data by points
-        const sortedNoldor = [...noldorData].sort((a,b) => b.pts - a.pts);
-        const sortedKrim = [...krimData].sort((a,b) => b.pts - a.pts);
+        const render = (data, id, col) => {
+            const sorted = [...data].sort((a,b) => b.pts - a.pts);
+            document.getElementById(id).innerHTML = sorted.map((cp, i) => createCPItem(cp, col, i)).join('');
+        };
 
-        document.getElementById('noldor-list').innerHTML = sortedNoldor.map((cp, i) => createCPItem(cp, '--noldor-sky', i)).join('');
-        document.getElementById('krim-list').innerHTML = sortedKrim.map((cp, i) => createCPItem(cp, '--krim-red', i)).join('');
-        
-        // Fill Loot Log
-        const allNames = ["NIKLAUS", "TSAKNORRIS", ...sortedNoldor.map(c=>c.name), ...sortedKrim.map(c=>c.name)];
-        document.getElementById('epic-dist-list').innerHTML = allNames.map(n => `<div style="padding:10px; border-bottom:1px solid #222; font-size:0.75rem;"><b style="color:var(--gold)">${n}</b><br><span style="color:#555">No items yet</span></div>`).join('');
+        render(noldorData, 'noldor-list', '--noldor-sky');
+        render(krimData, 'krim-list', '--krim-red');
+
+        const all = ["NIKLAUS", "TSAKNORRIS", ...noldorData.map(c=>c.name), ...krimData.map(c=>c.name)];
+        document.getElementById('epic-dist-list').innerHTML = all.map(n => 
+            `<div style="padding:15px; border-bottom:1px solid #222;"><b style="color:var(--gold)">${n}</b><br><span style="color:#555; font-size:0.75rem;">Waiting for loot...</span></div>`
+        ).join('');
     </script>
 </body>
 </html>
