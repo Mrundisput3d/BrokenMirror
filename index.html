@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Broken Mirror Alliance | Dashboard</title>
+    <title>Broken Mirror Alliance | Pro Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --gold: #d4af37; --silver: #c0c0c0; --bronze: #cd7f32;
-            --noldor-sky: #00d9ff; --krim-red: #ff3333;
+            --gold: #d4af37; --noldor-sky: #00d9ff; --krim-red: #ff3333;
             --bg-overlay: rgba(10, 12, 15, 0.96); 
         }
         html { scroll-behavior: smooth; }
@@ -30,91 +29,89 @@
         .page-section { min-height: 100vh; padding: 20px; position: relative; border-bottom: 1px solid rgba(212,175,55,0.1); }
         .server-time { position: absolute; top: 20px; right: 40px; color: var(--gold); font-family: 'Cinzel'; border: 1px solid var(--gold); padding: 5px 15px; border-radius: 5px; background: rgba(0,0,0,0.5); font-size: 0.8rem; }
 
-        /* DASHBOARD STYLE */
-        .top-header { text-align: center; margin-bottom: 30px; }
-        .ally-logo { width: 160px; filter: drop-shadow(0 0 15px var(--gold)); }
-        .ally-title { font-family: 'Cinzel Decorative'; font-size: 2.2rem; color: var(--gold); display: block; letter-spacing: 2px; }
+        /* HEADER & FAST NAVIGATION */
+        .top-header { text-align: center; margin-bottom: 20px; }
+        .ally-logo { width: 150px; filter: drop-shadow(0 0 15px var(--gold)); }
+        .ally-title { font-family: 'Cinzel Decorative'; font-size: 2.2rem; color: var(--gold); display: block; }
         
-        .leaders-row { display: flex; justify-content: center; gap: 40px; margin-top: 30px; }
-        .leader-card { text-align: center; cursor: pointer; transition: 0.3s; }
-        .leader-card:hover { transform: scale(1.1); }
-        .img-frame { width: 95px; height: 95px; margin: 0 auto; background: #000; border: 2px solid var(--gold); border-radius: 50%; overflow: hidden; box-shadow: 0 0 15px rgba(212,175,55,0.3); }
+        .nav-buttons { display: flex; justify-content: center; gap: 20px; margin: 20px 0; }
+        .nav-btn { background: rgba(0,0,0,0.6); border: 1px solid var(--gold); color: var(--gold); padding: 10px 25px; font-family: 'Cinzel'; cursor: pointer; transition: 0.3s; border-radius: 4px; font-weight: bold; }
+        .nav-btn:hover { background: var(--gold); color: black; box-shadow: 0 0 15px var(--gold); }
+
+        .leaders-row { display: flex; justify-content: center; gap: 40px; }
+        .img-frame { width: 85px; height: 85px; border: 2px solid var(--gold); border-radius: 50%; overflow: hidden; margin: 0 auto; background: #000; }
         .leader-img { width: 100%; height: 100%; object-fit: contain; }
 
-        .main-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; max-width: 1600px; margin: 40px auto; }
-        .clan-column { background: rgba(15, 18, 22, 0.95); height: 750px; display: flex; flex-direction: column; border: 1px solid #333; border-radius: 10px; border-top: 4px solid var(--gold); }
-        .column-header { padding: 18px; text-align: center; font-family: 'Cinzel'; font-size: 1.1rem; border-bottom: 1px solid #222; }
-
-        .cp-box { margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.3); border-radius: 6px; overflow: hidden; }
-        .top-cp { border: 1px solid var(--gold); background: rgba(212, 175, 55, 0.08); }
-        .cp-btn { width: 100%; background: none; border: none; padding: 12px 15px; color: #fff; text-align: left; cursor: pointer; display: flex; justify-content: space-between; font-weight: 600; }
+        /* CP BOXES */
+        .main-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; max-width: 1600px; margin: 30px auto; }
+        .clan-column { background: rgba(15, 18, 22, 0.95); height: 700px; display: flex; flex-direction: column; border-radius: 10px; border: 1px solid #333; }
+        .noldor-col { border-top: 4px solid var(--noldor-sky); }
+        .krim-col { border-top: 4px solid var(--krim-red); }
         
-        .member-list { display: none; background: rgba(0,0,0,0.5); border-top: 1px solid #222; padding: 5px 0; }
-        .active > .member-list { display: block; }
-        .member-item { border-bottom: 1px solid rgba(255,255,255,0.03); }
-        .member-btn { width: 100%; background: none; border: none; padding: 10px 20px; color: #ccc; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .column-header { padding: 15px; text-align: center; font-family: 'Cinzel'; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .mini-clan-icon { width: 24px; height: 24px; }
 
-        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
-        .stat-box { background: #15181c; padding: 8px; border: 1px solid #222; text-align: center; border-radius: 4px; }
-        .stat-name { display: block; color: var(--gold); font-size: 0.55rem; font-weight: bold; }
-        .stat-val { font-size: 0.9rem; color: #fff; }
-
-        /* LOOT HISTORY (RESTORED) */
-        .loot-section { padding: 12px; background: rgba(212, 175, 55, 0.03); border-top: 1px solid #333; }
-        .loot-toggle-btn { width: 100%; background: none; color: var(--gold); border: 1px solid var(--gold); padding: 8px; font-family: 'Cinzel'; cursor: pointer; border-radius: 4px; font-size: 0.75rem; }
-        .loot-content { display: none; margin-top: 10px; font-size: 0.8rem; color: #aaa; border-left: 2px solid var(--gold); padding-left: 10px; }
-
-        /* MARKETPLACE (RESTORED FULL) */
-        .section-flex { display: flex; flex-wrap: wrap; gap: 30px; justify-content: center; max-width: 1400px; margin: 0 auto; }
-        .epic-table-container { background: rgba(10, 12, 15, 0.9); border: 2px solid var(--gold); border-radius: 10px; padding: 15px; flex: 1; min-width: 400px; }
-        .epic-table { width: 100%; border-collapse: collapse; }
-        .epic-table td { padding: 8px 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); font-size: 0.85rem; }
-        .mini-icon { width: 22px; height: 22px; vertical-align: middle; margin-right: 10px; }
+        .cp-box { margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.3); border-radius: 6px; overflow: hidden; }
+        .cp-btn { width: 100%; background: none; border: none; padding: 12px; color: #fff; display: flex; justify-content: space-between; cursor: pointer; font-weight: 600; }
+        
+        /* MARKETPLACE & RULES */
+        .section-flex { display: flex; flex-wrap: wrap; gap: 30px; justify-content: center; max-width: 1400px; margin: 40px auto; }
+        .rules-card { flex: 1.5; background: linear-gradient(145deg, #111, #1a1a1a); padding: 30px; border-radius: 15px; border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .rule-line { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; padding: 10px; background: rgba(255,255,255,0.02); border-radius: 8px; }
+        .rule-bullet { color: var(--gold); font-size: 1.5rem; }
 
         /* VIRTUAL PAGES */
-        .virtual-page { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#0a0c0f; z-index:10000; overflow-y:auto; padding:40px; box-sizing:border-box; }
-        .close-btn { background:var(--gold); color:#000; border:none; padding:10px 25px; font-family:'Cinzel'; font-weight:bold; cursor:pointer; margin-bottom:30px; }
-        .ana-table { width: 100%; border-collapse: collapse; margin-bottom: 50px; }
+        .virtual-page { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#0a0c0f; z-index:10000; overflow-y:auto; padding:40px; }
+        .ana-table { width: 100%; border-collapse: collapse; background: rgba(255,255,255,0.02); margin-bottom: 40px; }
         .ana-table td { padding: 12px; border-bottom: 1px solid #222; }
+        .top-rank-box { background: rgba(212,175,55,0.1); border: 1px solid var(--gold); padding: 20px; border-radius: 10px; }
     </style>
 </head>
 <body>
 
     <div class="modal-overlay" id="overlay" onclick="closeModal()"></div>
     <div id="caller-modal">
-        <img id="modal-img" src="" style="width:100px; height:100px; border-radius:50%; border:2px solid var(--gold); margin-bottom:15px; background:#000;">
+        <img id="modal-img" src="" style="width:100px; height:100px; border-radius:50%; border:2px solid var(--gold); margin-bottom:15px;">
         <h2 id="modal-name" style="font-family:'Cinzel Decorative'; color:var(--gold); margin:0;"></h2>
-        <p id="modal-title" style="color:#888; font-size:0.7rem; letter-spacing:2px; margin-bottom:20px;"></p>
-        <div class="stat-grid" id="modal-stats"></div>
-        <button onclick="closeModal()" style="margin-top:20px; background:var(--gold); color:#000; border:none; padding:10px 30px; cursor:pointer; font-weight:bold; font-family:'Cinzel';">CLOSE</button>
+        <div class="stat-grid" id="modal-stats" style="margin-top:20px;"></div>
+        <button onclick="closeModal()" style="margin-top:20px; background:var(--gold); border:none; padding:10px 30px; cursor:pointer; font-family:'Cinzel';">CLOSE</button>
     </div>
 
     <div class="page-section" id="section1">
         <div class="server-time" id="clock">SERVER TIME: --:--:--</div>
+        
         <div class="top-header">
             <img src="https://i.ibb.co/6R9q5PGv/ALLIANCE-LOGO.png" class="ally-logo">
             <span class="ally-title">BROKEN MIRROR ALLIANCE</span>
+            
+            <div class="nav-buttons">
+                <button class="nav-btn" onclick="openPage('video-page')">🎬 PVP VIDEOS</button>
+                <button class="nav-btn" onclick="openPage('analytics-page')">📊 DATA ANALYTICS</button>
+            </div>
+
             <div class="leaders-row">
                 <div class="leader-card" onclick="openCaller('NIKLAUS', 'ALLY LEADER', 'https://i.ibb.co/5X3NDQFR/niklaus.png')">
                     <div class="img-frame"><img src="https://i.ibb.co/5X3NDQFR/niklaus.png" class="leader-img"></div>
-                    <span style="color:var(--gold); display:block; font-family:Cinzel; margin-top:10px;">NIKLAUS</span>
-                    <small style="color:#888;">ALLY LEADER</small>
+                    <span style="color:var(--gold); font-family:Cinzel; display:block; margin-top:5px;">NIKLAUS</span>
                 </div>
                 <div class="leader-card" onclick="openCaller('TSAKNORRIS', 'SHOT CALLER', 'https://i.ibb.co/xSVgzBPB/tsaknorris.png')">
                     <div class="img-frame"><img src="https://i.ibb.co/xSVgzBPB/tsaknorris.png" class="leader-img"></div>
-                    <span style="color:var(--gold); display:block; font-family:Cinzel; margin-top:10px;">TSAKNORRIS</span>
-                    <small style="color:#888;">SHOT CALLER</small>
+                    <span style="color:var(--gold); font-family:Cinzel; display:block; margin-top:5px;">TSAKNORRIS</span>
                 </div>
             </div>
         </div>
 
         <div class="main-wrapper">
-            <div class="clan-column">
-                <div class="column-header" style="color:var(--noldor-sky)">NOLDOR CLAN</div>
+            <div class="clan-column noldor-col">
+                <div class="column-header" style="color:var(--noldor-sky)">
+                    <img src="https://i.ibb.co/S47P8m9f/NOLDOR-LOGO.png" class="mini-clan-icon"> NOLDOR CLAN
+                </div>
                 <div class="scroll-area" id="noldor-list"></div>
             </div>
-            <div class="clan-column">
-                <div class="column-header" style="color:var(--krim-red)">KRIMINALIDES CLAN</div>
+            <div class="clan-column krim-col">
+                <div class="column-header" style="color:var(--krim-red)">
+                    <img src="https://i.ibb.co/6R0D99Xz/KRIM-LOGO.png" class="mini-clan-icon"> KRIMINALIDES CLAN
+                </div>
                 <div class="scroll-area" id="krim-list"></div>
             </div>
         </div>
@@ -123,54 +120,76 @@
     <div class="page-section" id="section2">
         <h2 style="text-align:center; font-family:Cinzel; color:var(--gold);">MARKETPLACE & PROTOCOL</h2>
         <div class="section-flex">
-            <div class="epic-table-container">
-                <table class="epic-table">
-                    <tbody id="price-list"></tbody>
-                </table>
+            <div style="flex:1; background:rgba(0,0,0,0.6); border:2px solid var(--gold); border-radius:10px; padding:20px;">
+                <table style="width:100%; border-collapse:collapse;" id="price-list"></table>
             </div>
-            <div style="flex:1.5; background:rgba(15,18,22,0.95); padding:25px; border-left:4px solid var(--gold); border-radius:8px;">
-                <h3 style="color:var(--gold); font-family:Cinzel; margin-top:0;">POINTS SYSTEM & POLICIES</h3>
-                <p>• <span style="color:var(--gold)">Attendance:</span> Mid-Low Epics = 1 pt | Baium = 2 pts | Siege/Valakas/Antharas = 3 pts.</p>
-                <p>• <span style="color:var(--gold)">Purchases:</span> Points are deducted from the CP's total balance.</p>
-                <p>• <span style="color:var(--gold)">Priority:</span> Baium (Archers) | Valakas (Mages) | Antharas (Stoppers).</p>
-                <p>• <span style="color:var(--gold)">Caller Bonus:</span> Active Callers receive personal points (x9 multiplier).</p>
+            
+            <div class="rules-card">
+                <h3 style="color:var(--gold); font-family:Cinzel; border-bottom:1px solid #333; padding-bottom:15px; margin-top:0;">ALLIANCE POLICIES</h3>
+                <div class="rule-line">
+                    <span class="rule-bullet">✦</span>
+                    <div><b style="color:var(--gold);">Attendance Points:</b> Mid-Low Epics: 1pt | Baium: 2pts | High Epics & Sieges: 3pts.</div>
+                </div>
+                <div class="rule-line">
+                    <span class="rule-bullet">✦</span>
+                    <div><b style="color:var(--gold);">Jewel Priority:</b> Baium for Archers, Valakas for Mages, Antharas for Stoppers.</div>
+                </div>
+                <div class="rule-line">
+                    <span class="rule-bullet">✦</span>
+                    <div><b style="color:var(--gold);">Purchasing:</b> Points are deducted from the CP balance upon receiving a Jewel.</div>
+                </div>
+                <div class="rule-line">
+                    <span class="rule-bullet">✦</span>
+                    <div><b style="color:var(--gold);">Caller Bonus:</b> All active callers receive a x9 point multiplier.</div>
+                </div>
             </div>
-        </div>
-    </div>
-
-    <div class="page-section" id="section3" style="min-height:auto; padding:80px 0;">
-        <div style="display:flex; justify-content:center; gap:30px;">
-            <button onclick="openPage('video-page')" style="background:var(--krim-red); color:white; border:none; padding:20px 50px; font-family:Cinzel; cursor:pointer; border-radius:5px; font-weight:bold;">🎬 PVP VIDEOS</button>
-            <button onclick="openPage('analytics-page')" style="background:var(--gold); color:black; border:none; padding:20px 50px; font-family:Cinzel; cursor:pointer; border-radius:5px; font-weight:bold;">📊 DATA ANALYTICS</button>
-        </div>
-    </div>
-
-    <div id="video-page" class="virtual-page">
-        <button class="close-btn" onclick="closePage('video-page')">⬅ BACK</button>
-        <h1 style="text-align:center; font-family:Cinzel Decorative; color:var(--gold);">WAR ARCHIVES</h1>
-        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap:30px;">
-            <div style="background:#111; padding:15px; border-radius:10px;"><iframe width="100%" height="220" src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allowfullscreen></iframe></div>
-            <div style="background:#111; padding:15px; border-radius:10px;"><iframe width="100%" height="220" src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allowfullscreen></iframe></div>
         </div>
     </div>
 
     <div id="analytics-page" class="virtual-page">
-        <button class="close-btn" onclick="closePage('analytics-page')">⬅ BACK</button>
-        <h1 style="text-align:center; font-family:Cinzel Decorative; color:var(--gold);">FULL PERFORMANCE DATA (22 CPs)</h1>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:40px;">
+        <button class="nav-btn" onclick="closePage('analytics-page')">⬅ BACK</button>
+        <h1 style="text-align:center; font-family:Cinzel; color:var(--gold);">PERFORMANCE ANALYTICS</h1>
+        
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:30px; max-width:1400px; margin: 0 auto;">
             <div>
-                <h3 style="color:var(--gold); text-align:center; font-family:Cinzel;">IN-WEEK ACTIVITY</h3>
+                <h3 style="color:var(--noldor-sky); text-align:center;">IN-WEEK ACTIVITY (22 CPs)</h3>
                 <table class="ana-table" id="ana-week"></table>
             </div>
             <div>
-                <h3 style="color:var(--gold); text-align:center; font-family:Cinzel;">WEEKEND ACTIVITY</h3>
+                <h3 style="color:var(--krim-red); text-align:center;">WEEKEND ACTIVITY (22 CPs)</h3>
                 <table class="ana-table" id="ana-weekend"></table>
+            </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:30px; max-width:1400px; margin: 40px auto;">
+            <div class="top-rank-box">
+                <h3 style="color:var(--gold); text-align:center; font-family:Cinzel;">🏆 TOP ACTIVE CPs (MONTH)</h3>
+                <table class="ana-table">
+                    <tr><td style="color:var(--gold);">1</td><td>Hattrick CP</td><td style="text-align:right;">98% Att.</td></tr>
+                    <tr><td style="color:var(--gold);">2</td><td>Noldor Archer</td><td style="text-align:right;">95% Att.</td></tr>
+                    <tr><td style="color:var(--gold);">3</td><td>Legion CP</td><td style="text-align:right;">92% Att.</td></tr>
+                </table>
+            </div>
+            <div class="top-rank-box">
+                <h3 style="color:var(--gold); text-align:center; font-family:Cinzel;">🥇 TOP ACTIVE PLAYERS (MONTH)</h3>
+                <table class="ana-table">
+                    <tr><td style="color:var(--gold);">1</td><td>PlayerName1</td><td style="text-align:right;">42 Raids</td></tr>
+                    <tr><td style="color:var(--gold);">2</td><td>PlayerName2</td><td style="text-align:right;">40 Raids</td></tr>
+                    <tr><td style="color:var(--gold);">3</td><td>PlayerName3</td><td style="text-align:right;">38 Raids</td></tr>
+                </table>
             </div>
         </div>
     </div>
 
+    <div id="video-page" class="virtual-page">
+        <button class="nav-btn" onclick="closePage('video-page')">⬅ BACK</button>
+        <h1 style="text-align:center; font-family:Cinzel Decorative; color:var(--gold);">WAR ARCHIVES</h1>
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap:30px;">
+            <div style="background:#111; padding:15px; border:1px solid #333;"><iframe width="100%" height="250" src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allowfullscreen></iframe></div>
+        </div>
+    </div>
+
     <script>
-        const bosses = ["VAL", "ANT", "BAI", "FRI", "ZAK", "ORF", "AQ", "CORE", "SIEGE"];
         const noldorNames = ["Noldor Clan", "Noldor Archer", "Noldor Archer 2", "Noldor Dummy", "Noldor Tank", "Kriminalides CP", "Outlaw CP", "Ronin CP", "Brazilians CP", "Brazilians 2 CP", "I am Groot CP"];
         const krimNames = ["Hattrick CP", "55 Room CP", "Legion CP", "Criminal Record CP", "Avalanche CP", "Gankly Crew CP", "Furious Wolves CP", "Animals CP", "Dracaris CP", "Sinaloa CP", "Knockout CP"];
         const allCPs = [...noldorNames, ...krimNames];
@@ -181,12 +200,11 @@
                     <button class="cp-btn" onclick="this.parentElement.classList.toggle('active')">
                         <span>${i<3?'⭐ ':''}${name}</span><span>2500 PTS</span>
                     </button>
-                    <div class="member-list">
-                        <div class="member-item">👑 CP Leader</div>
-                        <div class="member-item">👤 Member A</div>
-                        <div class="loot-section">
-                            <button class="loot-toggle-btn" onclick="toggleLoot(event)">VIEW CP LOOT HISTORY</button>
-                            <div class="loot-content">1x Ring of Baium (12/03)</div>
+                    <div class="member-list" style="padding:15px; background:rgba(0,0,0,0.6); border-top:1px solid #222;">
+                        <div style="margin-bottom:10px;">👑 CP Leader</div>
+                        <div style="border-top:1px solid #333; padding-top:10px;">
+                            <button onclick="this.nextElementSibling.style.display='block'" style="background:none; border:1px solid var(--gold); color:var(--gold); padding:5px 10px; cursor:pointer; font-size:0.7rem;">LOOT HISTORY</button>
+                            <div style="display:none; padding:10px; color:#aaa; font-size:0.8rem;">1x Baium Ring (10/03)</div>
                         </div>
                     </div>
                 </div>`;
@@ -195,31 +213,24 @@
         }
 
         const prices = [
-            {n: "Core Ring", p: 25, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/ring-of-core.png?raw=true"},
-            {n: "Orfen Earring", p: 75, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/earring-orfen.png?raw=true"},
             {n: "Queen Ant Ring", p: 150, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/ring-of-queen-ant.png?raw=true"},
             {n: "Zaken Earring", p: 175, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/zaken-earring.png?raw=true"},
-            {n: "Frintezza Neck", p: 225, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/frintezza-necklace.png?raw=true"},
             {n: "Baium Ring", p: 950, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/ring-of-baium.png?raw=true"},
-            {n: "Antharas Earring", p: 1100, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/earring-antharas.png?raw=true"},
             {n: "Valakas Necklace", p: 3100, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/necklace-valakas.png?raw=true"}
         ];
+        document.getElementById('price-list').innerHTML = prices.map(p => `<tr><td style="padding:12px;"><img src="${p.img}" style="width:24px; vertical-align:middle; margin-right:10px;"> ${p.n}</td><td style="text-align:right; color:var(--gold); font-weight:bold;">${p.p} PTS</td></tr>`).join('');
 
-        document.getElementById('price-list').innerHTML = prices.map(p => `<tr><td><img src="${p.img}" class="mini-icon"> ${p.n}</td><td style="color:var(--gold); font-weight:bold; text-align:right;">${p.p} PTS</td></tr>`).join('');
-
-        const anaRow = (n, i) => `<tr><td style="color:var(--gold); font-weight:bold;">${i+1}</td><td>${n}</td><td style="text-align:right; color:#00ff88;">${95-i}%</td></tr>`;
+        const anaRow = (n, i) => `<tr><td style="color:var(--gold); font-weight:bold; width:30px;">${i+1}</td><td>${n}</td><td style="text-align:right; color:#00ff88;">${95-i}%</td></tr>`;
         document.getElementById('ana-week').innerHTML = allCPs.map((n, i) => anaRow(n, i)).join('');
         document.getElementById('ana-weekend').innerHTML = allCPs.map((n, i) => anaRow(n, i)).join('');
 
-        function toggleLoot(e) { const content = e.target.nextElementSibling; content.style.display = content.style.display === 'block' ? 'none' : 'block'; e.stopPropagation(); }
         function openPage(id) { document.getElementById(id).style.display = 'block'; document.body.style.overflow='hidden'; }
         function closePage(id) { document.getElementById(id).style.display = 'none'; document.body.style.overflow='auto'; }
         
         function openCaller(name, title, img) {
             document.getElementById('modal-name').innerText = name;
-            document.getElementById('modal-title').innerText = title;
             document.getElementById('modal-img').src = img;
-            document.getElementById('modal-stats').innerHTML = bosses.map(b => `<div class="stat-box"><span class="stat-name">${b}</span><span class="stat-val">0</span></div>`).join('');
+            document.getElementById('modal-stats').innerHTML = ["VAL", "ANT", "BAI", "SIEGE"].map(b => `<div style="background:#1a1a1a; padding:10px; border:1px solid #333; border-radius:5px;"><span style="color:var(--gold); display:block; font-size:0.6rem;">${b}</span><span style="font-size:1.2rem;">0</span></div>`).join('');
             document.getElementById('caller-modal').style.display = 'block';
             document.getElementById('overlay').style.display = 'block';
         }
