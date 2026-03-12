@@ -49,13 +49,11 @@
 
         .cp-box { margin-bottom: 6px; border: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.4); border-radius: 4px; }
         .rank-1 { border-color: var(--top1); box-shadow: inset 0 0 10px rgba(255,215,0,0.05); }
-        .rank-2 { border-color: var(--top2); }
-        .rank-3 { border-color: var(--top3); }
 
         .cp-btn { width: 100%; background: none; border: none; padding: 10px 12px; color: #fff; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; }
         .points-tag { color: var(--gold); font-weight: bold; font-size: 0.75rem; border: 1px solid var(--gold); padding: 1px 6px; border-radius: 3px; }
 
-        .member-list { display: none; background: rgba(0,0,0,0.6); border-top: 1px solid #222; }
+        .member-list { display: none; background: rgba(0,0,0,0.6); border-top: 1px solid #222; max-height: 300px; overflow-y: auto; }
         .active > .member-list { display: block; }
         
         .member-btn { width: 100%; background: none; border: none; padding: 8px 15px; color: #ccc; text-align: left; cursor: pointer; font-size: 0.8rem; display: flex; justify-content: space-between; border-bottom: 1px solid #111; }
@@ -70,8 +68,10 @@
         .dist-header { background: #1a1400; color: var(--gold); padding: 12px; text-align: center; font-family: 'Cinzel'; border-bottom: 1px solid var(--gold); font-size: 0.9rem; }
         .dist-item { border-bottom: 1px solid #222; }
         .dist-trigger { width: 100%; padding: 10px; background: none; border: none; color: #fff; text-align: left; cursor: pointer; display: flex; justify-content: space-between; font-size: 0.75rem; }
-        .loot-detail { display: none; background: rgba(0,0,0,0.5); padding: 8px; font-size: 0.7rem; color: #aaa; border-left: 2px solid var(--gold); }
+        .loot-detail { display: none; background: rgba(0,0,0,0.8); padding: 10px; font-size: 0.75rem; color: #eee; border-left: 2px solid var(--gold); }
         .active-dist > .loot-detail { display: block; }
+        .loot-entry { display: block; margin-bottom: 5px; color: #00d9ff; font-weight: bold; }
+        .loot-date { color: #888; font-size: 0.65rem; display: block; }
 
         @media (max-width: 1200px) { .main-wrapper { flex-direction: column; } .mini-dist { width: 100%; } }
     </style>
@@ -89,9 +89,7 @@
                 <small style="color:var(--gold)">ALLY LEADER</small>
             </div>
             <div class="leader-card">
-                <div class="img-frame">
-                    <img src="https://i.ibb.co/xSVgzBPB/tsaknorris.png" class="leader-img">
-                </div>
+                <div class="img-frame"><img src="https://i.ibb.co/xSVgzBPB/tsaknorris.png" class="leader-img"></div>
                 <span class="leader-name">TSAKNORRIS</span>
                 <small style="color:var(--gold)">SHOTCALLER</small>
             </div>
@@ -119,9 +117,27 @@
     <script>
         const bosses = ["VAL", "ANT", "BAI", "FRI", "ZAK", "ORF", "AQ", "CORE", "SIEGE"];
         
-        // ΟΛΑ ΤΑ CP NAMES ΟΠΩΣ ΗΤΑΝ ΣΤΗΝ ΑΡΧΗ
+        // ΠΡΑΓΜΑΤΙΚΟ LOOT DATA
+        const lootDatabase = {
+            "Hattrick CP": [
+                { item: "Valakas Necklace", date: "10/03/2026" },
+                { item: "Zaken Earring", date: "05/03/2026" },
+                { item: "Shield of Vesper", date: "01/03/2026" }
+            ],
+            "Kriminalides CP": [
+                { item: "Antharas Earring", date: "08/03/2026" },
+                { item: "Vesper Noble Set", date: "02/03/2026" }
+            ],
+            "55 Room CP": [
+                { item: "Core Ring", date: "07/03/2026" }
+            ],
+            "NIKLAUS": [
+                { item: "Frintezza's Necklace", date: "11/03/2026" }
+            ]
+        };
+
         const noldorData = [
-            { name: "Kriminalides CP", pts: 1800, lead: "Boss", mems: ["Member1", "Member2"] },
+            { name: "Kriminalides CP", pts: 2850, lead: "DarkLord", mems: ["Slayer", "Healer1", "TankX", "Archer1", "Archer2", "Mage7", "Buffer"] },
             { name: "Noldor Archer", pts: 1500, lead: "Artemis", mems: ["Legolas", "Sylvanas"] },
             { name: "Brazilians CP", pts: 1350, lead: "Ronaldo", mems: ["Neymar"] },
             { name: "Noldor Archer 2", pts: 1200, lead: "Apollo", mems: ["ArcherX"] },
@@ -134,8 +150,8 @@
         ];
 
         const krimData = [
-            { name: "Hattrick CP", pts: 2100, lead: "Captain", mems: ["Striker"] },
-            { name: "55 Room CP", pts: 1950, lead: "Master55", mems: ["P1"] },
+            { name: "Hattrick CP", pts: 3100, lead: "Captain", mems: ["Striker", "Goalie", "Mid1", "Mid2", "Defense", "Winger", "Bench1", "Bench2"] },
+            { name: "55 Room CP", pts: 1950, lead: "Master55", mems: ["P1", "P2", "P3"] },
             { name: "Criminal Record CP", pts: 1600, lead: "Judge", mems: ["J1"] },
             { name: "Sinaloa CP", pts: 1550, lead: "ElChapo", mems: ["C1"] },
             { name: "Avalanche CP", pts: 1400, lead: "Snow", mems: ["Ice"] },
@@ -149,14 +165,14 @@
         ];
 
         function createCPItem(cp, color, rank) {
-            let rankClass = (rank === 0) ? "rank-1" : (rank === 1) ? "rank-2" : (rank === 2) ? "rank-3" : "";
+            let rankClass = (rank === 0) ? "rank-1" : "";
             const membersHTML = [cp.lead, ...cp.mems].map((m, i) => `
                 <div class="member-container">
                     <button class="member-btn" onclick="this.parentElement.classList.toggle('active-member')">
                         <span>${i === 0 ? '👑 ' : ''}${m}</span><small>STATS ▼</small>
                     </button>
                     <div class="stats-area">
-                        <div class="stat-grid">${bosses.map(b => `<div class="stat-box"><span class="stat-name">${b}</span>0</div>`).join('')}</div>
+                        <div class="stat-grid">${bosses.map(b => `<div class="stat-box"><span class="stat-name">${b}</span>${Math.floor(Math.random()*15)}</div>`).join('')}</div>
                     </div>
                 </div>`).join('');
 
@@ -178,16 +194,23 @@
         render(noldorData, 'noldor-list', '--noldor-sky');
         render(krimData, 'krim-list', '--krim-red');
 
-        // ΟΛΑ ΤΑ ΟΝΟΜΑΤΑ ΣΤΟ LOOT ARCHIVE (Sorted)
+        // LOOT ARCHIVE GENERATION
         const allEntities = ["NIKLAUS", "TSAKNORRIS", ...noldorData.map(c=>c.name), ...krimData.map(c=>c.name)].sort();
-        document.getElementById('epic-dist-list').innerHTML = allEntities.map(name => `
+        document.getElementById('epic-dist-list').innerHTML = allEntities.map(name => {
+            const items = lootDatabase[name] || [];
+            const lootHTML = items.length > 0 
+                ? items.map(i => `<span class="loot-entry">💠 ${i.item}<span class="loot-date">${i.date}</span></span>`).join('')
+                : "No rewards found in current cycle.";
+            
+            return `
             <div class="dist-item">
                 <button class="dist-trigger" onclick="this.parentElement.classList.toggle('active-dist')">
                     <span style="color:var(--gold)">${name}</span>
-                    <small>LOOT ▼</small>
+                    <small>${items.length} ITEMS ▼</small>
                 </button>
-                <div class="loot-detail">No rewards found in current cycle.</div>
-            </div>`).join('');
+                <div class="loot-detail">${lootHTML}</div>
+            </div>`;
+        }).join('');
     </script>
 </body>
 </html>
