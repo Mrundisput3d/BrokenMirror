@@ -10,103 +10,113 @@
             --gold: #d4af37;
             --noldor-sky: #00d9ff;
             --krim-red: #ff3333;
-            --bg-overlay: rgba(10, 12, 15, 0.9);
-            --panel-bg: rgba(15, 18, 22, 0.98);
+            /* Ρύθμιση για να "αναπνέει" το background */
+            --bg-overlay: rgba(8, 10, 12, 0.85); 
+            --panel-bg: rgba(15, 18, 22, 0.95);
             --top1: #ffd700; --top2: #c0c0c0; --top3: #cd7f32;
         }
 
         body { 
             font-family: 'Open Sans', sans-serif; 
-            /* BACKGROUND LOGO */
-            background: #0a0c0f url('https://i.ibb.co/LzfXmKxV/background.jpg') no-repeat center center fixed; 
+            /* ΝΕΟ BACKGROUND URL */
+            background: #0a0c0f url('https://i.ibb.co/CKBbgKym/background-new.jpg') no-repeat center center fixed; 
             background-size: cover; 
             color: #eee; margin: 0; padding: 20px;
         }
 
+        /* Layer για να σκοτεινιάσει ελαφρά η φωτό ώστε να μη "χτυπάει" στα μάτια */
         body::before { 
             content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: radial-gradient(circle, transparent 20%, var(--bg-overlay) 100%); 
+            background: radial-gradient(circle, transparent 10%, var(--bg-overlay) 100%); 
             z-index: -1; 
         }
 
-        .top-header { text-align: center; margin-bottom: 30px; }
+        .top-header { text-align: center; margin-bottom: 40px; }
         
-        /* ALLIANCE LOGO */
         .ally-logo { 
             width: 160px; height: 160px; border: 3px solid var(--gold); 
-            box-shadow: 0 0 30px rgba(212, 175, 55, 0.5); margin-bottom: 10px; 
-            object-fit: contain; background: rgba(0,0,0,0.5); border-radius: 10px;
+            box-shadow: 0 0 35px rgba(212, 175, 55, 0.6); margin-bottom: 15px; 
+            object-fit: contain; background: rgba(0,0,0,0.6); border-radius: 12px;
         }
-        .ally-title { font-family: 'Cinzel'; font-size: 2.8rem; color: var(--gold); display: block; letter-spacing: 5px; text-shadow: 2px 2px 10px #000; }
+        .ally-title { font-family: 'Cinzel'; font-size: 3rem; color: var(--gold); display: block; letter-spacing: 6px; text-shadow: 3px 3px 15px #000; }
         
-        .leaders-row { display: flex; justify-content: center; gap: 50px; margin-top: 30px; }
-        .leader-card { text-align: center; width: 180px; }
+        .leaders-row { display: flex; justify-content: center; gap: 60px; margin-top: 30px; }
+        .leader-card { text-align: center; }
         
-        /* NIKLAUS PHOTO */
         .leader-img { 
-            width: 140px; height: 140px; border-radius: 50%; border: 3px solid #fff; 
-            object-fit: cover; box-shadow: 0 0 20px rgba(255,255,255,0.2); 
-            background: #222;
+            width: 150px; height: 150px; border-radius: 50%; border: 3px solid #fff; 
+            object-fit: cover; box-shadow: 0 0 25px rgba(255,255,255,0.15); 
+            background: #111;
         }
-        .leader-name { font-family: 'Cinzel'; font-size: 1.8rem; color: #fff; display: block; margin-top: 10px; text-shadow: 2px 2px 5px #000; }
+        .leader-name { font-family: 'Cinzel'; font-size: 1.8rem; color: #fff; display: block; margin-top: 10px; text-shadow: 2px 2px 8px #000; }
 
-        .main-wrapper { display: flex; gap: 20px; max-width: 1650px; margin: 0 auto; align-items: flex-start; }
+        .main-wrapper { display: flex; gap: 25px; max-width: 1700px; margin: 0 auto; align-items: flex-start; }
 
-        /* DASHBOARD */
+        /* DASHBOARD COLUMNS */
         .dashboard-container { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; flex-grow: 1; }
-        .clan-column { background: var(--panel-bg); height: 700px; display: flex; flex-direction: column; border: 1px solid #444; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .column-header { padding: 15px; text-align: center; font-family: 'Cinzel'; font-size: 1.2rem; border-bottom: 1px solid #333; }
+        .clan-column { 
+            background: var(--panel-bg); height: 750px; display: flex; flex-direction: column; 
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; 
+            box-shadow: 0 15px 40px rgba(0,0,0,0.7); backdrop-filter: blur(5px);
+        }
+        .column-header { padding: 18px; text-align: center; font-family: 'Cinzel'; font-size: 1.3rem; border-bottom: 1px solid rgba(255,255,255,0.1); letter-spacing: 2px; }
         
-        .noldor-col { border-top: 4px solid var(--noldor-sky); }
-        .krim-col { border-top: 4px solid var(--krim-red); }
+        .noldor-col { border-top: 5px solid var(--noldor-sky); }
+        .krim-col { border-top: 5px solid var(--krim-red); }
 
-        .scroll-area { overflow-y: scroll; padding: 10px; flex-grow: 1; scrollbar-color: #444 transparent; }
-        .scroll-area::-webkit-scrollbar { width: 8px; }
-        .scroll-area::-webkit-scrollbar-thumb { background: #555; border-radius: 4px; }
+        .scroll-area { overflow-y: scroll; padding: 15px; flex-grow: 1; scrollbar-width: thin; }
+        .scroll-area::-webkit-scrollbar { width: 6px; }
+        .scroll-area::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
 
-        /* CP & MEMBERS */
-        .cp-box { margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.6); border-radius: 4px; transition: 0.3s; }
-        .cp-box:hover { background: rgba(255,255,255,0.05); }
-        .cp-btn { width: 100%; background: none; border: none; padding: 15px; color: #fff; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        /* CP BOXES */
+        .cp-box { margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.5); border-radius: 6px; transition: all 0.3s ease; }
+        .cp-box:hover { border-color: var(--gold); transform: translateX(5px); }
+        .cp-btn { width: 100%; background: none; border: none; padding: 18px; color: #fff; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 1rem; }
         
-        .rank-1 { border: 1px solid var(--top1); box-shadow: inset 0 0 15px rgba(255,215,0,0.1); }
-        .points-tag { background: rgba(212, 175, 55, 0.15); padding: 4px 12px; border-radius: 15px; color: var(--gold); font-weight: bold; font-size: 0.8rem; border: 1px solid rgba(212, 175, 55, 0.3); }
+        .rank-1 { border: 1px solid var(--top1); background: rgba(255, 215, 0, 0.05); }
+        .points-tag { border: 1px solid var(--gold); padding: 4px 14px; border-radius: 20px; color: var(--gold); font-weight: bold; font-size: 0.85rem; background: rgba(0,0,0,0.4); }
 
-        .member-list { display: none; background: rgba(0,0,0,0.9); border-top: 1px solid #222; }
-        .member-item { border-bottom: 1px solid #111; }
-        .member-btn { width: 100%; background: none; border: none; padding: 12px 25px; color: #ccc; text-align: left; cursor: pointer; display: flex; justify-content: space-between; font-size: 0.9rem; }
+        /* MEMBER LIST & STATS */
+        .member-list { display: none; background: rgba(0,0,0,0.85); border-top: 1px solid rgba(212,175,55,0.2); border-radius: 0 0 6px 6px; }
+        .member-btn { width: 100%; background: none; border: none; padding: 14px 25px; color: #ddd; text-align: left; cursor: pointer; display: flex; justify-content: space-between; font-size: 0.95rem; transition: 0.2s; }
+        .member-btn:hover { color: var(--gold); background: rgba(255,255,255,0.05); }
         
-        .stats-area { display: none; background: #000; padding: 15px; border-top: 1px solid var(--gold); }
-        .active > .member-list, .active > .stats-area { display: block; animation: fadeIn 0.3s; }
+        .stats-area { display: none; background: #050505; padding: 20px; border-top: 1px solid var(--gold); }
+        .active > .member-list, .active > .stats-area { display: block; animation: slideDown 0.3s ease-out; }
 
-        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
-        .stat-box { background: #111; padding: 8px; text-align: center; border: 1px solid #222; border-radius: 3px; }
-        .stat-name { display: block; color: var(--gold); font-weight: bold; font-size: 0.75rem; margin-bottom: 3px; }
+        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        .stat-box { background: #111; padding: 10px; text-align: center; border: 1px solid #333; border-radius: 4px; }
+        .stat-name { display: block; color: var(--gold); font-weight: bold; font-size: 0.8rem; margin-bottom: 4px; }
 
         /* SIDEBAR LOOT */
-        .mini-dist { width: 320px; background: var(--panel-bg); border: 1px solid var(--gold); height: 700px; display: flex; flex-direction: column; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .dist-header { background: linear-gradient(to bottom, #221a00, #000); color: var(--gold); padding: 15px; text-align: center; font-family: 'Cinzel'; border-bottom: 1px solid var(--gold); }
+        .mini-dist { width: 340px; background: var(--panel-bg); border: 1px solid var(--gold); height: 750px; display: flex; flex-direction: column; border-radius: 10px; box-shadow: 0 15px 40px rgba(0,0,0,0.8); }
+        .dist-header { background: linear-gradient(180deg, #221a00 0%, #000 100%); color: var(--gold); padding: 18px; text-align: center; font-family: 'Cinzel'; border-bottom: 1px solid var(--gold); font-size: 1.1rem; }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @media (max-width: 1200px) { .main-wrapper { flex-direction: column; } .mini-dist { width: 100%; height: 400px; } }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        @media (max-width: 1300px) { 
+            .main-wrapper { flex-direction: column; align-items: center; } 
+            .mini-dist { width: 100%; height: 450px; } 
+            .ally-title { font-size: 2.2rem; }
+        }
     </style>
 </head>
 <body>
 
     <div class="top-header">
-        <img src="https://i.ibb.co/YCTxJLw/alliance-logo.png" class="ally-logo">
+        <img src="https://i.ibb.co/YCTxJLw/alliance-logo.png" class="ally-logo" alt="Alliance Logo">
         <span class="ally-title">BROKEN MIRROR ALLIANCE</span>
         
         <div class="leaders-row">
             <div class="leader-card">
-                <img src="https://i.ibb.co/39kHvqVG/niklaus-logo.png" class="leader-img">
+                <img src="https://i.ibb.co/39kHvqVG/niklaus-logo.png" class="leader-img" alt="Niklaus">
                 <span class="leader-name">NIKLAUS</span>
-                <small style="color:var(--gold); letter-spacing: 3px; font-weight: bold;">ALLY LEADER</small>
+                <small style="color:var(--gold); letter-spacing: 4px; font-weight: bold; text-transform: uppercase;">Ally Leader</small>
             </div>
             <div class="leader-card">
-                <img src="https://via.placeholder.com/140/111/fff?text=TSAK" class="leader-img">
+                <img src="https://via.placeholder.com/150/111/fff?text=TSAK" class="leader-img" alt="Tsaknorris">
                 <span class="leader-name">TSAKNORRIS</span>
-                <small style="color:var(--gold); letter-spacing: 3px; font-weight: bold;">SHOTCALLER</small>
+                <small style="color:var(--gold); letter-spacing: 4px; font-weight: bold; text-transform: uppercase;">Shotcaller</small>
             </div>
         </div>
     </div>
@@ -124,7 +134,7 @@
         </div>
 
         <div class="mini-dist">
-            <div class="dist-header">EPIC DISTRIBUTION LOG</div>
+            <div class="dist-header">LOOT DISTRIBUTION ARCHIVE</div>
             <div class="scroll-area" id="epic-dist-list"></div>
         </div>
     </div>
@@ -132,6 +142,7 @@
     <script>
         const bosses = ["VAL", "ANT", "BAI", "FRI", "ZAK", "ORF", "AQ", "CORE", "SIEGE"];
         
+        // Μπορείς να επεξεργαστείς τα ονόματα και τους πόντους εδώ
         const noldorData = [
             { name: "Noldor Archer", pts: 1500, lead: "Artemis", mems: ["Legolas", "Sylvanas", "Robin"] },
             { name: "Noldor Archer 2", pts: 1200, lead: "Apollo", mems: ["ArcherX", "ArcherY"] },
@@ -162,12 +173,12 @@
 
         function createCPItem(cp, color, rank) {
             let rankClass = (rank === 0) ? "rank-1" : "";
-            const badge = rank < 3 ? `<span style="color:var(--gold); font-weight:bold; margin-right:8px;">#${rank+1}</span>` : "";
+            const badge = rank < 3 ? `<span style="color:var(--gold); font-weight:bold; margin-right:10px;">#${rank+1}</span>` : "";
 
             const membersHTML = [cp.lead, ...cp.mems].map((m, i) => `
                 <div class="member-item">
                     <button class="member-btn" onclick="this.parentElement.classList.toggle('active')">
-                        <span>${i === 0 ? '👑 ' : ''}${m}</span><small>DETAILS ▼</small>
+                        <span>${i === 0 ? '👑 ' : ''}${m}</span><small>ATTENDANCE ▼</small>
                     </button>
                     <div class="stats-area">
                         <div class="stat-grid">${bosses.map(b => `<div class="stat-box"><span class="stat-name">${b}</span>0</div>`).join('')}</div>
@@ -177,7 +188,7 @@
             return `
                 <div class="cp-box ${rankClass}">
                     <button class="cp-btn" onclick="this.parentElement.classList.toggle('active')">
-                        <span>${badge}<span style="color:var(${color})">${cp.name}</span></span>
+                        <span>${badge}<span style="color:var(${color}); font-weight:bold;">${cp.name}</span></span>
                         <span class="points-tag">${cp.pts} PTS</span>
                     </button>
                     <div class="member-list">${membersHTML}</div>
@@ -192,9 +203,10 @@
         render(noldorData, 'noldor-list', '--noldor-sky');
         render(krimData, 'krim-list', '--krim-red');
 
-        const all = ["NIKLAUS", "TSAKNORRIS", ...noldorData.map(c=>c.name), ...krimData.map(c=>c.name)];
-        document.getElementById('epic-dist-list').innerHTML = all.map(n => 
-            `<div style="padding:15px; border-bottom:1px solid #222;"><b style="color:var(--gold)">${n}</b><br><span style="color:#555; font-size:0.75rem;">Waiting for loot...</span></div>`
+        // Distribution Archive Setup
+        const allEntities = ["NIKLAUS", "TSAKNORRIS", ...noldorData.map(c=>c.name), ...krimData.map(c=>c.name)];
+        document.getElementById('epic-dist-list').innerHTML = allEntities.map(n => 
+            `<div style="padding:18px; border-bottom:1px solid rgba(255,255,255,0.05);"><b style="color:var(--gold)">${n}</b><br><span style="color:#555; font-size:0.75rem;">No rewards found in current cycle.</span></div>`
         ).join('');
     </script>
 </body>
