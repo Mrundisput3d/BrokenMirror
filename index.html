@@ -8,11 +8,12 @@
     <style>
         :root {
             --gold: #d4af37;
+            --silver: #c0c0c0;
+            --bronze: #cd7f32;
             --noldor-sky: #00d9ff;
             --krim-red: #ff3333;
             --bg-overlay: rgba(10, 12, 15, 0.9); 
             --panel-bg: rgba(15, 18, 22, 0.98);
-            --top1: #ffd700; --top2: #c0c0c0; --top3: #cd7f32;
         }
 
         body { 
@@ -31,49 +32,63 @@
         .ally-logo { width: 140px; height: 140px; object-fit: contain; margin-bottom: 5px; filter: drop-shadow(0 0 15px var(--gold)); }
         .ally-title { font-family: 'Cinzel Decorative', cursive; font-size: 2.2rem; color: var(--gold); display: block; text-shadow: 2px 2px 10px #000; }
         
-        .leaders-row { display: flex; justify-content: center; gap: 40px; margin-top: 15px; }
-        .leader-card { text-align: center; }
+        .leaders-row { display: flex; justify-content: center; gap: 40px; margin-top: 15px; position: relative; }
+        .leader-card { text-align: center; cursor: pointer; transition: 0.3s; z-index: 10; }
+        .leader-card:hover { transform: translateY(-5px); }
         .img-frame { width: 110px; height: 110px; margin: 0 auto; background: #000; border: 2px solid var(--gold); border-radius: 12px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
         .leader-img { width: 100%; height: 100%; object-fit: contain; }
-        .leader-name { font-family: 'Cinzel'; font-size: 1.3rem; color: #fff; display: block; margin-top: 5px; }
-
+        
         .main-wrapper { display: flex; gap: 15px; max-width: 1700px; margin: 0 auto; align-items: flex-start; }
 
+        /* CLAN HEADERS WITH LOGOS */
         .dashboard-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; flex-grow: 1; }
         .clan-column { background: var(--panel-bg); height: 720px; display: flex; flex-direction: column; border: 1px solid #333; border-radius: 8px; border-top: 3px solid var(--gold); }
-        .column-header { padding: 12px; text-align: center; font-family: 'Cinzel'; font-size: 1rem; border-bottom: 1px solid #222; letter-spacing: 1px; }
-        
-        .scroll-area { overflow-y: auto; padding: 8px; flex-grow: 1; scrollbar-width: thin; scrollbar-color: var(--gold) transparent; }
+        .column-header { 
+            padding: 15px; 
+            text-align: center; 
+            font-family: 'Cinzel'; 
+            font-size: 1.1rem; 
+            border-bottom: 1px solid #222; 
+            display: flex; align-items: center; justify-content: center; gap: 12px;
+        }
+        .clan-mini-logo { width: 35px; height: 35px; object-fit: contain; }
+
+        .scroll-area { overflow-y: auto; padding: 8px; flex-grow: 1; }
         .scroll-area::-webkit-scrollbar { width: 4px; }
         .scroll-area::-webkit-scrollbar-thumb { background: var(--gold); }
 
-        .cp-box { margin-bottom: 6px; border: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.4); border-radius: 4px; }
-        .rank-1 { border-color: var(--top1); box-shadow: inset 0 0 10px rgba(255,215,0,0.05); }
+        /* TOP 3 RANKING BORDERS */
+        .rank-1 { border: 1.5px solid var(--gold) !important; background: rgba(212, 175, 55, 0.05) !important; }
+        .rank-2 { border: 1.5px solid var(--silver) !important; }
+        .rank-3 { border: 1.5px solid var(--bronze) !important; }
 
-        .cp-btn { width: 100%; background: none; border: none; padding: 10px 12px; color: #fff; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; }
+        .cp-box { margin-bottom: 6px; border: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.4); border-radius: 4px; }
+        .cp-btn { width: 100%; background: none; border: none; padding: 10px 12px; color: #fff; text-align: left; cursor: pointer; display: flex; justify-content: space-between; font-size: 0.85rem; }
         .points-tag { color: var(--gold); font-weight: bold; font-size: 0.75rem; border: 1px solid var(--gold); padding: 1px 6px; border-radius: 3px; }
 
-        .member-list { display: none; background: rgba(0,0,0,0.6); border-top: 1px solid #222; max-height: 300px; overflow-y: auto; }
+        .member-list { display: none; background: rgba(0,0,0,0.6); border-top: 1px solid #222; }
         .active > .member-list { display: block; }
         
         .member-btn { width: 100%; background: none; border: none; padding: 8px 15px; color: #ccc; text-align: left; cursor: pointer; font-size: 0.8rem; display: flex; justify-content: space-between; border-bottom: 1px solid #111; }
-        .stats-area { display: none; background: #000; padding: 8px; }
+        .stats-area { display: none; background: #000; padding: 10px; border: 1px solid var(--gold); border-radius: 5px; }
         .active-member > .stats-area { display: block; }
+        .leader-pop { position: absolute; top: 130px; width: 260px; z-index: 100; box-shadow: 0 0 20px #000; }
 
         .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; }
         .stat-box { background: #111; padding: 4px; text-align: center; border: 1px solid #222; font-size: 0.6rem; }
         .stat-name { display: block; color: var(--gold); font-weight: bold; }
 
+        /* ARCHIVE */
         .mini-dist { width: 300px; background: var(--panel-bg); border: 1px solid var(--gold); height: 720px; border-radius: 8px; display: flex; flex-direction: column; }
-        .dist-header { background: #1a1400; color: var(--gold); padding: 12px; text-align: center; font-family: 'Cinzel'; border-bottom: 1px solid var(--gold); font-size: 0.9rem; }
-        .dist-item { border-bottom: 1px solid #222; }
-        .dist-trigger { width: 100%; padding: 10px; background: none; border: none; color: #fff; text-align: left; cursor: pointer; display: flex; justify-content: space-between; font-size: 0.75rem; }
-        .loot-detail { display: none; background: rgba(0,0,0,0.8); padding: 10px; font-size: 0.75rem; color: #eee; border-left: 2px solid var(--gold); }
+        .dist-header { background: #1a1400; color: var(--gold); padding: 12px; text-align: center; font-family: 'Cinzel'; border-bottom: 1px solid var(--gold); }
+        .dist-trigger { width: 100%; padding: 10px; background: none; border: none; color: #fff; text-align: left; cursor: pointer; display: flex; justify-content: space-between; font-size: 0.75rem; border-bottom: 1px solid #222; }
+        .loot-detail { display: none; background: rgba(0,0,0,0.8); padding: 10px; font-size: 0.75rem; border-left: 2px solid var(--gold); }
         .active-dist > .loot-detail { display: block; }
-        .loot-entry { display: block; margin-bottom: 5px; color: #00d9ff; font-weight: bold; }
-        .loot-date { color: #888; font-size: 0.65rem; display: block; }
 
-        @media (max-width: 1200px) { .main-wrapper { flex-direction: column; } .mini-dist { width: 100%; } }
+        /* ADMIN PANEL */
+        .admin-panel { max-width: 1700px; margin: 20px auto; background: rgba(20,20,20,0.9); padding: 15px; border-radius: 8px; border: 1px dashed var(--gold); display: flex; gap: 10px; align-items: center; justify-content: center; }
+        .admin-panel input, .admin-panel select { background: #000; border: 1px solid #444; color: #fff; padding: 8px; border-radius: 4px; }
+        .admin-btn { background: var(--gold); color: #000; border: none; padding: 8px 20px; border-radius: 4px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -83,15 +98,17 @@
         <span class="ally-title">BROKEN MIRROR ALLIANCE</span>
         
         <div class="leaders-row">
-            <div class="leader-card">
+            <div class="leader-card" onclick="toggleLeader('nik-stats')">
                 <div class="img-frame"><img src="https://i.ibb.co/5X3NDQFR/niklaus.png" class="leader-img"></div>
-                <span class="leader-name">NIKLAUS</span>
+                <span style="font-family:'Cinzel'; font-size:1.3rem; display:block;">NIKLAUS</span>
                 <small style="color:var(--gold)">ALLY LEADER</small>
+                <div id="nik-stats" class="stats-area leader-pop" style="left: 25%;"></div>
             </div>
-            <div class="leader-card">
+            <div class="leader-card" onclick="toggleLeader('tsak-stats')">
                 <div class="img-frame"><img src="https://i.ibb.co/xSVgzBPB/tsaknorris.png" class="leader-img"></div>
-                <span class="leader-name">TSAKNORRIS</span>
+                <span style="font-family:'Cinzel'; font-size:1.3rem; display:block;">TSAKNORRIS</span>
                 <small style="color:var(--gold)">SHOTCALLER</small>
+                <div id="tsak-stats" class="stats-area leader-pop" style="right: 25%;"></div>
             </div>
         </div>
     </div>
@@ -99,46 +116,35 @@
     <div class="main-wrapper">
         <div class="dashboard-container">
             <div class="clan-column">
-                <div class="column-header" style="color:var(--noldor-sky)">NOLDOR CLAN</div>
+                <div class="column-header" style="color:var(--noldor-sky)">
+                    <img src="https://i.ibb.co/8LvFNQkC/noldor.png" class="clan-mini-logo"> NOLDOR CLAN
+                </div>
                 <div class="scroll-area" id="noldor-list"></div>
             </div>
             <div class="clan-column">
-                <div class="column-header" style="color:var(--krim-red)">KRIMINALIDES MAIN</div>
+                <div class="column-header" style="color:var(--krim-red)">
+                    <img src="https://i.ibb.co/VYMZjzYr/kriminalides.png" class="clan-mini-logo"> KRIMINALIDES MAIN
+                </div>
                 <div class="scroll-area" id="krim-list"></div>
             </div>
         </div>
+        <div class="mini-dist"><div class="dist-header">LOOT ARCHIVE</div><div class="scroll-area" id="epic-dist-list"></div></div>
+    </div>
 
-        <div class="mini-dist">
-            <div class="dist-header">LOOT ARCHIVE</div>
-            <div class="scroll-area" id="epic-dist-list"></div>
-        </div>
+    <div class="admin-panel">
+        <strong style="color:var(--gold)">ADMIN PANEL:</strong>
+        <select id="target-cp"></select>
+        <input type="text" id="loot-name" placeholder="Item Name">
+        <button class="admin-btn" onclick="addLoot()">ADD LOOT</button>
     </div>
 
     <script>
         const bosses = ["VAL", "ANT", "BAI", "FRI", "ZAK", "ORF", "AQ", "CORE", "SIEGE"];
-        
-        // ΠΡΑΓΜΑΤΙΚΟ LOOT DATA
-        const lootDatabase = {
-            "Hattrick CP": [
-                { item: "Valakas Necklace", date: "10/03/2026" },
-                { item: "Zaken Earring", date: "05/03/2026" },
-                { item: "Shield of Vesper", date: "01/03/2026" }
-            ],
-            "Kriminalides CP": [
-                { item: "Antharas Earring", date: "08/03/2026" },
-                { item: "Vesper Noble Set", date: "02/03/2026" }
-            ],
-            "55 Room CP": [
-                { item: "Core Ring", date: "07/03/2026" }
-            ],
-            "NIKLAUS": [
-                { item: "Frintezza's Necklace", date: "11/03/2026" }
-            ]
-        };
+        let lootDatabase = { "Hattrick CP": [{item: "Valakas Necklace", date: "12/03"}] };
 
         const noldorData = [
-            { name: "Kriminalides CP", pts: 2850, lead: "DarkLord", mems: ["Slayer", "Healer1", "TankX", "Archer1", "Archer2", "Mage7", "Buffer"] },
-            { name: "Noldor Archer", pts: 1500, lead: "Artemis", mems: ["Legolas", "Sylvanas"] },
+            { name: "Kriminalides CP", pts: 2850, lead: "DarkLord", mems: ["Slayer", "Healer1"] },
+            { name: "Noldor Archer", pts: 1500, lead: "Artemis", mems: ["Legolas"] },
             { name: "Brazilians CP", pts: 1350, lead: "Ronaldo", mems: ["Neymar"] },
             { name: "Noldor Archer 2", pts: 1200, lead: "Apollo", mems: ["ArcherX"] },
             { name: "Noldor Tank", pts: 1100, lead: "Aegis", mems: ["Shield"] },
@@ -150,8 +156,8 @@
         ];
 
         const krimData = [
-            { name: "Hattrick CP", pts: 3100, lead: "Captain", mems: ["Striker", "Goalie", "Mid1", "Mid2", "Defense", "Winger", "Bench1", "Bench2"] },
-            { name: "55 Room CP", pts: 1950, lead: "Master55", mems: ["P1", "P2", "P3"] },
+            { name: "Hattrick CP", pts: 3100, lead: "Captain", mems: ["Striker", "Goalie"] },
+            { name: "55 Room CP", pts: 1950, lead: "Master55", mems: ["P1"] },
             { name: "Criminal Record CP", pts: 1600, lead: "Judge", mems: ["J1"] },
             { name: "Sinaloa CP", pts: 1550, lead: "ElChapo", mems: ["C1"] },
             { name: "Avalanche CP", pts: 1400, lead: "Snow", mems: ["Ice"] },
@@ -164,26 +170,24 @@
             { name: "Animals CP", pts: 750, lead: "Lion", mems: ["Tiger"] }
         ];
 
-        function createCPItem(cp, color, rank) {
-            let rankClass = (rank === 0) ? "rank-1" : "";
-            const membersHTML = [cp.lead, ...cp.mems].map((m, i) => `
-                <div class="member-container">
-                    <button class="member-btn" onclick="this.parentElement.classList.toggle('active-member')">
-                        <span>${i === 0 ? '👑 ' : ''}${m}</span><small>STATS ▼</small>
-                    </button>
-                    <div class="stats-area">
-                        <div class="stat-grid">${bosses.map(b => `<div class="stat-box"><span class="stat-name">${b}</span>${Math.floor(Math.random()*15)}</div>`).join('')}</div>
-                    </div>
-                </div>`).join('');
+        function toggleLeader(id) {
+            const el = document.getElementById(id);
+            const isVisible = el.style.display === 'block';
+            document.querySelectorAll('.leader-pop').forEach(p => p.style.display = 'none');
+            if(!isVisible) {
+                el.style.display = 'block';
+                el.innerHTML = `<div class="stat-grid">${bosses.map(b => `<div class="stat-box"><span class="stat-name">${b}</span>${Math.floor(Math.random()*20)}</div>`).join('')}</div>`;
+            }
+        }
 
-            return `
-                <div class="cp-box ${rankClass}">
-                    <button class="cp-btn" onclick="this.parentElement.classList.toggle('active')">
-                        <span style="color:var(${color}); font-weight:bold;">#${rank+1} ${cp.name}</span>
-                        <span class="points-tag">${cp.pts} PTS</span>
-                    </button>
-                    <div class="member-list">${membersHTML}</div>
-                </div>`;
+        function createCPItem(cp, color, rank) {
+            let rankClass = (rank === 0) ? "rank-1" : (rank === 1) ? "rank-2" : (rank === 2) ? "rank-3" : "";
+            const membersHTML = [cp.lead, ...cp.mems].map(m => `
+                <div class="member-container">
+                    <button class="member-btn" onclick="this.parentElement.classList.toggle('active-member')"><span>${m}</span><small>▼</small></button>
+                    <div class="stats-area"><div class="stat-grid">${bosses.map(b => `<div class="stat-box"><span class="stat-name">${b}</span>0</div>`).join('')}</div></div>
+                </div>`).join('');
+            return `<div class="cp-box ${rankClass}"><button class="cp-btn" onclick="this.parentElement.classList.toggle('active')"><span style="color:var(${color})">#${rank+1} ${cp.name}</span><span class="points-tag">${cp.pts} PTS</span></button><div class="member-list">${membersHTML}</div></div>`;
         }
 
         const render = (data, id, col) => {
@@ -191,26 +195,28 @@
             document.getElementById(id).innerHTML = sorted.map((cp, i) => createCPItem(cp, col, i)).join('');
         };
 
+        function updateArchive() {
+            const all = ["NIKLAUS", "TSAKNORRIS", ...noldorData.map(c=>c.name), ...krimData.map(c=>c.name)].sort();
+            document.getElementById('epic-dist-list').innerHTML = all.map(name => {
+                const items = lootDatabase[name] || [];
+                return `<div class="dist-item"><button class="dist-trigger" onclick="this.parentElement.classList.toggle('active-dist')"><span>${name}</span><small>${items.length} ▼</small></button><div class="loot-detail">${items.map(i => `<div style="color:var(--noldor-sky)">💠 ${i.item} <small style="color:#666">(${i.date})</small></div>`).join('') || 'No loot'}</div></div>`;
+            }).join('');
+            document.getElementById('target-cp').innerHTML = all.map(n => `<option value="${n}">${n}</option>`).join('');
+        }
+
+        function addLoot() {
+            const cp = document.getElementById('target-cp').value;
+            const item = document.getElementById('loot-name').value;
+            if(!item) return alert("Enter item name!");
+            if(!lootDatabase[cp]) lootDatabase[cp] = [];
+            lootDatabase[cp].push({item: item, date: new Date().toLocaleDateString('el-GR', {day:'2-digit', month:'2-digit'})});
+            document.getElementById('loot-name').value = "";
+            updateArchive();
+        }
+
         render(noldorData, 'noldor-list', '--noldor-sky');
         render(krimData, 'krim-list', '--krim-red');
-
-        // LOOT ARCHIVE GENERATION
-        const allEntities = ["NIKLAUS", "TSAKNORRIS", ...noldorData.map(c=>c.name), ...krimData.map(c=>c.name)].sort();
-        document.getElementById('epic-dist-list').innerHTML = allEntities.map(name => {
-            const items = lootDatabase[name] || [];
-            const lootHTML = items.length > 0 
-                ? items.map(i => `<span class="loot-entry">💠 ${i.item}<span class="loot-date">${i.date}</span></span>`).join('')
-                : "No rewards found in current cycle.";
-            
-            return `
-            <div class="dist-item">
-                <button class="dist-trigger" onclick="this.parentElement.classList.toggle('active-dist')">
-                    <span style="color:var(--gold)">${name}</span>
-                    <small>${items.length} ITEMS ▼</small>
-                </button>
-                <div class="loot-detail">${lootHTML}</div>
-            </div>`;
-        }).join('');
+        updateArchive();
     </script>
 </body>
 </html>
