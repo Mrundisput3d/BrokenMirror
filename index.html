@@ -9,7 +9,7 @@
         :root {
             --gold: #d4af37; --silver: #c0c0c0; --bronze: #cd7f32;
             --noldor-sky: #00d9ff; --krim-red: #ff3333;
-            --bg-overlay: rgba(10, 12, 15, 0.92); 
+            --bg-overlay: rgba(10, 12, 15, 0.94); 
             --panel-bg: rgba(15, 18, 22, 0.98);
         }
         html { scroll-behavior: smooth; }
@@ -20,64 +20,65 @@
         }
         body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-overlay); z-index: -1; }
 
-        .page-section { min-height: 100vh; padding: 20px; box-sizing: border-box; }
-        .server-time { position: absolute; top: 20px; right: 40px; color: var(--gold); font-family: 'Cinzel'; border: 1px solid var(--gold); padding: 5px 15px; border-radius: 5px; background: rgba(0,0,0,0.5); }
+        .page-section { min-height: 100vh; padding: 20px; box-sizing: border-box; position: relative; }
+        .server-time { position: absolute; top: 20px; right: 40px; color: var(--gold); font-family: 'Cinzel'; border: 1px solid var(--gold); padding: 5px 15px; border-radius: 5px; background: rgba(0,0,0,0.5); font-size: 0.8rem; }
 
         .top-header { text-align: center; margin-bottom: 25px; }
-        .ally-logo { width: 140px; height: 140px; object-fit: contain; filter: drop-shadow(0 0 15px var(--gold)); }
-        .ally-title { font-family: 'Cinzel Decorative', cursive; font-size: 2.2rem; color: var(--gold); display: block; }
+        .ally-logo { width: 120px; height: 120px; object-fit: contain; filter: drop-shadow(0 0 15px var(--gold)); }
+        .ally-title { font-family: 'Cinzel Decorative', cursive; font-size: 2rem; color: var(--gold); display: block; margin-top: 10px; }
         
-        .leaders-row { display: flex; justify-content: center; gap: 40px; margin-top: 15px; position: relative; }
-        .leader-card { text-align: center; cursor: pointer; transition: 0.3s; z-index: 10; }
-        .img-frame { width: 110px; height: 110px; margin: 0 auto; background: #000; border: 2px solid var(--gold); border-radius: 12px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .leaders-row { display: flex; justify-content: center; gap: 30px; margin-top: 15px; }
+        .leader-card { text-align: center; cursor: pointer; transition: 0.3s; width: 120px; }
+        .img-frame { width: 90px; height: 90px; margin: 0 auto; background: #000; border: 2px solid var(--gold); border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
         .leader-img { width: 100%; height: 100%; object-fit: contain; }
         
-        .main-wrapper { display: flex; gap: 15px; max-width: 1750px; margin: 0 auto; }
+        .main-wrapper { display: flex; gap: 15px; max-width: 1800px; margin: 0 auto; }
         .dashboard-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; flex-grow: 1; }
-        .clan-column { background: var(--panel-bg); height: 720px; display: flex; flex-direction: column; border: 1px solid #333; border-radius: 8px; border-top: 3px solid var(--gold); }
-        .column-header { padding: 15px; text-align: center; font-family: 'Cinzel'; font-size: 1.1rem; border-bottom: 1px solid #222; display: flex; align-items: center; justify-content: center; gap: 12px; }
-        .clan-mini-logo { width: 35px; height: 35px; object-fit: contain; }
+        .clan-column { background: var(--panel-bg); height: 700px; display: flex; flex-direction: column; border: 1px solid #333; border-radius: 8px; border-top: 3px solid var(--gold); }
+        .column-header { padding: 12px; text-align: center; font-family: 'Cinzel'; font-size: 1rem; border-bottom: 1px solid #222; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .clan-mini-logo { width: 30px; height: 30px; object-fit: contain; }
 
-        .scroll-area { overflow-y: auto; padding: 8px; flex-grow: 1; scrollbar-width: thin; scrollbar-color: var(--gold) transparent; }
+        .scroll-area { overflow-y: auto; padding: 8px; flex-grow: 1; scrollbar-width: thin; }
         .scroll-area::-webkit-scrollbar { width: 4px; }
         .scroll-area::-webkit-scrollbar-thumb { background: var(--gold); }
 
-        .rank-1 { border: 1.5px solid var(--gold) !important; background: rgba(212, 175, 55, 0.05) !important; }
-        .rank-2 { border: 1.5px solid var(--silver) !important; }
-        .rank-3 { border: 1.5px solid var(--bronze) !important; }
+        .rank-1 { border: 1px solid var(--gold) !important; box-shadow: inset 0 0 10px rgba(212,175,55,0.1); }
+        .rank-2 { border: 1px solid var(--silver) !important; }
+        .rank-3 { border: 1px solid var(--bronze) !important; }
 
-        .cp-box { margin-bottom: 6px; border: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.4); border-radius: 4px; }
-        .cp-btn { width: 100%; background: none; border: none; padding: 10px 12px; color: #fff; text-align: left; cursor: pointer; display: flex; justify-content: space-between; font-size: 0.85rem; }
-        .points-tag { color: var(--gold); font-weight: bold; font-size: 0.75rem; border: 1px solid var(--gold); padding: 1px 6px; border-radius: 3px; }
+        .cp-box { margin-bottom: 6px; border: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.3); border-radius: 4px; }
+        .cp-btn { width: 100%; background: none; border: none; padding: 10px; color: #fff; text-align: left; cursor: pointer; display: flex; justify-content: space-between; font-size: 0.85rem; align-items: center; }
+        .points-tag { color: var(--gold); font-weight: bold; font-size: 0.75rem; border: 1px solid var(--gold); padding: 2px 6px; border-radius: 3px; }
 
-        .member-list { display: none; background: rgba(0,0,0,0.6); border-top: 1px solid #222; }
+        .member-list { display: none; background: rgba(0,0,0,0.5); border-top: 1px solid #222; padding: 5px 0; }
         .active > .member-list { display: block; }
-        .member-btn { width: 100%; background: none; border: none; padding: 8px 15px; color: #ccc; text-align: left; cursor: pointer; font-size: 0.8rem; display: flex; justify-content: space-between; border-bottom: 1px solid #111; }
+        .member-btn { width: 100%; background: none; border: none; padding: 6px 15px; color: #bbb; text-align: left; font-size: 0.8rem; cursor: pointer; display: flex; justify-content: space-between; }
         
-        .stats-area { display: none; background: #000; padding: 10px; border: 1px solid var(--gold); border-radius: 5px; }
-        .active-member > .stats-area { display: block; }
-        .leader-pop { position: absolute; top: 130px; width: 260px; z-index: 100; box-shadow: 0 0 20px #000; }
+        .stats-area { display: none; background: #000; padding: 10px; border: 1px solid var(--gold); border-radius: 5px; position: absolute; z-index: 100; width: 250px; }
+        .active-member > .stats-area { display: block; position: relative; width: auto; margin: 5px 10px; }
+        .leader-pop { position: absolute; top: 120px; box-shadow: 0 0 20px #000; }
 
-        .mini-dist { width: 320px; background: var(--panel-bg); border: 1px solid var(--gold); height: 720px; border-radius: 8px; display: flex; flex-direction: column; }
+        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; }
+        .stat-box { background: #111; padding: 4px; text-align: center; border: 1px solid #222; font-size: 0.6rem; }
+        .stat-name { display: block; color: var(--gold); font-weight: bold; }
+
+        .mini-dist { width: 300px; background: var(--panel-bg); border: 1px solid var(--gold); height: 700px; border-radius: 8px; display: flex; flex-direction: column; }
         .dist-header { background: #1a1400; color: var(--gold); padding: 12px; text-align: center; font-family: 'Cinzel'; border-bottom: 1px solid var(--gold); }
-        .archive-search { background: #000; border: none; border-bottom: 1px solid #333; color: #fff; padding: 10px; width: 100%; box-sizing: border-box; font-size: 0.8rem; }
+        .archive-search { background: #000; border: none; border-bottom: 1px solid #333; color: #fff; padding: 10px; width: 100%; box-sizing: border-box; font-size: 0.75rem; outline: none; }
         .dist-trigger { width: 100%; padding: 10px; background: none; border: none; color: #fff; text-align: left; cursor: pointer; display: flex; justify-content: space-between; font-size: 0.75rem; border-bottom: 1px solid #222; }
-        .loot-detail { display: none; background: rgba(0,0,0,0.8); padding: 10px; font-size: 0.75rem; border-left: 2px solid var(--gold); }
+        .loot-detail { display: none; background: rgba(0,0,0,0.8); padding: 8px; font-size: 0.7rem; border-left: 2px solid var(--gold); }
         .active-dist > .loot-detail { display: block; }
 
-        /* EPIC PRICES TABLE */
-        .epic-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 20px; }
-        .epic-card { background: rgba(0,0,0,0.5); border: 1px solid #333; padding: 15px; text-align: center; border-radius: 8px; transition: 0.3s; }
-        .epic-card:hover { border-color: var(--gold); transform: translateY(-5px); }
-        .epic-icon { width: 42px; height: 42px; margin-bottom: 10px; filter: drop-shadow(0 0 5px var(--gold)); }
-        .epic-name { display: block; font-family: 'Cinzel'; color: var(--gold); font-size: 0.9rem; }
-        .epic-price { display: block; font-size: 0.8rem; color: #aaa; margin-top: 5px; }
-        .epic-pts { display: block; color: #fff; font-weight: bold; font-size: 1.1rem; margin-top: 5px; }
+        /* COMPACT EPIC PRICES */
+        .epic-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 10px; }
+        .epic-card { background: rgba(20,20,20,0.8); border: 1px solid #333; padding: 8px; text-align: center; border-radius: 6px; display: flex; align-items: center; gap: 10px; }
+        .epic-icon { width: 28px; height: 28px; filter: drop-shadow(0 0 3px var(--gold)); }
+        .epic-info { text-align: left; }
+        .epic-name { display: block; font-family: 'Cinzel'; color: var(--gold); font-size: 0.7rem; }
+        .epic-pts { color: #fff; font-weight: bold; font-size: 0.8rem; }
 
-        .admin-panel { max-width: 1750px; margin: 20px auto; background: rgba(20,20,20,0.9); padding: 15px; border-radius: 8px; border: 1px dashed var(--gold); display: flex; gap: 10px; align-items: center; justify-content: center; }
-        .admin-panel select, .admin-panel button { padding: 8px; border-radius: 4px; font-weight: bold; }
-        .scroll-down-btn { text-align: center; color: var(--gold); cursor: pointer; font-family: 'Cinzel'; text-decoration: none; display: block; margin-top: 10px; animation: bounce 2s infinite; }
-        @keyframes bounce { 0%, 100% {transform: translateY(0);} 50% {transform: translateY(-10px);} }
+        .admin-panel { max-width: 1800px; margin: 15px auto; background: rgba(20,20,20,0.9); padding: 12px; border-radius: 8px; border: 1px dashed var(--gold); display: flex; gap: 10px; align-items: center; justify-content: center; }
+        .admin-panel select, .admin-panel button { padding: 6px; border-radius: 4px; font-size: 0.8rem; }
     </style>
 </head>
 <body>
@@ -91,15 +92,13 @@
             <div class="leaders-row">
                 <div class="leader-card" onclick="toggleLeader('nik-stats')">
                     <div class="img-frame"><img src="https://i.ibb.co/5X3NDQFR/niklaus.png" class="leader-img"></div>
-                    <span style="font-family:'Cinzel'; font-size:1.3rem; display:block;">NIKLAUS</span>
-                    <small style="color:var(--gold)">ALLY LEADER</small>
-                    <div id="nik-stats" class="stats-area leader-pop" style="left: 25%;"></div>
+                    <span style="font-family:'Cinzel'; font-size:1rem; display:block;">NIKLAUS</span>
+                    <div id="nik-stats" class="stats-area leader-pop" style="left: 30%;"></div>
                 </div>
                 <div class="leader-card" onclick="toggleLeader('tsak-stats')">
                     <div class="img-frame"><img src="https://i.ibb.co/xSVgzBPB/tsaknorris.png" class="leader-img"></div>
-                    <span style="font-family:'Cinzel'; font-size:1.3rem; display:block;">TSAKNORRIS</span>
-                    <small style="color:var(--gold)">SHOTCALLER</small>
-                    <div id="tsak-stats" class="stats-area leader-pop" style="right: 25%;"></div>
+                    <span style="font-family:'Cinzel'; font-size:1rem; display:block;">TSAKNORRIS</span>
+                    <div id="tsak-stats" class="stats-area leader-pop" style="right: 30%;"></div>
                 </div>
             </div>
         </div>
@@ -127,73 +126,71 @@
         </div>
 
         <div class="admin-panel">
-            <strong style="color:var(--gold)">LOOT DISTRIBUTION:</strong>
+            <strong style="color:var(--gold); font-size:0.8rem;">LOOT DISTRIBUTION:</strong>
             <select id="target-cp"></select>
             <select id="target-jewel">
                 <option value="none">-- Select Jewel --</option>
-                <option value="Core|25">Core (25 pts)</option>
-                <option value="Orfen|75">Orfen (75 pts)</option>
-                <option value="AQ|150">Ant Queen (150 pts)</option>
-                <option value="Zaken|175">Zaken (175 pts)</option>
-                <option value="Frintezza|225">Frintezza (225 pts)</option>
-                <option value="Baium|950">Baium (950 pts)</option>
-                <option value="Antharas|1100">Antharas (1100 pts)</option>
-                <option value="Valakas|3100">Valakas (3100 pts)</option>
+                <option value="Core|25">Core Ring (25)</option>
+                <option value="Orfen|75">Orfen Earring (75)</option>
+                <option value="AQ|150">Queen Ant (150)</option>
+                <option value="Zaken|175">Zaken (175)</option>
+                <option value="Frintezza|225">Frintezza (225)</option>
+                <option value="Baium|950">Baium (950)</option>
+                <option value="Antharas|1100">Antharas (1100)</option>
+                <option value="Valakas|3100">Valakas (3100)</option>
             </select>
-            <button onclick="distributeLoot()" style="background:var(--gold); cursor:pointer;">CONFIRM & DEDUCT</button>
+            <button onclick="distributeLoot()" style="background:var(--gold); font-weight:bold; cursor:pointer;">CONFIRM DEDUCTION</button>
         </div>
-
-        <a href="#bottom" class="scroll-down-btn">EPIC JEWELS PRICES ▼</a>
     </div>
 
-    <div class="page-section" id="bottom" style="background: rgba(0,0,0,0.4);">
-        <h2 style="font-family:'Cinzel Decorative'; color:var(--gold); text-align:center; font-size:2rem; margin-top:50px;">EPIC JEWELS PRICES</h2>
-        <div style="max-width:1200px; margin: 0 auto;">
-            <div class="epic-grid" id="prices-grid"></div>
-        </div>
+    <div class="page-section" id="bottom" style="background: rgba(0,0,0,0.5);">
+        <h2 style="font-family:'Cinzel'; color:var(--gold); text-align:center; font-size:1.5rem; margin-top:30px;">EPIC JEWELS PRICES</h2>
+        <div style="max-width:1400px; margin: 0 auto;" id="prices-grid" class="epic-grid"></div>
         
-        <div style="text-align:center; margin-top:80px;">
-            <a href="#top" style="color:var(--gold); font-family:'Cinzel'; text-decoration:none;">▲ BACK TO DASHBOARD</a>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; max-width:1400px; margin: 40px auto;">
+            <div class="clan-column" style="height:300px;"><div class="column-header">ALLIANCE RULES</div><div class="scroll-area">1. Respect Callers<br>2. Attendance is mandatory</div></div>
+            <div class="clan-column" style="height:300px;"><div class="column-header">UPCOMING EVENTS</div><div class="scroll-area">Castle Siege: Sunday 20:00</div></div>
         </div>
     </div>
 
     <script>
         const bosses = ["VAL", "ANT", "BAI", "FRI", "ZAK", "ORF", "AQ", "CORE", "SIEGE"];
-        const jewelIcons = {
-            "Core": "https://raw.githubusercontent.com/Mrundisput3d/animals-cp-tracker/master/images/core.png",
-            "Orfen": "https://raw.githubusercontent.com/Mrundisput3d/animals-cp-tracker/master/images/orfen.png",
-            "AQ": "https://raw.githubusercontent.com/Mrundisput3d/animals-cp-tracker/master/images/ant_queen.png",
-            "Zaken": "https://raw.githubusercontent.com/Mrundisput3d/animals-cp-tracker/master/images/zaken.png",
-            "Frintezza": "https://raw.githubusercontent.com/Mrundisput3d/animals-cp-tracker/master/images/frintezza.png",
-            "Baium": "https://raw.githubusercontent.com/Mrundisput3d/animals-cp-tracker/master/images/baium.png",
-            "Antharas": "https://raw.githubusercontent.com/Mrundisput3d/animals-cp-tracker/master/images/antharas.png",
-            "Valakas": "https://raw.githubusercontent.com/Mrundisput3d/animals-cp-tracker/master/images/valakas.png"
-        };
-        const jewelPrices = [
-            {id: "Core", name: "Core Ring", gb: "5 GB", pts: 25},
-            {id: "Orfen", name: "Orfen's Earring", gb: "15 GB", pts: 75},
-            {id: "AQ", name: "Queen Ant Ring", gb: "30 GB", pts: 150},
-            {id: "Zaken", name: "Zaken's Earring", gb: "35 GB", pts: 175},
-            {id: "Frintezza", name: "Frintezza's Neck", gb: "45 GB", pts: 225},
-            {id: "Baium", name: "Baium Ring", gb: "190 GB", pts: 950},
-            {id: "Antharas", name: "Antharas Earring", gb: "220 GB", pts: 1100},
-            {id: "Valakas", name: "Valakas Necklace", gb: "620 GB", pts: 3100}
+        
+        // ΔΕΔΟΜΕΝΑ CP
+        let noldorData = [
+            { name: "Kriminalides CP", pts: 4500, lead: "DarkLord", mems: ["Slayer", "Healer1", "TankX"] },
+            { name: "Noldor Archer", pts: 2500, lead: "Artemis", mems: ["Legolas", "Swift"] },
+            { name: "Brazilians CP", pts: 1800, lead: "Ronaldo", mems: ["Neymar", "Kaka"] },
+            { name: "Noldor Archer 2", pts: 1200, lead: "Apollo", mems: ["ArcherX"] },
+            { name: "Ronin CP", pts: 950, lead: "Samurai", mems: ["Katana"] }
         ];
 
-        let noldorData = [
-            { name: "Kriminalides CP", pts: 4500, lead: "DarkLord", mems: ["Slayer"] },
-            { name: "Noldor Archer", pts: 2500, lead: "Artemis", mems: ["Legolas"] }
-        ];
         let krimData = [
-            { name: "Hattrick CP", pts: 5200, lead: "Captain", mems: ["Striker"] },
-            { name: "55 Room CP", pts: 1950, lead: "Master55", mems: ["P1"] }
+            { name: "Hattrick CP", pts: 5200, lead: "Captain", mems: ["Striker", "Goalie", "Mid"] },
+            { name: "55 Room CP", pts: 2100, lead: "Master55", mems: ["P1", "P2"] },
+            { name: "Criminal Record CP", pts: 1900, lead: "Judge", mems: ["J1"] },
+            { name: "Sinaloa CP", pts: 1600, lead: "ElChapo", mems: ["C1"] },
+            { name: "Dracaris CP", pts: 1300, lead: "Dany", mems: ["Drag1"] }
         ];
+
+        const jewelPrices = [
+            {id: "core", name: "Core", pts: 25, icon: "https://raw.githubusercontent.com/Mrundisput3d/animals-cp-tracker/master/images/core.png"},
+            {id: "orfen", name: "Orfen", pts: 75, icon: "https://raw.githubusercontent.com/Mrundisput3d/animals-cp-tracker/master/images/orfen.png"},
+            {id: "aq", name: "Ant Queen", pts: 150, icon: "https://raw.githubusercontent.com/Mrundisput3d/animals-cp-tracker/master/images/ant_queen.png"},
+            {id: "zaken", name: "Zaken", pts: 175, icon: "https://raw.githubusercontent.com/Mrundisput3d/animals-cp-tracker/master/images/zaken.png"},
+            {id: "frintezza", name: "Frintezza", pts: 225, icon: "https://raw.githubusercontent.com/Mrundisput3d/animals-cp-tracker/master/images/frintezza.png"},
+            {id: "baium", name: "Baium", pts: 950, icon: "https://raw.githubusercontent.com/Mrundisput3d/animals-cp-tracker/master/images/baium.png"},
+            {id: "antharas", name: "Antharas", pts: 1100, icon: "https://raw.githubusercontent.com/Mrundisput3d/animals-cp-tracker/master/images/antharas.png"},
+            {id: "valakas", name: "Valakas", pts: 3100, icon: "https://raw.githubusercontent.com/Mrundisput3d/animals-cp-tracker/master/images/valakas.png"}
+        ];
+
         let lootArchive = {};
 
         function renderEverything() {
             renderList(noldorData, 'noldor-list', '--noldor-sky');
             renderList(krimData, 'krim-list', '--krim-red');
             updateArchive();
+            renderPrices();
         }
 
         function renderList(data, id, col) {
@@ -206,50 +203,67 @@
                         <span class="points-tag">${cp.pts} PTS</span>
                     </button>
                     <div class="member-list">
-                        <div class="member-container">
-                            <button class="member-btn"><span>👑 ${cp.lead}</span></button>
+                        <div class="member-container active-member">
+                            <button class="member-btn"><span>👑 ${cp.lead} (Leader)</span></button>
                         </div>
+                        ${cp.mems.map(m => `<div class="member-container"><button class="member-btn"><span>${m}</span></button></div>`).join('')}
                     </div>
                 </div>`;
             }).join('');
         }
 
+        function renderPrices() {
+            document.getElementById('prices-grid').innerHTML = jewelPrices.map(j => `
+                <div class="epic-card">
+                    <img src="${j.icon}" class="epic-icon" onerror="this.src='https://via.placeholder.com/30'">
+                    <div class="epic-info">
+                        <span class="epic-name">${j.name}</span>
+                        <span class="epic-pts">${j.pts} PTS</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
         function distributeLoot() {
             const cpName = document.getElementById('target-cp').value;
-            const jewelData = document.getElementById('target-jewel').value.split('|');
-            if(jewelData[0] === "none") return alert("Select a jewel");
+            const jewelInfo = document.getElementById('target-jewel').value.split('|');
+            if(jewelInfo[0] === "none") return;
 
-            const jewelName = jewelData[0];
-            const cost = parseInt(jewelData[1]);
+            const name = jewelInfo[0];
+            const cost = parseInt(jewelInfo[1]);
 
-            // Deduction Logic
-            let found = false;
-            [noldorData, krimData].forEach(list => {
-                const cp = list.find(c => c.name === cpName);
-                if(cp) {
-                    cp.pts -= cost;
-                    found = true;
-                }
-            });
-
-            if(!found && (cpName === "NIKLAUS" || cpName === "TSAKNORRIS")) found = true;
-
-            if(found) {
+            let target = [...noldorData, ...krimData].find(c => c.name === cpName);
+            if(target) {
+                target.pts -= cost;
                 if(!lootArchive[cpName]) lootArchive[cpName] = [];
-                lootArchive[cpName].unshift({item: jewelName, date: new Date().toLocaleDateString('el-GR')});
+                lootArchive[cpName].unshift({item: name, date: new Date().toLocaleDateString('el-GR')});
                 renderEverything();
-                alert(`Loot Added: ${jewelName} to ${cpName}. Points Deducted: -${cost}`);
+                alert(`SUCCESS: -${cost} points from ${cpName}`);
             }
         }
 
         function updateArchive() {
-            const all = ["NIKLAUS", "TSAKNORRIS", ...noldorData.map(c=>c.name), ...krimData.map(c=>c.name)].sort();
-            document.getElementById('epic-dist-list').innerHTML = all.map(name => {
+            const allNames = ["NIKLAUS", "TSAKNORRIS", ...noldorData.map(c=>c.name), ...krimData.map(c=>c.name)].sort();
+            document.getElementById('target-cp').innerHTML = allNames.map(n => `<option value="${n}">${n}</option>`).join('');
+            document.getElementById('epic-dist-list').innerHTML = allNames.map(name => {
                 const items = lootArchive[name] || [];
-                return `<div class="dist-item"><button class="dist-trigger" onclick="this.parentElement.classList.toggle('active-dist')"><span>${name}</span><small>${items.length} ▼</small></button>
-                <div class="loot-detail">${items.map(i => `<div style="color:var(--gold)">💠 ${i.item} <small>(${i.date})</small></div>`).join('') || 'No loot'}</div></div>`;
+                return `<div class="dist-item">
+                    <button class="dist-trigger" onclick="this.parentElement.classList.toggle('active-dist')">
+                        <span>${name}</span><small>${items.length} ▼</small>
+                    </button>
+                    <div class="loot-detail">${items.map(i => `<div style="color:var(--gold)">💠 ${i.item} <small>(${i.date})</small></div>`).join('') || 'Empty'}</div>
+                </div>`;
             }).join('');
-            document.getElementById('target-cp').innerHTML = all.map(n => `<option value="${n}">${n}</option>`).join('');
+        }
+
+        function toggleLeader(id) {
+            const el = document.getElementById(id);
+            const isVisible = el.style.display === 'block';
+            document.querySelectorAll('.leader-pop').forEach(p => p.style.display = 'none');
+            if(!isVisible) {
+                el.style.display = 'block';
+                el.innerHTML = `<div class="stat-grid">${bosses.map(b => `<div class="stat-box"><span class="stat-name">${b}</span>${Math.floor(Math.random()*15)}</div>`).join('')}</div>`;
+            }
         }
 
         function filterArchive() {
@@ -260,29 +274,7 @@
             }
         }
 
-        function toggleLeader(id) {
-            const el = document.getElementById(id);
-            const visible = el.style.display === 'block';
-            document.querySelectorAll('.leader-pop').forEach(p => p.style.display = 'none');
-            if(!visible) {
-                el.style.display = 'block';
-                el.innerHTML = `<div class="stat-grid">${bosses.map(b => `<div class="stat-box"><span class="stat-name">${b}</span>${Math.floor(Math.random()*20)}</div>`).join('')}</div>`;
-            }
-        }
-
-        // Clock
         setInterval(() => { document.getElementById('clock').innerText = "SERVER TIME: " + new Date().toLocaleTimeString('el-GR'); }, 1000);
-
-        // Render Prices Table
-        document.getElementById('prices-grid').innerHTML = jewelPrices.map(j => `
-            <div class="epic-card">
-                <img src="${jewelIcons[j.id]}" class="epic-icon">
-                <span class="epic-name">${j.name}</span>
-                <span class="epic-price">${j.gb}</span>
-                <span class="epic-pts">${j.pts} POINTS</span>
-            </div>
-        `).join('');
-
         renderEverything();
     </script>
 </body>
