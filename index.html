@@ -11,87 +11,83 @@
             --noldor-sky: #00d9ff;
             --krim-red: #ff3333;
             --bg-overlay: rgba(10, 12, 15, 0.98);
-            --panel-bg: rgba(20, 24, 28, 1);
+            --panel-bg: rgba(15, 18, 22, 1);
         }
 
         body { 
             font-family: 'Open Sans', sans-serif; 
             background: #0a0c0f url('https://images.alphacoders.com/133/1335334.png') no-repeat center center fixed; 
-            background-size: cover; color: #eee; margin: 0; padding: 20px; overflow-x: hidden;
+            background-size: cover; color: #eee; margin: 0; padding: 20px;
         }
 
-        /* ALLIANCE & LEADER SECTION - LARGER LOGOS */
+        /* HEADER & LOGOS */
         .top-header { text-align: center; margin-bottom: 30px; }
-        .ally-logo { 
-            width: 140px; height: 140px; 
-            border: 3px solid var(--gold); 
-            margin-bottom: 10px;
-            box-shadow: 0 0 25px rgba(212, 175, 55, 0.4);
-        }
-        .ally-title { font-family: 'Cinzel'; font-size: 2.8rem; color: var(--gold); display: block; letter-spacing: 6px; text-shadow: 0 0 15px #000; }
+        .ally-logo { width: 130px; height: 130px; border: 3px solid var(--gold); box-shadow: 0 0 20px rgba(212, 175, 55, 0.4); margin-bottom: 10px; }
+        .ally-title { font-family: 'Cinzel'; font-size: 2.5rem; color: var(--gold); display: block; letter-spacing: 5px; }
         
-        .leader-section { margin-top: 25px; }
-        .leader-img { 
-            width: 160px; height: 160px; 
-            border-radius: 50%; border: 4px solid #fff; 
-            object-fit: cover;
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
-        }
-        .leader-name { font-family: 'Cinzel'; font-size: 2rem; color: #fff; display: block; margin-top: 5px; }
+        .leaders-row { display: flex; justify-content: center; gap: 40px; margin-top: 25px; flex-wrap: wrap; }
+        .leader-card { text-align: center; width: 180px; }
+        .leader-img { width: 140px; height: 140px; border-radius: 50%; border: 3px solid #fff; object-fit: cover; box-shadow: 0 0 15px rgba(255,255,255,0.2); }
+        .leader-name { font-family: 'Cinzel'; font-size: 1.6rem; color: #fff; display: block; margin-top: 10px; }
 
-        .main-wrapper { display: flex; gap: 20px; max-width: 1500px; margin: 0 auto; align-items: flex-start; }
+        .main-wrapper { display: flex; gap: 20px; max-width: 1600px; margin: 0 auto; align-items: flex-start; }
 
-        /* COLUMNS */
+        /* DASHBOARD & COLUMNS */
         .dashboard-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; flex-grow: 1; }
-        .clan-column { background: var(--panel-bg); height: 550px; display: flex; flex-direction: column; border: 1px solid #444; border-radius: 5px; }
-        .column-header { padding: 12px; text-align: center; font-family: 'Cinzel'; font-size: 1.1rem; letter-spacing: 2px; border-bottom: 1px solid #444; }
+        .clan-column { background: var(--panel-bg); height: 600px; display: flex; flex-direction: column; border: 1px solid #333; border-radius: 5px; }
+        .column-header { padding: 15px; text-align: center; font-family: 'Cinzel'; font-size: 1.1rem; border-bottom: 1px solid #333; }
         
-        .noldor-col { border-color: var(--noldor-sky); box-shadow: 0 0 15px rgba(0, 217, 255, 0.1); }
+        .noldor-col { border-color: var(--noldor-sky); }
         .noldor-col .column-header { color: var(--noldor-sky); background: rgba(0, 217, 255, 0.05); }
-        .krim-col { border-color: var(--krim-red); box-shadow: 0 0 15px rgba(255, 51, 51, 0.1); }
+        .krim-col { border-color: var(--krim-red); }
         .krim-col .column-header { color: var(--krim-red); background: rgba(255, 51, 51, 0.05); }
 
-        .scroll-area { overflow-y: auto; padding: 10px; flex-grow: 1; scrollbar-width: thin; scrollbar-color: #444 transparent; }
-        .scroll-area::-webkit-scrollbar { width: 6px; }
-        .scroll-area::-webkit-scrollbar-thumb { background: #444; border-radius: 10px; }
+        .scroll-area { overflow-y: auto; padding: 10px; flex-grow: 1; scrollbar-width: thin; }
 
-        /* CP ITEMS */
-        .cp-item { margin-bottom: 6px; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.05); transition: 0.2s; }
-        .cp-item:hover { border-color: rgba(255,255,255,0.2); }
-        .cp-trigger { width: 100%; background: none; border: none; padding: 12px; color: #fff; text-align: left; cursor: pointer; display: flex; justify-content: space-between; font-size: 0.9rem; }
-        .cp-details { display: none; background: #000; padding: 15px; border-top: 1px solid #222; }
-        .active .cp-details { display: block; }
+        /* NESTED MENU STRUCTURE */
+        .cp-box { margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.4); }
+        .cp-btn { width: 100%; background: none; border: none; padding: 12px; color: #fff; text-align: left; cursor: pointer; display: flex; justify-content: space-between; font-family: 'Cinzel'; font-size: 0.9rem; }
+        
+        .member-list { display: none; background: rgba(20,20,20,0.8); border-top: 1px solid #222; }
+        .member-item { border-bottom: 1px solid #111; }
+        .member-btn { width: 100%; background: none; border: none; padding: 8px 20px; color: #ccc; text-align: left; cursor: pointer; display: flex; justify-content: space-between; font-size: 0.8rem; }
+        
+        .stats-area { display: none; background: #000; padding: 10px; border-top: 1px solid var(--gold); }
+        
+        /* OPEN STATES */
+        .cp-box.active > .member-list { display: block; }
+        .member-item.active > .stats-area { display: block; }
 
-        /* ATTENDANCE GRID */
-        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
-        .stat-box { background: #111; padding: 6px; text-align: center; border: 1px solid #333; font-size: 0.7rem; }
-        .stat-name { display: block; color: var(--gold); font-weight: bold; margin-bottom: 2px; }
+        /* STATS GRID */
+        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+        .stat-box { background: #111; padding: 5px; text-align: center; border: 1px solid #222; font-size: 0.65rem; }
+        .stat-name { display: block; color: var(--gold); font-weight: bold; }
 
-        /* FULL DISTRIBUTION LOG (SCROLLABLE SIDEBAR) */
-        .mini-dist { width: 280px; background: var(--panel-bg); border: 1px solid var(--gold); height: 550px; display: flex; flex-direction: column; font-size: 0.8rem; box-shadow: 0 0 20px rgba(212, 175, 55, 0.1); }
-        .dist-header { background: #221a00; color: var(--gold); padding: 12px; text-align: center; font-family: 'Cinzel'; border-bottom: 1px solid var(--gold); letter-spacing: 1px; }
-        .dist-row { padding: 10px; border-bottom: 1px solid #333; display: flex; flex-direction: column; transition: 0.2s; }
-        .dist-row:hover { background: rgba(212, 175, 55, 0.05); }
-        .dist-date { color: #666; font-size: 0.65rem; margin-top: 3px; }
-        .dist-item { color: #fff; font-weight: 600; margin-top: 2px; }
+        /* SIDEBAR LOOT LOG */
+        .mini-dist { width: 260px; background: var(--panel-bg); border: 1px solid var(--gold); height: 600px; display: flex; flex-direction: column; }
+        .dist-header { background: #221a00; color: var(--gold); padding: 12px; text-align: center; font-family: 'Cinzel'; border-bottom: 1px solid var(--gold); }
+        .dist-entry { padding: 10px; border-bottom: 1px solid #333; font-size: 0.75rem; }
 
-        @media (max-width: 1200px) { 
-            .main-wrapper { flex-direction: column; align-items: center; } 
-            .mini-dist { width: 100%; height: 300px; }
-            .dashboard-container { grid-template-columns: 1fr; width: 100%; }
-        }
+        @media (max-width: 1100px) { .main-wrapper { flex-direction: column; } .mini-dist { width: 100%; height: 300px; } }
     </style>
 </head>
 <body>
 
     <div class="top-header">
-        <img src="https://via.placeholder.com/140/000000/d4af37?text=BM" alt="Alliance Logo" class="ally-logo">
+        <img src="https://via.placeholder.com/130/000000/d4af37?text=BM" alt="Alliance Logo" class="ally-logo">
         <span class="ally-title">BROKEN MIRROR ALLIANCE</span>
         
-        <div class="leader-section">
-            <img src="https://via.placeholder.com/160/222222/ffffff?text=NIKLAUS" alt="Niklaus" class="leader-img">
-            <span class="leader-name">NIKLAUS</span>
-            <small style="color: var(--gold); letter-spacing: 5px; font-weight: bold;">ALLY LEADER</small>
+        <div class="leaders-row">
+            <div class="leader-card">
+                <img src="https://via.placeholder.com/140/222/fff?text=NIKLAUS" class="leader-img">
+                <span class="leader-name">NIKLAUS</span>
+                <small style="color:var(--gold)">ALLY LEADER</small>
+            </div>
+            <div class="leader-card">
+                <img src="https://via.placeholder.com/140/111/fff?text=TSAK" class="leader-img">
+                <span class="leader-name">TSAKNORRIS</span>
+                <small style="color:var(--gold)">SHOTCALLER</small>
+            </div>
         </div>
     </div>
 
@@ -101,7 +97,6 @@
                 <div class="column-header">NOLDOR CLAN</div>
                 <div class="scroll-area" id="noldor-list"></div>
             </div>
-
             <div class="clan-column krim-col">
                 <div class="column-header">KRIMINALIDES MAIN</div>
                 <div class="scroll-area" id="krim-list"></div>
@@ -109,60 +104,65 @@
         </div>
 
         <div class="mini-dist">
-            <div class="dist-header">EPIC DISTRIBUTION LOG</div>
+            <div class="dist-header">LOOT HISTORY</div>
             <div class="scroll-area" id="epic-dist-list"></div>
         </div>
     </div>
 
     <script>
         const bosses = ["VAL", "ANT", "BAI", "FRI", "ZAK", "ORF", "AQ", "CORE", "SIEGE"];
-        const noldorCPs = ["Noldor Archer", "Noldor Archer 2", "Noldor Dummy", "Noldor Tank", "Κriminalides CP", "Outlaw CP", "Ronin CP", "Brazilians CP", "Brazilians 2 CP", "I am Groot CP"];
-        const krimCPs = ["Hattrick CP", "55 Room CP", "Legion CP", "Criminal Record CP", "Avalanche CP", "Gankly Crew CP", "Furious Wolves CP", "Animals CP", "Dracaris CP", "Sinaloa CP", "Knockout CP", "VaBank CP"];
-
-        // Λίστα για το Loot Log (Πρόσθεσε εδώ τα drops)
-        const epicLog = [
-            { cp: "Hattrick CP", item: "Valakas Necklace", date: "12/03/2026" },
-            { cp: "TSAKNORRIS", item: "Zaken Earring", date: "05/03/2026" },
-            { cp: "Noldor Archer", item: "Baium Ring", date: "01/03/2026" }
+        const noldorCPs = [
+            { name: "Noldor Archer", leader: "Artemis", members: ["Legolas", "Sylvanas", "Robin"] },
+            { name: "Noldor Tank", leader: "Aegis", members: ["Shield", "Wall", "Fortress"] },
+            { name: "Brazilians CP", leader: "Ronaldo", members: ["Neymar", "Pele", "Kaka"] }
+            // Πρόσθεσε εδώ τα υπόλοιπα...
+        ];
+        const krimCPs = [
+            { name: "Hattrick CP", leader: "Captain", members: ["Striker", "Goalie", "Mid"] },
+            { name: "55 Room CP", leader: "Master55", members: ["P1", "P2", "P3"] }
         ];
 
-        function createStats() {
+        function createStatsHTML() {
             return `<div class="stat-grid">${bosses.map(b => `<div class="stat-box"><span class="stat-name">${b}</span>0</div>`).join('')}</div>`;
         }
 
-        function createCPItem(name, colorVar) {
-            return `
-                <div class="cp-item">
-                    <button class="cp-trigger" onclick="toggleCP(this)">
-                        <span style="color:var(${colorVar})">${name}</span>
-                        <small style="color:#888">VIEW STATS ▼</small>
+        function createCPItem(cp, color) {
+            const memberHTML = [cp.leader, ...cp.members].map((m, i) => `
+                <div class="member-item">
+                    <button class="member-btn" onclick="toggleElement(this)">
+                        <span>${i === 0 ? '👑 ' : ''}${m}</span>
+                        <small>STATS ▼</small>
                     </button>
-                    <div class="cp-details">
-                        ${createStats()}
-                    </div>
+                    <div class="stats-area">${createStatsHTML()}</div>
+                </div>
+            `).join('');
+
+            return `
+                <div class="cp-box">
+                    <button class="cp-btn" onclick="toggleElement(this)">
+                        <span style="color:var(${color})">${cp.name}</span>
+                        <small>ROSTER ▼</small>
+                    </button>
+                    <div class="member-list">${memberHTML}</div>
                 </div>`;
         }
 
-        function toggleCP(btn) {
+        function toggleElement(btn) {
             btn.parentElement.classList.toggle('active');
         }
 
-        // Render Clan Lists
-        document.getElementById('noldor-list').innerHTML = noldorCPs.map(n => createCPItem(n, '--noldor-sky')).join('');
-        document.getElementById('krim-list').innerHTML = krimCPs.map(n => createCPItem(n, '--krim-red')).join('');
+        // Render Lists
+        document.getElementById('noldor-list').innerHTML = noldorCPs.map(cp => createCPItem(cp, '--noldor-sky')).join('');
+        document.getElementById('krim-list').innerHTML = krimCPs.map(cp => createCPItem(cp, '--krim-red')).join('');
         
-        // Render Full Distribution Log (Callers + All CPs)
-        const allEntities = ["TSAKNORRIS", "NIKLAUS", ...noldorCPs, ...krimCPs];
-        document.getElementById('epic-dist-list').innerHTML = allEntities.map(name => {
-            const entry = epicLog.find(l => l.cp === name);
-            return `
-                <div class="dist-row">
-                    <span style="color:var(--gold); font-weight:bold;">${name}</span>
-                    <span class="dist-item">${entry ? entry.item : '<span style="color:#444">No Loot</span>'}</span>
-                    ${entry ? `<span class="dist-date">${entry.date}</span>` : ''}
-                </div>
-            `;
-        }).join('');
+        // Render Loot Log (All CPs + Callers)
+        const allNames = ["NIKLAUS", "TSAKNORRIS", ...noldorCPs.map(c=>c.name), ...krimCPs.map(c=>c.name)];
+        document.getElementById('epic-dist-list').innerHTML = allNames.map(name => `
+            <div class="dist-entry">
+                <b style="color:var(--gold)">${name}</b><br>
+                <span style="color:#777">No current loots recorded</span>
+            </div>
+        `).join('');
     </script>
 </body>
 </html>
