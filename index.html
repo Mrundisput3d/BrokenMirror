@@ -14,7 +14,7 @@
             --border-style: 2px solid var(--dark-gold);
             --member-bg: rgba(255, 255, 255, 0.03);
             --epic-pink: #ff79c6;
-            --caller-glow: rgba(212, 175, 55, 0.3);
+            --leader-glow: 0 0 20px rgba(212, 175, 55, 0.4);
         }
 
         body { 
@@ -30,24 +30,40 @@
             z-index: -1;
         }
 
-        h1, h2, .column-header, .cp-trigger span, .leader-label, .stat-title, .caller-name { font-family: 'Cinzel', serif; }
+        h1, h2, h3, .column-header, .cp-trigger span, .leader-label, .stat-title, .caller-name { font-family: 'Cinzel', serif; }
 
         header { text-align: center; margin-bottom: 30px; }
         .main-title { font-size: 3.5rem; color: var(--gold); text-shadow: 0 0 15px rgba(212, 175, 55, 0.5); margin: 0; letter-spacing: 6px; }
 
-        /* ALLY CALLERS SECTION */
-        .ally-callers-section {
-            max-width: 1300px; margin: 0 auto 40px auto;
-            text-align: center; background: rgba(0,0,0,0.6);
-            border: 1px solid var(--dark-gold); border-radius: 10px; padding: 20px;
-            box-shadow: 0 0 20px var(--caller-glow);
+        /* LEADERSHIP SECTION */
+        .leadership-section {
+            max-width: 1000px; margin: 0 auto 40px auto;
+            text-align: center;
         }
-        .callers-container { display: flex; justify-content: center; gap: 50px; margin-top: 15px; }
-        .caller-card { display: flex; flex-direction: column; align-items: center; }
-        .caller-icon { font-size: 2rem; color: var(--gold); margin-bottom: 5px; text-shadow: 0 0 10px var(--gold); }
-        .caller-name { font-size: 1.5rem; color: #fff; letter-spacing: 2px; }
-        .caller-title { color: var(--gold); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; }
 
+        .leader-box {
+            background: rgba(0,0,0,0.7); border: var(--border-style);
+            padding: 20px; margin-bottom: 20px; border-radius: 5px;
+            box-shadow: var(--leader-glow);
+        }
+
+        .caller-box {
+            max-width: 500px; margin: 0 auto;
+            background: rgba(20, 24, 28, 0.9); border: 1px solid var(--dark-gold);
+            border-radius: 5px; overflow: hidden;
+        }
+
+        .caller-trigger {
+            width: 100%; background: none; border: none; color: #fff; padding: 15px;
+            cursor: pointer; display: flex; flex-direction: column; align-items: center;
+            transition: 0.3s;
+        }
+        .caller-trigger:hover { background: rgba(212, 175, 55, 0.1); }
+
+        .caller-stats { display: none; background: #0a0c0e; padding: 15px; border-top: 1px solid var(--dark-gold); }
+        .caller-box.active .caller-stats { display: block; animation: fadeIn 0.4s; }
+
+        /* DASHBOARD GRID */
         .dashboard-container { 
             display: grid; grid-template-columns: 1fr 1fr; gap: 30px; 
             width: 100%; max-width: 1300px; margin: 0 auto;
@@ -55,54 +71,41 @@
 
         .clan-column {
             background: var(--panel-bg); border: var(--border-style);
-            border-radius: 5px; height: 600px; display: flex; flex-direction: column;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+            border-radius: 5px; height: 550px; display: flex; flex-direction: column;
         }
 
         .column-header { 
             background: linear-gradient(to bottom, #2c3136, #111);
-            padding: 15px; color: var(--gold); font-size: 1.2rem;
-            text-align: center; border-bottom: var(--border-style);
+            padding: 15px; color: var(--gold); font-size: 1.2rem; text-align: center; border-bottom: var(--border-style);
         }
 
         .scroll-area { overflow-y: auto; padding: 15px; flex-grow: 1; }
         .scroll-area::-webkit-scrollbar { width: 6px; }
         .scroll-area::-webkit-scrollbar-thumb { background: var(--dark-gold); }
 
-        /* CP ITEM */
+        /* NESTED ITEMS */
         .cp-item { margin-bottom: 10px; border: 1px solid rgba(138, 109, 59, 0.2); background: rgba(0,0,0,0.4); }
-        .cp-trigger { 
-            width: 100%; background: none; border: none; color: var(--gold); padding: 15px;
-            text-align: left; cursor: pointer; display: flex; justify-content: space-between;
-        }
-
-        /* MEMBER ITEM (Nested) */
+        .cp-trigger { width: 100%; background: none; border: none; color: var(--gold); padding: 15px; text-align: left; cursor: pointer; display: flex; justify-content: space-between; }
         .cp-details { display: none; background: rgba(0,0,0,0.5); border-top: 1px solid var(--dark-gold); }
         .active > .cp-details { display: block; }
 
         .member-item { border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .member-trigger {
-            width: 100%; background: none; border: none; color: #fff; padding: 10px 20px;
-            text-align: left; cursor: pointer; font-size: 0.9rem; display: flex; justify-content: space-between;
-        }
-
-        /* MEMBER STATS (Nested deeper) */
+        .member-trigger { width: 100%; background: none; border: none; color: #fff; padding: 10px 20px; text-align: left; cursor: pointer; font-size: 0.9rem; display: flex; justify-content: space-between; }
         .member-stats { display: none; background: #0a0c0e; padding: 15px; border-left: 3px solid var(--gold); margin: 5px 20px; }
-        .member-item.active .member-stats { display: block; animation: slideIn 0.3s forwards; }
+        .member-item.active .member-stats { display: block; }
 
         .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
         .stat-box { background: #161a1f; padding: 8px; text-align: center; border: 1px solid #333; font-size: 0.75rem; }
         .stat-name { display: block; color: var(--gold); font-weight: bold; }
 
-        /* EPIC LOG TABLE */
+        /* EPIC LOG */
         .epic-section { width: 100%; max-width: 1300px; margin: 40px auto; background: var(--panel-bg); border: var(--border-style); padding: 20px; box-sizing: border-box; }
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th { color: var(--gold); border-bottom: 2px solid var(--dark-gold); padding: 12px; text-align: left; font-family: 'Cinzel'; }
+        th { color: var(--gold); border-bottom: 2px solid var(--dark-gold); padding: 12px; text-align: left; }
         td { padding: 12px; border-bottom: 1px solid rgba(138, 109, 59, 0.1); }
-        .jewel-name { color: var(--epic-pink); font-weight: bold; }
 
-        @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
-        @media (max-width: 900px) { .dashboard-container { grid-template-columns: 1fr; } .callers-container { flex-direction: column; gap: 20px; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @media (max-width: 900px) { .dashboard-container { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -112,48 +115,49 @@
         <p style="color: var(--gold); letter-spacing: 2px;">CLAN MANAGEMENT SYSTEM</p>
     </header>
 
-    <div class="ally-callers-section">
-        <h2 style="color: var(--gold); margin: 0; letter-spacing: 3px; font-size: 1.2rem;">★ ALLY CALLERS ★</h2>
-        <div class="callers-container">
-            <div class="caller-card">
-                <span class="caller-icon">◈</span>
-                <span class="caller-name">TSAKNORRIS</span>
-                <span class="caller-title">Main Shotcaller</span>
-            </div>
-            <div class="caller-card">
-                <span class="caller-icon">◈</span>
-                <span class="caller-name">NIKLAUS</span>
-                <span class="caller-title">Tactical Caller</span>
+    <div class="leadership-section">
+        <div class="leader-box">
+            <h3 style="color: var(--gold); margin: 0; font-size: 0.8rem; letter-spacing: 3px;">★ ALLY LEADER ★</h3>
+            <div style="font-size: 2.2rem; color: #fff; text-shadow: 0 0 10px var(--gold); font-family: 'Cinzel';">NIKLAUS</div>
+        </div>
+
+        <div class="caller-box" id="caller-tsak">
+            <button class="caller-trigger" onclick="toggleCaller()">
+                <span style="color: var(--gold); font-size: 0.7rem; letter-spacing: 2px;">TACTICAL CALLER ▼</span>
+                <span style="font-size: 1.6rem; color: #fff; font-family: 'Cinzel';">TSAKNORRIS</span>
+            </button>
+            <div class="caller-stats">
+                <span class="stat-title" style="font-size:0.8rem; color:var(--gold)">Personal Raid Stats</span>
+                <div id="caller-stat-grid" class="stat-grid"></div>
             </div>
         </div>
     </div>
 
     <div class="dashboard-container">
-        <div class="clan-column">
-            <div class="column-header">Noldor Clan</div>
-            <div class="scroll-area" id="noldor-list"></div>
-        </div>
-
-        <div class="clan-column">
-            <div class="column-header">Kriminalides Main</div>
-            <div class="scroll-area" id="krim-list"></div>
-        </div>
+        <div class="clan-column"><div class="column-header">Noldor Clan</div><div class="scroll-area" id="noldor-list"></div></div>
+        <div class="clan-column"><div class="column-header">Kriminalides Main</div><div class="scroll-area" id="krim-list"></div></div>
     </div>
 
     <div class="epic-section">
         <h2 style="color:var(--gold); text-align: center; letter-spacing: 3px;">EPIC JEWELS DISTRIBUTION LOG</h2>
         <table>
-            <thead>
-                <tr><th>Date</th><th>Epic Jewel</th><th>Recipient CP</th><th>Clan</th></tr>
-            </thead>
+            <thead><tr><th>Date</th><th>Epic Jewel</th><th>Recipient CP</th><th>Clan</th></tr></thead>
             <tbody>
-                <tr><td>12/03/2026</td><td class="jewel-name">Valakas Necklace</td><td>Hattrick CP</td><td>Kriminalides</td></tr>
-                <tr><td>10/03/2026</td><td class="jewel-name">Antharas Earring</td><td>Noldor Archer</td><td>Noldor</td></tr>
+                <tr><td>12/03/2026</td><td style="color:var(--epic-pink); font-weight:bold;">Valakas Necklace</td><td>Hattrick CP</td><td>Kriminalides</td></tr>
             </tbody>
         </table>
     </div>
 
     <script>
+        const bosses = ["VAL", "ANT", "BAI", "ZAK", "FRI", "AQ", "ORFEN", "CORE", "BELETH"];
+        
+        // Fill Tsaknorris Stats
+        document.getElementById('caller-stat-grid').innerHTML = bosses.map(b => `<div class="stat-box"><span class="stat-name">${b}</span>0</div>`).join('');
+
+        function toggleCaller() {
+            document.getElementById('caller-tsak').classList.toggle('active');
+        }
+
         const noldorData = [
             { name: "CP 1", leader: "Player1", members: ["MemberA", "MemberB"] },
             { name: "Noldor Archer", leader: "Artemis", members: ["Legolas", "Sylvanas"] },
@@ -183,39 +187,18 @@
             { name: "VaBank CP", leader: "Dealer", members: ["Card1", "Card2"] }
         ];
 
-        const bosses = ["VAL", "ANT", "BAI", "ZAK", "FRI", "AQ", "ORFEN", "CORE", "BELETH"];
-
         function createMemberHTML(name, isLeader = false) {
-            return `
-                <div class="member-item">
-                    <button class="member-trigger" onclick="toggleItem(event, this)">
-                        <span>${isLeader ? '👑 ' : ''}${name}</span>
-                        <small style="color:#666">Stats ▼</small>
-                    </button>
-                    <div class="member-stats">
-                        <span class="stat-title" style="font-size:0.8rem; color:var(--gold)">Epic Participations</span>
-                        <div class="stat-grid">
-                            ${bosses.map(b => `<div class="stat-box"><span class="stat-name">${b}</span>0</div>`).join('')}
-                        </div>
-                    </div>
-                </div>`;
+            return `<div class="member-item">
+                <button class="member-trigger" onclick="toggleItem(event, this)"><span>${isLeader ? '👑 ' : ''}${name}</span><small style="color:#666">Stats ▼</small></button>
+                <div class="member-stats"><div class="stat-grid">${bosses.map(b => `<div class="stat-box"><span class="stat-name">${b}</span>0</div>`).join('')}</div></div>
+            </div>`;
         }
 
         function createCPItem(cp) {
-            const leaderHTML = createMemberHTML(cp.leader, true);
-            const membersHTML = cp.members.map(m => createMemberHTML(m)).join('');
-
-            return `
-                <div class="cp-item">
-                    <button class="cp-trigger" onclick="toggleItem(event, this)">
-                        <span>${cp.name}</span>
-                        <small>Roster ▼</small>
-                    </button>
-                    <div class="cp-details">
-                        ${leaderHTML}
-                        ${membersHTML}
-                    </div>
-                </div>`;
+            return `<div class="cp-item">
+                <button class="cp-trigger" onclick="toggleItem(event, this)"><span>${cp.name}</span><small>Roster ▼</small></button>
+                <div class="cp-details">${createMemberHTML(cp.leader, true)}${cp.members.map(m => createMemberHTML(m)).join('')}</div>
+            </div>`;
         }
 
         document.getElementById('noldor-list').innerHTML = noldorData.map(createCPItem).join('');
