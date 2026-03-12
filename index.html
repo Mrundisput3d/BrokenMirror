@@ -7,46 +7,32 @@
     <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --gold: #d4af37;
-            --silver: #c0c0c0;
-            --bronze: #cd7f32;
-            --noldor-sky: #00d9ff;
-            --krim-red: #ff3333;
-            --bg-overlay: rgba(10, 12, 15, 0.9); 
+            --gold: #d4af37; --silver: #c0c0c0; --bronze: #cd7f32;
+            --noldor-sky: #00d9ff; --krim-red: #ff3333;
+            --bg-overlay: rgba(10, 12, 15, 0.92); 
             --panel-bg: rgba(15, 18, 22, 0.98);
         }
-
-        /* Smooth Scrolling */
         html { scroll-behavior: smooth; }
-
         body { 
             font-family: 'Open Sans', sans-serif; 
             background: #0a0c0f url('https://i.ibb.co/1GmpSyxZ/BACKGROUND.jpg') no-repeat center center fixed; 
-            background-size: cover; 
-            color: #eee; margin: 0; padding: 0;
+            background-size: cover; color: #eee; margin: 0; padding: 0;
         }
+        body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-overlay); z-index: -1; }
 
-        body::before { 
-            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: var(--bg-overlay); z-index: -1; 
-        }
-
-        /* SECTION 1: MAIN DASHBOARD */
         .page-section { min-height: 100vh; padding: 20px; box-sizing: border-box; }
-
         .server-time { position: absolute; top: 20px; right: 40px; color: var(--gold); font-family: 'Cinzel'; border: 1px solid var(--gold); padding: 5px 15px; border-radius: 5px; background: rgba(0,0,0,0.5); }
 
         .top-header { text-align: center; margin-bottom: 25px; }
-        .ally-logo { width: 140px; height: 140px; object-fit: contain; margin-bottom: 5px; filter: drop-shadow(0 0 15px var(--gold)); }
-        .ally-title { font-family: 'Cinzel Decorative', cursive; font-size: 2.2rem; color: var(--gold); display: block; text-shadow: 2px 2px 10px #000; }
+        .ally-logo { width: 140px; height: 140px; object-fit: contain; filter: drop-shadow(0 0 15px var(--gold)); }
+        .ally-title { font-family: 'Cinzel Decorative', cursive; font-size: 2.2rem; color: var(--gold); display: block; }
         
         .leaders-row { display: flex; justify-content: center; gap: 40px; margin-top: 15px; position: relative; }
         .leader-card { text-align: center; cursor: pointer; transition: 0.3s; z-index: 10; }
         .img-frame { width: 110px; height: 110px; margin: 0 auto; background: #000; border: 2px solid var(--gold); border-radius: 12px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
         .leader-img { width: 100%; height: 100%; object-fit: contain; }
         
-        .main-wrapper { display: flex; gap: 15px; max-width: 1750px; margin: 0 auto; align-items: flex-start; }
-
+        .main-wrapper { display: flex; gap: 15px; max-width: 1750px; margin: 0 auto; }
         .dashboard-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; flex-grow: 1; }
         .clan-column { background: var(--panel-bg); height: 720px; display: flex; flex-direction: column; border: 1px solid #333; border-radius: 8px; border-top: 3px solid var(--gold); }
         .column-header { padding: 15px; text-align: center; font-family: 'Cinzel'; font-size: 1.1rem; border-bottom: 1px solid #222; display: flex; align-items: center; justify-content: center; gap: 12px; }
@@ -56,7 +42,6 @@
         .scroll-area::-webkit-scrollbar { width: 4px; }
         .scroll-area::-webkit-scrollbar-thumb { background: var(--gold); }
 
-        /* RANKING BORDERS */
         .rank-1 { border: 1.5px solid var(--gold) !important; background: rgba(212, 175, 55, 0.05) !important; }
         .rank-2 { border: 1.5px solid var(--silver) !important; }
         .rank-3 { border: 1.5px solid var(--bronze) !important; }
@@ -73,32 +58,26 @@
         .active-member > .stats-area { display: block; }
         .leader-pop { position: absolute; top: 130px; width: 260px; z-index: 100; box-shadow: 0 0 20px #000; }
 
-        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; }
-        .stat-box { background: #111; padding: 4px; text-align: center; border: 1px solid #222; font-size: 0.6rem; }
-        .stat-name { display: block; color: var(--gold); font-weight: bold; }
-
         .mini-dist { width: 320px; background: var(--panel-bg); border: 1px solid var(--gold); height: 720px; border-radius: 8px; display: flex; flex-direction: column; }
         .dist-header { background: #1a1400; color: var(--gold); padding: 12px; text-align: center; font-family: 'Cinzel'; border-bottom: 1px solid var(--gold); }
         .archive-search { background: #000; border: none; border-bottom: 1px solid #333; color: #fff; padding: 10px; width: 100%; box-sizing: border-box; font-size: 0.8rem; }
-        
         .dist-trigger { width: 100%; padding: 10px; background: none; border: none; color: #fff; text-align: left; cursor: pointer; display: flex; justify-content: space-between; font-size: 0.75rem; border-bottom: 1px solid #222; }
         .loot-detail { display: none; background: rgba(0,0,0,0.8); padding: 10px; font-size: 0.75rem; border-left: 2px solid var(--gold); }
         .active-dist > .loot-detail { display: block; }
 
-        /* ADMIN & SCROLL DOWN */
+        /* EPIC PRICES TABLE */
+        .epic-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 20px; }
+        .epic-card { background: rgba(0,0,0,0.5); border: 1px solid #333; padding: 15px; text-align: center; border-radius: 8px; transition: 0.3s; }
+        .epic-card:hover { border-color: var(--gold); transform: translateY(-5px); }
+        .epic-icon { width: 42px; height: 42px; margin-bottom: 10px; filter: drop-shadow(0 0 5px var(--gold)); }
+        .epic-name { display: block; font-family: 'Cinzel'; color: var(--gold); font-size: 0.9rem; }
+        .epic-price { display: block; font-size: 0.8rem; color: #aaa; margin-top: 5px; }
+        .epic-pts { display: block; color: #fff; font-weight: bold; font-size: 1.1rem; margin-top: 5px; }
+
         .admin-panel { max-width: 1750px; margin: 20px auto; background: rgba(20,20,20,0.9); padding: 15px; border-radius: 8px; border: 1px dashed var(--gold); display: flex; gap: 10px; align-items: center; justify-content: center; }
-        .admin-panel input, .admin-panel select { background: #000; border: 1px solid #444; color: #fff; padding: 8px; border-radius: 4px; }
-        .admin-btn { background: var(--gold); color: #000; border: none; padding: 8px 20px; border-radius: 4px; font-weight: bold; cursor: pointer; }
-
+        .admin-panel select, .admin-panel button { padding: 8px; border-radius: 4px; font-weight: bold; }
         .scroll-down-btn { text-align: center; color: var(--gold); cursor: pointer; font-family: 'Cinzel'; text-decoration: none; display: block; margin-top: 10px; animation: bounce 2s infinite; }
-        @keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-10px);} 60% {transform: translateY(-5px);} }
-
-        /* SECTION 2: ANALYTICS */
-        .section-title { font-family: 'Cinzel Decorative', cursive; font-size: 2rem; color: var(--gold); text-align: center; margin: 50px 0; }
-        .analytics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 30px; max-width: 1750px; margin: 0 auto; }
-        .analytics-card { background: var(--panel-bg); border: 1px solid #333; padding: 20px; border-radius: 12px; border-top: 2px solid var(--gold); }
-        .card-title { font-family: 'Cinzel'; color: var(--gold); margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 10px; display: block; }
-        .rule-item { margin-bottom: 10px; font-size: 0.9rem; color: #bbb; display: flex; gap: 10px; }
+        @keyframes bounce { 0%, 100% {transform: translateY(0);} 50% {transform: translateY(-10px);} }
     </style>
 </head>
 <body>
@@ -148,142 +127,163 @@
         </div>
 
         <div class="admin-panel">
-            <strong style="color:var(--gold)">ADMIN PANEL:</strong>
+            <strong style="color:var(--gold)">LOOT DISTRIBUTION:</strong>
             <select id="target-cp"></select>
-            <input type="text" id="loot-name" placeholder="Item Name">
-            <button class="admin-btn" onclick="addLoot()">ADD LOOT</button>
+            <select id="target-jewel">
+                <option value="none">-- Select Jewel --</option>
+                <option value="Core|25">Core (25 pts)</option>
+                <option value="Orfen|75">Orfen (75 pts)</option>
+                <option value="AQ|150">Ant Queen (150 pts)</option>
+                <option value="Zaken|175">Zaken (175 pts)</option>
+                <option value="Frintezza|225">Frintezza (225 pts)</option>
+                <option value="Baium|950">Baium (950 pts)</option>
+                <option value="Antharas|1100">Antharas (1100 pts)</option>
+                <option value="Valakas|3100">Valakas (3100 pts)</option>
+            </select>
+            <button onclick="distributeLoot()" style="background:var(--gold); cursor:pointer;">CONFIRM & DEDUCT</button>
         </div>
 
-        <a href="#bottom" class="scroll-down-btn">
-            EXPLORE DEEP ANALYTICS<br>▼
-        </a>
+        <a href="#bottom" class="scroll-down-btn">EPIC JEWELS PRICES ▼</a>
     </div>
 
-    <div class="page-section" id="bottom" style="background: rgba(0,0,0,0.3);">
-        <h2 class="section-title">ALLIANCE DEEP ANALYTICS</h2>
-        
-        <div class="analytics-grid">
-            <div class="analytics-card">
-                <span class="card-title">RAID BOSS TIMERS</span>
-                <div class="rule-item"><span style="color:var(--krim-red)">●</span> VALAKAS: <span style="color:#fff">UP (Random)</span></div>
-                <div class="rule-item"><span style="color:#0f0">●</span> ANTHARAS: <span style="color:#fff">DEAD (Respawn: 14/03)</span></div>
-                <div class="rule-item"><span style="color:var(--gold)">●</span> QUEEN ANT: <span style="color:#fff">24h Window</span></div>
-            </div>
-
-            <div class="analytics-card">
-                <span class="card-title">ALLIANCE RULES</span>
-                <div class="rule-item"><span>1.</span> Always be on Discord for Epics.</div>
-                <div class="rule-item"><span>2.</span> Loot distribution is based on CP points.</div>
-                <div class="rule-item"><span>3.</span> 100% participation required for Siege days.</div>
-            </div>
-
-            <div class="analytics-card">
-                <span class="card-title">GLOBAL ALLY STATS</span>
-                <div class="rule-item">TOTAL ACTIVE MEMBERS: <span style="color:#fff">145</span></div>
-                <div class="rule-item">TOTAL ALLY POINTS: <span style="color:var(--gold)">124,500</span></div>
-                <div class="rule-item">MOST ACTIVE CP: <span style="color:var(--noldor-sky)">Hattrick CP</span></div>
-            </div>
+    <div class="page-section" id="bottom" style="background: rgba(0,0,0,0.4);">
+        <h2 style="font-family:'Cinzel Decorative'; color:var(--gold); text-align:center; font-size:2rem; margin-top:50px;">EPIC JEWELS PRICES</h2>
+        <div style="max-width:1200px; margin: 0 auto;">
+            <div class="epic-grid" id="prices-grid"></div>
         </div>
-
-        <div style="text-align: center; margin-top: 100px;">
-            <a href="#top" style="color:var(--gold); text-decoration: none; font-family: 'Cinzel'; border-bottom: 1px solid var(--gold);">▲ BACK TO COMMAND CENTER</a>
+        
+        <div style="text-align:center; margin-top:80px;">
+            <a href="#top" style="color:var(--gold); font-family:'Cinzel'; text-decoration:none;">▲ BACK TO DASHBOARD</a>
         </div>
     </div>
 
     <script>
         const bosses = ["VAL", "ANT", "BAI", "FRI", "ZAK", "ORF", "AQ", "CORE", "SIEGE"];
-        let lootDatabase = { "Hattrick CP": [{item: "Valakas Necklace", date: "12/03"}] };
-
-        const noldorData = [
-            { name: "Kriminalides CP", pts: 2850, lead: "DarkLord", mems: ["Slayer", "Healer1"] },
-            { name: "Noldor Archer", pts: 1500, lead: "Artemis", mems: ["Legolas"] },
-            { name: "Brazilians CP", pts: 1350, lead: "Ronaldo", mems: ["Neymar"] },
-            { name: "Noldor Archer 2", pts: 1200, lead: "Apollo", mems: ["ArcherX"] },
-            { name: "Noldor Tank", pts: 1100, lead: "Aegis", mems: ["Shield"] },
-            { name: "Outlaw CP", pts: 950, lead: "Renegade", mems: ["O1"] },
-            { name: "Ronin CP", pts: 800, lead: "Samurai", mems: ["Katana"] },
-            { name: "Brazilians 2 CP", pts: 700, lead: "Kaka", mems: ["Zico"] },
-            { name: "Noldor Dummy", pts: 450, lead: "Dummy", mems: ["D1"] },
-            { name: "I am Groot CP", pts: 300, lead: "Groot", mems: ["Rocket"] }
+        const jewelIcons = {
+            "Core": "https://raw.githubusercontent.com/Mrundisput3d/animals-cp-tracker/master/images/core.png",
+            "Orfen": "https://raw.githubusercontent.com/Mrundisput3d/animals-cp-tracker/master/images/orfen.png",
+            "AQ": "https://raw.githubusercontent.com/Mrundisput3d/animals-cp-tracker/master/images/ant_queen.png",
+            "Zaken": "https://raw.githubusercontent.com/Mrundisput3d/animals-cp-tracker/master/images/zaken.png",
+            "Frintezza": "https://raw.githubusercontent.com/Mrundisput3d/animals-cp-tracker/master/images/frintezza.png",
+            "Baium": "https://raw.githubusercontent.com/Mrundisput3d/animals-cp-tracker/master/images/baium.png",
+            "Antharas": "https://raw.githubusercontent.com/Mrundisput3d/animals-cp-tracker/master/images/antharas.png",
+            "Valakas": "https://raw.githubusercontent.com/Mrundisput3d/animals-cp-tracker/master/images/valakas.png"
+        };
+        const jewelPrices = [
+            {id: "Core", name: "Core Ring", gb: "5 GB", pts: 25},
+            {id: "Orfen", name: "Orfen's Earring", gb: "15 GB", pts: 75},
+            {id: "AQ", name: "Queen Ant Ring", gb: "30 GB", pts: 150},
+            {id: "Zaken", name: "Zaken's Earring", gb: "35 GB", pts: 175},
+            {id: "Frintezza", name: "Frintezza's Neck", gb: "45 GB", pts: 225},
+            {id: "Baium", name: "Baium Ring", gb: "190 GB", pts: 950},
+            {id: "Antharas", name: "Antharas Earring", gb: "220 GB", pts: 1100},
+            {id: "Valakas", name: "Valakas Necklace", gb: "620 GB", pts: 3100}
         ];
 
-        const krimData = [
-            { name: "Hattrick CP", pts: 3100, lead: "Captain", mems: ["Striker", "Goalie"] },
-            { name: "55 Room CP", pts: 1950, lead: "Master55", mems: ["P1"] },
-            { name: "Criminal Record CP", pts: 1600, lead: "Judge", mems: ["J1"] },
-            { name: "Sinaloa CP", pts: 1550, lead: "ElChapo", mems: ["C1"] },
-            { name: "Avalanche CP", pts: 1400, lead: "Snow", mems: ["Ice"] },
-            { name: "VaBank CP", pts: 1300, lead: "Dealer", mems: ["V1"] },
-            { name: "Dracaris CP", pts: 1250, lead: "Dany", mems: ["Drag1"] },
-            { name: "Legion CP", pts: 1100, lead: "Cent", mems: ["S1"] },
-            { name: "Knockout CP", pts: 1050, lead: "Tyson", mems: ["Box1"] },
-            { name: "Gankly Crew CP", pts: 900, lead: "Ganker", mems: ["G1"] },
-            { name: "Furious Wolves CP", pts: 850, lead: "Alpha", mems: ["W1"] },
-            { name: "Animals CP", pts: 750, lead: "Lion", mems: ["Tiger"] }
+        let noldorData = [
+            { name: "Kriminalides CP", pts: 4500, lead: "DarkLord", mems: ["Slayer"] },
+            { name: "Noldor Archer", pts: 2500, lead: "Artemis", mems: ["Legolas"] }
         ];
+        let krimData = [
+            { name: "Hattrick CP", pts: 5200, lead: "Captain", mems: ["Striker"] },
+            { name: "55 Room CP", pts: 1950, lead: "Master55", mems: ["P1"] }
+        ];
+        let lootArchive = {};
 
-        function toggleLeader(id) {
-            const el = document.getElementById(id);
-            const isVisible = el.style.display === 'block';
-            document.querySelectorAll('.leader-pop').forEach(p => p.style.display = 'none');
-            if(!isVisible) {
-                el.style.display = 'block';
-                el.innerHTML = `<div class="stat-grid">${bosses.map(b => `<div class="stat-box"><span class="stat-name">${b}</span>${Math.floor(Math.random()*20)}</div>`).join('')}</div>`;
+        function renderEverything() {
+            renderList(noldorData, 'noldor-list', '--noldor-sky');
+            renderList(krimData, 'krim-list', '--krim-red');
+            updateArchive();
+        }
+
+        function renderList(data, id, col) {
+            const sorted = [...data].sort((a,b) => b.pts - a.pts);
+            document.getElementById(id).innerHTML = sorted.map((cp, i) => {
+                let rank = (i === 0) ? "rank-1" : (i === 1) ? "rank-2" : (i === 2) ? "rank-3" : "";
+                return `<div class="cp-box ${rank}">
+                    <button class="cp-btn" onclick="this.parentElement.classList.toggle('active')">
+                        <span style="color:var(${col})">#${i+1} ${cp.name}</span>
+                        <span class="points-tag">${cp.pts} PTS</span>
+                    </button>
+                    <div class="member-list">
+                        <div class="member-container">
+                            <button class="member-btn"><span>👑 ${cp.lead}</span></button>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function distributeLoot() {
+            const cpName = document.getElementById('target-cp').value;
+            const jewelData = document.getElementById('target-jewel').value.split('|');
+            if(jewelData[0] === "none") return alert("Select a jewel");
+
+            const jewelName = jewelData[0];
+            const cost = parseInt(jewelData[1]);
+
+            // Deduction Logic
+            let found = false;
+            [noldorData, krimData].forEach(list => {
+                const cp = list.find(c => c.name === cpName);
+                if(cp) {
+                    cp.pts -= cost;
+                    found = true;
+                }
+            });
+
+            if(!found && (cpName === "NIKLAUS" || cpName === "TSAKNORRIS")) found = true;
+
+            if(found) {
+                if(!lootArchive[cpName]) lootArchive[cpName] = [];
+                lootArchive[cpName].unshift({item: jewelName, date: new Date().toLocaleDateString('el-GR')});
+                renderEverything();
+                alert(`Loot Added: ${jewelName} to ${cpName}. Points Deducted: -${cost}`);
             }
         }
-
-        function createCPItem(cp, color, rank) {
-            let rankClass = (rank === 0) ? "rank-1" : (rank === 1) ? "rank-2" : (rank === 2) ? "rank-3" : "";
-            const membersHTML = [cp.lead, ...cp.mems].map((m, i) => `
-                <div class="member-container">
-                    <button class="member-btn" onclick="this.parentElement.classList.toggle('active-member')">
-                        <span>${i === 0 ? '👑 ' : ''}${m}</span><small>▼</small>
-                    </button>
-                    <div class="stats-area"><div class="stat-grid">${bosses.map(b => `<div class="stat-box"><span class="stat-name">${b}</span>0</div>`).join('')}</div></div>
-                </div>`).join('');
-            return `<div class="cp-box ${rankClass}"><button class="cp-btn" onclick="this.parentElement.classList.toggle('active')"><span style="color:var(${color})">#${rank+1} ${cp.name}</span><span class="points-tag">${cp.pts} PTS</span></button><div class="member-list">${membersHTML}</div></div>`;
-        }
-
-        const render = (data, id, col) => {
-            const sorted = [...data].sort((a,b) => b.pts - a.pts);
-            document.getElementById(id).innerHTML = sorted.map((cp, i) => createCPItem(cp, col, i)).join('');
-        };
 
         function updateArchive() {
             const all = ["NIKLAUS", "TSAKNORRIS", ...noldorData.map(c=>c.name), ...krimData.map(c=>c.name)].sort();
             document.getElementById('epic-dist-list').innerHTML = all.map(name => {
-                const items = lootDatabase[name] || [];
-                return `<div class="dist-item"><button class="dist-trigger" onclick="this.parentElement.classList.toggle('active-dist')"><span>${name}</span><small>${items.length} ▼</small></button><div class="loot-detail">${items.map(i => `<div style="color:var(--noldor-sky)">💠 ${i.item} <small style="color:#666">(${i.date})</small></div>`).join('') || 'No loot'}</div></div>`;
+                const items = lootArchive[name] || [];
+                return `<div class="dist-item"><button class="dist-trigger" onclick="this.parentElement.classList.toggle('active-dist')"><span>${name}</span><small>${items.length} ▼</small></button>
+                <div class="loot-detail">${items.map(i => `<div style="color:var(--gold)">💠 ${i.item} <small>(${i.date})</small></div>`).join('') || 'No loot'}</div></div>`;
             }).join('');
             document.getElementById('target-cp').innerHTML = all.map(n => `<option value="${n}">${n}</option>`).join('');
         }
 
         function filterArchive() {
             let input = document.getElementById('searchBox').value.toUpperCase();
-            let items = document.getElementById('epic-dist-list').getElementsByClassName('dist-item');
+            let items = document.getElementsByClassName('dist-item');
             for (let i = 0; i < items.length; i++) {
-                let txt = items[i].innerText;
-                items[i].style.display = txt.toUpperCase().indexOf(input) > -1 ? "" : "none";
+                items[i].style.display = items[i].innerText.toUpperCase().includes(input) ? "" : "none";
             }
         }
 
-        function addLoot() {
-            const cp = document.getElementById('target-cp').value;
-            const item = document.getElementById('loot-name').value;
-            if(!item) return;
-            if(!lootDatabase[cp]) lootDatabase[cp] = [];
-            lootDatabase[cp].unshift({item: item, date: new Date().toLocaleDateString('el-GR', {day:'2-digit', month:'2-digit'})});
-            document.getElementById('loot-name').value = "";
-            updateArchive();
+        function toggleLeader(id) {
+            const el = document.getElementById(id);
+            const visible = el.style.display === 'block';
+            document.querySelectorAll('.leader-pop').forEach(p => p.style.display = 'none');
+            if(!visible) {
+                el.style.display = 'block';
+                el.innerHTML = `<div class="stat-grid">${bosses.map(b => `<div class="stat-box"><span class="stat-name">${b}</span>${Math.floor(Math.random()*20)}</div>`).join('')}</div>`;
+            }
         }
 
-        setInterval(() => {
-            document.getElementById('clock').innerText = "SERVER TIME: " + new Date().toLocaleTimeString('el-GR');
-        }, 1000);
+        // Clock
+        setInterval(() => { document.getElementById('clock').innerText = "SERVER TIME: " + new Date().toLocaleTimeString('el-GR'); }, 1000);
 
-        render(noldorData, 'noldor-list', '--noldor-sky');
-        render(krimData, 'krim-list', '--krim-red');
-        updateArchive();
+        // Render Prices Table
+        document.getElementById('prices-grid').innerHTML = jewelPrices.map(j => `
+            <div class="epic-card">
+                <img src="${jewelIcons[j.id]}" class="epic-icon">
+                <span class="epic-name">${j.name}</span>
+                <span class="epic-price">${j.gb}</span>
+                <span class="epic-pts">${j.pts} POINTS</span>
+            </div>
+        `).join('');
+
+        renderEverything();
     </script>
 </body>
 </html>
