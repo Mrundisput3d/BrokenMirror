@@ -10,7 +10,6 @@
             --gold: #d4af37; --silver: #c0c0c0; --bronze: #cd7f32;
             --noldor-sky: #00d9ff; --krim-red: #ff3333;
             --bg-overlay: rgba(10, 12, 15, 0.96); 
-            --panel-bg: rgba(15, 18, 22, 0.98);
         }
         html { scroll-behavior: smooth; }
         body { 
@@ -75,6 +74,19 @@
         .loot-toggle-btn { width: 100%; background: rgba(212,175,55,0.15); color: var(--gold); border: 1px solid var(--gold); padding: 6px; font-family: 'Cinzel'; cursor: pointer; border-radius: 4px; font-size: 0.7rem; }
         .loot-content { display: none; margin-top: 10px; font-size: 0.8rem; color: #aaa; padding-left: 10px; border-left: 2px solid var(--gold); }
 
+        /* SECTION 2 STYLES */
+        .section-flex { display: flex; flex-wrap: wrap; gap: 30px; justify-content: center; max-width: 1400px; margin: 0 auto; }
+        .epic-table-container { background: rgba(10, 12, 15, 0.9); border: 2px solid var(--gold); border-radius: 10px; padding: 15px; flex: 1; min-width: 300px; }
+        .epic-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        .epic-table th { border-bottom: 2px solid var(--gold); color: var(--gold); font-family: 'Cinzel'; padding: 10px; text-align: left; }
+        .epic-table td { padding: 8px 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+        .mini-icon { width: 22px; height: 22px; vertical-align: middle; margin-right: 10px; }
+
+        .rules-container { background: rgba(15, 18, 22, 0.95); border-left: 4px solid var(--gold); border-radius: 8px; padding: 20px; flex: 1.5; min-width: 400px; font-size: 0.85rem; line-height: 1.6; }
+        .rules-container h3 { font-family: 'Cinzel'; color: var(--gold); margin-top: 0; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        .rule-item { margin-bottom: 8px; display: flex; gap: 10px; }
+        .highlight { color: var(--gold); font-weight: bold; }
+
         /* SECTION 3 TABS */
         .tab-container { max-width: 1200px; margin: 30px auto; background: rgba(15,18,22,0.9); border: 1px solid #333; border-radius: 10px; overflow: hidden; }
         .tab-menu { display: flex; background: #111; border-bottom: 1px solid #333; }
@@ -97,9 +109,8 @@
 
     <div class="page-section" id="section1">
         <div class="server-time" id="clock">SERVER TIME: 00:00:00</div>
-        
         <div class="top-header">
-            <img src="https://i.ibb.co/6R9q5PGv/ALLIANCE-LOGO.png" class="ally-logo">
+            <img src="https://i.ibb.co/1fyDHTJp/alliance-logo.png" class="ally-logo">
             <span class="ally-title">BROKEN MIRROR ALLIANCE</span>
             <div class="leaders-row">
                 <div class="leader-card" onclick="openCaller('NIKLAUS', 'ALLY LEADER', 'https://i.ibb.co/5X3NDQFR/niklaus.png')">
@@ -127,22 +138,30 @@
                 <div class="scroll-area" id="krim-list"></div>
             </div>
         </div>
-
-        <div style="text-align:center; margin-top:20px;">
-            <a href="#section2" style="color:var(--gold); text-decoration:none; font-family:'Cinzel'; font-size:0.8rem;">VIEW PRICES & RULES ▼</a>
-        </div>
     </div>
 
-    <div class="page-section" id="section2" style="background: rgba(0,0,0,0.5);">
-        <h2 style="font-family:'Cinzel Decorative'; color:var(--gold); text-align:center; margin:40px 0;">EPIC JEWELS PRICES</h2>
-        <div class="epic-grid" id="prices-grid"></div>
-        <div style="text-align:center; margin-top:40px;">
-            <a href="#section3" style="color:var(--gold); text-decoration:none; font-family:'Cinzel'; font-size:0.8rem;">ALLIANCE CENTER ▼</a>
+    <div class="page-section" id="section2" style="background: rgba(0,0,0,0.6);">
+        <h2 style="font-family:'Cinzel Decorative'; color:var(--gold); text-align:center; margin:30px 0;">MARKETPLACE & PROTOCOL</h2>
+        <div class="section-flex">
+            <div class="epic-table-container">
+                <table class="epic-table">
+                    <thead><tr><th>JEWEL</th><th>PRICE</th></tr></thead>
+                    <tbody id="prices-table-body"></tbody>
+                </table>
+            </div>
+            <div class="rules-container">
+                <h3>POINTS SYSTEM & POLICIES</h3>
+                <div class="rule-item"><span>» <span class="highlight">Attendance:</span> Mid-Low Epics = 1 | Baium = 2 | Siege/Valakas/Antharas = 3.</span></div>
+                <div class="rule-item"><span>» <span class="highlight">Purchases:</span> Points are deducted from the CP's total balance.</span></div>
+                <div class="rule-item"><span>» <span class="highlight">Priority:</span> <span style="color:var(--noldor-sky)">Baium</span> (Archer CPs) | <span style="color:var(--krim-red)">Valakas</span> (Mage CPs) | <span style="color:#00ff88">Antharas</span> (Stoppers).</span></div>
+                <div class="rule-item"><span>» <span class="highlight">Cooldown:</span> 3-week restriction for the same jewel (Frintezza+).</span></div>
+                <div class="rule-item"><span>» <span class="highlight">Caller Bonus:</span> Callers receive personal points (x9 multiplier).</span></div>
+            </div>
         </div>
     </div>
 
     <div class="page-section" id="section3">
-        <h2 style="font-family:'Cinzel Decorative'; color:var(--gold); text-align:center; margin:40px 0;">ALLIANCE MANAGEMENT CENTER</h2>
+        <h2 style="font-family:'Cinzel Decorative'; color:var(--gold); text-align:center; margin:30px 0;">ALLIANCE MANAGEMENT CENTER</h2>
         <div class="tab-container">
             <div class="tab-menu">
                 <div class="tab-link active" onclick="openTab(event, 'rules')">RULES</div>
@@ -150,23 +169,14 @@
                 <div class="tab-link" onclick="openTab(event, 'announcements')">ANNOUNCEMENTS</div>
             </div>
             <div id="rules" class="tab-content active">
-                <h3 style="color:var(--gold)">Engagement Rules</h3>
-                <p>• Respect the Shotcallers during the raid.</p>
-                <p>• Mandatory Discord for all alliance members.</p>
-                <p>• Loot is distributed via the CP DKP system.</p>
+                <p>• Respect the Shotcallers. • Mandatory Discord. • DKP distribution.</p>
             </div>
             <div id="siege" class="tab-content">
-                <h3 style="color:var(--gold)">Siege Strategy</h3>
-                <p>Targets: Aden Castle (Main), Giran (Secondary).</p>
-                <p>Check Discord for CP-specific positions.</p>
+                <p>Main Target: Aden. Secondary: Giran.</p>
             </div>
             <div id="announcements" class="tab-content">
-                <h3 style="color:var(--gold)">Latest News</h3>
-                <p>Alliance meeting this Friday at 21:00 Server Time.</p>
+                <p>Alliance meeting this Friday at 21:00.</p>
             </div>
-        </div>
-        <div style="text-align:center;">
-            <a href="#section1" style="color:var(--gold); text-decoration:none; font-family:'Cinzel';">▲ BACK TO TOP</a>
         </div>
     </div>
 
@@ -177,22 +187,29 @@
         const noldorNames = ["Noldor Clan", "Noldor Archer", "Noldor Archer 2", "Noldor Dummy", "Noldor Tank", "Kriminalides CP", "Outlaw CP", "Ronin CP", "Brazilians CP", "Brazilians 2 CP", "I am Groot CP"];
         const krimNames = ["Hattrick CP", "55 Room CP", "Legion CP", "Criminal Record CP", "Avalanche CP", "Gankly Crew CP", "Furious Wolves CP", "Animals CP", "Dracaris CP", "Sinaloa CP", "Knockout CP", "VaBank CP"];
 
-        let noldorData = noldorNames.map(name => ({ name, pts: 2500, lead: "Leader", mems: ["Member A", "Member B"] }));
-        let krimData = krimNames.map(name => ({ name, pts: 2500, lead: "Leader", mems: ["Player 1", "Player 2"] }));
+        const pricesData = [
+            { name: "Core Ring", pts: 25, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/ring-of-core.png?raw=true" },
+            { name: "Orfen Earring", pts: 75, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/earring-orfen.png?raw=true" },
+            { name: "Queen Ant Ring", pts: 150, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/ring-of-queen-ant.png?raw=true" },
+            { name: "Zaken Earring", pts: 175, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/zaken-earring.png?raw=true" },
+            { name: "Frintezza Neck", pts: 225, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/frintezza-necklace.png?raw=true" },
+            { name: "Baium Ring", pts: 950, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/ring-of-baium.png?raw=true" },
+            { name: "Antharas Earring", pts: 1100, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/earring-antharas.png?raw=true" },
+            { name: "Valakas Necklace", pts: 3100, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/necklace-valakas.png?raw=true" }
+        ];
 
         function renderLists() {
-            const render = (data, elId) => {
-                document.getElementById(elId).innerHTML = data.map(cp => `
+            const render = (names, elId) => {
+                document.getElementById(elId).innerHTML = names.map(name => `
                     <div class="cp-box">
                         <button class="cp-btn" onclick="this.parentElement.classList.toggle('active')">
-                            <span>${cp.name}</span>
-                            <span class="points-tag">${cp.pts} PTS</span>
+                            <span>${name}</span><span class="points-tag">2500 PTS</span>
                         </button>
                         <div class="member-list">
-                            ${[cp.lead, ...cp.mems].map((m, idx) => `
+                            ${["Member 1", "Member 2"].map(m => `
                                 <div class="member-item">
                                     <button class="member-btn" onclick="this.parentElement.classList.toggle('active-member')">
-                                        <span>${idx === 0 ? '👑 ' : ''}${m}</span><small>▼</small>
+                                        <span>${m}</span><small>▼</small>
                                     </button>
                                     <div class="member-stats">
                                         <div class="stat-grid">${bosses.map(b => `<div class="stat-box"><span class="stat-name">${b}</span><span class="stat-val">0</span></div>`).join('')}</div>
@@ -200,17 +217,16 @@
                                 </div>
                             `).join('')}
                             <div class="loot-section">
-                                <button class="loot-toggle-btn" onclick="toggleLoot('${cp.name}')">VIEW CP LOOT HISTORY</button>
-                                <div class="loot-content" id="loot-${cp.name.replace(/\s+/g, '')}">
-                                    ${archive[cp.name] ? archive[cp.name].join('<br>') : 'No loot history.'}
-                                </div>
+                                <button class="loot-toggle-btn" onclick="toggleLoot('${name}')">VIEW CP LOOT HISTORY</button>
+                                <div class="loot-content" id="loot-${name.replace(/\s+/g, '')}">No items yet.</div>
                             </div>
                         </div>
                     </div>
                 `).join('');
             };
-            render(noldorData, 'noldor-list');
-            render(krimData, 'krim-list');
+            render(noldorNames, 'noldor-list');
+            render(krimNames, 'krim-list');
+            document.getElementById('prices-table-body').innerHTML = pricesData.map(p => `<tr><td><img src="${p.img}" class="mini-icon"> ${p.name}</td><td style="color:var(--gold); font-weight:bold;">${p.pts}</td></tr>`).join('');
         }
 
         function toggleLoot(name) {
@@ -228,7 +244,6 @@
         }
 
         function closeModal() { document.getElementById('caller-modal').style.display = 'none'; document.getElementById('overlay').style.display = 'none'; }
-
         function openTab(evt, tabName) {
             let i, tabcontent, tablinks;
             tabcontent = document.getElementsByClassName("tab-content");
@@ -238,19 +253,6 @@
             document.getElementById(tabName).classList.add("active");
             evt.currentTarget.classList.add("active");
         }
-
-        const prices = [
-            { name: "Core Ring", pts: 25, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/ring-of-core.png?raw=true" },
-            { name: "Orfen Earring", pts: 75, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/earring-orfen.png?raw=true" },
-            { name: "Queen Ant Ring", pts: 150, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/ring-of-queen-ant.png?raw=true" },
-            { name: "Zaken Earring", pts: 175, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/zaken-earring.png?raw=true" },
-            { name: "Frintezza Neck", pts: 225, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/frintezza-necklace.png?raw=true" },
-            { name: "Baium Ring", pts: 950, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/ring-of-baium.png?raw=true" },
-            { name: "Antharas Earring", pts: 1100, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/earring-antharas.png?raw=true" },
-            { name: "Valakas Necklace", pts: 3100, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/necklace-valakas.png?raw=true" }
-        ];
-
-        document.getElementById('prices-grid').innerHTML = prices.map(p => `<div class="epic-card"><img src="${p.img}" style="width:40px;"><div style="margin-left:10px;"><h4 style="margin:0;color:var(--gold);font-size:0.8rem;">${p.name}</h4><p style="margin:0;font-weight:bold;">${p.pts} PTS</p></div></div>`).join('');
 
         setInterval(() => { document.getElementById('clock').innerText = "SERVER TIME: " + new Date().toLocaleTimeString('el-GR'); }, 1000);
         renderLists();
