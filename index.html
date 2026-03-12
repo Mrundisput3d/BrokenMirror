@@ -10,6 +10,7 @@
             --gold: #d4af37; --silver: #c0c0c0; --bronze: #cd7f32;
             --noldor-sky: #00d9ff; --krim-red: #ff3333;
             --bg-overlay: rgba(10, 12, 15, 0.96); 
+            --panel-bg: rgba(15, 18, 22, 0.98);
         }
         html { scroll-behavior: smooth; }
         body { 
@@ -23,12 +24,12 @@
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9998; backdrop-filter: blur(5px); }
         #caller-modal {
             display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 450px; background: #0f1216; border: 2px solid var(--gold); border-radius: 15px;
+            width: 420px; background: #0f1216; border: 2px solid var(--gold); border-radius: 15px;
             padding: 30px; z-index: 9999; box-shadow: 0 0 50px #000; text-align: center;
         }
 
-        .page-section { min-height: 100vh; padding: 20px; box-sizing: border-box; }
-        .server-time { position: absolute; top: 20px; right: 40px; color: var(--gold); font-family: 'Cinzel'; border: 1px solid var(--gold); padding: 5px 15px; border-radius: 5px; background: rgba(0,0,0,0.5); }
+        .page-section { min-height: 100vh; padding: 20px; box-sizing: border-box; position: relative; border-bottom: 1px solid rgba(212,175,55,0.1); }
+        .server-time { position: absolute; top: 20px; right: 40px; color: var(--gold); font-family: 'Cinzel'; border: 1px solid var(--gold); padding: 5px 15px; border-radius: 5px; background: rgba(0,0,0,0.5); font-size: 0.8rem; }
 
         .top-header { text-align: center; margin-bottom: 30px; }
         .ally-logo { width: 100px; height: 100px; filter: drop-shadow(0 0 15px var(--gold)); }
@@ -42,8 +43,9 @@
 
         /* DASHBOARD */
         .main-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 1600px; margin: 0 auto; }
-        .clan-column { background: rgba(15, 18, 22, 0.95); height: 750px; display: flex; flex-direction: column; border: 1px solid #333; border-radius: 10px; border-top: 4px solid var(--gold); }
-        .column-header { padding: 15px; text-align: center; font-family: 'Cinzel'; font-size: 1.1rem; border-bottom: 1px solid #222; }
+        .clan-column { background: rgba(15, 18, 22, 0.95); height: 720px; display: flex; flex-direction: column; border: 1px solid #333; border-radius: 10px; border-top: 4px solid var(--gold); }
+        .column-header { padding: 15px; text-align: center; font-family: 'Cinzel'; font-size: 1.1rem; border-bottom: 1px solid #222; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .clan-mini-logo { width: 35px; height: 35px; object-fit: contain; }
 
         .scroll-area { overflow-y: auto; padding: 10px; flex-grow: 1; }
         .scroll-area::-webkit-scrollbar { width: 5px; }
@@ -59,42 +61,41 @@
 
         .member-item { border-bottom: 1px solid rgba(255,255,255,0.03); }
         .member-btn { width: 100%; background: none; border: none; padding: 8px 20px; color: #ccc; text-align: left; cursor: pointer; display: flex; justify-content: space-between; font-size: 0.85rem; }
-        .member-btn:hover { color: var(--gold); }
-
         .member-stats { display: none; background: #000; padding: 10px; border-top: 1px solid #333; }
         .active-member > .member-stats { display: block; }
 
         /* STATS GRID */
         .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
         .stat-box { background: #15181c; padding: 6px; border: 1px solid #222; text-align: center; border-radius: 3px; }
-        .stat-name { display: block; color: var(--gold); font-size: 0.6rem; font-weight: bold; text-transform: uppercase; }
-        .stat-val { font-size: 0.9rem; color: #fff; }
+        .stat-name { display: block; color: var(--gold); font-size: 0.55rem; font-weight: bold; }
+        .stat-val { font-size: 0.85rem; color: #fff; }
 
         /* LOOT HISTORY */
         .loot-section { padding: 10px; background: rgba(212, 175, 55, 0.05); border-top: 1px solid #333; }
-        .loot-toggle-btn { width: 100%; background: var(--gold); color: #000; border: none; padding: 6px; font-family: 'Cinzel'; font-weight: bold; cursor: pointer; border-radius: 4px; font-size: 0.7rem; }
-        .loot-content { display: none; margin-top: 10px; font-size: 0.8rem; color: #aaa; padding-left: 10px; border-left: 2px solid var(--gold); line-height: 1.6; }
+        .loot-toggle-btn { width: 100%; background: rgba(212,175,55,0.15); color: var(--gold); border: 1px solid var(--gold); padding: 6px; font-family: 'Cinzel'; cursor: pointer; border-radius: 4px; font-size: 0.7rem; }
+        .loot-content { display: none; margin-top: 10px; font-size: 0.8rem; color: #aaa; padding-left: 10px; border-left: 2px solid var(--gold); }
 
-        /* ADMIN */
-        .admin-panel { max-width: 1600px; margin: 20px auto; background: #111; padding: 15px; border-radius: 8px; border: 1px dashed var(--gold); display: flex; gap: 15px; align-items: center; justify-content: center; }
-        .admin-panel select, .admin-panel button { padding: 8px 12px; border-radius: 4px; background: #000; color: #fff; border: 1px solid #444; }
-
-        .epic-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; max-width: 1600px; margin: 0 auto; }
-        .epic-card { background: rgba(15, 18, 22, 0.9); border: 1px solid #333; padding: 15px; border-radius: 8px; display: flex; align-items: center; gap: 15px; border-left: 3px solid var(--gold); }
+        /* SECTION 3 TABS */
+        .tab-container { max-width: 1200px; margin: 30px auto; background: rgba(15,18,22,0.9); border: 1px solid #333; border-radius: 10px; overflow: hidden; }
+        .tab-menu { display: flex; background: #111; border-bottom: 1px solid #333; }
+        .tab-link { padding: 15px 25px; cursor: pointer; color: #777; font-family: 'Cinzel'; border-right: 1px solid #222; }
+        .tab-link.active { color: var(--gold); background: rgba(212,175,55,0.1); border-bottom: 2px solid var(--gold); }
+        .tab-content { padding: 25px; display: none; }
+        .tab-content.active { display: block; }
     </style>
 </head>
 <body>
 
     <div class="modal-overlay" id="overlay" onclick="closeModal()"></div>
     <div id="caller-modal">
-        <img id="modal-img" src="" style="width:110px; height:110px; border-radius:50%; border:3px solid var(--gold); margin-bottom:15px; background:#000;">
+        <img id="modal-img" src="" style="width:100px; height:100px; border-radius:50%; border:2px solid var(--gold); margin-bottom:15px; background:#000;">
         <h2 id="modal-name" style="font-family:'Cinzel Decorative'; color:var(--gold); margin:0;"></h2>
-        <p id="modal-title" style="color:#888; font-size:0.8rem; letter-spacing:2px; margin-bottom:20px;"></p>
+        <p id="modal-title" style="color:#888; font-size:0.7rem; letter-spacing:2px; margin-bottom:20px;"></p>
         <div class="stat-grid" id="modal-stats"></div>
-        <button onclick="closeModal()" style="margin-top:25px; background:var(--gold); color:#000; border:none; padding:10px 30px; cursor:pointer; font-weight:bold; font-family:'Cinzel';">CLOSE</button>
+        <button onclick="closeModal()" style="margin-top:20px; background:var(--gold); color:#000; border:none; padding:10px 30px; cursor:pointer; font-weight:bold; font-family:'Cinzel'; border-radius:4px;">CLOSE</button>
     </div>
 
-    <div class="page-section">
+    <div class="page-section" id="section1">
         <div class="server-time" id="clock">SERVER TIME: 00:00:00</div>
         
         <div class="top-header">
@@ -114,36 +115,59 @@
 
         <div class="main-wrapper">
             <div class="clan-column">
-                <div class="column-header" style="color:var(--noldor-sky)">NOLDOR CLAN — CPs</div>
+                <div class="column-header" style="color:var(--noldor-sky)">
+                    <img src="https://i.ibb.co/8LvFNQkC/noldor.png" class="clan-mini-logo"> NOLDOR CLAN — CPs
+                </div>
                 <div class="scroll-area" id="noldor-list"></div>
             </div>
             <div class="clan-column">
-                <div class="column-header" style="color:var(--krim-red)">KRIMINALIDES CLAN — CPs</div>
+                <div class="column-header" style="color:var(--krim-red)">
+                    <img src="https://i.ibb.co/VYMZjzYr/kriminalides.png" class="clan-mini-logo"> KRIMINALIDES CLAN — CPs
+                </div>
                 <div class="scroll-area" id="krim-list"></div>
             </div>
         </div>
 
-        <div class="admin-panel">
-            <strong style="color:var(--gold); font-size:0.8rem;">ADMIN PANEL:</strong>
-            <select id="sel-cp"></select>
-            <select id="sel-jewel">
-                <option value="none">-- Select Loot --</option>
-                <option value="Core Ring|25">Core Ring (25)</option>
-                <option value="Orfen Earring|75">Orfen Earring (75)</option>
-                <option value="Queen Ant Ring|150">Queen Ant (150)</option>
-                <option value="Zaken Earring|175">Zaken Earring (175)</option>
-                <option value="Frintezza Neck|225">Frintezza Neck (225)</option>
-                <option value="Baium Ring|950">Baium Ring (950)</option>
-                <option value="Antharas Earring|1100">Antharas Earring (1100)</option>
-                <option value="Valakas Necklace|3100">Valakas Necklace (3100)</option>
-            </select>
-            <button onclick="applyLoot()" style="background:var(--gold); color:#000; font-weight:bold; cursor:pointer; border:none;">SUBMIT DEDUCTION</button>
+        <div style="text-align:center; margin-top:20px;">
+            <a href="#section2" style="color:var(--gold); text-decoration:none; font-family:'Cinzel'; font-size:0.8rem;">VIEW PRICES & RULES ▼</a>
         </div>
     </div>
 
-    <div class="page-section" style="background: rgba(0,0,0,0.5);">
-        <h2 style="font-family:'Cinzel Decorative'; color:var(--gold); text-align:center; margin-bottom:40px;">EPIC JEWELS PRICES</h2>
+    <div class="page-section" id="section2" style="background: rgba(0,0,0,0.5);">
+        <h2 style="font-family:'Cinzel Decorative'; color:var(--gold); text-align:center; margin:40px 0;">EPIC JEWELS PRICES</h2>
         <div class="epic-grid" id="prices-grid"></div>
+        <div style="text-align:center; margin-top:40px;">
+            <a href="#section3" style="color:var(--gold); text-decoration:none; font-family:'Cinzel'; font-size:0.8rem;">ALLIANCE CENTER ▼</a>
+        </div>
+    </div>
+
+    <div class="page-section" id="section3">
+        <h2 style="font-family:'Cinzel Decorative'; color:var(--gold); text-align:center; margin:40px 0;">ALLIANCE MANAGEMENT CENTER</h2>
+        <div class="tab-container">
+            <div class="tab-menu">
+                <div class="tab-link active" onclick="openTab(event, 'rules')">RULES</div>
+                <div class="tab-link" onclick="openTab(event, 'siege')">SIEGES</div>
+                <div class="tab-link" onclick="openTab(event, 'announcements')">ANNOUNCEMENTS</div>
+            </div>
+            <div id="rules" class="tab-content active">
+                <h3 style="color:var(--gold)">Engagement Rules</h3>
+                <p>• Respect the Shotcallers during the raid.</p>
+                <p>• Mandatory Discord for all alliance members.</p>
+                <p>• Loot is distributed via the CP DKP system.</p>
+            </div>
+            <div id="siege" class="tab-content">
+                <h3 style="color:var(--gold)">Siege Strategy</h3>
+                <p>Targets: Aden Castle (Main), Giran (Secondary).</p>
+                <p>Check Discord for CP-specific positions.</p>
+            </div>
+            <div id="announcements" class="tab-content">
+                <h3 style="color:var(--gold)">Latest News</h3>
+                <p>Alliance meeting this Friday at 21:00 Server Time.</p>
+            </div>
+        </div>
+        <div style="text-align:center;">
+            <a href="#section1" style="color:var(--gold); text-decoration:none; font-family:'Cinzel';">▲ BACK TO TOP</a>
+        </div>
     </div>
 
     <script>
@@ -153,13 +177,12 @@
         const noldorNames = ["Noldor Clan", "Noldor Archer", "Noldor Archer 2", "Noldor Dummy", "Noldor Tank", "Kriminalides CP", "Outlaw CP", "Ronin CP", "Brazilians CP", "Brazilians 2 CP", "I am Groot CP"];
         const krimNames = ["Hattrick CP", "55 Room CP", "Legion CP", "Criminal Record CP", "Avalanche CP", "Gankly Crew CP", "Furious Wolves CP", "Animals CP", "Dracaris CP", "Sinaloa CP", "Knockout CP", "VaBank CP"];
 
-        // Database
-        let noldorData = noldorNames.map(name => ({ name, pts: 2500, lead: "Leader", mems: ["Member A", "Member B", "Member C"] }));
-        let krimData = krimNames.map(name => ({ name, pts: 2500, lead: "Leader", mems: ["Player 1", "Player 2", "Player 3"] }));
+        let noldorData = noldorNames.map(name => ({ name, pts: 2500, lead: "Leader", mems: ["Member A", "Member B"] }));
+        let krimData = krimNames.map(name => ({ name, pts: 2500, lead: "Leader", mems: ["Player 1", "Player 2"] }));
 
-        function renderDashboard() {
+        function renderLists() {
             const render = (data, elId) => {
-                document.getElementById(elId).innerHTML = data.sort((a,b) => b.pts - a.pts).map(cp => `
+                document.getElementById(elId).innerHTML = data.map(cp => `
                     <div class="cp-box">
                         <button class="cp-btn" onclick="this.parentElement.classList.toggle('active')">
                             <span>${cp.name}</span>
@@ -177,9 +200,9 @@
                                 </div>
                             `).join('')}
                             <div class="loot-section">
-                                <button class="loot-toggle-btn" onclick="toggleLootContent('${cp.name}')">VIEW CP LOOT HISTORY</button>
+                                <button class="loot-toggle-btn" onclick="toggleLoot('${cp.name}')">VIEW CP LOOT HISTORY</button>
                                 <div class="loot-content" id="loot-${cp.name.replace(/\s+/g, '')}">
-                                    ${archive[cp.name] ? archive[cp.name].join('<br>') : 'No loot history found.'}
+                                    ${archive[cp.name] ? archive[cp.name].join('<br>') : 'No loot history.'}
                                 </div>
                             </div>
                         </div>
@@ -188,12 +211,9 @@
             };
             render(noldorData, 'noldor-list');
             render(krimData, 'krim-list');
-            
-            const all = [...noldorNames, ...krimNames].sort();
-            document.getElementById('sel-cp').innerHTML = all.map(n => `<option value="${n}">${n}</option>`).join('');
         }
 
-        function toggleLootContent(name) {
+        function toggleLoot(name) {
             const el = document.getElementById('loot-' + name.replace(/\s+/g, ''));
             el.style.display = (el.style.display === 'block') ? 'none' : 'block';
         }
@@ -202,34 +222,23 @@
             document.getElementById('modal-name').innerText = name;
             document.getElementById('modal-title').innerText = title;
             document.getElementById('modal-img').src = img;
-            document.getElementById('modal-stats').innerHTML = bosses.map(b => `
-                <div class="stat-box"><span class="stat-name">${b}</span><span class="stat-val">${Math.floor(Math.random()*20)}</span></div>
-            `).join('');
+            document.getElementById('modal-stats').innerHTML = bosses.map(b => `<div class="stat-box"><span class="stat-name">${b}</span><span class="stat-val">${Math.floor(Math.random()*15)}</span></div>`).join('');
             document.getElementById('caller-modal').style.display = 'block';
             document.getElementById('overlay').style.display = 'block';
         }
 
-        function closeModal() {
-            document.getElementById('caller-modal').style.display = 'none';
-            document.getElementById('overlay').style.display = 'none';
+        function closeModal() { document.getElementById('caller-modal').style.display = 'none'; document.getElementById('overlay').style.display = 'none'; }
+
+        function openTab(evt, tabName) {
+            let i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) tabcontent[i].classList.remove("active");
+            tablinks = document.getElementsByClassName("tab-link");
+            for (i = 0; i < tablinks.length; i++) tablinks[i].classList.remove("active");
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
         }
 
-        function applyLoot() {
-            const cpName = document.getElementById('sel-cp').value;
-            const itemVal = document.getElementById('sel-jewel').value.split('|');
-            if(itemVal[0] === 'none') return;
-
-            let cp = [...noldorData, ...krimData].find(c => c.name === cpName);
-            if(cp) {
-                cp.pts -= parseInt(itemVal[1]);
-                if(!archive[cpName]) archive[cpName] = [];
-                archive[cpName].unshift(`💠 ${itemVal[0]} (${new Date().toLocaleDateString('el-GR')})`);
-                renderDashboard();
-                alert('DKP updated successfully!');
-            }
-        }
-
-        // Prices Grid
         const prices = [
             { name: "Core Ring", pts: 25, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/ring-of-core.png?raw=true" },
             { name: "Orfen Earring", pts: 75, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/earring-orfen.png?raw=true" },
@@ -241,18 +250,10 @@
             { name: "Valakas Necklace", pts: 3100, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/necklace-valakas.png?raw=true" }
         ];
 
-        document.getElementById('prices-grid').innerHTML = prices.map(p => `
-            <div class="epic-card">
-                <img src="${p.img}" style="width:45px; height:45px;">
-                <div>
-                    <h4 style="margin:0; color:var(--gold); font-family:Cinzel; font-size:0.85rem;">${p.name}</h4>
-                    <p style="margin:2px 0 0; font-weight:bold;">${p.pts} PTS</p>
-                </div>
-            </div>
-        `).join('');
+        document.getElementById('prices-grid').innerHTML = prices.map(p => `<div class="epic-card"><img src="${p.img}" style="width:40px;"><div style="margin-left:10px;"><h4 style="margin:0;color:var(--gold);font-size:0.8rem;">${p.name}</h4><p style="margin:0;font-weight:bold;">${p.pts} PTS</p></div></div>`).join('');
 
         setInterval(() => { document.getElementById('clock').innerText = "SERVER TIME: " + new Date().toLocaleTimeString('el-GR'); }, 1000);
-        renderDashboard();
+        renderLists();
     </script>
 </body>
 </html>
