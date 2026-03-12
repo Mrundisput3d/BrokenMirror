@@ -14,6 +14,7 @@
             --border-style: 2px solid var(--dark-gold);
             --member-bg: rgba(255, 255, 255, 0.03);
             --epic-pink: #ff79c6;
+            --caller-glow: rgba(212, 175, 55, 0.3);
         }
 
         body { 
@@ -29,10 +30,23 @@
             z-index: -1;
         }
 
-        h1, h2, .column-header, .cp-trigger span, .leader-label, .stat-title { font-family: 'Cinzel', serif; }
+        h1, h2, .column-header, .cp-trigger span, .leader-label, .stat-title, .caller-name { font-family: 'Cinzel', serif; }
 
         header { text-align: center; margin-bottom: 30px; }
         .main-title { font-size: 3.5rem; color: var(--gold); text-shadow: 0 0 15px rgba(212, 175, 55, 0.5); margin: 0; letter-spacing: 6px; }
+
+        /* ALLY CALLERS SECTION */
+        .ally-callers-section {
+            max-width: 1300px; margin: 0 auto 40px auto;
+            text-align: center; background: rgba(0,0,0,0.6);
+            border: 1px solid var(--dark-gold); border-radius: 10px; padding: 20px;
+            box-shadow: 0 0 20px var(--caller-glow);
+        }
+        .callers-container { display: flex; justify-content: center; gap: 50px; margin-top: 15px; }
+        .caller-card { display: flex; flex-direction: column; align-items: center; }
+        .caller-icon { font-size: 2rem; color: var(--gold); margin-bottom: 5px; text-shadow: 0 0 10px var(--gold); }
+        .caller-name { font-size: 1.5rem; color: #fff; letter-spacing: 2px; }
+        .caller-title { color: var(--gold); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; }
 
         .dashboard-container { 
             display: grid; grid-template-columns: 1fr 1fr; gap: 30px; 
@@ -41,7 +55,7 @@
 
         .clan-column {
             background: var(--panel-bg); border: var(--border-style);
-            border-radius: 5px; height: 650px; display: flex; flex-direction: column;
+            border-radius: 5px; height: 600px; display: flex; flex-direction: column;
             box-shadow: 0 10px 40px rgba(0,0,0,0.8);
         }
 
@@ -71,7 +85,6 @@
             width: 100%; background: none; border: none; color: #fff; padding: 10px 20px;
             text-align: left; cursor: pointer; font-size: 0.9rem; display: flex; justify-content: space-between;
         }
-        .member-trigger:hover { background: rgba(212, 175, 55, 0.1); }
 
         /* MEMBER STATS (Nested deeper) */
         .member-stats { display: none; background: #0a0c0e; padding: 15px; border-left: 3px solid var(--gold); margin: 5px 20px; }
@@ -89,7 +102,7 @@
         .jewel-name { color: var(--epic-pink); font-weight: bold; }
 
         @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
-        @media (max-width: 900px) { .dashboard-container { grid-template-columns: 1fr; } }
+        @media (max-width: 900px) { .dashboard-container { grid-template-columns: 1fr; } .callers-container { flex-direction: column; gap: 20px; } }
     </style>
 </head>
 <body>
@@ -98,6 +111,22 @@
         <h1 class="main-title">Broken Mirror</h1>
         <p style="color: var(--gold); letter-spacing: 2px;">CLAN MANAGEMENT SYSTEM</p>
     </header>
+
+    <div class="ally-callers-section">
+        <h2 style="color: var(--gold); margin: 0; letter-spacing: 3px; font-size: 1.2rem;">★ ALLY CALLERS ★</h2>
+        <div class="callers-container">
+            <div class="caller-card">
+                <span class="caller-icon">◈</span>
+                <span class="caller-name">TSAKNORRIS</span>
+                <span class="caller-title">Main Shotcaller</span>
+            </div>
+            <div class="caller-card">
+                <span class="caller-icon">◈</span>
+                <span class="caller-name">NIKLAUS</span>
+                <span class="caller-title">Tactical Caller</span>
+            </div>
+        </div>
+    </div>
 
     <div class="dashboard-container">
         <div class="clan-column">
@@ -120,14 +149,13 @@
             <tbody>
                 <tr><td>12/03/2026</td><td class="jewel-name">Valakas Necklace</td><td>Hattrick CP</td><td>Kriminalides</td></tr>
                 <tr><td>10/03/2026</td><td class="jewel-name">Antharas Earring</td><td>Noldor Archer</td><td>Noldor</td></tr>
-                <tr><td>08/03/2026</td><td class="jewel-name">Baium Ring</td><td>Ronin CP</td><td>Noldor</td></tr>
             </tbody>
         </table>
     </div>
 
     <script>
         const noldorData = [
-            { name: "CP 1", leader: "Player1", members: ["MemberA", "MemberB", "MemberC"] },
+            { name: "CP 1", leader: "Player1", members: ["MemberA", "MemberB"] },
             { name: "Noldor Archer", leader: "Artemis", members: ["Legolas", "Sylvanas"] },
             { name: "Noldor Archer 2", leader: "Apollo", members: ["ArcherX", "ArcherY"] },
             { name: "Noldor Dummy", leader: "DummyLead", members: ["D1", "D2"] },
