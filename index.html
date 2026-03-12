@@ -34,12 +34,10 @@
         .ally-logo { width: 140px; height: auto; filter: drop-shadow(0 0 15px var(--gold)); margin-bottom: 10px; }
         .ally-title { font-family: 'Cinzel Decorative', cursive; font-size: 2.2rem; color: var(--gold); display: block; letter-spacing: 2px; }
         
-        /* FAST NAV BUTTONS */
         .fast-nav { display: flex; justify-content: center; gap: 15px; margin: 20px 0; }
         .nav-link-btn { background: rgba(212,175,55,0.1); border: 1px solid var(--gold); color: var(--gold); padding: 8px 20px; font-family: 'Cinzel'; text-decoration: none; border-radius: 4px; font-size: 0.8rem; transition: 0.3s; cursor: pointer; }
         .nav-link-btn:hover { background: var(--gold); color: #000; box-shadow: 0 0 10px var(--gold); }
 
-        /* CALLERS ROW */
         .leaders-row { display: flex; justify-content: center; flex-wrap: wrap; gap: 40px; margin-top: 20px; max-width: 1200px; margin-left: auto; margin-right: auto; }
         .leader-card { text-align: center; cursor: pointer; transition: 0.3s; min-width: 120px; }
         .leader-card:hover { transform: scale(1.1); }
@@ -67,24 +65,21 @@
         .member-list { display: none; background: rgba(0,0,0,0.5); border-top: 1px solid #222; padding: 5px 0; }
         .active > .member-list { display: block; }
 
-        /* MEMBERS MENU */
         .member-item { border-bottom: 1px solid rgba(255,255,255,0.03); }
         .member-btn { width: 100%; background: none; border: none; padding: 10px 20px; color: #ccc; text-align: left; cursor: pointer; display: flex; justify-content: space-between; font-size: 0.85rem; align-items: center; }
         .member-stats { display: none; background: #000; padding: 15px; border-top: 1px solid #333; }
         .active-member > .member-stats { display: block; }
 
-        /* STATS GRID */
         .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
         .stat-box { background: #15181c; padding: 8px; border: 1px solid #222; text-align: center; border-radius: 4px; }
         .stat-name { display: block; color: var(--gold); font-size: 0.55rem; font-weight: bold; text-transform: uppercase; margin-bottom: 2px; }
         .stat-val { font-size: 0.9rem; color: #fff; font-family: 'Cinzel'; }
 
-        /* LOOT SECTION */
         .loot-section { padding: 12px; background: rgba(212, 175, 55, 0.03); border-top: 1px solid #333; }
         .loot-toggle-btn { width: 100%; background: rgba(212,175,55,0.1); color: var(--gold); border: 1px solid var(--gold); padding: 8px; font-family: 'Cinzel'; cursor: pointer; border-radius: 4px; font-size: 0.75rem; transition: 0.3s; }
         .loot-content { display: none; margin-top: 10px; font-size: 0.8rem; color: #aaa; padding-left: 12px; border-left: 2px solid var(--gold); }
 
-        /* SECTION 2 & 3 STYLES */
+        /* MARKET & RULES */
         .section-flex { display: flex; flex-wrap: wrap; gap: 30px; justify-content: center; max-width: 1400px; margin: 0 auto; }
         .epic-table-container { background: rgba(10, 12, 15, 0.9); border: 2px solid var(--gold); border-radius: 10px; padding: 15px; flex: 1; min-width: 300px; }
         .epic-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
@@ -92,30 +87,26 @@
         .epic-table td { padding: 8px 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
         .mini-icon { width: 22px; height: 22px; vertical-align: middle; margin-right: 10px; }
         
-        .rules-container { background: rgba(15, 18, 22, 0.95); border: 1px solid #333; border-radius: 12px; padding: 25px; flex: 1.5; min-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .rules-container { background: rgba(15, 18, 22, 0.95); border: 1px solid #333; border-radius: 12px; padding: 25px; flex: 1.5; min-width: 400px; }
         .rules-container h3 { font-family: 'Cinzel'; color: var(--gold); margin-top: 0; border-bottom: 1px solid rgba(212,175,55,0.2); padding-bottom: 15px; text-align: center; }
         .rule-item { margin-bottom: 12px; display: flex; gap: 12px; padding: 8px; border-radius: 6px; background: rgba(255,255,255,0.02); }
         .highlight { color: var(--gold); font-weight: bold; }
 
-        /* DATA ANALYTICS SECTION */
-        .analytics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 30px; }
-        .top-rank-card { background: rgba(212,175,55,0.05); border: 1px solid rgba(212,175,55,0.3); border-radius: 8px; padding: 20px; }
-        .top-rank-card h4 { font-family: 'Cinzel'; color: var(--gold); margin: 0 0 15px 0; text-align: center; border-bottom: 1px solid rgba(212,175,55,0.1); padding-bottom: 10px; }
-        .rank-list { list-style: none; padding: 0; margin: 0; }
-        .rank-list li { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.9rem; }
-        .rank-list li span:first-child { color: var(--gold); font-weight: bold; }
+        /* VIDEO ARCHIVE SECTION */
+        .video-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
+        .video-card { background: #000; border: 1px solid #333; border-radius: 8px; overflow: hidden; transition: 0.3s; }
+        .video-card:hover { border-color: var(--gold); transform: translateY(-5px); }
+        .video-container { position: relative; padding-bottom: 56.25%; height: 0; }
+        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        .video-info { padding: 12px; font-family: 'Cinzel'; color: var(--gold); font-size: 0.8rem; text-align: center; }
 
-        .tab-container { max-width: 1200px; margin: 30px auto; background: rgba(15,18,22,0.9); border: 1px solid #333; border-radius: 10px; overflow: hidden; }
-        .tab-menu { display: flex; background: #111; border-bottom: 1px solid #333; }
-        .tab-link { padding: 15px 25px; cursor: pointer; color: #777; font-family: 'Cinzel'; border-right: 1px solid #222; }
-        .tab-link.active { color: var(--gold); background: rgba(212,175,55,0.1); border-bottom: 2px solid var(--gold); }
-        .tab-content { padding: 25px; display: none; }
-        .tab-content.active { display: block; }
+        .submit-video-box { text-align: center; margin-bottom: 40px; padding: 20px; background: rgba(212,175,55,0.05); border: 1px dashed var(--gold); border-radius: 10px; }
     </style>
 </head>
 <body>
 
     <div class="modal-overlay" id="overlay" onclick="closeModal()"></div>
+    
     <div id="caller-modal">
         <img id="modal-img" src="" style="width:100px; height:100px; border-radius:50%; border:2px solid var(--gold); margin-bottom:15px; background:#000;">
         <h2 id="modal-name" style="font-family:'Cinzel Decorative'; color:var(--gold); margin:0;"></h2>
@@ -132,8 +123,8 @@
             <span class="ally-title">BROKEN MIRROR ALLIANCE</span>
             
             <div class="fast-nav">
-                <a href="#section3" class="nav-link-btn">🎬 PVP VIDEOS</a>
-                <a href="#data-analytics" class="nav-link-btn">📊 DATA ANALYTICS</a>
+                <a href="#section3" class="nav-link-btn">🎬 WAR ARCHIVES</a>
+                <a href="#section2" class="nav-link-btn">💎 MARKETPLACE</a>
             </div>
 
             <div class="leaders-row">
@@ -153,13 +144,13 @@
         <div class="main-wrapper">
             <div class="clan-column" style="border-top-color: var(--noldor-sky);">
                 <div class="column-header" style="color:var(--noldor-sky)">
-                    <img src="https://i.ibb.co/8LvFNQkC/noldor.png" class="clan-mini-logo"> NOLDOR CLAN — CPs
+                    <img src="https://i.ibb.co/8LvFNQkC/noldor.png" class="clan-mini-logo"> NOLDOR CLAN
                 </div>
                 <div class="scroll-area" id="noldor-list"></div>
             </div>
             <div class="clan-column" style="border-top-color: var(--krim-red);">
                 <div class="column-header" style="color:var(--krim-red)">
-                    <img src="https://i.ibb.co/VYMZjzYr/kriminalides.png" class="clan-mini-logo"> KRIMINALIDES CLAN — CPs
+                    <img src="https://i.ibb.co/VYMZjzYr/kriminalides.png" class="clan-mini-logo"> KRIMINALIDES CLAN
                 </div>
                 <div class="scroll-area" id="krim-list"></div>
             </div>
@@ -179,109 +170,80 @@
                 <h3>POINTS SYSTEM & POLICIES</h3>
                 <div class="rule-item"><span>» <span class="highlight">Attendance:</span> Mid-Low Epics = 1 | Baium = 2 | Siege/Valakas/Antharas = 3.</span></div>
                 <div class="rule-item"><span>» <span class="highlight">Purchases:</span> Points are deducted from the CP's total balance.</span></div>
-                <div class="rule-item"><span>» <span class="highlight">Priority:</span> <span style="color:var(--noldor-sky)">Archer CPs</span> get Baium | <span style="color:var(--krim-red)">Mage CPs</span> get Valakas | <span style="color:#00ff88">Stoppers</span> get Antharas.</span></div>
-                <div class="rule-item"><span>» <span class="highlight">Cooldown:</span> 3-week restriction for the same jewel (Frintezza+).</span></div>
-                <div class="rule-item"><span>» <span class="highlight">Caller Bonus:</span> Callers receive personal points (x9 multiplier).</span></div>
-            </div>
-        </div>
-
-        <div id="data-analytics" style="margin-top: 60px;">
-            <h3 style="font-family:'Cinzel'; color:var(--gold); text-align:center; letter-spacing: 2px;">ALLIANCE ACTIVITY ANALYTICS</h3>
-            <div class="analytics-grid">
-                <div class="top-rank-card">
-                    <h4>🏆 TOP ACTIVE CPs (MONTH)</h4>
-                    <ul class="rank-list">
-                        <li><span>1. Hattrick CP</span> <span>98% Attendance</span></li>
-                        <li><span>2. Noldor Archer</span> <span>95% Attendance</span></li>
-                        <li><span>3. Legion CP</span> <span>92% Attendance</span></li>
-                        <li><span>4. Avalanche CP</span> <span>89% Attendance</span></li>
-                    </ul>
-                </div>
-                <div class="top-rank-card">
-                    <h4>🥇 TOP ACTIVE PLAYERS (MONTH)</h4>
-                    <ul class="rank-list">
-                        <li><span>1. PlayerOne</span> <span>42 Raids</span></li>
-                        <li><span>2. PlayerTwo</span> <span>40 Raids</span></li>
-                        <li><span>3. PlayerThree</span> <span>38 Raids</span></li>
-                        <li><span>4. PlayerFour</span> <span>35 Raids</span></li>
-                    </ul>
-                </div>
+                <div class="rule-item"><span>» <span class="highlight">Priority:</span> Archer CPs (Baium) | Mage CPs (Valakas) | Stoppers (Antharas).</span></div>
+                <div class="rule-item"><span>» <span class="highlight">Caller Bonus:</span> Active callers receive personal x9 multiplier.</span></div>
             </div>
         </div>
     </div>
 
     <div class="page-section" id="section3">
-        <h2 style="font-family:'Cinzel Decorative'; color:var(--gold); text-align:center; margin:30px 0;">ALLIANCE MANAGEMENT CENTER</h2>
-        <div class="tab-container">
-            <div class="tab-menu">
-                <div class="tab-link active" onclick="openTab(event, 'rules')">RULES</div>
-                <div class="tab-link" onclick="openTab(event, 'siege')">SIEGES</div>
-                <div class="tab-link" onclick="openTab(event, 'announcements')">ANNOUNCEMENTS</div>
+        <h2 style="font-family:'Cinzel Decorative'; color:var(--gold); text-align:center; margin:30px 0;">WAR ARCHIVES</h2>
+        
+        <div style="max-width: 1200px; margin: 0 auto;">
+            <div class="submit-video-box">
+                <p style="font-family: 'Cinzel'; color: var(--gold); margin-bottom: 15px;">HAVE EPIC PVP FOOTAGE?</p>
+                <button class="nav-link-btn" onclick="alert('Στείλε το link στο Discord της Alliance (Channel: #war-archives)')">SUBMIT YOUR VIDEO LINK</button>
             </div>
-            <div id="rules" class="tab-content active">
-                <p>• Respect the Shotcallers. • Mandatory Discord. • DKP distribution.</p>
-            </div>
-            <div id="siege" class="tab-content">
-                <p>Main Target: Aden. Secondary: Giran.</p>
-            </div>
-            <div id="announcements" class="tab-content">
-                <p>Alliance meeting this Friday at 21:00.</p>
+
+            <div class="video-grid">
+                <div class="video-card">
+                    <div class="video-container">
+                        <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allowfullscreen></iframe>
+                    </div>
+                    <div class="video-info">ADEN CASTLE SIEGE - 2024</div>
+                </div>
+                <div class="video-card">
+                    <div class="video-container">
+                        <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allowfullscreen></iframe>
+                    </div>
+                    <div class="video-info">VALAKAS RAID HIGHLIGHTS</div>
+                </div>
+                <div class="video-card">
+                    <div class="video-container">
+                        <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allowfullscreen></iframe>
+                    </div>
+                    <div class="video-info">OPEN WORLD PVP AT CRUMA</div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
         const bosses = ["VAL", "ANT", "BAI", "FRI", "ZAK", "ORF", "AQ", "CORE", "SIEGE"];
-        const noldorNames = ["Noldor Clan", "Noldor Archer", "Noldor Archer 2", "Noldor Dummy", "Noldor Tank", "Kriminalides CP", "Outlaw CP", "Ronin CP", "Brazilians CP", "Brazilians 2 CP", "I am Groot CP"];
-        const krimNames = ["Hattrick CP", "55 Room CP", "Legion CP", "Criminal Record CP", "Avalanche CP", "Gankly Crew CP", "Furious Wolves CP", "Animals CP", "Dracaris CP", "Sinaloa CP", "Knockout CP", "VaBank CP"];
+        const noldorNames = ["Noldor Clan", "Noldor Archer", "Noldor Archer 2", "Noldor Dummy", "Noldor Tank", "Outlaw CP", "Ronin CP"];
+        const krimNames = ["Hattrick CP", "55 Room CP", "Legion CP", "Criminal Record CP", "Avalanche CP", "Gankly Crew CP"];
 
         const pricesData = [
-            { name: "Core Ring", pts: 25, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/ring-of-core.png?raw=true" },
-            { name: "Orfen Earring", pts: 75, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/earring-orfen.png?raw=true" },
             { name: "Queen Ant Ring", pts: 150, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/ring-of-queen-ant.png?raw=true" },
             { name: "Zaken Earring", pts: 175, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/zaken-earring.png?raw=true" },
-            { name: "Frintezza Neck", pts: 225, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/frintezza-necklace.png?raw=true" },
             { name: "Baium Ring", pts: 950, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/ring-of-baium.png?raw=true" },
-            { name: "Antharas Earring", pts: 1100, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/earring-antharas.png?raw=true" },
             { name: "Valakas Necklace", pts: 3100, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/necklace-valakas.png?raw=true" }
         ];
 
         function renderLists() {
             const render = (names, elId) => {
-                document.getElementById(elId).innerHTML = names.map((name, index) => {
-                    const isTop3 = index < 3;
-                    return `
-                    <div class="cp-box ${isTop3 ? 'top-cp' : ''}">
+                document.getElementById(elId).innerHTML = names.map((name, index) => `
+                    <div class="cp-box ${index < 3 ? 'top-cp' : ''}">
                         <button class="cp-btn" onclick="this.parentElement.classList.toggle('active')">
-                            <span>${isTop3 ? '⭐ ' : ''}${name}</span>
+                            <span>${index < 3 ? '⭐ ' : ''}${name}</span>
                             <span class="points-tag">2500 PTS</span>
                         </button>
                         <div class="member-list">
                             <div class="member-item">
                                 <button class="member-btn" onclick="this.parentElement.classList.toggle('active-member')">
-                                    <span><span class="leader-crown" style="color:var(--gold);margin-right:8px;">👑</span>CP Leader</span><small>▼</small>
+                                    <span>👑 CP Leader</span><small>▼</small>
                                 </button>
                                 <div class="member-stats">
                                     <div class="stat-grid">${bosses.map(b => `<div class="stat-box"><span class="stat-name">${b}</span><span class="stat-val">0</span></div>`).join('')}</div>
                                 </div>
                             </div>
-                            ${["Member A", "Member B", "Member C"].map(m => `
-                                <div class="member-item">
-                                    <button class="member-btn" onclick="this.parentElement.classList.toggle('active-member')">
-                                        <span>${m}</span><small>▼</small>
-                                    </button>
-                                    <div class="member-stats">
-                                        <div class="stat-grid">${bosses.map(b => `<div class="stat-box"><span class="stat-name">${b}</span><span class="stat-val">0</span></div>`).join('')}</div>
-                                    </div>
-                                </div>
-                            `).join('')}
                             <div class="loot-section">
-                                <button class="loot-toggle-btn" onclick="toggleLoot('${name}')">VIEW CP LOOT HISTORY</button>
+                                <button class="loot-toggle-btn" onclick="toggleLoot('${name}')">LOOT HISTORY</button>
                                 <div class="loot-content" id="loot-${name.replace(/\s+/g, '')}">No items yet.</div>
                             </div>
                         </div>
                     </div>
-                `}).join('');
+                `).join('');
             };
             render(noldorNames, 'noldor-list');
             render(krimNames, 'krim-list');
@@ -304,16 +266,6 @@
 
         function closeModal() { document.getElementById('caller-modal').style.display = 'none'; document.getElementById('overlay').style.display = 'none'; }
         
-        function openTab(evt, tabName) {
-            let i, tabcontent, tablinks;
-            tabcontent = document.getElementsByClassName("tab-content");
-            for (i = 0; i < tabcontent.length; i++) tabcontent[i].classList.remove("active");
-            tablinks = document.getElementsByClassName("tab-link");
-            for (i = 0; i < tablinks.length; i++) tablinks[i].classList.remove("active");
-            document.getElementById(tabName).classList.add("active");
-            evt.currentTarget.classList.add("active");
-        }
-
         setInterval(() => { document.getElementById('clock').innerText = "SERVER TIME: " + new Date().toLocaleTimeString('el-GR'); }, 1000);
         renderLists();
     </script>
