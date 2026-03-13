@@ -7,10 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --gold: #d4af37; --silver: #c0c0c0; --bronze: #cd7f32;
-            --noldor-sky: #00d9ff; --krim-red: #ff3333;
-            --noldor-grad: linear-gradient(90deg, rgba(0,217,255,0.15) 0%, rgba(0,0,0,0) 100%);
-            --krim-grad: linear-gradient(90deg, rgba(255,51,51,0.15) 0%, rgba(0,0,0,0) 100%);
+            --gold: #d4af37; --noldor-sky: #00d9ff; --krim-red: #ff3333;
             --bg-overlay: rgba(10, 12, 15, 0.96); 
         }
         body { 
@@ -21,121 +18,84 @@
         body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-overlay); z-index: -1; }
 
         /* HEADER CONTROLS */
-        .header-controls { position: absolute; top: 20px; right: 40px; display: flex; gap: 10px; z-index: 100; }
-        .control-btn { color: var(--gold); font-family: 'Cinzel'; border: 1px solid var(--gold); padding: 5px 15px; border-radius: 5px; background: rgba(0,0,0,0.6); font-size: 0.75rem; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 8px; }
-        .control-btn:hover { background: var(--gold); color: #000; }
+        .header-controls { position: relative; display: flex; justify-content: flex-end; gap: 10px; padding: 20px 40px; z-index: 100; }
+        .control-btn { color: var(--gold); font-family: 'Cinzel'; border: 1px solid var(--gold); padding: 5px 15px; border-radius: 5px; background: rgba(0,0,0,0.6); font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; gap: 8px; }
 
-        .top-header { text-align: center; padding-top: 20px; }
+        .top-header { text-align: center; }
         .ally-logo { width: 110px; filter: drop-shadow(0 0 15px var(--gold)); }
-        .ally-title { font-family: 'Cinzel Decorative', cursive; font-size: 1.8rem; color: var(--gold); display: block; letter-spacing: 2px; margin-bottom: 20px;}
+        .ally-title { font-family: 'Cinzel Decorative', cursive; font-size: 1.8rem; color: var(--gold); display: block; margin-bottom: 20px;}
 
-        /* MAIN NAVIGATION */
-        .main-nav { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-        .nav-link { text-decoration: none; }
-        .nav-btn { background: rgba(212, 175, 55, 0.1); border: 1px solid var(--gold); color: var(--gold); padding: 8px 15px; font-family: 'Cinzel'; cursor: pointer; transition: 0.3s; font-size: 0.75rem; border-radius: 4px; }
-        .nav-btn:hover { background: var(--gold); color: #000; }
-        .nav-btn.active { background: var(--gold); color: #000; box-shadow: 0 0 10px rgba(212, 175, 55, 0.5); }
-
-        /* LEADERS */
-        .leaders-row { display: flex; justify-content: center; gap: 40px; margin-bottom: 20px; }
-        .leader-card { text-align: center; cursor: pointer; width: 110px; }
-        .img-frame { width: 80px; height: 80px; margin: 0 auto; background: #000; border: 2px solid var(--gold); border-radius: 50%; overflow: hidden; box-shadow: 0 0 15px rgba(212,175,55,0.2); }
-        .leader-img { width: 100%; height: 100%; object-fit: contain; }
-        .leader-name { color: var(--gold); font-size: 0.8rem; font-family: 'Cinzel'; display: block; margin-top: 8px; font-weight: bold; }
-        .leader-role { color: #888; font-size: 0.6rem; text-transform: uppercase; display: block; }
-
-        /* TABS */
+        /* NAV */
+        .main-nav { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+        .nav-btn { background: rgba(212, 175, 55, 0.1); border: 1px solid var(--gold); color: var(--gold); padding: 8px 15px; font-family: 'Cinzel'; cursor: pointer; border-radius: 4px; font-size: 0.75rem; text-decoration: none; }
+        
         .tabs-nav { display: flex; justify-content: center; gap: 15px; margin: 25px 0; }
-        .tab-btn { background: rgba(0,0,0,0.6); border: 1px solid var(--gold); color: var(--gold); padding: 10px 25px; font-family: 'Cinzel'; cursor: pointer; transition: 0.3s; font-size: 0.8rem; text-decoration: none; border-radius: 4px; }
-        .tab-btn:hover, .tab-btn.active { background: var(--gold); color: #000; }
+        .tab-btn { background: rgba(0,0,0,0.6); border: 1px solid var(--gold); color: var(--gold); padding: 10px 25px; font-family: 'Cinzel'; cursor: pointer; text-decoration: none; border-radius: 4px; font-size: 0.8rem; }
+        .tab-btn.active { background: var(--gold); color: #000; }
 
-        .page { display: block; max-width: 1500px; margin: 0 auto; padding: 0 20px; animation: fadeIn 0.4s; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        /* LISTS */
-        .main-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px; }
-        .clan-column { background: rgba(15, 18, 22, 0.95); height: 750px; display: flex; flex-direction: column; border: 1px solid #333; border-radius: 10px; border-top: 4px solid var(--gold); }
-        .column-header { padding: 15px; text-align: center; font-family: 'Cinzel'; font-size: 1.1rem; border-bottom: 1px solid #222; display: flex; align-items: center; justify-content: center; gap: 12px; background: rgba(0,0,0,0.4); }
+        /* CP LISTS */
+        .main-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; max-width: 1400px; margin: 0 auto 30px auto; padding: 0 20px; }
+        .clan-column { background: rgba(15, 18, 22, 0.95); height: 700px; display: flex; flex-direction: column; border: 1px solid #333; border-radius: 10px; border-top: 4px solid var(--gold); }
+        .column-header { padding: 15px; text-align: center; font-family: 'Cinzel'; font-size: 1.1rem; border-bottom: 1px solid #222; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .scroll-area { overflow-y: auto; padding: 10px; flex-grow: 1; }
 
-        /* CP BOXES */
-        .cp-box { margin-bottom: 8px; border-radius: 5px; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s; }
-        .cp-noldor { border-left: 4px solid var(--noldor-sky); background: var(--noldor-grad); }
-        .cp-krim { border-left: 4px solid var(--krim-red); background: var(--krim-grad); }
-        .cp-btn { width: 100%; background: none; border: none; padding: 12px 15px; color: #fff; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 0.85rem; }
-        .cp-content { display: none; background: rgba(0,0,0,0.85); padding: 15px; border-top: 1px solid #333; }
+        .cp-box { margin-bottom: 8px; border-radius: 5px; border: 1px solid rgba(255,255,255,0.05); }
+        .cp-noldor { border-left: 4px solid var(--noldor-sky); background: linear-gradient(90deg, rgba(0,217,255,0.1) 0%, transparent 100%); }
+        .cp-krim { border-left: 4px solid var(--krim-red); background: linear-gradient(90deg, rgba(255,51,51,0.1) 0%, transparent 100%); }
+        
+        .cp-btn { width: 100%; background: none; border: none; padding: 12px 15px; color: #fff; text-align: left; cursor: pointer; display: flex; justify-content: space-between; font-weight: bold; }
+        .cp-content { display: none; padding: 15px; background: rgba(0,0,0,0.4); border-top: 1px solid #333; }
         .cp-box.active .cp-content { display: block; }
 
-        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 15px; }
-        .stat-box { background: #15181c; padding: 6px; border: 1px solid #333; text-align: center; border-radius: 4px; }
-        .boss-icon { width: 22px; height: 22px; margin-bottom: 4px; }
-        .stat-val { font-size: 0.75rem; color: #fff; font-family: 'Cinzel'; display: block; }
+        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
+        .stat-box { background: #111; padding: 5px; border: 1px solid #222; text-align: center; border-radius: 4px; }
+        .boss-icon-mini { width: 18px; vertical-align: middle; }
+        
+        .loot-panel { margin-top: 10px; font-size: 0.75rem; color: #bbb; border-top: 1px solid #222; padding-top: 10px; }
+        .history-item { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
 
-        .loot-btn { width: 100%; background: rgba(212,175,55,0.1); border: 1px solid #444; color: var(--gold); padding: 8px; font-family: 'Cinzel'; font-size: 0.65rem; cursor: pointer; border-radius: 4px; margin-top:10px; }
-        .loot-panel { display: none; padding: 12px; background: rgba(0,0,0,0.5); margin-top: 8px; border-radius: 4px; font-size: 0.75rem; border: 1px solid #222; color: #aaa; text-align: left;}
+        /* LEADERS */
+        .leaders-row { display: flex; justify-content: center; gap: 40px; margin: 20px 0; }
+        .leader-card { text-align: center; cursor: pointer; }
+        .img-frame { width: 70px; height: 70px; border: 2px solid var(--gold); border-radius: 50%; overflow: hidden; margin: 0 auto; }
+        .leader-img { width: 100%; height: 100%; object-fit: cover; }
 
-        /* OTHER CLANS */
-        .other-clans-section { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 20px; margin-bottom: 40px; }
-        .new-clan-card { background: rgba(15, 18, 22, 0.95); border: 1px solid #333; border-top: 3px solid var(--gold); border-radius: 10px; padding: 20px; text-align: center; }
-
-        /* MODAL */
-        #caller-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 420px; background: #0f1216; border: 2px solid var(--gold); border-radius: 15px; padding: 25px; z-index: 9999; text-align: center; }
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9998; backdrop-filter: blur(5px); }
-
-        @media (max-width: 900px) {
-            .main-wrapper { grid-template-columns: 1fr; }
-            .other-clans-section { grid-template-columns: 1fr; }
-        }
+        @media (max-width: 800px) { .main-wrapper { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body onclick="tryAutoPlay()">
 
     <div class="header-controls">
         <div class="control-btn" onclick="toggleMusic(event)">
-            <span id="music-icon">🔇</span> <span id="track-name">DION THEME</span>
+            <span id="music-icon">🔊</span> <span id="track-name">DION THEME</span>
         </div>
-        <div class="control-btn" id="clock">SERVER TIME: 00:00:00 UTC</div>
+        <div class="control-btn" id="clock">00:00:00 UTC</div>
     </div>
 
     <audio id="bg-music" loop>
-        <source id="music-source" src="https://www.dropbox.com/scl/fi/ypzqrr336iewt62gncy6u/Lineage-2-Dion-Theme-Song.mp3?rlkey=nl1quliuqleuljgkt5jhqq6hh&st=sb8ij16g&raw=1" type="audio/mpeg">
+        <source src="https://www.dropbox.com/scl/fi/ypzqrr336iewt62gncy6u/Lineage-2-Dion-Theme-Song.mp3?rlkey=nl1quliuqleuljgkt5jhqq6hh&st=sb8ij16g&raw=1" type="audio/mpeg">
     </audio>
-
-    <div class="modal-overlay" id="overlay" onclick="closeModal()"></div>
-    <div id="caller-modal">
-        <img id="modal-img" src="" style="width:90px; height:90px; border-radius:50%; border:2px solid var(--gold); background:#000; margin-bottom:15px;">
-        <h2 id="modal-name" style="font-family:'Cinzel'; color:var(--gold); margin:0;"></h2>
-        <p id="modal-title" style="color:#888; font-size:0.7rem; margin-bottom:20px;"></p>
-        <div class="stat-grid" id="modal-stats"></div>
-        
-        <button class="loot-btn" id="modal-loot-btn" onclick="toggleModalLoot()">VIEW LOOT HISTORY</button>
-        <div id="modal-loot-panel" class="loot-panel"></div>
-
-        <button onclick="closeModal()" style="margin-top:20px; background:var(--gold); color:#000; border:none; padding:10px 25px; cursor:pointer; font-weight:bold; border-radius:4px; width: 100%;">CLOSE</button>
-    </div>
 
     <div class="top-header">
         <img src="https://i.ibb.co/6R9q5PGv/ALLIANCE-LOGO.png" class="ally-logo">
         <span class="ally-title">BROKEN MIRROR ALLIANCE</span>
         
         <div class="main-nav">
-            <a href="index.html" class="nav-link"><button class="nav-btn active">DASHBOARD</button></a>
-            <a href="pvpzone.html" class="nav-link"><button class="nav-btn">PVP ZONE</button></a>
-            <a href="history.html" class="nav-link"><button class="nav-btn">LEAVERS HISTORY</button></a>
-            <a href="halloffame.html" class="nav-link"><button class="nav-btn">HALL OF FAME</button></a>
+            <a href="index.html" class="nav-btn">DASHBOARD</a>
+            <a href="pvpzone.html" class="nav-btn">PVP ZONE</a>
+            <a href="history.html" class="nav-btn">LEAVERS</a>
+            <a href="halloffame.html" class="nav-btn">HALL OF FAME</a>
         </div>
+    </div>
 
-        <div class="leaders-row">
-            <div class="leader-card" onclick="openCaller('NIKLAUS', 'ALLY LEADER', 'https://i.ibb.co/5X3NDQFR/niklaus.png')">
-                <div class="img-frame"><img src="https://i.ibb.co/5X3NDQFR/niklaus.png" class="leader-img"></div>
-                <span class="leader-name">NIKLAUS</span>
-                <span class="leader-role">ALLY LEADER</span>
-            </div>
-            <div class="leader-card" onclick="openCaller('TSAKNORRIS', 'SHOT CALLER', 'https://i.ibb.co/xSVgzBPB/tsaknorris.png')">
-                <div class="img-frame"><img src="https://i.ibb.co/xSVgzBPB/tsaknorris.png" class="leader-img"></div>
-                <span class="leader-name">TSAKNORRIS</span>
-                <span class="leader-role">SHOT CALLER</span>
-            </div>
+    <div class="leaders-row">
+        <div class="leader-card" onclick="alert('Leader Stats Coming Soon')">
+            <div class="img-frame"><img src="https://i.ibb.co/5X3NDQFR/niklaus.png" class="leader-img"></div>
+            <div style="color:var(--gold); font-size:0.8rem; font-family:'Cinzel';">NIKLAUS</div>
+        </div>
+        <div class="leader-card" onclick="alert('Leader Stats Coming Soon')">
+            <div class="img-frame"><img src="https://i.ibb.co/xSVgzBPB/tsaknorris.png" class="leader-img"></div>
+            <div style="color:var(--gold); font-size:0.8rem; font-family:'Cinzel';">TSAKNORRIS</div>
         </div>
     </div>
 
@@ -144,103 +104,60 @@
         <a href="marketplace.html" class="tab-btn">MARKET & POLICIES ↗</a>
     </div>
 
-    <div id="dashboard" class="page">
-        <div class="main-wrapper">
-            <div class="clan-column">
-                <div class="column-header" style="color:var(--noldor-sky)">
-                    <img src="https://i.ibb.co/8LvFNQkC/noldor.png" style="width:25px;"> NOLDOR CLAN
-                </div>
-                <div class="scroll-area" id="noldor-list"></div>
-            </div>
-            <div class="clan-column">
-                <div class="column-header" style="color:var(--krim-red)">
-                    <img src="https://i.ibb.co/VYMZjzYr/kriminalides.png" style="width:25px;"> KRIMINALIDES CLAN
-                </div>
-                <div class="scroll-area" id="krim-list"></div>
-            </div>
+    <div class="main-wrapper">
+        <div class="clan-column">
+            <div class="column-header" style="color:var(--noldor-sky)">NOLDOR CLAN</div>
+            <div class="scroll-area" id="noldor-list"></div>
         </div>
-
-        <div class="other-clans-section">
-            <div class="new-clan-card">
-                <img src="https://i.ibb.co/6cgvyHHW/orzelbialy.png" style="width:55px;">
-                <span style="display:block; font-family:'Cinzel'; color:#fff;">OrzelBialy Clan</span>
-                <span style="color:var(--gold); font-size:0.75rem;">Leader: Unqual</span>
-            </div>
-            <div class="new-clan-card">
-                <img src="https://i.ibb.co/Y4spJqVy/exitgaming.png" style="width:55px;">
-                <span style="display:block; font-family:'Cinzel'; color:#fff;">ExitGaming Clan</span>
-                <span style="color:var(--gold); font-size:0.75rem;">Leader: basilio</span>
-            </div>
-            <div class="new-clan-card">
-                <img src="https://i.ibb.co/xqg1qNFw/lastkingdom.png" style="width:55px;">
-                <span style="display:block; font-family:'Cinzel'; color:#fff;">LastKingdom Clan</span>
-                <span style="color:var(--gold); font-size:0.75rem;">Leader: Concrete</span>
-            </div>
+        <div class="clan-column">
+            <div class="column-header" style="color:var(--krim-red)">KRIMINALIDES CLAN</div>
+            <div class="scroll-area" id="krim-list"></div>
         </div>
     </div>
 
     <script>
-        const bossIcons = { "VAL": "https://i.ibb.co/84gZPVRP/necklace-valakas.png", "ANT": "https://i.ibb.co/rfqvc6mv/earring-antharas.png", "BAI": "https://i.ibb.co/XrZkv67h/ring-of-baium.png", "FRI": "https://i.ibb.co/gF4YKGTM/frintezza-necklace.png", "ZAK": "https://i.ibb.co/spkC6Gzz/zaken-earring.png", "AQ":  "https://i.ibb.co/rKRtZmBG/ring-of-queen-ant.png", "ORF": "https://i.ibb.co/j9dDnXwH/earring-orfen.png", "COR": "https://i.ibb.co/ksv37fNZ/ring-of-.png", "SIE": "https://i.ibb.co/Txfby6wD/images.png" };
+        const bossIcons = { "VAL": "https://i.ibb.co/84gZPVRP/necklace-valakas.png", "ANT": "https://i.ibb.co/rfqvc6mv/earring-antharas.png", "BAI": "https://i.ibb.co/XrZkv67h/ring-of-baium.png", "ZAK": "https://i.ibb.co/spkC6Gzz/zaken-earring.png", "AQ": "https://i.ibb.co/rKRtZmBG/ring-of-queen-ant.png", "ORF": "https://i.ibb.co/j9dDnXwH/earring-orfen.png" };
 
-        const noldorNames = ["Noldor Clan", "Noldor Archer", "Outlaw CP", "Ronin CP", "Brazilians CP", "Shadow CP"];
-        const krimNames = ["Hattrick CP", "55 Room CP", "Legion CP", "Criminal Record CP", "Avalanche CP", "Gankly Crew CP"];
-
-        // MUSIC & CLOCK
-        const tracks = [{ name: "DION THEME", url: "https://www.dropbox.com/scl/fi/ypzqrr336iewt62gncy6u/Lineage-2-Dion-Theme-Song.mp3?rlkey=nl1quliuqleuljgkt5jhqq6hh&st=sb8ij16g&raw=1" }];
-        const audio = document.getElementById('bg-music');
-        function toggleMusic(e) { e.stopPropagation(); audio.paused ? audio.play() : audio.pause(); }
-        function tryAutoPlay() { audio.play().catch(()=>{}); }
-        setInterval(() => { document.getElementById('clock').innerText = "SERVER TIME: " + new Date().toLocaleTimeString('el-GR', {timeZone:'UTC', hour12:false}) + " UTC"; }, 1000);
+        const noldorCPs = ["Noldor Archer", "Outlaw CP", "Ronin CP", "Brazilians CP", "Shadow CP"];
+        const krimCPs = ["Hattrick CP", "55 Room CP", "Legion CP", "Criminal Record CP", "Avalanche CP"];
 
         function renderLists() {
-            const getStats = (isExample) => Object.keys(bossIcons).map(b => {
-                let val = (isExample && (b === 'VAL' || b === 'BAI')) ? "1" : "0";
-                return `<div class="stat-box"><img src="${bossIcons[b]}" class="boss-icon"><span class="stat-val">${val}</span></div>`;
-            }).join('');
-
-            const renderClan = (list, style) => list.map((name, index) => `
+            const createCP = (name, style, hasLoot) => `
                 <div class="cp-box ${style}">
                     <button class="cp-btn" onclick="this.parentElement.classList.toggle('active')">
                         <span>${name}</span>
-                        <span style="color:var(--gold); font-size:0.75rem;">4000 PTS</span>
+                        <span style="color:var(--gold); font-size:0.7rem;">4000 PTS</span>
                     </button>
                     <div class="cp-content">
-                        <div class="stat-grid">${getStats(index === 0)}</div>
-                        <button class="loot-btn" onclick="const p=this.nextElementSibling; p.style.display=p.style.display==='block'?'none':'block'; this.innerText=p.style.display==='block'?'HIDE HISTORY':'VIEW HISTORY'">VIEW HISTORY</button>
-                        <div class="loot-panel">${index === 0 ? '• Received Valakas Necklace (20/10/2023)<br>• Received Baium Ring (15/10/2023)' : 'No history found.'}</div>
+                        <div class="stat-grid">
+                            ${Object.keys(bossIcons).map(b => `<div class="stat-box"><img src="${bossIcons[b]}" class="boss-icon-mini"> 1</div>`).join('')}
+                        </div>
+                        <div class="loot-panel">
+                            <strong>LOOT HISTORY:</strong><br>
+                            ${hasLoot ? `
+                                <div class="history-item"><img src="${bossIcons.VAL}" class="boss-icon-mini"> VALAKAS NECKLACE - <span style="color:var(--gold)">RECEIVED</span></div>
+                                <div class="history-item"><img src="${bossIcons.BAI}" class="boss-icon-mini"> BAIUM RING - <span style="color:var(--gold)">RECEIVED</span></div>
+                            ` : 'No history found.'}
+                        </div>
                     </div>
-                </div>`).join('');
-            document.getElementById('noldor-list').innerHTML = renderClan(noldorNames, "cp-noldor");
-            document.getElementById('krim-list').innerHTML = renderClan(krimNames, "cp-krim");
+                </div>`;
+
+            document.getElementById('noldor-list').innerHTML = noldorCPs.map(cp => createCP(cp, "cp-noldor", cp === "Noldor Archer")).join('');
+            document.getElementById('krim-list').innerHTML = krimCPs.map(cp => createCP(cp, "cp-krim", cp === "Hattrick CP")).join('');
         }
 
-        function openCaller(name, role, img) {
-            document.getElementById('modal-name').innerText = name;
-            document.getElementById('modal-title').innerText = role;
-            document.getElementById('modal-img').src = img;
-            
-            // Stats for Leaders (Example)
-            document.getElementById('modal-stats').innerHTML = Object.keys(bossIcons).map(b => `<div class="stat-box"><img src="${bossIcons[b]}" class="boss-icon"><span class="stat-val">1</span></div>`).join('');
-            
-            // Reset History Panel
-            const panel = document.getElementById('modal-loot-panel');
-            panel.style.display = 'none';
-            panel.innerHTML = `• Distributed 5x Baium Rings<br>• Distributed 2x Valakas Necklaces<br>• Managed 12 Sieges Successfully`;
-            document.getElementById('modal-loot-btn').innerText = 'VIEW LOOT HISTORY';
-
-            document.getElementById('caller-modal').style.display = 'block';
-            document.getElementById('overlay').style.display = 'block';
+        // Music Logic
+        const audio = document.getElementById('bg-music');
+        function toggleMusic(e) { 
+            e.stopPropagation(); 
+            if(audio.paused) { audio.play(); document.getElementById('music-icon').innerText = '🔊'; }
+            else { audio.pause(); document.getElementById('music-icon').innerText = '🔇'; }
         }
+        function tryAutoPlay() { audio.play().catch(()=>{}); }
 
-        function toggleModalLoot() {
-            const panel = document.getElementById('modal-loot-panel');
-            const btn = document.getElementById('modal-loot-btn');
-            const isVisible = panel.style.display === 'block';
-            panel.style.display = isVisible ? 'none' : 'block';
-            btn.innerText = isVisible ? 'VIEW LOOT HISTORY' : 'HIDE LOOT HISTORY';
-        }
+        // Clock
+        setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('el-GR', {timeZone:'UTC', hour12:false}) + " UTC"; }, 1000);
 
-        function closeModal() { document.getElementById('caller-modal').style.display='none'; document.getElementById('overlay').style.display='none'; }
         renderLists();
     </script>
 </body>
