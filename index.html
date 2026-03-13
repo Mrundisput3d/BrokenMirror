@@ -28,55 +28,46 @@
         .img-frame { width: 90px; height: 90px; margin: 0 auto; background: #000; border: 2px solid var(--gold); border-radius: 50%; overflow: hidden; box-shadow: 0 0 15px rgba(212,175,55,0.2); }
         .leader-img { width: 100%; height: 100%; object-fit: contain; }
         .leader-name { color: var(--gold); font-size: 0.9rem; font-family: 'Cinzel'; display: block; margin-top: 10px; font-weight: bold; }
-        .leader-role { color: #888; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; display: block; }
+        .leader-role { color: #888; font-size: 0.65rem; text-transform: uppercase; display: block; }
 
-        .search-container { max-width: 600px; margin: 40px auto; padding: 0 20px; position: relative; }
-        .search-input { width: 100%; padding: 15px 25px; background: rgba(0,0,0,0.7); border: 1px solid var(--gold); border-radius: 30px; color: #fff; outline: none; font-family: 'Open Sans'; font-size: 1rem; transition: 0.3s; box-shadow: 0 0 15px rgba(0,0,0,0.5); }
+        .search-container { max-width: 600px; margin: 40px auto; padding: 0 20px; }
+        .search-input { width: 100%; padding: 15px 25px; background: rgba(0,0,0,0.7); border: 1px solid var(--gold); border-radius: 30px; color: #fff; outline: none; }
 
         .main-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; max-width: 1500px; margin: 0 auto; padding: 0 20px; }
         .clan-column { background: rgba(15, 18, 22, 0.95); height: 700px; display: flex; flex-direction: column; border: 1px solid #333; border-radius: 10px; border-top: 4px solid var(--gold); }
-        .column-header { padding: 20px; text-align: center; font-family: 'Cinzel'; font-size: 1.2rem; border-bottom: 1px solid #222; display: flex; align-items: center; justify-content: center; gap: 12px; background: rgba(0,0,0,0.4); }
-        .scroll-area { overflow-y: auto; padding: 15px; flex-grow: 1; scrollbar-width: thin; scrollbar-color: var(--gold) #111; }
+        .column-header { padding: 20px; text-align: center; font-family: 'Cinzel'; font-size: 1.2rem; border-bottom: 1px solid #222; background: rgba(0,0,0,0.4); }
+        .scroll-area { overflow-y: auto; padding: 15px; flex-grow: 1; }
 
-        .cp-box { margin-bottom: 12px; border: 1px solid rgba(212, 175, 55, 0.1); background: rgba(255, 255, 255, 0.02); border-radius: 8px; transition: all 0.3s ease; position: relative; overflow: hidden; }
-        .cp-box:hover { border-color: rgba(212, 175, 55, 0.5); background: rgba(212, 175, 55, 0.05); transform: translateX(5px); }
-        .cp-btn { width: 100%; background: none; border: none; padding: 16px; color: #fff; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-family: 'Open Sans'; font-weight: 700; text-transform: uppercase; font-size: 0.85rem; }
-
-        .cp-noldor { color: var(--noldor-sky); }
-        .cp-krim { color: var(--krim-red); }
-        .points-tag { font-size: 0.75rem; border: 1px solid rgba(212, 175, 55, 0.4); padding: 3px 10px; border-radius: 4px; font-family: 'Cinzel'; background: rgba(0, 0, 0, 0.3); color: var(--gold); }
-
-        /* CP CONTENT AREA */
+        .cp-box { margin-bottom: 12px; border: 1px solid rgba(212, 175, 55, 0.1); background: rgba(255, 255, 255, 0.02); border-radius: 8px; transition: 0.3s; overflow: hidden; }
+        .cp-box:hover { border-color: rgba(212, 175, 55, 0.5); transform: translateX(5px); }
+        .cp-btn { width: 100%; background: none; border: none; padding: 16px; color: #fff; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-family: 'Open Sans'; font-weight: 700; }
+        
         .cp-content { display: none; background: rgba(0,0,0,0.6); border-top: 1px solid #222; padding: 15px; }
         .active > .cp-content { display: block; }
 
-        .attendance-title { font-family: 'Cinzel'; color: var(--gold); font-size: 0.75rem; margin-bottom: 10px; display: block; letter-spacing: 1px; }
-        .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 15px; }
+        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 15px; }
         .stat-box { background: #15181c; padding: 8px; border: 1px solid #222; text-align: center; border-radius: 4px; }
         .boss-icon { width: 22px; height: 22px; margin-bottom: 4px; }
-        .stat-val { font-size: 0.8rem; color: #fff; font-family: 'Cinzel'; font-weight: bold; display: block; }
+        .stat-val { font-size: 0.8rem; color: #fff; font-family: 'Cinzel'; display: block; }
 
-        .roster-section { background: rgba(0,0,0,0.3); border: 1px solid #333; padding: 10px; border-radius: 5px; margin-top: 15px; }
+        .roster-section { background: rgba(0,0,0,0.3); border: 1px solid #333; padding: 10px; border-radius: 5px; margin-top: 10px; }
         .roster-title { font-family: 'Cinzel'; color: var(--gold); font-size: 0.7rem; border-bottom: 1px solid #444; padding-bottom: 5px; margin-bottom: 8px; display: block; }
-        .roster-list { font-size: 0.8rem; color: #bbb; line-height: 1.6; }
+        .roster-list { font-size: 0.8rem; color: #bbb; }
         .leader-item { color: #fff; font-weight: bold; }
 
-        .loot-btn { width: 100%; background: rgba(212,175,55,0.05); border: 1px solid #333; padding: 8px; color: var(--gold); font-family: 'Cinzel'; cursor: pointer; font-size: 0.65rem; border-radius: 4px; margin-top: 10px; transition: 0.3s; }
-        .loot-btn:hover { background: rgba(212,175,55,0.15); }
-        .loot-content { display: none; padding: 10px; background: rgba(0,0,0,0.4); border-radius: 4px; margin-top: 5px; font-size: 0.75rem; }
+        .loot-btn { width: 100%; background: rgba(212,175,55,0.05); border: 1px solid #333; padding: 8px; color: var(--gold); font-family: 'Cinzel'; cursor: pointer; font-size: 0.65rem; border-radius: 4px; margin-bottom: 10px; }
 
-        /* INFO SECTION */
+        /* INFO SECTION FIXES */
         .info-section { background: rgba(10, 12, 15, 0.98); border-top: 3px solid var(--gold); padding: 60px 20px; margin-top: 60px; }
-        .info-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 50px; max-width: 1400px; margin: 0 auto; }
-        .info-card { background: rgba(15, 18, 22, 0.8); border: 1px solid #333; border-radius: 12px; padding: 35px; }
-        .info-card h3 { font-family: 'Cinzel'; color: var(--gold); font-size: 1.5rem; border-bottom: 1px solid rgba(212,175,55,0.3); padding-bottom: 10px; }
+        .info-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 40px; max-width: 1400px; margin: 0 auto; }
+        .info-card { background: rgba(15, 18, 22, 0.8); border: 1px solid #333; border-radius: 12px; padding: 30px; }
+        .info-card h3 { font-family: 'Cinzel'; color: var(--gold); font-size: 1.3rem; border-bottom: 1px solid rgba(212,175,55,0.3); padding-bottom: 10px; margin-top: 0; }
 
-        .market-table { width: 100%; border-collapse: collapse; }
-        .market-table td { padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .market-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        .market-table td { padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
 
-        /* MODAL */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9998; backdrop-filter: blur(5px); }
-        #caller-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 400px; background: #0f1216; border: 2px solid var(--gold); border-radius: 15px; padding: 30px; z-index: 9999; text-align: center; }
+        #caller-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 380px; background: #0f1216; border: 2px solid var(--gold); border-radius: 15px; padding: 30px; z-index: 9999; text-align: center; }
 
         @media (max-width: 1100px) { .main-wrapper, .info-grid { grid-template-columns: 1fr; } }
     </style>
@@ -85,10 +76,10 @@
 
     <div class="modal-overlay" id="overlay" onclick="closeModal()"></div>
     <div id="caller-modal">
-        <img id="modal-img" src="" style="width:100px; height:100px; border-radius:50%; border:2px solid var(--gold); margin-bottom:15px; background:#000;">
+        <img id="modal-img" src="" style="width:90px; height:90px; border-radius:50%; border:2px solid var(--gold); margin-bottom:15px;">
         <h2 id="modal-name" style="font-family:'Cinzel Decorative'; color:var(--gold); margin:0;"></h2>
         <p id="modal-title" style="color:#888; font-size:0.7rem; letter-spacing:2px; margin-bottom:20px;"></p>
-        <div class="stat-grid" id="modal-stats" style="grid-template-columns: repeat(4, 1fr);"></div>
+        <div class="stat-grid" id="modal-stats"></div>
         <button onclick="closeModal()" style="margin-top:20px; background:var(--gold); color:#000; border:none; padding:10px 30px; cursor:pointer; font-weight:bold; font-family:'Cinzel'; border-radius:4px;">CLOSE</button>
     </div>
 
@@ -117,15 +108,11 @@
 
     <div class="main-wrapper">
         <div class="clan-column">
-            <div class="column-header" style="color:var(--noldor-sky)">
-                <img src="https://i.ibb.co/8LvFNQkC/noldor.png" style="width:30px;"> NOLDOR CLAN
-            </div>
+            <div class="column-header" style="color:var(--noldor-sky)">NOLDOR CLAN</div>
             <div class="scroll-area" id="noldor-list"></div>
         </div>
         <div class="clan-column">
-            <div class="column-header" style="color:var(--krim-red)">
-                <img src="https://i.ibb.co/VYMZjzYr/kriminalides.png" style="width:30px;"> KRIMINALIDES CLAN
-            </div>
+            <div class="column-header" style="color:var(--krim-red)">KRIMINALIDES CLAN</div>
             <div class="scroll-area" id="krim-list"></div>
         </div>
     </div>
@@ -138,11 +125,18 @@
             </div>
             <div class="info-card">
                 <h3>ALLIANCE POLICIES</h3>
-                <div style="color:#ccc; font-size: 0.9rem; line-height:1.8;">
+                <div style="color:#ccc; font-size: 0.85rem; line-height:1.7;">
+                    <b style="color:var(--gold); font-family:'Cinzel';">ATTENDANCE POINTS:</b><br>
+                    • Mid Epics (Zaken, Queen Ant, Core, Orfen) = 1 pt<br>
+                    • Baium / Frintezza = 2 pts<br>
+                    • Valakas / Antharas = 3 pts<br><br>
                     <b style="color:var(--gold); font-family:'Cinzel';">JEWEL PRIORITY:</b><br>
                     • <span style="color:var(--noldor-sky)">Archer CPs</span>: Baium Ring<br>
                     • <span style="color:var(--krim-red)">Mage CPs</span>: Valakas Necklace<br>
-                    • <span style="color:var(--gold)">Stopper Party</span>: Antharas Earring
+                    • <span style="color:var(--gold)">Stopper Party</span>: Antharas Earring<br><br>
+                    <b style="color:var(--gold); font-family:'Cinzel';">GENERAL RULES:</b><br>
+                    • A 3-week cooldown applies after receiving a major jewel.<br>
+                    • Points are deducted based on current Marketplace prices.
                 </div>
             </div>
         </div>
@@ -150,18 +144,17 @@
 
     <script>
         const bossConfig = {
-            "VAL": { name: "Valakas", img: "https://i.ibb.co/84gZPVRP/necklace-valakas.png" },
-            "ANT": { name: "Antharas", img: "https://i.ibb.co/rfqvc6mv/earring-antharas.png" },
-            "BAI": { name: "Baium", img: "https://i.ibb.co/XrZkv67h/ring-of-baium.png" },
-            "FRI": { name: "Frintezza", img: "https://i.ibb.co/gF4YKGTM/frintezza-necklace.png" },
-            "ZAK": { name: "Zaken", img: "https://i.ibb.co/spkC6Gzz/zaken-earring.png" },
-            "CORE": { name: "Core", img: "https://i.ibb.co/ksv37fNZ/ring-of-core.png" },
-            "ORF": { name: "Orfen", img: "https://i.ibb.co/j9dDnXwH/earring-orfen.png" },
-            "AQ":  { name: "Queen Ant", img: "https://i.ibb.co/rKRtZmBG/ring-of-queen-ant.png" }
+            "VAL": { img: "https://i.ibb.co/84gZPVRP/necklace-valakas.png" },
+            "ANT": { img: "https://i.ibb.co/rfqvc6mv/earring-antharas.png" },
+            "BAI": { img: "https://i.ibb.co/XrZkv67h/ring-of-baium.png" },
+            "FRI": { img: "https://i.ibb.co/gF4YKGTM/frintezza-necklace.png" },
+            "ZAK": { img: "https://i.ibb.co/spkC6Gzz/zaken-earring.png" },
+            "AQ":  { img: "https://i.ibb.co/rKRtZmBG/ring-of-queen-ant.png" },
+            "SIEGE": { img: "https://i.ibb.co/Txfby6wD/images.png" }
         };
 
-        const noldorNames = ["Noldor Clan", "Noldor Archer", "Noldor Archer 2", "Outlaw CP", "Ronin CP", "Brazilians CP", "Shadow CP", "Viking CP", "Elders CP", "Spartans CP", "Noldor Support"];
-        const krimNames = ["Hattrick CP", "55 Room CP", "Legion CP", "Criminal Record CP", "Avalanche CP", "Gankly Crew CP", "Animals CP", "Mafia CP", "NoMercy CP", "Chaos CP", "Krim Scouts"];
+        const noldorNames = ["Noldor Clan", "Noldor Archer", "Noldor Archer 2", "Outlaw CP", "Ronin CP", "Brazilians CP", "Shadow CP", "Viking CP", "Elders CP", "Spartans CP"];
+        const krimNames = ["Hattrick CP", "55 Room CP", "Legion CP", "Criminal Record CP", "Avalanche CP", "Gankly Crew CP", "Animals CP", "Mafia CP", "NoMercy CP", "Chaos CP"];
 
         function getStatsHtml() {
             return Object.keys(bossConfig).map(b => `<div class="stat-box"><img src="${bossConfig[b].img}" class="boss-icon"><span class="stat-val">0</span></div>`).join('');
@@ -171,24 +164,17 @@
             const renderClan = (names, clanClass) => names.map((name, index) => {
                 const pts = 5000 - (index * 400);
                 return `
-                <div class="cp-box" data-cp-name="${name.toLowerCase()}" data-members="leadername member1 member2 member3">
+                <div class="cp-box" data-cp-name="${name.toLowerCase()}">
                     <button class="cp-btn" onclick="this.parentElement.classList.toggle('active')">
                         <span class="${clanClass}">${name}</span>
                         <span class="points-tag">${pts} PTS</span>
                     </button>
                     <div class="cp-content">
-                        <span class="attendance-title">CP ATTENDANCE (TOTAL)</span>
                         <div class="stat-grid">${getStatsHtml()}</div>
-                        
-                        <button class="loot-btn" onclick="const e=this.nextElementSibling; e.style.display=e.style.display==='block'?'none':'block'">▼ VIEW LOOT HISTORY</button>
-                        <div class="loot-content">No recent loots found for this CP.</div>
-
+                        <button class="loot-btn" onclick="alert('No History Available')">VIEW LOOT HISTORY</button>
                         <div class="roster-section">
                             <span class="roster-title">ROSTER</span>
-                            <div class="roster-list">
-                                <span class="leader-item">👑 LeaderName</span><br>
-                                Member 1, Member 2, Member 3, Member 4, Member 5, Member 6, Member 7, Member 8
-                            </div>
+                            <div class="roster-list"><span class="leader-item">👑 CP_Leader</span><br>Member 1, Member 2, Member 3, Member 4, Member 5</div>
                         </div>
                     </div>
                 </div>`;
@@ -197,15 +183,14 @@
             document.getElementById('noldor-list').innerHTML = renderClan(noldorNames, "cp-noldor");
             document.getElementById('krim-list').innerHTML = renderClan(krimNames, "cp-krim");
             
-            const prices = [{n:"Orfen Earring",p:75,i:bossConfig.ORF.img},{n:"Core Ring",p:75,i:bossConfig.CORE.img},{n:"Queen Ant Ring",p:150,i:bossConfig.AQ.img},{n:"Zaken Earring",p:175,i:bossConfig.ZAK.img},{n:"Frintezza Neck",p:225,i:bossConfig.FRI.img},{n:"Baium Ring",p:950,i:bossConfig.BAI.img},{n:"Antharas Earring",p:1100,i:bossConfig.ANT.img},{n:"Valakas Necklace",p:3100,i:bossConfig.VAL.img}];
-            document.getElementById('market-table').innerHTML = prices.map(p => `<tr><td><img src="${p.i}" style="width:22px; vertical-align:middle; margin-right:12px;"> ${p.n}</td><td style="color:var(--gold); font-weight:bold; text-align:right;">${p.p} PTS</td></tr>`).join('');
+            const prices = [{n:"Valakas",p:3100,i:bossConfig.VAL.img},{n:"Antharas",p:1100,i:bossConfig.ANT.img},{n:"Baium",p:950,i:bossConfig.BAI.img},{n:"Zaken",p:175,i:bossConfig.ZAK.img},{n:"Frintezza",p:225,i:bossConfig.FRI.img}];
+            document.getElementById('market-table').innerHTML = prices.map(p => `<tr><td><img src="${p.i}" style="width:20px; vertical-align:middle; margin-right:10px;"> ${p.n}</td><td style="color:var(--gold); font-weight:bold; text-align:right;">${p.p}</td></tr>`).join('');
         }
 
         function searchFunction() {
             const input = document.getElementById('mainSearch').value.toLowerCase();
             document.querySelectorAll('.cp-box').forEach(box => {
-                const match = box.getAttribute('data-cp-name').includes(input) || box.getAttribute('data-members').includes(input);
-                box.style.display = match ? "block" : "none";
+                box.style.display = box.getAttribute('data-cp-name').includes(input) ? "block" : "none";
             });
         }
 
