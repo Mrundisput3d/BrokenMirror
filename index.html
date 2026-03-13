@@ -17,121 +17,118 @@
             font-family: 'Open Sans', sans-serif; 
             background: #0a0c0f url('https://i.ibb.co/1GmpSyxZ/BACKGROUND.jpg') no-repeat center center fixed; 
             background-size: cover; color: #eee; margin: 0; padding: 0;
+            overflow-x: hidden;
         }
         body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-overlay); z-index: -1; }
+
+        .header-controls { position: absolute; top: 20px; right: 40px; display: flex; gap: 10px; z-index: 100; }
+        .control-btn { color: var(--gold); font-family: 'Cinzel'; border: 1px solid var(--gold); padding: 5px 15px; border-radius: 5px; background: rgba(0,0,0,0.6); font-size: 0.75rem; cursor: pointer; transition: 0.3s; }
+        .control-btn:hover { background: var(--gold); color: #000; }
 
         .top-header { text-align: center; padding-top: 20px; }
         .ally-logo { width: 110px; filter: drop-shadow(0 0 15px var(--gold)); }
         .ally-title { font-family: 'Cinzel Decorative', cursive; font-size: 1.8rem; color: var(--gold); display: block; letter-spacing: 2px; margin-bottom: 20px;}
 
         .main-nav { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-        .nav-btn { background: rgba(212, 175, 55, 0.1); border: 1px solid var(--gold); color: var(--gold); padding: 8px 15px; font-family: 'Cinzel'; cursor: pointer; transition: 0.3s; font-size: 0.75rem; border-radius: 4px; text-decoration: none; }
+        .nav-btn { background: rgba(212, 175, 55, 0.1); border: 1px solid var(--gold); color: var(--gold); padding: 8px 15px; font-family: 'Cinzel'; cursor: pointer; transition: 0.3s; font-size: 0.75rem; border-radius: 4px; }
         .nav-btn:hover, .nav-btn.active { background: var(--gold); color: #000; }
 
         .leaders-row { display: flex; justify-content: center; gap: 40px; margin-bottom: 20px; }
-        .leader-card { text-align: center; width: 110px; }
-        .img-frame { width: 80px; height: 80px; margin: 0 auto; background: #000; border: 2px solid var(--gold); border-radius: 50%; overflow: hidden; }
+        .leader-card { text-align: center; width: 110px; cursor: pointer; transition: 0.3s; }
+        .leader-card:hover { transform: translateY(-5px); }
+        .img-frame { width: 80px; height: 80px; margin: 0 auto; background: #000; border: 2px solid var(--gold); border-radius: 50%; overflow: hidden; box-shadow: 0 0 15px rgba(212,175,55,0.2); }
         .leader-img { width: 100%; height: 100%; object-fit: contain; }
         .leader-name { color: var(--gold); font-size: 0.8rem; font-family: 'Cinzel'; display: block; margin-top: 8px; font-weight: bold; }
 
-        .tabs-nav { display: flex; justify-content: center; gap: 15px; margin: 25px 0; }
-        .tab-btn { background: rgba(0,0,0,0.6); border: 1px solid var(--gold); color: var(--gold); padding: 10px 25px; font-family: 'Cinzel'; cursor: pointer; transition: 0.3s; font-size: 0.8rem; }
-        .tab-btn.active { background: var(--gold); color: #000; font-weight: bold; }
-
-        .page { display: none; max-width: 1500px; margin: 0 auto; padding: 0 20px; animation: fadeIn 0.4s; }
-        .page.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        .main-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px; }
+        .main-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; max-width: 1400px; margin: 0 auto; padding: 20px; }
         .clan-column { background: rgba(15, 18, 22, 0.95); height: 750px; display: flex; flex-direction: column; border: 1px solid #333; border-radius: 10px; border-top: 4px solid var(--gold); }
         .column-header { padding: 15px; text-align: center; font-family: 'Cinzel'; font-size: 1.1rem; border-bottom: 1px solid #222; background: rgba(0,0,0,0.4); }
         .scroll-area { overflow-y: auto; padding: 10px; flex-grow: 1; }
 
-        .cp-box { margin-bottom: 8px; border-radius: 5px; border: 1px solid rgba(255,255,255,0.05); }
+        .cp-box { margin-bottom: 8px; border-radius: 5px; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s; }
         .cp-noldor { border-left: 4px solid var(--noldor-sky); background: var(--noldor-grad); }
         .cp-krim { border-left: 4px solid var(--krim-red); background: var(--krim-grad); }
         .cp-btn { width: 100%; background: none; border: none; padding: 12px 15px; color: #fff; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 0.85rem; }
         .cp-content { display: none; background: rgba(0,0,0,0.85); padding: 15px; border-top: 1px solid #333; }
         .cp-box.active .cp-content { display: block; }
 
-        /* STATS GRID - 9 ITEMS */
-        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
         .stat-box { background: #15181c; padding: 6px; border: 1px solid #333; text-align: center; border-radius: 4px; }
         .boss-icon { width: 22px; height: 22px; margin-bottom: 4px; }
         .stat-val { font-size: 0.75rem; color: #fff; font-family: 'Cinzel'; display: block; }
 
-        .info-wrapper { display: grid; grid-template-columns: 1fr 1.5fr; gap: 30px; }
-        .info-card { background: rgba(15, 18, 22, 0.9); border: 1px solid #333; border-radius: 12px; padding: 25px; }
-        .market-table { width: 100%; border-collapse: collapse; }
-        .market-table td { padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.85rem;}
+        /* MODAL & OVERLAY - ΕΠΑΝΑΦΟΡΑ ΟΠΩΣ ΗΤΑΝ */
+        #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 900; backdrop-filter: blur(5px); }
+        .modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 500px; background: #0f1216; border: 1px solid var(--gold); border-radius: 10px; z-index: 1000; padding: 30px; box-shadow: 0 0 40px rgba(0,0,0,1); }
+        .modal-header { display: flex; align-items: center; gap: 20px; border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 20px; }
+        .modal-img { width: 70px; height: 70px; border: 2px solid var(--gold); border-radius: 50%; }
+        .close-btn { position: absolute; top: 15px; right: 15px; color: #666; cursor: pointer; font-size: 1.5rem; }
+        .loot-btn { width: 100%; margin-top: 20px; background: none; border: 1px solid var(--gold); color: var(--gold); padding: 10px; font-family: 'Cinzel'; cursor: pointer; border-radius: 5px; }
 
         @media (max-width: 900px) {
-            .main-wrapper, .info-wrapper { grid-template-columns: 1fr; }
+            .main-wrapper { grid-template-columns: 1fr; }
             .clan-column { height: 500px; }
         }
     </style>
 </head>
 <body>
 
+    <div class="header-controls">
+        <div class="control-btn" id="clock">SERVER TIME: 00:00:00 UTC</div>
+    </div>
+
     <div class="top-header">
         <img src="https://i.ibb.co/6R9q5PGv/ALLIANCE-LOGO.png" class="ally-logo">
         <span class="ally-title">BROKEN MIRROR ALLIANCE</span>
+        
         <div class="main-nav">
-            <a href="index.html" class="nav-btn active">DASHBOARD</a>
-            <a href="history.html" class="nav-btn">LEAVERS</a>
-            <a href="pvpzone.html" class="nav-btn">PVP ZONE</a>
+            <button class="nav-btn active">DASHBOARD</button>
+            <button class="nav-btn">HISTORY</button>
+            <button class="nav-btn">PVP ZONE</button>
         </div>
+
         <div class="leaders-row">
-            <div class="leader-card">
+            <div class="leader-card" onclick="openCaller('NIKLAUS', 'https://i.ibb.co/5X3NDQFR/niklaus.png')">
                 <div class="img-frame"><img src="https://i.ibb.co/5X3NDQFR/niklaus.png" class="leader-img"></div>
                 <span class="leader-name">NIKLAUS</span>
             </div>
-            <div class="leader-card">
+            <div class="leader-card" onclick="openCaller('TSAKNORRIS', 'https://i.ibb.co/xSVgzBPB/tsaknorris.png')">
                 <div class="img-frame"><img src="https://i.ibb.co/xSVgzBPB/tsaknorris.png" class="leader-img"></div>
                 <span class="leader-name">TSAKNORRIS</span>
             </div>
         </div>
     </div>
 
-    <div class="tabs-nav">
-        <button class="tab-btn active" onclick="showPage('dashboard', this)">ALLIANCE CP LIST</button>
-        <button class="tab-btn" onclick="showPage('info', this)">MARKET & POLICIES</button>
-    </div>
-
-    <div id="dashboard" class="page active">
-        <div class="main-wrapper">
-            <div class="clan-column">
-                <div class="column-header" style="color:var(--noldor-sky)">NOLDOR CLAN</div>
-                <div class="scroll-area" id="noldor-list"></div>
-            </div>
-            <div class="clan-column">
-                <div class="column-header" style="color:var(--krim-red)">KRIMINALIDES CLAN</div>
-                <div class="scroll-area" id="krim-list"></div>
-            </div>
+    <div class="main-wrapper">
+        <div class="clan-column">
+            <div class="column-header" style="color:var(--noldor-sky)">NOLDOR CLAN</div>
+            <div class="scroll-area" id="noldor-list"></div>
+        </div>
+        <div class="clan-column">
+            <div class="column-header" style="color:var(--krim-red)">KRIMINALIDES CLAN</div>
+            <div class="scroll-area" id="krim-list"></div>
         </div>
     </div>
 
-    <div id="info" class="page">
-        <div class="info-wrapper">
-            <div class="info-card">
-                <h3>MARKETPLACE</h3>
-                <table class="market-table" id="market-table"></table>
+    <div id="overlay" onclick="closeModal()"></div>
+    <div id="caller-modal" class="modal">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <div class="modal-header">
+            <img src="" id="modal-img" class="modal-img">
+            <div>
+                <h2 id="modal-name" style="margin:0; font-family:'Cinzel'; color:var(--gold);"></h2>
+                <p style="margin:5px 0 0; font-size:0.8rem; color:#888;">ALLIANCE LEADER / CALLER</p>
             </div>
-            <div class="info-card">
-                <h3>ALLIANCE POLICIES</h3>
-                <div style="color:#ccc; font-size: 0.85rem; line-height:1.7;">
-                    <b style="color:var(--gold); font-family:'Cinzel';">ATTENDANCE POINTS:</b><br>
-                    • Mid Epics (Orfen, Core, Queen Ant, Zaken) = 1 pt<br>
-                    • Baium / Frintezza = 2 pts<br>
-                    • Valakas / Antharas = 3 pts<br><br>
-                    <b style="color:var(--gold); font-family:'Cinzel';">LOOT RULES:</b><br>
-                    Priority based on points. 3-week cooldown for big jewels.
-                </div>
-            </div>
+        </div>
+        <div class="stat-grid" id="modal-stats"></div>
+        <button class="loot-btn" onclick="toggleLeaderLoot()">VIEW LOOT HISTORY</button>
+        <div id="leader-loot-panel" style="display:none; margin-top:15px; font-size:0.75rem; color:#ccc; border-top:1px solid #333; padding-top:15px;">
+            No recent loot distribution recorded.
         </div>
     </div>
 
     <script>
+        // ΟΛΑ ΤΑ ICONS ΟΠΩΣ ΤΑ ΖΗΤΗΣΕΣ
         const bossIcons = {
             "VAL": "https://i.ibb.co/84gZPVRP/necklace-valakas.png",
             "ANT": "https://i.ibb.co/rfqvc6mv/earring-antharas.png",
@@ -147,38 +144,49 @@
         const noldor = ["Noldor Archer", "Outlaw CP", "Shadow CP", "Viking CP"];
         const krim = ["Hattrick CP", "Legion CP", "Animals CP", "Mafia CP"];
 
-        function render() {
-            const stats = Object.keys(bossIcons).map(b => `
-                <div class="stat-box"><img src="${bossIcons[b]}" class="boss-icon"><span class="stat-val">0</span></div>`).join('');
+        function renderLists() {
+            const statsHtml = Object.keys(bossIcons).map(b => `
+                <div class="stat-box"><img src="${bossIcons[b]}" class="boss-icon"><span class="stat-val">0</span></div>
+            `).join('');
 
-            const makeList = (list, style) => list.map(name => `
+            const makeItem = (name, style) => `
                 <div class="cp-box ${style}">
                     <button class="cp-btn" onclick="this.parentElement.classList.toggle('active')">
                         <span>${name}</span><span style="color:var(--gold)">0 PTS</span>
                     </button>
-                    <div class="cp-content"><div class="stat-grid">${stats}</div></div>
-                </div>`).join('');
+                    <div class="cp-content"><div class="stat-grid">${statsHtml}</div></div>
+                </div>`;
 
-            document.getElementById('noldor-list').innerHTML = makeList(noldor, "cp-noldor");
-            document.getElementById('krim-list').innerHTML = makeList(krim, "cp-krim");
-
-            const prices = [
-                {n:"Valakas",p:3100,i:bossIcons.VAL}, {n:"Antharas",p:1100,i:bossIcons.ANT},
-                {n:"Baium",p:950,i:bossIcons.BAI}, {n:"Frintezza",p:225,i:bossIcons.FRI},
-                {n:"Zaken",p:175,i:bossIcons.ZAK}, {n:"Orfen",p:150,i:bossIcons.ORF},
-                {n:"Queen Ant",p:150,i:bossIcons.AQ}, {n:"Core",p:100,i:bossIcons.COR}
-            ];
-            document.getElementById('market-table').innerHTML = prices.map(p => `<tr><td><img src="${p.i}" width="20" style="vertical-align:middle; margin-right:10px;"> ${p.n}</td><td style="color:var(--gold); font-weight:bold; text-align:right;">${p.p} PTS</td></tr>`).join('');
+            document.getElementById('noldor-list').innerHTML = noldor.map(n => makeItem(n, 'cp-noldor')).join('');
+            document.getElementById('krim-list').innerHTML = krim.map(n => makeItem(n, 'cp-krim')).join('');
         }
 
-        function showPage(id, btn) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            btn.classList.add('active');
+        // ΛΕΙΤΟΥΡΓΙΕΣ MODAL ΟΠΩΣ ΣΤΟ SAFE POINT
+        function openCaller(name, img) {
+            document.getElementById('modal-name').innerText = name;
+            document.getElementById('modal-img').src = img;
+            document.getElementById('modal-stats').innerHTML = Object.keys(bossIcons).map(b => `
+                <div class="stat-box"><img src="${bossIcons[b]}" class="boss-icon"><span class="stat-val">0</span></div>
+            `).join('');
+            document.getElementById('caller-modal').style.display = 'block';
+            document.getElementById('overlay').style.display = 'block';
         }
 
-        render();
+        function toggleLeaderLoot() {
+            const panel = document.getElementById('leader-loot-panel');
+            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function closeModal() {
+            document.getElementById('caller-modal').style.display = 'none';
+            document.getElementById('overlay').style.display = 'none';
+        }
+
+        setInterval(() => { 
+            document.getElementById('clock').innerText = "SERVER TIME: " + new Date().toLocaleTimeString('el-GR', {timeZone:'UTC', hour12:false}) + " UTC"; 
+        }, 1000);
+
+        renderLists();
     </script>
 </body>
 </html>
