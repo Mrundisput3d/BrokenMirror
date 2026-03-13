@@ -171,7 +171,7 @@
     </div>
 
     <script>
-        // MUSIC CONFIG
+        // MUSIC LOGIC
         const tracks = [
             { name: "DION THEME", url: "https://www.dropbox.com/scl/fi/ypzqrr336iewt62gncy6u/Lineage-2-Dion-Theme-Song.mp3?rlkey=nl1quliuqleuljgkt5jhqq6hh&st=sb8ij16g&raw=1" },
             { name: "GIRAN THEME", url: "https://www.dropbox.com/scl/fi/iu8j9wn9wky8fav176ayf/Lineage-2-Giran-Theme.mp3?rlkey=xp1j0upa076sy21tgcta6t9c3&st=0a4ihyhg&raw=1" },
@@ -201,8 +201,7 @@
             }
         }
 
-        // DASHBOARD DATA
-        const bosses = ["VAL", "ANT", "BAI", "FRI", "ZAK", "AQ", "ORF", "COR", "SIE"];
+        // BOSS DATA
         const bossIcons = {
             "VAL": "https://i.ibb.co/84gZPVRP/necklace-valakas.png",
             "ANT": "https://i.ibb.co/rfqvc6mv/earring-antharas.png",
@@ -218,15 +217,10 @@
         const noldorNames = ["Noldor Clan", "Noldor Archer", "Noldor Archer 2", "Outlaw CP", "Ronin CP", "Brazilians CP", "Shadow CP", "Viking CP", "Elders CP", "Spartans CP", "Noldor Support"];
         const krimNames = ["Hattrick CP", "55 Room CP", "Legion CP", "Criminal Record CP", "Avalanche CP", "Gankly Crew CP", "Animals CP", "Mafia CP", "NoMercy CP", "Chaos CP", "Krim Scouts"];
 
-        function getStatsHtml(includeSiege = true) {
-            return bosses.filter(b => includeSiege || b !== "SIE").map(b => `
-                <div class="stat-box">
-                    <img src="${bossIcons[b]}" class="boss-icon">
-                    <span class="stat-val">0</span>
-                </div>`).join('');
-        }
-
         function renderLists() {
+            const getStats = () => Object.keys(bossIcons).map(b => `
+                <div class="stat-box"><img src="${bossIcons[b]}" class="boss-icon"><span class="stat-val">0</span></div>`).join('');
+
             const renderClan = (list, style) => list.map(name => `
                 <div class="cp-box ${style}">
                     <button class="cp-btn" onclick="this.parentElement.classList.toggle('active')">
@@ -234,7 +228,7 @@
                         <span style="color:var(--gold); font-size:0.75rem;">4000 PTS</span>
                     </button>
                     <div class="cp-content">
-                        <div class="stat-grid">${getStatsHtml(true)}</div>
+                        <div class="stat-grid">${getStats()}</div>
                         <button class="loot-btn" onclick="const p=this.nextElementSibling; p.style.display=p.style.display==='block'?'none':'block'; this.innerText=p.style.display==='block'?'HIDE LOOT HISTORY':'VIEW LOOT HISTORY'">VIEW LOOT HISTORY</button>
                         <div class="loot-panel">No history found.</div>
                         <div class="roster-section">
@@ -248,12 +242,12 @@
             document.getElementById('krim-list').innerHTML = renderClan(krimNames, "cp-krim");
 
             const prices = [
-                {n:\"Valakas\",p:3100,i:bossIcons.VAL}, {n:\"Antharas\",p:1100,i:bossIcons.ANT},
-                {n:\"Baium\",p:950,i:bossIcons.BAI}, {n:\"Zaken\",p:175,i:bossIcons.ZAK},
-                {n:\"Frintezza\",p:225,i:bossIcons.FRI}, {n:\"Queen Ant\",p:150,i:bossIcons.AQ},
-                {n:\"Orfen\",p:75,i:bossIcons.ORF}, {n:\"Core\",p:75,i:bossIcons.COR}
+                {n:"Valakas",p:3100,i:bossIcons.VAL}, {n:"Antharas",p:1100,i:bossIcons.ANT},
+                {n:"Baium",p:950,i:bossIcons.BAI}, {n:"Zaken",p:175,i:bossIcons.ZAK},
+                {n:"Frintezza",p:225,i:bossIcons.FRI}, {n:"Queen Ant",p:150,i:bossIcons.AQ},
+                {n:"Orfen",p:75,i:bossIcons.ORF}, {n:"Core",p:75,i:bossIcons.COR}
             ];
-            document.getElementById('market-table').innerHTML = prices.map(p => `<tr><td><img src=\"${p.i}\" style=\"width:22px; vertical-align:middle; margin-right:12px;\"> ${p.n}</td><td style=\"color:var(--gold); font-weight:bold; text-align:right;\">${p.p} PTS</td></tr>`).join('');
+            document.getElementById('market-table').innerHTML = prices.map(p => `<tr><td><img src="${p.i}" style="width:22px; vertical-align:middle; margin-right:12px;"> ${p.n}</td><td style="color:var(--gold); font-weight:bold; text-align:right;">${p.p} PTS</td></tr>`).join('');
         }
 
         function showPage(id, btn) {
@@ -267,7 +261,8 @@
             document.getElementById('modal-name').innerText = name;
             document.getElementById('modal-title').innerText = role;
             document.getElementById('modal-img').src = img;
-            document.getElementById('modal-stats').innerHTML = getStatsHtml(true);
+            document.getElementById('modal-stats').innerHTML = Object.keys(bossIcons).map(b => `
+                <div class="stat-box"><img src="${bossIcons[b]}" class="boss-icon"><span class="stat-val">0</span></div>`).join('');
             document.getElementById('caller-modal').style.display = 'block';
             document.getElementById('overlay').style.display = 'block';
         }
