@@ -18,9 +18,9 @@
         }
         body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-overlay); z-index: -1; }
 
-        /* HEADER & CLOCK */
+        /* HEADER */
         .server-time { position: absolute; top: 20px; right: 40px; color: var(--gold); font-family: 'Cinzel'; border: 1px solid var(--gold); padding: 5px 15px; border-radius: 5px; background: rgba(0,0,0,0.5); font-size: 0.8rem; z-index: 100; }
-        .top-header { text-align: center; padding-top: 30px; margin-bottom: 40px; }
+        .top-header { text-align: center; padding-top: 30px; margin-bottom: 20px; }
         .ally-logo { width: 140px; filter: drop-shadow(0 0 15px var(--gold)); margin-bottom: 10px; }
         .ally-title { font-family: 'Cinzel Decorative', cursive; font-size: 2.2rem; color: var(--gold); display: block; letter-spacing: 2px; }
 
@@ -32,43 +32,25 @@
         .leader-name { color: var(--gold); font-size: 0.9rem; font-family: 'Cinzel'; display: block; margin-top: 10px; font-weight: bold; }
         .leader-role { color: #888; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; display: block; }
 
+        /* SEARCH BAR */
+        .search-container { max-width: 500px; margin: 30px auto; padding: 0 20px; }
+        .search-input { width: 100%; padding: 12px 25px; background: rgba(0,0,0,0.6); border: 1px solid var(--gold); border-radius: 25px; color: #fff; outline: none; font-family: 'Open Sans'; transition: 0.3s; }
+        .search-input:focus { box-shadow: 0 0 15px rgba(212,175,55,0.3); background: rgba(0,0,0,0.8); }
+
         /* DASHBOARD GRID */
         .main-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; max-width: 1500px; margin: 0 auto; padding: 0 20px; }
         .clan-column { background: rgba(15, 18, 22, 0.95); height: 700px; display: flex; flex-direction: column; border: 1px solid #333; border-radius: 10px; border-top: 4px solid var(--gold); }
         .column-header { padding: 20px; text-align: center; font-family: 'Cinzel'; font-size: 1.2rem; border-bottom: 1px solid #222; display: flex; align-items: center; justify-content: center; gap: 12px; background: rgba(0,0,0,0.4); }
         .scroll-area { overflow-y: auto; padding: 15px; flex-grow: 1; scrollbar-width: thin; scrollbar-color: var(--gold) #111; }
 
-        /* CP BOX ENHANCED VISUALS */
-        .cp-box { 
-            margin-bottom: 12px; 
-            border: 1px solid rgba(212, 175, 55, 0.1); 
-            background: rgba(255, 255, 255, 0.02); 
-            border-radius: 8px; 
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        .cp-box:hover {
-            border-color: rgba(212, 175, 55, 0.5);
-            background: rgba(212, 175, 55, 0.05);
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.1);
-            transform: translateX(5px);
-        }
-
-        .cp-btn { 
-            width: 100%; background: none; border: none; padding: 16px; color: #fff; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; 
-            font-family: 'Open Sans'; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; font-size: 0.85rem;
-        }
-
-        /* GLOW EFFECTS */
+        /* CP BOXES (Visuals Fixed as requested) */
+        .cp-box { margin-bottom: 12px; border: 1px solid rgba(212, 175, 55, 0.1); background: rgba(255, 255, 255, 0.02); border-radius: 8px; transition: all 0.3s ease; position: relative; overflow: hidden; }
+        .cp-box:hover { border-color: rgba(212, 175, 55, 0.5); background: rgba(212, 175, 55, 0.05); box-shadow: 0 0 15px rgba(212, 175, 55, 0.1); transform: translateX(5px); }
+        .cp-btn { width: 100%; background: none; border: none; padding: 16px; color: #fff; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-family: 'Open Sans'; font-weight: 700; text-transform: uppercase; font-size: 0.85rem; }
         .cp-box:hover .cp-btn span:first-child { text-shadow: 0 0 10px currentColor; filter: brightness(1.2); }
-        .cp-noldor { color: var(--noldor-sky); filter: drop-shadow(0 0 2px rgba(0, 217, 255, 0.2)); }
-        .cp-krim { color: var(--krim-red); filter: drop-shadow(0 0 2px rgba(255, 51, 51, 0.2)); }
-
-        .points-tag { 
-            font-size: 0.75rem; border: 1px solid rgba(212, 175, 55, 0.4); padding: 3px 10px; border-radius: 4px; font-family: 'Cinzel'; background: rgba(0, 0, 0, 0.3); color: var(--gold); transition: 0.3s;
-        }
-        .cp-box:hover .points-tag { border-color: var(--gold); box-shadow: 0 0 8px rgba(212, 175, 55, 0.3); }
+        .cp-noldor { color: var(--noldor-sky); }
+        .cp-krim { color: var(--krim-red); }
+        .points-tag { font-size: 0.75rem; border: 1px solid rgba(212, 175, 55, 0.4); padding: 3px 10px; border-radius: 4px; font-family: 'Cinzel'; background: rgba(0, 0, 0, 0.3); color: var(--gold); }
 
         /* MEMBER LISTS */
         .member-list { display: none; background: rgba(0,0,0,0.5); border-top: 1px solid #222; }
@@ -76,26 +58,28 @@
         .member-row { padding: 10px 20px; border-bottom: 1px solid rgba(255,255,255,0.03); display: flex; justify-content: space-between; cursor: pointer; font-size: 0.85rem; }
         .member-stats { display: none; background: #000; padding: 15px; }
         .active-member + .member-stats { display: block; }
-
         .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
         .stat-box { background: #15181c; padding: 8px; border: 1px solid #222; text-align: center; border-radius: 4px; }
         .boss-icon { width: 22px; height: 22px; margin-bottom: 4px; }
         .stat-val { font-size: 0.8rem; color: #fff; font-family: 'Cinzel'; font-weight: bold; display: block; }
 
         /* LOOT */
-        .loot-btn { width: 100%; background: rgba(212,175,55,0.05); border: none; padding: 12px; color: var(--gold); font-family: 'Cinzel'; cursor: pointer; font-size: 0.7rem; letter-spacing: 1px; border-top: 1px solid #333; }
+        .loot-btn { width: 100%; background: rgba(212,175,55,0.05); border: none; padding: 12px; color: var(--gold); font-family: 'Cinzel'; cursor: pointer; font-size: 0.7rem; border-top: 1px solid #333; }
         .loot-content { display: none; padding: 15px; background: rgba(0,0,0,0.4); border-top: 1px solid rgba(212,175,55,0.2); }
 
-        /* INFO SECTION (MARKET & POLICIES) */
+        /* INFO SECTION */
         .info-section { background: rgba(10, 12, 15, 0.98); border-top: 3px solid var(--gold); padding: 60px 20px; margin-top: 60px; }
         .info-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 50px; max-width: 1400px; margin: 0 auto; }
         .info-card { background: rgba(15, 18, 22, 0.8); border: 1px solid #333; border-radius: 12px; padding: 35px; }
-        .info-card h3 { font-family: 'Cinzel'; color: var(--gold); font-size: 1.5rem; margin-top: 0; margin-bottom: 25px; border-bottom: 1px solid rgba(212,175,55,0.3); padding-bottom: 10px; }
-
+        .info-card h3 { font-family: 'Cinzel'; color: var(--gold); font-size: 1.5rem; margin-bottom: 25px; border-bottom: 1px solid rgba(212,175,55,0.3); padding-bottom: 10px; }
         .market-table { width: 100%; border-collapse: collapse; }
         .market-table td { padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .policy-item { margin-bottom: 20px; line-height: 1.8; color: #ccc; }
         .policy-item b { color: var(--gold); font-family: 'Cinzel'; font-size: 0.9rem; display: block; margin-bottom: 5px; }
+
+        /* EXTRA SPACE SECTION */
+        .extra-section { background: rgba(0,0,0,0.4); padding: 100px 20px; text-align: center; border-top: 1px solid #222; }
+        .extra-content { max-width: 1000px; margin: 0 auto; color: #555; font-family: 'Cinzel'; letter-spacing: 5px; }
 
         /* MODAL */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9998; backdrop-filter: blur(5px); }
@@ -132,6 +116,10 @@
                 <span class="leader-role">SHOT CALLER</span>
             </div>
         </div>
+    </div>
+
+    <div class="search-container">
+        <input type="text" id="cpSearch" class="search-input" placeholder="Search CP name or member..." onkeyup="filterCPs()">
     </div>
 
     <div class="main-wrapper">
@@ -182,16 +170,23 @@
         </div>
     </div>
 
+    <div class="extra-section">
+        <div class="extra-content">
+            --- FUTURE EXTENSIONS ---<br>
+            STRATEGY BOARD • UPCOMING RAIDS • ALLIANCE LOGS
+        </div>
+    </div>
+
     <script>
         const bossConfig = {
-            "VAL": { name: "Valakas", img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/necklace-valakas.png?raw=true" },
-            "ANT": { name: "Antharas", img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/earring-antharas.png?raw=true" },
-            "BAI": { name: "Baium", img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/ring-of-baium.png?raw=true" },
-            "FRI": { name: "Frintezza", img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/frintezza-necklace.png?raw=true" },
-            "ZAK": { name: "Zaken", img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/zaken-earring.png?raw=true" },
-            "CORE": { name: "Core", img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/ring-of-core.png?raw=true" },
-            "ORF": { name: "Orfen", img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/earring-orfen.png?raw=true" },
-            "AQ":  { name: "Queen Ant", img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/ring-of-queen-ant.png?raw=true" },
+            "VAL": { name: "Valakas", img: "https://l2wiki.com/images/8/8f/Item_6650.png" },
+            "ANT": { name: "Antharas", img: "https://l2wiki.com/images/3/36/Item_6651.png" },
+            "BAI": { name: "Baium", img: "https://l2wiki.com/images/b/ba/Item_6652.png" },
+            "FRI": { name: "Frintezza", img: "https://l2wiki.com/images/3/3b/Item_8191.png" },
+            "ZAK": { name: "Zaken", img: "https://l2wiki.com/images/3/35/Item_6653.png" },
+            "CORE": { name: "Core", img: "https://l2wiki.com/images/1/13/Item_6662.png" },
+            "ORF": { name: "Orfen", img: "https://l2wiki.com/images/d/d4/Item_6661.png" },
+            "AQ":  { name: "Queen Ant", img: "https://l2wiki.com/images/5/5e/Item_6660.png" },
             "SIEGE": { name: "Siege", img: "https://i.ibb.co/Txfby6wD/images.png" }
         };
 
@@ -216,29 +211,32 @@
             const renderClan = (names, clanClass) => names.map((name, index) => {
                 const pts = 5000 - (index * 400);
                 return `
-                <div class="cp-box">
+                <div class="cp-box" data-name="${name.toLowerCase()}">
                     <button class="cp-btn" onclick="this.parentElement.classList.toggle('active')">
                         <span class="${clanClass}">${name}</span>
                         <span class="points-tag">${pts} PTS</span>
                     </button>
                     <div class="member-list">
-                        ${[1,2,3].map(m => `
-                            <div class="member-row" onclick="this.classList.toggle('active-member')"><span>Member_${m}</span><small>▼</small></div>
-                            <div class="member-stats"><div class="stat-grid">${getStatsHtml()}</div></div>
-                        `).join('')}
+                        ${[1,2,3].map(m => `<div class="member-row" onclick="this.classList.toggle('active-member')"><span>Member_${m}</span><small>▼</small></div><div class="member-stats"><div class="stat-grid">${getStatsHtml()}</div></div>`).join('')}
                         <div class="loot-section">
                             <button class="loot-btn" onclick="const e=this.nextElementSibling; e.style.display=e.style.display==='block'?'none':'block'">▼ VIEW LOOT HISTORY</button>
                             <div class="loot-content">
-                                ${index === 0 ? `<div style="display:flex; align-items:center; gap:10px; font-size:0.8rem;"><img src="${bossConfig.BAI.img}" style="width:20px;"> Baium Ring (10/03/2026)</div>` : 'No history.'}
+                                ${index === 0 ? `<div style="display:flex; align-items:center; gap:10px;"><img src="${bossConfig.BAI.img}" style="width:20px;"> Baium Ring (10/03/2026)</div>` : 'No history.'}
                             </div>
                         </div>
                     </div>
                 </div>`;
             }).join('');
-
             document.getElementById('noldor-list').innerHTML = renderClan(noldorNames, "cp-noldor");
             document.getElementById('krim-list').innerHTML = renderClan(krimNames, "cp-krim");
             document.getElementById('market-table').innerHTML = prices.map(p => `<tr><td><img src="${p.i}" style="width:22px; vertical-align:middle; margin-right:12px;"> ${p.n}</td><td style="color:var(--gold); font-weight:bold; text-align:right;">${p.p} PTS</td></tr>`).join('');
+        }
+
+        function filterCPs() {
+            let input = document.getElementById('cpSearch').value.toLowerCase();
+            document.querySelectorAll('.cp-box').forEach(box => {
+                box.style.display = box.getAttribute('data-name').includes(input) ? "block" : "none";
+            });
         }
 
         function openCaller(name, role, img) {
