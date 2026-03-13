@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Broken Mirror Alliance | Marketplace</title>
+    <title>Broken Mirror | Market & Policies</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -17,70 +17,87 @@
         }
         body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-overlay); z-index: -1; }
 
-        .top-header { text-align: center; padding-top: 40px; }
-        .ally-logo { width: 80px; filter: drop-shadow(0 0 15px var(--gold)); }
+        .top-header { text-align: center; padding-top: 30px; }
+        .ally-logo { width: 70px; filter: drop-shadow(0 0 15px var(--gold)); }
         .ally-title { font-family: 'Cinzel Decorative', cursive; font-size: 1.5rem; color: var(--gold); display: block; margin-bottom: 20px;}
 
-        /* NAVIGATION */
-        .main-nav { display: flex; justify-content: center; gap: 10px; margin-bottom: 40px; }
-        .nav-btn { background: rgba(212, 175, 55, 0.1); border: 1px solid var(--gold); color: var(--gold); padding: 8px 15px; font-family: 'Cinzel'; cursor: pointer; transition: 0.3s; font-size: 0.75rem; text-decoration: none; border-radius: 4px;}
+        .main-nav { display: flex; justify-content: center; gap: 10px; margin-bottom: 30px; }
+        .nav-btn { background: rgba(212, 175, 55, 0.1); border: 1px solid var(--gold); color: var(--gold); padding: 8px 15px; font-family: 'Cinzel'; cursor: pointer; text-decoration: none; border-radius: 4px; font-size: 0.75rem; transition: 0.3s; }
         .nav-btn:hover, .nav-btn.active { background: var(--gold); color: #000; }
 
-        /* MARKET TABLE */
-        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
-        .market-card { background: rgba(15, 18, 22, 0.9); border: 1px solid #333; border-top: 4px solid var(--gold); border-radius: 12px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .market-card h2 { font-family: 'Cinzel'; color: var(--gold); text-align: center; margin-top: 0; border-bottom: 1px solid rgba(212,175,55,0.2); padding-bottom: 15px; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        .card { background: rgba(15, 18, 22, 0.9); border: 1px solid #333; border-top: 4px solid var(--gold); border-radius: 12px; padding: 25px; }
+        .card h2 { font-family: 'Cinzel'; color: var(--gold); border-bottom: 1px solid rgba(212,175,55,0.2); padding-bottom: 15px; margin-top: 0; text-align: center; }
         
-        .market-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        .market-table tr { transition: 0.2s; }
-        .market-table tr:hover { background: rgba(255,255,255,0.03); }
-        .market-table td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 1rem; }
-        .boss-icon { width: 32px; height: 32px; vertical-align: middle; margin-right: 15px; border: 1px solid #444; border-radius: 4px; }
-        .price-tag { color: var(--gold); font-family: 'Cinzel'; font-weight: bold; text-align: right; font-size: 1.1rem; }
-        
-        @media (max-width: 600px) {
-            .market-table td { font-size: 0.85rem; padding: 10px 5px; }
-            .price-tag { font-size: 0.9rem; }
+        /* Marketplace Style */
+        .market-table { width: 100%; border-collapse: collapse; }
+        .market-table td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .boss-icon { width: 28px; vertical-align: middle; margin-right: 10px; }
+        .price { color: var(--gold); font-family: 'Cinzel'; font-weight: bold; text-align: right; }
+
+        /* Policies Style */
+        .policy-section { margin-bottom: 20px; line-height: 1.6; font-size: 0.9rem; color: #ccc; }
+        .policy-title { color: var(--gold); font-family: 'Cinzel'; font-weight: bold; display: block; margin-bottom: 5px; border-left: 3px solid var(--gold); padding-left: 10px; }
+
+        @media (max-width: 900px) {
+            .container { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-
     <div class="top-header">
         <img src="https://i.ibb.co/6R9q5PGv/ALLIANCE-LOGO.png" class="ally-logo">
-        <span class="ally-title">ALLIANCE MARKETPLACE</span>
-        
+        <span class="ally-title">MARKET & POLICIES</span>
         <nav class="main-nav">
             <a href="index.html" class="nav-btn">DASHBOARD</a>
-            <a href="marketplace.html" class="nav-btn active">MARKETPLACE</a>
-            <a href="history.html" class="nav-btn">HISTORY</a>
+            <a href="marketplace.html" class="nav-btn active">MARKET & POLICIES</a>
+            <a href="history.html" class="nav-btn">LEAVERS</a>
         </nav>
     </div>
 
     <div class="container">
-        <div class="market-card">
-            <h2>EPIC JEWELRY PRICES</h2>
-            <table class="market-table" id="market-content">
-                </table>
+        <div class="card">
+            <h2>MARKETPLACE</h2>
+            <table class="market-table" id="market-content"></table>
+        </div>
+
+        <div class="card">
+            <h2>ALLIANCE RULES</h2>
+            <div class="policy-section">
+                <span class="policy-title">ATTENDANCE POINTS (PTS)</span>
+                • Mid Epics (Orfen, Queen Ant, Zaken): 1 pt<br>
+                • Baium: 2 pts<br>
+                • Valakas / Antharas: 3 pts
+            </div>
+            <div class="policy-section">
+                <span class="policy-title">JEWEL PRIORITY</span>
+                • Archer CPs: Baium Ring<br>
+                • Mage CPs: Valakas Necklace<br>
+                • Stopper Party: Antharas Earring
+            </div>
+            <div class="policy-section">
+                <span class="policy-title">COOLDOWN & DEDUCTIONS</span>
+                • 3-week restriction for major jewels.<br>
+                • Points deducted automatically based on Market price.
+            </div>
         </div>
     </div>
 
     <script>
         const prices = [
-            {n:"Valakas Necklace", p:3100, i:"https://i.ibb.co/84gZPVRP/necklace-valakas.png"},
-            {n:"Antharas Earring", p:1100, i:"https://i.ibb.co/rfqvc6mv/earring-antharas.png"},
-            {n:"Baium Ring", p:950, i:"https://i.ibb.co/XrZkv67h/ring-of-baium.png"},
-            {n:"Zaken Earring", p:175, i:"https://i.ibb.co/spkC6Gzz/zaken-earring.png"},
-            {n:"Frintezza Necklace", p:225, i:"https://i.ibb.co/gF4YKGTM/frintezza-necklace.png"},
-            {n:"Queen Ant Ring", p:150, i:"https://i.ibb.co/rKRtZmBG/ring-of-queen-ant.png"},
-            {n:"Orfen Earring", p:75, i:"https://i.ibb.co/j9dDnXwH/earring-orfen.png"},
-            {n:"Ring of Core", p:25, i:"https://i.ibb.co/ksv37fNZ/ring-of-.png"}
+            {n:"Valakas", p:3100, i:"https://i.ibb.co/84gZPVRP/necklace-valakas.png"},
+            {n:"Antharas", p:1100, i:"https://i.ibb.co/rfqvc6mv/earring-antharas.png"},
+            {n:"Baium", p:950, i:"https://i.ibb.co/XrZkv67h/ring-of-baium.png"},
+            {n:"Zaken", p:175, i:"https://i.ibb.co/spkC6Gzz/zaken-earring.png"},
+            {n:"Frintezza", p:225, i:"https://i.ibb.co/gF4YKGTM/frintezza-necklace.png"},
+            {n:"Queen Ant", p:150, i:"https://i.ibb.co/rKRtZmBG/ring-of-queen-ant.png"},
+            {n:"Orfen", p:75, i:"https://i.ibb.co/j9dDnXwH/earring-orfen.png"},
+            {n:"Core", p:25, i:"https://i.ibb.co/ksv37fNZ/ring-of-.png"}
         ];
-
-        document.getElementById('market-content').innerHTML = prices.map(item => `
+        document.getElementById('market-content').innerHTML = prices.map(p => `
             <tr>
-                <td><img src="${item.i}" class="boss-icon"> ${item.n}</td>
-                <td class="price-tag">${item.p} PTS</td>
+                <td><img src="${p.i}" class="boss-icon"> ${p.n}</td>
+                <td class="price">${p.p} PTS</td>
             </tr>
         `).join('');
     </script>
