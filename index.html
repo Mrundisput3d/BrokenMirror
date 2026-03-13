@@ -18,7 +18,7 @@
         }
         body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-overlay); z-index: -1; }
 
-        /* HEADER */
+        /* HEADER & CLOCK */
         .server-time { position: absolute; top: 20px; right: 40px; color: var(--gold); font-family: 'Cinzel'; border: 1px solid var(--gold); padding: 5px 15px; border-radius: 5px; background: rgba(0,0,0,0.5); font-size: 0.8rem; z-index: 100; }
         .top-header { text-align: center; padding-top: 30px; margin-bottom: 40px; }
         .ally-logo { width: 140px; filter: drop-shadow(0 0 15px var(--gold)); margin-bottom: 10px; }
@@ -34,15 +34,43 @@
 
         /* DASHBOARD GRID */
         .main-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; max-width: 1500px; margin: 0 auto; padding: 0 20px; }
-        .clan-column { background: rgba(15, 18, 22, 0.95); height: 750px; display: flex; flex-direction: column; border: 1px solid #333; border-radius: 10px; border-top: 4px solid var(--gold); }
+        .clan-column { background: rgba(15, 18, 22, 0.95); height: 700px; display: flex; flex-direction: column; border: 1px solid #333; border-radius: 10px; border-top: 4px solid var(--gold); }
         .column-header { padding: 20px; text-align: center; font-family: 'Cinzel'; font-size: 1.2rem; border-bottom: 1px solid #222; display: flex; align-items: center; justify-content: center; gap: 12px; background: rgba(0,0,0,0.4); }
         .scroll-area { overflow-y: auto; padding: 15px; flex-grow: 1; scrollbar-width: thin; scrollbar-color: var(--gold) #111; }
 
-        /* CP & MEMBERS */
-        .cp-box { margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.3); border-radius: 6px; overflow: hidden; }
-        .cp-btn { width: 100%; background: none; border: none; padding: 15px; color: #fff; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-family: 'Open Sans'; font-weight: 700; }
-        .points-tag { font-size: 0.8rem; border: 1px solid currentColor; padding: 2px 8px; border-radius: 4px; font-family: 'Cinzel'; }
+        /* CP BOX ENHANCED VISUALS */
+        .cp-box { 
+            margin-bottom: 12px; 
+            border: 1px solid rgba(212, 175, 55, 0.1); 
+            background: rgba(255, 255, 255, 0.02); 
+            border-radius: 8px; 
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .cp-box:hover {
+            border-color: rgba(212, 175, 55, 0.5);
+            background: rgba(212, 175, 55, 0.05);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.1);
+            transform: translateX(5px);
+        }
 
+        .cp-btn { 
+            width: 100%; background: none; border: none; padding: 16px; color: #fff; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; 
+            font-family: 'Open Sans'; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; font-size: 0.85rem;
+        }
+
+        /* GLOW EFFECTS */
+        .cp-box:hover .cp-btn span:first-child { text-shadow: 0 0 10px currentColor; filter: brightness(1.2); }
+        .cp-noldor { color: var(--noldor-sky); filter: drop-shadow(0 0 2px rgba(0, 217, 255, 0.2)); }
+        .cp-krim { color: var(--krim-red); filter: drop-shadow(0 0 2px rgba(255, 51, 51, 0.2)); }
+
+        .points-tag { 
+            font-size: 0.75rem; border: 1px solid rgba(212, 175, 55, 0.4); padding: 3px 10px; border-radius: 4px; font-family: 'Cinzel'; background: rgba(0, 0, 0, 0.3); color: var(--gold); transition: 0.3s;
+        }
+        .cp-box:hover .points-tag { border-color: var(--gold); box-shadow: 0 0 8px rgba(212, 175, 55, 0.3); }
+
+        /* MEMBER LISTS */
         .member-list { display: none; background: rgba(0,0,0,0.5); border-top: 1px solid #222; }
         .active > .member-list { display: block; }
         .member-row { padding: 10px 20px; border-bottom: 1px solid rgba(255,255,255,0.03); display: flex; justify-content: space-between; cursor: pointer; font-size: 0.85rem; }
@@ -57,18 +85,17 @@
         /* LOOT */
         .loot-btn { width: 100%; background: rgba(212,175,55,0.05); border: none; padding: 12px; color: var(--gold); font-family: 'Cinzel'; cursor: pointer; font-size: 0.7rem; letter-spacing: 1px; border-top: 1px solid #333; }
         .loot-content { display: none; padding: 15px; background: rgba(0,0,0,0.4); border-top: 1px solid rgba(212,175,55,0.2); }
-        .loot-item { display: flex; align-items: center; gap: 12px; font-size: 0.8rem; color: #ddd; margin-bottom: 8px; }
 
-        /* NEW SECTION: MARKET & POLICIES */
-        .info-section { background: rgba(10, 12, 15, 0.98); border-top: 3px solid var(--gold); padding: 80px 20px; margin-top: 60px; }
+        /* INFO SECTION (MARKET & POLICIES) */
+        .info-section { background: rgba(10, 12, 15, 0.98); border-top: 3px solid var(--gold); padding: 60px 20px; margin-top: 60px; }
         .info-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 50px; max-width: 1400px; margin: 0 auto; }
         .info-card { background: rgba(15, 18, 22, 0.8); border: 1px solid #333; border-radius: 12px; padding: 35px; }
         .info-card h3 { font-family: 'Cinzel'; color: var(--gold); font-size: 1.5rem; margin-top: 0; margin-bottom: 25px; border-bottom: 1px solid rgba(212,175,55,0.3); padding-bottom: 10px; }
 
         .market-table { width: 100%; border-collapse: collapse; }
         .market-table td { padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .policy-item { margin-bottom: 20px; line-height: 1.8; color: #ccc; display: flex; align-items: flex-start; gap: 15px; }
-        .policy-item b { color: var(--gold); font-family: 'Cinzel'; font-size: 0.9rem; }
+        .policy-item { margin-bottom: 20px; line-height: 1.8; color: #ccc; }
+        .policy-item b { color: var(--gold); font-family: 'Cinzel'; font-size: 0.9rem; display: block; margin-bottom: 5px; }
 
         /* MODAL */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9998; backdrop-filter: blur(5px); }
@@ -130,32 +157,28 @@
             </div>
 
             <div class="info-card">
-    <h3>ALLIANCE POLICIES</h3>
-    
-    <div class="policy-item">
-        <span><b>ATTENDANCE POINTS:</b><br>
-        • Mid Epics (Orfen, Core, Queen Ant, Zaken) = 1 pt<br>
-        • Baium = 2 pts<br>
-        • Valakas / Antharas = 3 pts</span>
-    </div>
-
-    <div class="policy-item">
-        <span><b>JEWEL PRIORITY:</b><br>
-        • <span style="color:var(--noldor-sky)">Archer CPs</span> hold priority on <b>Baium Ring</b>.<br>
-        • <span style="color:var(--krim-red)">Mage CPs</span> hold priority on <b>Valakas Necklace</b>.<br>
-        • <span style="color:var(--gold)">Stopper Party</span> holds priority on <b>Antharas Earring</b>.</span>
-    </div>
-
-    <div class="policy-item">
-        <span><b>COOLDOWN PROTOCOL:</b><br>
-        A 3-week restriction applies to any member/CP that has recently received a mid-level jewel before they can claim another.</span>
-    </div>
-
-    <div class="policy-item">
-        <span><b>POINTS DEDUCTION:</b><br>
-        When a CP receives an item, their total points are automatically deducted based on the current Marketplace price.</span>
-    </div>
-</div>
+                <h3>ALLIANCE POLICIES</h3>
+                <div class="policy-item">
+                    <b>ATTENDANCE POINTS:</b>
+                    • Mid Epics (Orfen, Core, Queen Ant, Zaken) = 1 pt<br>
+                    • Baium = 2 pts<br>
+                    • Valakas / Antharas = 3 pts
+                </div>
+                <div class="policy-item">
+                    <b>JEWEL PRIORITY:</b>
+                    • <span style="color:var(--noldor-sky)">Archer CPs</span> hold priority on Baium Ring.<br>
+                    • <span style="color:var(--krim-red)">Mage CPs</span> hold priority on Valakas Necklace.<br>
+                    • <span style="color:var(--gold)">Stopper Party</span> holds priority on Antharas Earring.
+                </div>
+                <div class="policy-item">
+                    <b>COOLDOWN PROTOCOL:</b>
+                    A 3-week restriction applies to any member/CP that has recently received a mid-level jewel before they can claim another.
+                </div>
+                <div class="policy-item">
+                    <b>POINTS DEDUCTION:</b>
+                    When a CP receives an item, their total points are automatically deducted based on the current Marketplace price.
+                </div>
+            </div>
         </div>
     </div>
 
@@ -192,12 +215,11 @@
         function renderLists() {
             const renderClan = (names, clanClass) => names.map((name, index) => {
                 const pts = 5000 - (index * 400);
-                const safeId = name.replace(/\s/g, '');
                 return `
                 <div class="cp-box">
                     <button class="cp-btn" onclick="this.parentElement.classList.toggle('active')">
                         <span class="${clanClass}">${name}</span>
-                        <span class="points-tag" style="color:inherit">${pts} PTS</span>
+                        <span class="points-tag">${pts} PTS</span>
                     </button>
                     <div class="member-list">
                         ${[1,2,3].map(m => `
@@ -207,7 +229,7 @@
                         <div class="loot-section">
                             <button class="loot-btn" onclick="const e=this.nextElementSibling; e.style.display=e.style.display==='block'?'none':'block'">▼ VIEW LOOT HISTORY</button>
                             <div class="loot-content">
-                                ${index === 0 ? `<div class="loot-item"><img src="${bossConfig.BAI.img}" style="width:20px;"> Baium Ring (10/03/2026)</div>` : '<span style="color:#666; font-size:0.75rem;">No loot history.</span>'}
+                                ${index === 0 ? `<div style="display:flex; align-items:center; gap:10px; font-size:0.8rem;"><img src="${bossConfig.BAI.img}" style="width:20px;"> Baium Ring (10/03/2026)</div>` : 'No history.'}
                             </div>
                         </div>
                     </div>
