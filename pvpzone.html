@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Broken Mirror Alliance | PVP Zone</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #d4af37; --bg-overlay: rgba(10, 12, 15, 0.96); 
+        }
+        body { 
+            font-family: 'Open Sans', sans-serif; 
+            background: #0a0c0f url('https://i.ibb.co/1GmpSyxZ/BACKGROUND.jpg') no-repeat center center fixed; 
+            background-size: cover; color: #eee; margin: 0; padding: 0;
+        }
+        body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-overlay); z-index: -1; }
+
+        .top-header { text-align: center; padding-top: 20px; }
+        .ally-logo { width: 110px; filter: drop-shadow(0 0 15px var(--gold)); }
+        .ally-title { font-family: 'Cinzel Decorative', cursive; font-size: 1.8rem; color: var(--gold); display: block; letter-spacing: 2px; margin-bottom: 20px;}
+
+        /* NAVIGATION */
+        .main-nav { display: flex; justify-content: center; gap: 10px; margin-bottom: 30px; }
+        .nav-btn { background: rgba(212, 175, 55, 0.1); border: 1px solid var(--gold); color: var(--gold); padding: 8px 15px; font-family: 'Cinzel'; cursor: pointer; transition: 0.3s; font-size: 0.75rem; border-radius: 4px; text-decoration: none; }
+        .nav-btn:hover { background: var(--gold); color: #000; }
+        .nav-btn.active { background: var(--gold); color: #000; }
+
+        /* VIDEO GRID */
+        .video-grid { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); 
+            gap: 30px; 
+            padding: 20px; 
+        }
+
+        .video-card { 
+            background: rgba(0, 0, 0, 0.8); 
+            border: 1px solid #333; 
+            border-top: 3px solid var(--gold); 
+            padding: 15px; 
+            border-radius: 8px; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            transition: 0.3s;
+        }
+        .video-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+        }
+
+        .video-title {
+            font-family: 'Cinzel';
+            color: var(--gold);
+            font-size: 1rem;
+            margin-bottom: 12px;
+            text-align: center;
+            display: block;
+            letter-spacing: 1px;
+        }
+
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 ratio */
+            height: 0;
+            overflow: hidden;
+            border-radius: 4px;
+            background: #000;
+        }
+
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .video-info {
+            margin-top: 10px;
+            font-size: 0.7rem;
+            color: #888;
+            text-align: right;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top-header">
+        <img src="https://i.ibb.co/6R9q5PGv/ALLIANCE-LOGO.png" class="ally-logo">
+        <span class="ally-title">BROKEN MIRROR ALLIANCE</span>
+        
+        <div class="main-nav">
+            <a href="index.html" class="nav-btn">DASHBOARD</a>
+            <a href="history.html" class="nav-btn">LEAVERS HISTORY</a>
+            <a href="pvpzone.html" class="nav-btn active">PVP ZONE</a>
+            <a href="halloffame.html" class="nav-btn">HALL OF FAME</a>
+        </div>
+    </div>
+
+    <div class="video-grid">
+        
+        <div class="video-card">
+            <span class="video-title">SIEGE OF ADEN CASTLE</span>
+            <div class="video-wrapper">
+                <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" allowfullscreen></iframe>
+            </div>
+            <div class="video-info">Uploaded by Niklaus | 12/03/2024</div>
+        </div>
+
+        <div class="video-card">
+            <span class="video-title">VALAKAS EPIC FIGHT</span>
+            <div class="video-wrapper">
+                <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" allowfullscreen></iframe>
+            </div>
+            <div class="video-info">Uploaded by TsakNorris | 10/03/2024</div>
+        </div>
+
+        <div class="video-card">
+            <span class="video-title">OPEN WORLD PVP - GIRAN</span>
+            <div class="video-wrapper">
+                <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" allowfullscreen></iframe>
+            </div>
+            <div class="video-info">Uploaded by Niklaus | 05/03/2024</div>
+        </div>
+
+    </div>
+
+    <div style="text-align:center; margin-top:50px; padding-bottom: 30px; color:#555; font-size:0.75rem; font-family:'Cinzel';">
+        <p>RECORDS OF GLORY - BROKEN MIRROR ALLIANCE</p>
+    </div>
+
+</body>
+</html>
