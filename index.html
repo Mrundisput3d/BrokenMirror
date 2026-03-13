@@ -8,6 +8,8 @@
     <style>
         :root {
             --gold: #d4af37; --noldor-sky: #00d9ff; --krim-red: #ff3333;
+            --noldor-grad: linear-gradient(90deg, rgba(0,217,255,0.15) 0%, rgba(0,0,0,0) 100%);
+            --krim-grad: linear-gradient(90deg, rgba(255,51,51,0.15) 0%, rgba(0,0,0,0) 100%);
             --bg-overlay: rgba(10, 12, 15, 0.96); 
         }
         body { 
@@ -17,11 +19,13 @@
         }
         body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-overlay); z-index: -1; }
 
+        /* HEADER */
         .server-time { position: absolute; top: 20px; right: 40px; color: var(--gold); font-family: 'Cinzel'; border: 1px solid var(--gold); padding: 5px 15px; border-radius: 5px; background: rgba(0,0,0,0.5); font-size: 0.8rem; z-index: 100; }
         .top-header { text-align: center; padding-top: 20px; }
         .ally-logo { width: 110px; filter: drop-shadow(0 0 15px var(--gold)); }
         .ally-title { font-family: 'Cinzel Decorative', cursive; font-size: 1.8rem; color: var(--gold); display: block; letter-spacing: 2px; margin-bottom: 20px;}
 
+        /* LEADERS */
         .leaders-row { display: flex; justify-content: center; gap: 40px; margin-bottom: 20px; }
         .leader-card { text-align: center; cursor: pointer; width: 110px; }
         .img-frame { width: 80px; height: 80px; margin: 0 auto; background: #000; border: 2px solid var(--gold); border-radius: 50%; overflow: hidden; box-shadow: 0 0 15px rgba(212,175,55,0.2); }
@@ -29,6 +33,7 @@
         .leader-name { color: var(--gold); font-size: 0.8rem; font-family: 'Cinzel'; display: block; margin-top: 8px; font-weight: bold; }
         .leader-role { color: #888; font-size: 0.6rem; text-transform: uppercase; display: block; }
 
+        /* TABS */
         .tabs-nav { display: flex; justify-content: center; gap: 15px; margin: 25px 0; }
         .tab-btn { background: rgba(0,0,0,0.6); border: 1px solid var(--gold); color: var(--gold); padding: 10px 25px; font-family: 'Cinzel'; cursor: pointer; transition: 0.3s; font-size: 0.8rem; }
         .tab-btn.active { background: var(--gold); color: #000; font-weight: bold; }
@@ -37,44 +42,54 @@
         .page.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
+        /* SEARCH */
         .search-container { max-width: 500px; margin: 0 auto 30px; }
         .search-input { width: 100%; padding: 12px 25px; background: rgba(0,0,0,0.7); border: 1px solid var(--gold); border-radius: 30px; color: #fff; outline: none; text-align: center;}
 
+        /* LISTS */
         .main-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px; }
         .clan-column { background: rgba(15, 18, 22, 0.95); height: 750px; display: flex; flex-direction: column; border: 1px solid #333; border-radius: 10px; border-top: 4px solid var(--gold); }
         .column-header { padding: 15px; text-align: center; font-family: 'Cinzel'; font-size: 1.1rem; border-bottom: 1px solid #222; display: flex; align-items: center; justify-content: center; gap: 12px; background: rgba(0,0,0,0.4); }
         .scroll-area { overflow-y: auto; padding: 10px; flex-grow: 1; }
 
-        .cp-box { margin-bottom: 8px; border: 1px solid rgba(212, 175, 55, 0.1); background: rgba(255, 255, 255, 0.02); border-radius: 5px; }
-        .cp-btn { width: 100%; background: none; border: none; padding: 10px 15px; color: #fff; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 0.8rem; }
+        /* CP BOXES WITH COLORS */
+        .cp-box { margin-bottom: 8px; border-radius: 5px; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s; }
+        .cp-noldor-bg { background: var(--noldor-grad); border-left: 3px solid var(--noldor-sky); }
+        .cp-krim-bg { background: var(--krim-grad); border-left: 3px solid var(--krim-red); }
+        .cp-box:hover { filter: brightness(1.3); }
+
+        .cp-btn { width: 100%; background: none; border: none; padding: 12px 15px; color: #fff; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 0.85rem; }
         
-        .cp-content { display: none; background: rgba(0,0,0,0.6); padding: 12px; border-top: 1px solid #222; }
+        .cp-content { display: none; background: rgba(0,0,0,0.8); padding: 15px; border-top: 1px solid #333; border-radius: 0 0 5px 5px; }
         .cp-box.active .cp-content { display: block; }
 
-        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-bottom: 10px; }
-        .stat-box { background: #15181c; padding: 6px; border: 1px solid #222; text-align: center; border-radius: 3px; }
-        .boss-icon { width: 18px; height: 18px; margin-bottom: 3px; }
+        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 15px; }
+        .stat-box { background: #15181c; padding: 6px; border: 1px solid #333; text-align: center; border-radius: 4px; }
+        .boss-icon { width: 20px; height: 20px; margin-bottom: 4px; }
         .stat-val { font-size: 0.75rem; color: #fff; font-family: 'Cinzel'; display: block; }
 
-        .roster-section { background: rgba(0,0,0,0.3); border: 1px solid #333; padding: 8px; border-radius: 4px; margin-top: 10px; font-size: 0.75rem; }
-        .leader-item { color: var(--gold); font-weight: bold; }
+        .roster-section { background: rgba(255,255,255,0.03); border: 1px solid #333; padding: 10px; border-radius: 5px; margin-top: 10px; font-size: 0.75rem; }
+        .leader-item { color: var(--gold); font-weight: bold; font-size: 0.8rem; }
 
-        .loot-btn { width: 100%; background: rgba(212,175,55,0.1); border: 1px solid #444; color: var(--gold); padding: 6px; font-family: 'Cinzel'; font-size: 0.6rem; cursor: pointer; border-radius: 3px; }
-        .loot-panel { display: none; padding: 10px; background: rgba(0,0,0,0.4); margin-top: 5px; border-radius: 3px; font-size: 0.7rem; border: 1px solid #222; }
+        .loot-btn { width: 100%; background: rgba(212,175,55,0.1); border: 1px solid #444; color: var(--gold); padding: 8px; font-family: 'Cinzel'; font-size: 0.65rem; cursor: pointer; border-radius: 4px; transition: 0.2s; }
+        .loot-btn:hover { background: var(--gold); color: #000; }
+        .loot-panel { display: none; padding: 12px; background: rgba(0,0,0,0.5); margin-top: 8px; border-radius: 4px; font-size: 0.75rem; border: 1px solid #222; line-height: 1.5; color: #aaa; }
 
-        /* NEW CLANS SECTION BELOW LISTS */
+        /* NEW CLANS CARDS */
         .other-clans-section { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 20px; }
         .new-clan-card { background: rgba(15, 18, 22, 0.95); border: 1px solid #333; border-top: 3px solid var(--gold); border-radius: 10px; padding: 15px; text-align: center; }
         .new-clan-icon { width: 50px; height: 50px; margin-bottom: 10px; }
         .new-clan-name { display: block; font-family: 'Cinzel'; color: #fff; font-size: 0.9rem; }
         .new-clan-lead { display: block; color: var(--gold); font-size: 0.75rem; font-style: italic; margin-top: 5px; }
 
+        /* MARKET & POLICIES */
         .info-wrapper { display: grid; grid-template-columns: 1fr 1.5fr; gap: 30px; }
         .info-card { background: rgba(15, 18, 22, 0.9); border: 1px solid #333; border-radius: 12px; padding: 25px; }
         .info-card h3 { font-family: 'Cinzel'; color: var(--gold); border-bottom: 1px solid rgba(212,175,55,0.3); padding-bottom: 10px; margin-top: 0; }
         .market-table { width: 100%; border-collapse: collapse; }
         .market-table td { padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.85rem;}
 
+        /* MODAL */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9998; backdrop-filter: blur(5px); }
         #caller-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 380px; background: #0f1216; border: 2px solid var(--gold); border-radius: 15px; padding: 25px; z-index: 9999; text-align: center; }
 
@@ -174,9 +189,9 @@
                     • <span style="color:var(--krim-red)">Mage CPs</span>: Valakas Necklace<br>
                     • <span style="color:var(--gold)">Stopper Party</span>: Antharas Earring<br><br>
                     <b style="color:var(--gold); font-family:'Cinzel';">COOLDOWN PROTOCOL:</b><br>
-                    3-week restriction for mid-level jewels.<br><br>
+                    3-week restriction for major jewels.<br><br>
                     <b style="color:var(--gold); font-family:'Cinzel';">DEDUCTIONS:</b><br>
-                    Points are deducted on receipt based on Market prices.
+                    Points are deducted automatically on loot receipt based on Marketplace price.
                 </div>
             </div>
         </div>
@@ -202,40 +217,37 @@
             return Object.values(bossConfig).map(src => `<div class="stat-box"><img src="${src}" class="boss-icon"><span class="stat-val">0</span></div>`).join('');
         }
 
-        // CORRECTED LOOT HISTORY FUNCTION
+        // LOOT HISTORY FIX
         function toggleLoot(btn) {
             const panel = btn.nextElementSibling;
-            if (panel.style.display === "block") {
-                panel.style.display = "none";
-                btn.innerText = "VIEW LOOT HISTORY";
-            } else {
-                panel.style.display = "block";
-                btn.innerText = "HIDE LOOT HISTORY";
-            }
+            const isVisible = panel.style.display === "block";
+            panel.style.display = isVisible ? "none" : "block";
+            btn.innerText = isVisible ? "VIEW LOOT HISTORY" : "HIDE LOOT HISTORY";
         }
 
         function renderLists() {
-            const render = (names, cls) => names.map(n => `
-                <div class="cp-box" data-name="${n.toLowerCase()}" data-roster="leadername member1 member2">
+            const render = (names, cls, bgClass) => names.map(n => `
+                <div class="cp-box ${bgClass}" data-name="${n.toLowerCase()}" data-roster="leadername member1 member2">
                     <button class="cp-btn" onclick="this.parentElement.classList.toggle('active')">
-                        <span class="${cls}">${n}</span>
-                        <span style="color:var(--gold); font-size:0.7rem;">4000 PTS</span>
+                        <span style="color:${cls === 'noldor' ? 'var(--noldor-sky)' : 'var(--krim-red)'}">${n}</span>
+                        <span style="color:var(--gold); font-size:0.75rem; font-weight:bold;">4000 PTS</span>
                     </button>
                     <div class="cp-content">
                         <div class="stat-grid">${getStatsHtml()}</div>
                         <button class="loot-btn" onclick="toggleLoot(this)">VIEW LOOT HISTORY</button>
-                        <div class="loot-panel">No history found.</div>
+                        <div class="loot-panel">No history recorded for this CP yet.</div>
                         <div class="roster-section">
-                            <span class="leader-item">👑 CP_Leader</span><br>Member 1, Member 2, Member 3
+                            <span class="leader-item">👑 CP_Leader</span><br>
+                            <span style="color:#888;">Members: Member 1, Member 2, Member 3, Member 4</span>
                         </div>
                     </div>
                 </div>`).join('');
 
-            document.getElementById('noldor-list').innerHTML = render(noldorCPs, "cp-noldor");
-            document.getElementById('krim-list').innerHTML = render(krimCPs, "cp-krim");
+            document.getElementById('noldor-list').innerHTML = render(noldorCPs, 'noldor', 'cp-noldor-bg');
+            document.getElementById('krim-list').innerHTML = render(krimCPs, 'krim', 'cp-krim-bg');
 
             const items = [{n:"Valakas",p:3100,i:bossConfig.VAL},{n:"Antharas",p:1100,i:bossConfig.ANT},{n:"Baium",p:950,i:bossConfig.BAI},{n:"Zaken",p:175,i:bossConfig.ZAK},{n:"Frintezza",p:225,i:bossConfig.FRI},{n:"Queen Ant",p:150,i:bossConfig.AQ},{n:"Orfen",p:75,i:bossConfig.ORF},{n:"Core",p:75,i:bossConfig.COR}];
-            document.getElementById('market-table').innerHTML = items.map(p => `<tr><td><img src="${p.i}" style="width:18px; vertical-align:middle; margin-right:10px;"> ${p.n}</td><td style="color:var(--gold); text-align:right; font-weight:bold;">${p.p} PTS</td></tr>`).join('');
+            document.getElementById('market-table').innerHTML = items.map(p => `<tr><td><img src="${p.i}" style="width:20px; vertical-align:middle; margin-right:12px;"> ${p.n}</td><td style="color:var(--gold); text-align:right; font-weight:bold;">${p.p} PTS</td></tr>`).join('');
         }
 
         function showPage(id, btn) {
