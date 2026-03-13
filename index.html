@@ -42,58 +42,65 @@
         .ally-logo { width: 140px; height: auto; filter: drop-shadow(0 0 15px var(--gold)); margin-bottom: 10px; }
         .ally-title { font-family: 'Cinzel Decorative', cursive; font-size: 2.2rem; color: var(--gold); display: block; letter-spacing: 2px; }
         
-        /* LEADERS */
-        .leaders-row { display: flex; justify-content: center; flex-wrap: wrap; gap: 40px; margin-top: 30px; max-width: 1200px; margin-left: auto; margin-right: auto; }
+        .leaders-row { display: flex; justify-content: center; flex-wrap: wrap; gap: 40px; margin-top: 30px; }
         .leader-card { text-align: center; cursor: pointer; transition: 0.3s; min-width: 120px; }
-        .leader-card:hover { transform: scale(1.1); }
         .img-frame { width: 90px; height: 90px; margin: 0 auto; background: #000; border: 2px solid var(--gold); border-radius: 50%; overflow: hidden; box-shadow: 0 0 15px rgba(212,175,55,0.3); }
         .leader-img { width: 100%; height: 100%; object-fit: contain; }
         .leader-name { color: var(--gold); font-size: 0.85rem; font-family: 'Cinzel'; display: block; margin-top: 10px; font-weight: bold; }
-        .leader-role { color: #888; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; display: block; margin-top: 2px; }
 
-        /* DASHBOARD GRID */
-        .main-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; max-width: 1600px; margin: 40px auto; padding: 0 20px; }
-        .clan-column { background: rgba(15, 18, 22, 0.95); height: 750px; display: flex; flex-direction: column; border: 1px solid #333; border-radius: 10px; border-top: 4px solid var(--gold); }
-        .column-header { padding: 18px; text-align: center; font-family: 'Cinzel'; font-size: 1.1rem; border-bottom: 1px solid #222; display: flex; align-items: center; justify-content: center; gap: 12px; position: sticky; top: 0; background: #0f1216; z-index: 10; }
-        .clan-mini-logo { width: 35px; height: 35px; object-fit: contain; }
+        /* DASHBOARD SECTION */
+        .page-section { min-height: 100vh; padding: 40px 20px; box-sizing: border-box; position: relative; }
+        .main-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; max-width: 1600px; margin: 20px auto; }
+        .clan-column { background: rgba(15, 18, 22, 0.95); height: 750px; display: flex; flex-direction: column; border: 1px solid #333; border-radius: 10px; border-top: 4px solid var(--gold); overflow: hidden; }
+        .column-header { padding: 18px; text-align: center; font-family: 'Cinzel'; font-size: 1.1rem; border-bottom: 1px solid #222; position: sticky; top: 0; background: #0f1216; z-index: 10; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .clan-mini-logo { width: 30px; height: 30px; object-fit: contain; }
 
         .scroll-area { overflow-y: auto; padding: 10px; flex-grow: 1; }
         .scroll-area::-webkit-scrollbar { width: 5px; }
         .scroll-area::-webkit-scrollbar-thumb { background: var(--gold); }
 
-        /* CP BOXES */
+        /* CP & MEMBERS */
         .cp-box { margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.3); border-radius: 6px; overflow: hidden; transition: 0.3s; }
-        .cp-box:hover { border-color: var(--gold); background: rgba(212, 175, 55, 0.05); }
+        .cp-box:hover { border-color: var(--gold); }
         .cp-btn { width: 100%; background: none; border: none; padding: 12px 15px; color: #fff; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-family: 'Open Sans'; font-weight: 600; }
         .points-tag { border: 1px solid var(--gold); padding: 2px 10px; border-radius: 4px; font-size: 0.8rem; color: var(--gold); }
 
-        .member-list { display: none; background: rgba(0,0,0,0.5); border-top: 1px solid #222; padding: 5px 0; }
+        .member-list { display: none; background: rgba(0,0,0,0.5); border-top: 1px solid #222; }
         .active > .member-list { display: block; }
-        .member-btn { width: 100%; background: none; border: none; padding: 10px 20px; color: #ccc; text-align: left; cursor: pointer; display: flex; justify-content: space-between; font-size: 0.85rem; align-items: center; }
-        .member-btn:hover { color: var(--gold); background: rgba(255,255,255,0.02); }
-
+        .member-btn { width: 100%; background: none; border: none; padding: 10px 20px; color: #ccc; text-align: left; cursor: pointer; display: flex; justify-content: space-between; font-size: 0.85rem; border-bottom: 1px solid rgba(255,255,255,0.03); }
+        
         .member-stats { display: none; background: #000; padding: 15px; border-top: 1px solid #333; }
         .active-member > .member-stats { display: block; }
 
-        /* STATS GRID WITH ICONS */
-        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
-        .stat-box { background: #15181c; padding: 8px; border: 1px solid #222; text-align: center; border-radius: 4px; display: flex; flex-direction: column; align-items: center; }
-        .boss-icon { width: 22px; height: 22px; margin-bottom: 4px; border: 1px solid #444; border-radius: 3px; }
-        .stat-val { font-size: 0.9rem; color: #fff; font-family: 'Cinzel'; }
+        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        .stat-box { background: #15181c; padding: 10px; border: 1px solid #222; text-align: center; border-radius: 4px; display: flex; flex-direction: column; align-items: center; }
+        .boss-icon { width: 24px; height: 24px; margin-bottom: 5px; border: 1px solid #444; border-radius: 3px; }
+        .stat-val { font-size: 0.9rem; color: #fff; font-family: 'Cinzel'; font-weight: bold; }
 
-        /* TABLES & SECTION 2 */
-        .section-flex { display: flex; flex-wrap: wrap; gap: 30px; justify-content: center; max-width: 1400px; margin: 0 auto; }
-        .epic-table-container { background: rgba(10, 12, 15, 0.9); border: 2px solid var(--gold); border-radius: 10px; padding: 15px; flex: 1; min-width: 300px; }
-        .epic-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-        .epic-table th { border-bottom: 2px solid var(--gold); color: var(--gold); font-family: 'Cinzel'; padding: 10px; text-align: left; }
-        .epic-table td { padding: 8px 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+        /* LOOT HISTORY MENU */
+        .loot-section { background: rgba(212, 175, 55, 0.05); border-top: 1px solid #333; padding: 10px; }
+        .loot-toggle-btn { width: 100%; background: none; border: 1px solid var(--gold); color: var(--gold); padding: 8px; font-family: 'Cinzel'; cursor: pointer; border-radius: 4px; font-size: 0.75rem; transition: 0.3s; }
+        .loot-toggle-btn:hover { background: var(--gold); color: #000; }
+        .loot-content { display: none; padding: 15px; color: #aaa; font-size: 0.8rem; line-height: 1.5; border-left: 2px solid var(--gold); margin-top: 10px; background: rgba(0,0,0,0.2); }
 
-        .rules-container { background: rgba(15, 18, 22, 0.95); border-left: 4px solid var(--gold); border-radius: 8px; padding: 20px; flex: 1.5; min-width: 320px; font-size: 0.85rem; line-height: 1.6; }
+        /* MARKETPLACE SECTION */
+        .market-section { background: rgba(0,0,0,0.7); border-top: 2px solid var(--gold); padding: 60px 20px; }
+        .market-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 40px; max-width: 1400px; margin: 0 auto; }
+        .market-title { font-family: 'Cinzel Decorative'; color: var(--gold); text-align: center; margin-bottom: 30px; font-size: 1.8rem; grid-column: span 2; }
+        
+        .epic-table-container { background: rgba(15, 18, 22, 0.95); border: 1px solid #333; border-radius: 10px; padding: 20px; }
+        .epic-table { width: 100%; border-collapse: collapse; }
+        .epic-table th { color: var(--gold); font-family: 'Cinzel'; border-bottom: 2px solid var(--gold); padding: 12px; text-align: left; }
+        .epic-table td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); color: #ddd; }
+        
+        .rules-box { background: rgba(15, 18, 22, 0.95); border-left: 4px solid var(--gold); padding: 30px; border-radius: 8px; }
+        .rules-box h3 { font-family: 'Cinzel'; color: var(--gold); margin-top: 0; font-size: 1.3rem; }
+        .rule-item { margin-bottom: 15px; display: flex; align-items: flex-start; gap: 10px; line-height: 1.6; }
         .highlight { color: var(--gold); font-weight: bold; }
 
-        @media (max-width: 900px) {
-            .main-wrapper { grid-template-columns: 1fr; }
-            .server-time { position: static; text-align: center; margin: 10px auto; display: table; }
+        @media (max-width: 1000px) {
+            .main-wrapper, .market-grid { grid-template-columns: 1fr; }
+            .market-title { grid-column: span 1; }
         }
     </style>
 </head>
@@ -108,23 +115,20 @@
         <button onclick="closeModal()" style="margin-top:20px; background:var(--gold); color:#000; border:none; padding:10px 30px; cursor:pointer; font-weight:bold; font-family:'Cinzel'; border-radius:4px;">CLOSE</button>
     </div>
 
-    <div class="page-section" id="section1">
+    <div class="page-section">
         <div class="server-time" id="clock">SERVER TIME: 00:00:00 UTC</div>
         
         <div class="top-header">
             <img src="https://i.ibb.co/6R9q5PGv/ALLIANCE-LOGO.png" class="ally-logo">
             <span class="ally-title">BROKEN MIRROR ALLIANCE</span>
-            
             <div class="leaders-row">
                 <div class="leader-card" onclick="openCaller('NIKLAUS', 'ALLY LEADER', 'https://i.ibb.co/5X3NDQFR/niklaus.png')">
                     <div class="img-frame"><img src="https://i.ibb.co/5X3NDQFR/niklaus.png" class="leader-img"></div>
                     <span class="leader-name">NIKLAUS</span>
-                    <span class="leader-role">ALLY LEADER</span>
                 </div>
                 <div class="leader-card" onclick="openCaller('TSAKNORRIS', 'SHOT CALLER', 'https://i.ibb.co/xSVgzBPB/tsaknorris.png')">
                     <div class="img-frame"><img src="https://i.ibb.co/xSVgzBPB/tsaknorris.png" class="leader-img"></div>
                     <span class="leader-name">TSAKNORRIS</span>
-                    <span class="leader-role">SHOT CALLER</span>
                 </div>
             </div>
         </div>
@@ -149,46 +153,45 @@
         </div>
     </div>
 
-    <div class="page-section" id="section2" style="background: rgba(0,0,0,0.6);">
-        <h2 style="font-family:'Cinzel Decorative'; color:var(--gold); text-align:center; margin:30px 0;">MARKETPLACE & PROTOCOL</h2>
-        <div class="section-flex">
+    <div class="market-section">
+        <div class="market-grid">
+            <h2 class="market-title">MARKETPLACE & PROTOCOL</h2>
             <div class="epic-table-container">
                 <table class="epic-table">
                     <thead><tr><th>JEWEL</th><th>PRICE</th></tr></thead>
                     <tbody id="prices-table-body"></tbody>
                 </table>
             </div>
-            <div class="rules-container">
-                <h3 style="font-family:'Cinzel'; color:var(--gold);">POINTS SYSTEM</h3>
-                <p>» <span class="highlight">Attendance:</span> Mid Epics = 1 | Baium = 2 | Valakas = 3</p>
-                <p>» <span class="highlight">Priority:</span> Archer CPs (Baium) | Mage CPs (Valakas)</p>
-                <p>» <span class="highlight">Rules:</span> 3-week cooldown for mid epics.</p>
+            <div class="rules-box">
+                <h3>ALLIANCE POLICIES</h3>
+                <div class="rule-item"><span>» <span class="highlight">Attendance:</span> Mid Epics = 1pt | Baium = 2pts | Valakas/Antharas = 3pts.</span></div>
+                <div class="rule-item"><span>» <span class="highlight">Jewel Priority:</span> <span style="color:var(--noldor-sky)">Archer CPs</span> get priority on Baium. <span style="color:var(--krim-red)">Mage CPs</span> get priority on Valakas.</span></div>
+                <div class="rule-item"><span>» <span class="highlight">Cooldown:</span> 3-week restriction for members who received a mid-level jewel.</span></div>
+                <div class="rule-item"><span>» <span class="highlight">Points Deduction:</span> When a jewel is taken, the CP's total points are reduced by the marketplace price.</span></div>
             </div>
         </div>
     </div>
 
     <script>
-        // Σταθερά Links για εικονίδια Bosses (L2Central/Github)
         const bossConfig = {
             "VAL": { name: "Valakas", img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/necklace-valakas.png?raw=true" },
             "ANT": { name: "Antharas", img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/earring-antharas.png?raw=true" },
             "BAI": { name: "Baium", img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/ring-of-baium.png?raw=true" },
             "FRI": { name: "Frintezza", img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/frintezza-necklace.png?raw=true" },
             "ZAK": { name: "Zaken", img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/zaken-earring.png?raw=true" },
-            "ORF": { name: "Orfen", img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/earring-orfen.png?raw=true" },
-            "AQ":  { name: "Queen Ant", img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/ring-of-queen-ant.png?raw=true" },
-            "CORE":{ name: "Core", img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/ring-of-core.png?raw=true" },
-            "SIEGE":{ name: "Siege", img: "https://i.ibb.co/3ykfLpC/Icon-Skill-0344.jpg" }
+            "AQ":  { name: "Queen Ant", img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/ring-of-queen-ant.png?raw=true" }
         };
 
         const bosses = Object.keys(bossConfig);
-        const noldorNames = ["Noldor Clan", "Noldor Archer", "Noldor Archer 2", "Noldor Dummy", "Noldor Tank", "Kriminalides CP", "Outlaw CP", "Ronin CP", "Brazilians CP", "Brazilians 2 CP", "I am Groot CP"];
-        const krimNames = ["Hattrick CP", "55 Room CP", "Legion CP", "Criminal Record CP", "Avalanche CP", "Gankly Crew CP", "Furious Wolves CP", "Animals CP", "Dracaris CP", "Sinaloa CP", "Knockout CP", "VaBank CP"];
+        const noldorNames = ["Noldor Clan", "Noldor Archer", "Noldor Archer 2", "Outlaw CP", "Ronin CP", "Brazilians CP"];
+        const krimNames = ["Hattrick CP", "55 Room CP", "Legion CP", "Criminal Record CP", "Avalanche CP", "Gankly Crew CP", "Animals CP"];
 
         const pricesData = [
-            { name: "Core Ring", pts: 25, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/ring-of-core.png?raw=true" },
             { name: "Queen Ant Ring", pts: 150, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/ring-of-queen-ant.png?raw=true" },
+            { name: "Zaken Earring", pts: 175, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/zaken-earring.png?raw=true" },
+            { name: "Frintezza Neck", pts: 225, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/frintezza-necklace.png?raw=true" },
             { name: "Baium Ring", pts: 950, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/ring-of-baium.png?raw=true" },
+            { name: "Antharas Earring", pts: 1100, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/earring-antharas.png?raw=true" },
             { name: "Valakas Necklace", pts: 3100, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/necklace-valakas.png?raw=true" }
         ];
 
@@ -204,9 +207,16 @@
             }).join('');
         }
 
+        function toggleLoot(id) {
+            const el = document.getElementById('loot-' + id);
+            el.style.display = (el.style.display === 'block') ? 'none' : 'block';
+        }
+
         function renderLists() {
             const render = (names, elId) => {
-                document.getElementById(elId).innerHTML = names.map((name, index) => `
+                document.getElementById(elId).innerHTML = names.map(name => {
+                    const safeId = name.replace(/[^a-z0-9]/gi, '');
+                    return `
                     <div class="cp-box" data-name="${name.toLowerCase()}">
                         <button class="cp-btn" onclick="this.parentElement.classList.toggle('active')">
                             <span>${name}</span>
@@ -217,25 +227,27 @@
                                 <button class="member-btn" onclick="this.parentElement.classList.toggle('active-member')">
                                     <span>👑 CP Leader</span><small>▼</small>
                                 </button>
-                                <div class="member-stats">
-                                    <div class="stat-grid">${getStatsHtml()}</div>
-                                </div>
+                                <div class="member-stats"><div class="stat-grid">${getStatsHtml()}</div></div>
                             </div>
                             <div class="member-item">
                                 <button class="member-btn" onclick="this.parentElement.classList.toggle('active-member')">
                                     <span>Member A</span><small>▼</small>
                                 </button>
-                                <div class="member-stats">
-                                    <div class="stat-grid">${getStatsHtml()}</div>
+                                <div class="member-stats"><div class="stat-grid">${getStatsHtml()}</div></div>
+                            </div>
+                            <div class="loot-section">
+                                <button class="loot-toggle-btn" onclick="toggleLoot('${safeId}')">VIEW CP LOOT HISTORY</button>
+                                <div class="loot-content" id="loot-${safeId}">
+                                    • No jewels recorded yet for this CP.
                                 </div>
                             </div>
                         </div>
                     </div>
-                `).join('');
+                `}).join('');
             };
             render(noldorNames, 'noldor-list');
             render(krimNames, 'krim-list');
-            document.getElementById('prices-table-body').innerHTML = pricesData.map(p => `<tr><td><img src="${p.img}" style="width:20px; vertical-align:middle; margin-right:10px;"> ${p.name}</td><td style="color:var(--gold); font-weight:bold;">${p.pts}</td></tr>`).join('');
+            document.getElementById('prices-table-body').innerHTML = pricesData.map(p => `<tr><td><img src="${p.img}" style="width:25px; vertical-align:middle; margin-right:10px;"> ${p.name}</td><td style="color:var(--gold); font-weight:bold;">${p.pts}</td></tr>`).join('');
         }
 
         function filterCPs() {
