@@ -18,56 +18,63 @@
         }
         body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-overlay); z-index: -1; }
 
-        /* HEADER */
+        /* HEADER & LEADERS */
         .server-time { position: absolute; top: 20px; right: 40px; color: var(--gold); font-family: 'Cinzel'; border: 1px solid var(--gold); padding: 5px 15px; border-radius: 5px; background: rgba(0,0,0,0.5); font-size: 0.8rem; z-index: 100; }
         .top-header { text-align: center; padding-top: 30px; margin-bottom: 20px; }
-        .ally-logo { width: 140px; filter: drop-shadow(0 0 15px var(--gold)); margin-bottom: 10px; }
+        .ally-logo { width: 120px; filter: drop-shadow(0 0 15px var(--gold)); margin-bottom: 10px; }
         .ally-title { font-family: 'Cinzel Decorative', cursive; font-size: 2.2rem; color: var(--gold); display: block; letter-spacing: 2px; }
+
+        .leaders-row { display: flex; justify-content: center; gap: 50px; margin-top: 30px; }
+        .leader-card { text-align: center; width: 130px; }
+        .img-frame { width: 80px; height: 80px; margin: 0 auto; background: #000; border: 2px solid var(--gold); border-radius: 50%; overflow: hidden; box-shadow: 0 0 15px rgba(212,175,55,0.2); }
+        .leader-img { width: 100%; height: 100%; object-fit: contain; }
+        .leader-name { color: var(--gold); font-size: 0.9rem; font-family: 'Cinzel'; display: block; margin-top: 10px; font-weight: bold; }
+        .leader-role { color: #888; font-size: 0.65rem; text-transform: uppercase; display: block; }
 
         /* SEARCH BAR */
         .search-container { max-width: 500px; margin: 30px auto; padding: 0 20px; }
-        .search-input { width: 100%; padding: 12px 25px; background: rgba(0,0,0,0.6); border: 1px solid var(--gold); border-radius: 25px; color: #fff; outline: none; font-family: 'Open Sans'; transition: 0.3s; }
+        .search-input { width: 100%; padding: 12px 25px; background: rgba(0,0,0,0.6); border: 1px solid var(--gold); border-radius: 25px; color: #fff; outline: none; font-family: 'Open Sans'; }
 
         /* DASHBOARD GRID */
         .main-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; max-width: 1500px; margin: 0 auto; padding: 0 20px; }
         .clan-column { background: rgba(15, 18, 22, 0.95); height: 700px; display: flex; flex-direction: column; border: 1px solid #333; border-radius: 10px; border-top: 4px solid var(--gold); }
-        .column-header { padding: 20px; text-align: center; font-family: 'Cinzel'; font-size: 1.2rem; border-bottom: 1px solid #222; display: flex; align-items: center; justify-content: center; gap: 12px; background: rgba(0,0,0,0.4); }
-        .scroll-area { overflow-y: auto; padding: 15px; flex-grow: 1; scrollbar-width: thin; scrollbar-color: var(--gold) #111; }
+        .column-header { padding: 20px; text-align: center; font-family: 'Cinzel'; font-size: 1.2rem; border-bottom: 1px solid #222; background: rgba(0,0,0,0.4); }
+        .scroll-area { overflow-y: auto; padding: 15px; flex-grow: 1; }
 
         /* CP BOXES */
         .cp-box { margin-bottom: 12px; border: 1px solid rgba(212, 175, 55, 0.1); background: rgba(255, 255, 255, 0.02); border-radius: 8px; transition: all 0.3s ease; overflow: hidden; }
-        .cp-box:hover { border-color: rgba(212, 175, 55, 0.5); background: rgba(212, 175, 55, 0.05); transform: translateX(5px); }
-        .cp-btn { width: 100%; background: none; border: none; padding: 16px; color: #fff; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-family: 'Open Sans'; font-weight: 700; text-transform: uppercase; }
+        .cp-box:hover { border-color: rgba(212, 175, 55, 0.5); transform: translateX(5px); }
+        .cp-btn { width: 100%; background: none; border: none; padding: 16px; color: #fff; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-family: 'Open Sans'; font-weight: 700; }
         .cp-noldor { color: var(--noldor-sky); }
         .cp-krim { color: var(--krim-red); }
         .points-tag { font-size: 0.75rem; border: 1px solid rgba(212, 175, 55, 0.4); padding: 3px 10px; border-radius: 4px; font-family: 'Cinzel'; color: var(--gold); }
 
-        /* CP DETAILS (ROSTER & ATTENDANCE) */
+        /* CP DETAILS */
         .cp-details { display: none; background: rgba(0,0,0,0.6); border-top: 1px solid #222; padding: 15px; }
         .active > .cp-details { display: block; }
-        
-        .roster-title { font-family: 'Cinzel'; color: var(--gold); font-size: 0.75rem; margin-bottom: 10px; border-bottom: 1px solid rgba(212,175,55,0.2); padding-bottom: 5px; display: block; }
-        .roster-list { font-size: 0.8rem; color: #bbb; line-height: 1.6; margin-bottom: 20px; }
-        .roster-list span { display: block; }
+        .roster-title { font-family: 'Cinzel'; color: var(--gold); font-size: 0.75rem; border-bottom: 1px solid rgba(212,175,55,0.2); padding-bottom: 5px; display: block; margin-bottom: 10px; }
+        .roster-list { font-size: 0.8rem; color: #bbb; margin-bottom: 15px; }
 
-        .attendance-section { background: #000; border: 1px solid #222; padding: 12px; border-radius: 6px; }
-        .att-label { font-family: 'Cinzel'; font-size: 0.7rem; color: #888; margin-bottom: 10px; display: block; text-align: center; }
-        
+        .attendance-section { background: #000; border: 1px solid #222; padding: 12px; border-radius: 6px; margin-bottom: 10px; }
         .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
         .stat-box { background: #15181c; padding: 8px; border: 1px solid #222; text-align: center; border-radius: 4px; }
-        .boss-icon { width: 20px; height: 20px; margin-bottom: 4px; }
-        .stat-val { font-size: 0.75rem; color: #fff; font-family: 'Cinzel'; font-weight: bold; display: block; }
+        .boss-icon { width: 20px; height: 20px; }
+        .stat-val { font-size: 0.75rem; color: #fff; font-family: 'Cinzel'; display: block; }
 
-        /* INFO SECTION */
-        .info-section { background: rgba(10, 12, 15, 0.98); border-top: 3px solid var(--gold); padding: 60px 20px; margin-top: 60px; }
+        .loot-history-btn { width: 100%; background: rgba(212,175,55,0.1); border: 1px solid rgba(212,175,55,0.2); color: var(--gold); padding: 8px; font-family: 'Cinzel'; font-size: 0.65rem; cursor: pointer; border-radius: 4px; transition: 0.3s; }
+        .loot-history-btn:hover { background: rgba(212,175,55,0.2); }
+
+        /* LINK SECTION AT THE BOTTOM */
+        .links-section { padding: 60px 20px; text-align: center; background: rgba(0,0,0,0.5); border-top: 1px solid #222; }
+        .link-buttons-container { display: flex; justify-content: center; gap: 20px; margin-top: 20px; }
+        .nav-btn { background: #000; border: 1px solid var(--gold); color: var(--gold); padding: 12px 25px; font-family: 'Cinzel'; text-decoration: none; border-radius: 4px; transition: 0.3s; font-size: 0.8rem; }
+        .nav-btn:hover { background: var(--gold); color: #000; box-shadow: 0 0 15px var(--gold); }
+
+        /* INFO (MARKET/POLICIES) */
+        .info-section { background: rgba(10, 12, 15, 0.98); border-top: 3px solid var(--gold); padding: 60px 20px; }
         .info-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 50px; max-width: 1400px; margin: 0 auto; }
         .info-card { background: rgba(15, 18, 22, 0.8); border: 1px solid #333; border-radius: 12px; padding: 35px; }
-        .info-card h3 { font-family: 'Cinzel'; color: var(--gold); font-size: 1.5rem; border-bottom: 1px solid rgba(212,175,55,0.3); padding-bottom: 10px; }
-        .market-table { width: 100%; border-collapse: collapse; }
-        .market-table td { padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
-
-        /* SAFE ZONE */
-        .extra-section { background: rgba(0,0,0,0.4); padding: 100px 20px; text-align: center; border-top: 1px solid #222; }
+        .info-card h3 { font-family: 'Cinzel'; color: var(--gold); border-bottom: 1px solid rgba(212,175,55,0.3); padding-bottom: 10px; }
     </style>
 </head>
 <body>
@@ -77,6 +84,19 @@
     <div class="top-header">
         <img src="https://i.ibb.co/6R9q5PGv/ALLIANCE-LOGO.png" class="ally-logo">
         <span class="ally-title">BROKEN MIRROR ALLIANCE</span>
+        
+        <div class="leaders-row">
+            <div class="leader-card">
+                <div class="img-frame"><img src="https://i.ibb.co/5X3NDQFR/niklaus.png" class="leader-img"></div>
+                <span class="leader-name">NIKLAUS</span>
+                <span class="leader-role">ALLY LEADER</span>
+            </div>
+            <div class="leader-card">
+                <div class="img-frame"><img src="https://i.ibb.co/xSVgzBPB/tsaknorris.png" class="leader-img"></div>
+                <span class="leader-name">TSAKNORRIS</span>
+                <span class="leader-role">SHOT CALLER</span>
+            </div>
+        </div>
     </div>
 
     <div class="search-container">
@@ -98,22 +118,26 @@
         <div class="info-grid">
             <div class="info-card">
                 <h3>MARKETPLACE</h3>
-                <table class="market-table" id="market-table"></table>
+                <table id="market-table" style="width:100%; border-collapse:collapse;"></table>
             </div>
             <div class="info-card">
                 <h3>ALLIANCE POLICIES</h3>
                 <div style="color:#ccc; font-size: 0.9rem; line-height:1.8;">
-                    <p><b style="color:var(--gold);">JEWEL PRIORITY:</b><br>
+                    <b style="color:var(--gold);">JEWEL PRIORITY:</b><br>
                     • Archer CPs: Baium Ring<br>
                     • Mage CPs: Valakas Necklace<br>
-                    • Stopper Party: Antharas Earring</p>
+                    • Stopper Party: Antharas Earring
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="safe-zone-for-new-things" class="extra-section">
-        <div style="color:#444; letter-spacing:5px;">--- ALLIANCE STRATEGY ZONE ---</div>
+    <div class="links-section">
+        <div style="font-family:'Cinzel'; color:#555; letter-spacing:3px;">ALLIANCE NAVIGATION</div>
+        <div class="link-buttons-container">
+            <a href="#" class="nav-btn">RAID CALENDAR</a>
+            <a href="#" class="nav-btn">RECRUITMENT FORM</a>
+        </div>
     </div>
 
     <script>
@@ -132,8 +156,7 @@
         const krimNames = ["Hattrick CP", "55 Room CP", "Legion CP", "Criminal Record CP", "Avalanche CP", "Gankly Crew CP", "Animals CP", "Mafia CP", "NoMercy CP", "Chaos CP", "Krim Scouts"];
 
         function renderLists() {
-            const renderClan = (names, clanClass) => names.map((name, index) => {
-                return `
+            const renderClan = (names, clanClass) => names.map((name, index) => `
                 <div class="cp-box" data-name="${name.toLowerCase()}">
                     <button class="cp-btn" onclick="this.parentElement.classList.toggle('active')">
                         <span class="${clanClass}">${name}</span>
@@ -141,44 +164,30 @@
                     </button>
                     <div class="cp-details">
                         <span class="roster-title">👑 CP LEADER & ROSTER</span>
-                        <div class="roster-list">
-                            <span style="color:#fff">👑 LeaderName</span>
-                            <span>Member 2, Member 3, Member 4, Member 5</span>
-                        </div>
+                        <div class="roster-list">👑 LeaderName | Members: Member1, Member2, Member3, Member4</div>
+                        
                         <div class="attendance-section">
-                            <span class="att-label">CP TOTAL ATTENDANCE</span>
                             <div class="stat-grid">
-                                ${Object.keys(bossIcons).map(key => `
-                                    <div class="stat-box">
-                                        <img src="${bossIcons[key]}" class="boss-icon">
-                                        <span class="stat-val">0</span>
-                                    </div>
-                                `).join('')}
+                                ${Object.keys(bossIcons).map(k => `<div class="stat-box"><img src="${bossIcons[k]}" class="boss-icon"><span class="stat-val">0</span></div>`).join('')}
                             </div>
                         </div>
+                        <button class="loot-history-btn" onclick="alert('Loot History coming soon...')">VIEW LOOTING HISTORY</button>
                     </div>
-                </div>`;
-            }).join('');
+                </div>`).join('');
+
             document.getElementById('noldor-list').innerHTML = renderClan(noldorNames, "cp-noldor");
             document.getElementById('krim-list').innerHTML = renderClan(krimNames, "cp-krim");
-            
-            // Market Table
+
             const marketData = [
                 {n: "Valakas Necklace", p: 3100, i: bossIcons.VAL},
                 {n: "Antharas Earring", p: 1100, i: bossIcons.ANT},
-                {n: "Baium Ring", p: 950, i: bossIcons.BAI},
-                {n: "Frintezza Neck", p: 225, i: bossIcons.FRI},
-                {n: "Zaken Earring", p: 175, i: bossIcons.ZAK},
-                {n: "Queen Ant Ring", p: 150, i: bossIcons.AQ},
-                {n: "Orfen Earring", p: 75, i: bossIcons.ORF},
-                {n: "Core Ring", p: 75, i: bossIcons.CORE}
+                {n: "Baium Ring", p: 950, i: bossIcons.BAI}
             ];
             document.getElementById('market-table').innerHTML = marketData.map(d => `
-                <tr>
-                    <td><img src="${d.i}" style="width:22px; vertical-align:middle; margin-right:10px;"> ${d.n}</td>
-                    <td style="color:var(--gold); text-align:right; font-weight:bold;">${d.p} PTS</td>
-                </tr>
-            `).join('');
+                <tr style="border-bottom: 1px solid #222;">
+                    <td style="padding:10px;"><img src="${d.i}" style="width:20px; vertical-align:middle; margin-right:10px;"> ${d.n}</td>
+                    <td style="text-align:right; color:var(--gold); font-weight:bold;">${d.p} PTS</td>
+                </tr>`).join('');
         }
 
         function filterCPs() {
