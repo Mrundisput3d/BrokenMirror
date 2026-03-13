@@ -61,7 +61,6 @@
 
         /* CP & MEMBERS */
         .cp-box { margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.3); border-radius: 6px; overflow: hidden; transition: 0.3s; }
-        .cp-box:hover { border-color: var(--gold); }
         .cp-btn { width: 100%; background: none; border: none; padding: 12px 15px; color: #fff; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-family: 'Open Sans'; font-weight: 600; }
         .points-tag { border: 1px solid var(--gold); padding: 2px 10px; border-radius: 4px; font-size: 0.8rem; color: var(--gold); }
 
@@ -72,7 +71,7 @@
         .member-stats { display: none; background: #000; padding: 15px; border-top: 1px solid #333; }
         .active-member > .member-stats { display: block; }
 
-        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
         .stat-box { background: #15181c; padding: 10px; border: 1px solid #222; text-align: center; border-radius: 4px; display: flex; flex-direction: column; align-items: center; }
         .boss-icon { width: 24px; height: 24px; margin-bottom: 5px; border: 1px solid #444; border-radius: 3px; }
         .stat-val { font-size: 0.9rem; color: #fff; font-family: 'Cinzel'; font-weight: bold; }
@@ -101,6 +100,7 @@
         @media (max-width: 1000px) {
             .main-wrapper, .market-grid { grid-template-columns: 1fr; }
             .market-title { grid-column: span 1; }
+            .stat-grid { grid-template-columns: repeat(3, 1fr); }
         }
     </style>
 </head>
@@ -179,7 +179,8 @@
             "BAI": { name: "Baium", img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/ring-of-baium.png?raw=true" },
             "FRI": { name: "Frintezza", img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/frintezza-necklace.png?raw=true" },
             "ZAK": { name: "Zaken", img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/zaken-earring.png?raw=true" },
-            "AQ":  { name: "Queen Ant", img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/ring-of-queen-ant.png?raw=true" }
+            "ORF": { name: "Orfen", img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/earring-orfen.png?raw=true" },
+            "AQ":  { name: "Queen Ant", img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/ring-of-queen-ant.png?raw=true" },
             "SIEGE": { name: "Siege", img: "https://l2central.info/mw/images/d/df/Icon_Skill_0344.jpg" }
         };
 
@@ -188,6 +189,7 @@
         const krimNames = ["Hattrick CP", "55 Room CP", "Legion CP", "Criminal Record CP", "Avalanche CP", "Gankly Crew CP", "Animals CP"];
 
         const pricesData = [
+            { name: "Orfen Earring", pts: 75, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/earring-orfen.png?raw=true" },
             { name: "Queen Ant Ring", pts: 150, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/ring-of-queen-ant.png?raw=true" },
             { name: "Zaken Earring", pts: 175, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/zaken-earring.png?raw=true" },
             { name: "Frintezza Neck", pts: 225, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/frintezza-necklace.png?raw=true" },
