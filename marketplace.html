@@ -1,52 +1,88 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="el">
 <head>
     <meta charset="UTF-8">
-    <title>BMA | Marketplace & Protocol</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Broken Mirror Alliance | Marketplace</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        :root { --gold: #d4af37; --bg: rgba(10, 12, 15, 0.97); }
-        body { font-family: 'Open Sans', sans-serif; background: #0a0c0f url('https://i.ibb.co/1GmpSyxZ/BACKGROUND.jpg') no-repeat center center fixed; background-size: cover; color: #eee; padding: 40px; margin: 0; }
-        body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: -1; }
-        .container { max-width: 1100px; margin: 0 auto; }
-        .back-btn { color: var(--gold); text-decoration: none; font-family: 'Cinzel'; border: 1px solid var(--gold); padding: 5px 15px; border-radius: 5px; }
-        .grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 40px; margin-top: 30px; }
-        .card { background: rgba(0,0,0,0.6); border: 2px solid var(--gold); border-radius: 10px; padding: 20px; }
-        .epic-table { width: 100%; border-collapse: collapse; }
-        .epic-table td { padding: 12px; border-bottom: 1px solid #222; }
-        .mini-icon { width: 24px; vertical-align: middle; margin-right: 10px; }
-        .protocol { background: rgba(15,18,22,0.95); border-left: 4px solid var(--gold); padding: 30px; border-radius: 5px; line-height: 1.8; }
-        h2 { font-family: 'Cinzel'; color: var(--gold); border-bottom: 1px solid #333; padding-bottom: 10px; }
+        :root {
+            --gold: #d4af37;
+            --bg-overlay: rgba(10, 12, 15, 0.96); 
+        }
+        body { 
+            font-family: 'Open Sans', sans-serif; 
+            background: #0a0c0f url('https://i.ibb.co/1GmpSyxZ/BACKGROUND.jpg') no-repeat center center fixed; 
+            background-size: cover; color: #eee; margin: 0; padding: 0;
+        }
+        body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-overlay); z-index: -1; }
+
+        .top-header { text-align: center; padding-top: 40px; }
+        .ally-logo { width: 80px; filter: drop-shadow(0 0 15px var(--gold)); }
+        .ally-title { font-family: 'Cinzel Decorative', cursive; font-size: 1.5rem; color: var(--gold); display: block; margin-bottom: 20px;}
+
+        /* NAVIGATION */
+        .main-nav { display: flex; justify-content: center; gap: 10px; margin-bottom: 40px; }
+        .nav-btn { background: rgba(212, 175, 55, 0.1); border: 1px solid var(--gold); color: var(--gold); padding: 8px 15px; font-family: 'Cinzel'; cursor: pointer; transition: 0.3s; font-size: 0.75rem; text-decoration: none; border-radius: 4px;}
+        .nav-btn:hover, .nav-btn.active { background: var(--gold); color: #000; }
+
+        /* MARKET TABLE */
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        .market-card { background: rgba(15, 18, 22, 0.9); border: 1px solid #333; border-top: 4px solid var(--gold); border-radius: 12px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .market-card h2 { font-family: 'Cinzel'; color: var(--gold); text-align: center; margin-top: 0; border-bottom: 1px solid rgba(212,175,55,0.2); padding-bottom: 15px; }
+        
+        .market-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .market-table tr { transition: 0.2s; }
+        .market-table tr:hover { background: rgba(255,255,255,0.03); }
+        .market-table td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 1rem; }
+        .boss-icon { width: 32px; height: 32px; vertical-align: middle; margin-right: 15px; border: 1px solid #444; border-radius: 4px; }
+        .price-tag { color: var(--gold); font-family: 'Cinzel'; font-weight: bold; text-align: right; font-size: 1.1rem; }
+        
+        @media (max-width: 600px) {
+            .market-table td { font-size: 0.85rem; padding: 10px 5px; }
+            .price-tag { font-size: 0.9rem; }
+        }
     </style>
 </head>
 <body>
+
+    <div class="top-header">
+        <img src="https://i.ibb.co/6R9q5PGv/ALLIANCE-LOGO.png" class="ally-logo">
+        <span class="ally-title">ALLIANCE MARKETPLACE</span>
+        
+        <nav class="main-nav">
+            <a href="index.html" class="nav-btn">DASHBOARD</a>
+            <a href="marketplace.html" class="nav-btn active">MARKETPLACE</a>
+            <a href="history.html" class="nav-btn">HISTORY</a>
+        </nav>
+    </div>
+
     <div class="container">
-        <a href="index.html" class="back-btn">← BACK TO ROSTER</a>
-        <h1 style="font-family:'Cinzel'; color:var(--gold); text-align:center;">MARKETPLACE & PROTOCOL</h1>
-        <div class="grid">
-            <div class="card">
-                <table class="epic-table" id="jewel-list"></table>
-            </div>
-            <div class="protocol">
-                <h2>ALLIANCE PROTOCOL</h2>
-                <p>• <b>Attendance Points:</b><br>
-                   - Mid-Low Epics: 1 Point<br>
-                   - Major Epics: 2 Points<br>
-                   - Grand Epics & Sieges: 3 Points</p>
-                <p>• <b>Priority:</b> Distribution based on class synergy. Archer CPs priority on Baium, Mage CPs on Valakas.</p>
-                <p>• <b>Conduct:</b> Penalty points apply for failing to follow Shotcaller's instructions during combat.</p>
-            </div>
+        <div class="market-card">
+            <h2>EPIC JEWELRY PRICES</h2>
+            <table class="market-table" id="market-content">
+                </table>
         </div>
     </div>
+
     <script>
-        const jewels = [
-            { name: "Valakas Necklace", pts: 3100, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/necklace-valakas.png?raw=true" },
-            { name: "Antharas Earring", pts: 2800, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/earring-antharas.png?raw=true" },
-            { name: "Ring of Baium", pts: 950, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/ring-of-baium.png?raw=true" },
-            { name: "Orfen Earring", pts: 35, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/earring-orfen.png?raw=true" },
-            { name: "Ring of Core", pts: 25, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/ring-of-core.png?raw=true" }
+        const prices = [
+            {n:"Valakas Necklace", p:3100, i:"https://i.ibb.co/84gZPVRP/necklace-valakas.png"},
+            {n:"Antharas Earring", p:1100, i:"https://i.ibb.co/rfqvc6mv/earring-antharas.png"},
+            {n:"Baium Ring", p:950, i:"https://i.ibb.co/XrZkv67h/ring-of-baium.png"},
+            {n:"Zaken Earring", p:175, i:"https://i.ibb.co/spkC6Gzz/zaken-earring.png"},
+            {n:"Frintezza Necklace", p:225, i:"https://i.ibb.co/gF4YKGTM/frintezza-necklace.png"},
+            {n:"Queen Ant Ring", p:150, i:"https://i.ibb.co/rKRtZmBG/ring-of-queen-ant.png"},
+            {n:"Orfen Earring", p:75, i:"https://i.ibb.co/j9dDnXwH/earring-orfen.png"},
+            {n:"Ring of Core", p:25, i:"https://i.ibb.co/ksv37fNZ/ring-of-.png"}
         ];
-        document.getElementById('jewel-list').innerHTML = jewels.map(j => `<tr><td><img src="${j.img}" class="mini-icon"> ${j.name}</td><td style="text-align:right; color:var(--gold); font-weight:bold;">${j.pts}</td></tr>`).join('');
+
+        document.getElementById('market-content').innerHTML = prices.map(item => `
+            <tr>
+                <td><img src="${item.i}" class="boss-icon"> ${item.n}</td>
+                <td class="price-tag">${item.p} PTS</td>
+            </tr>
+        `).join('');
     </script>
 </body>
 </html>
