@@ -19,22 +19,30 @@
         }
         body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-overlay); z-index: -1; }
 
+        /* SEARCH BAR */
+        .search-container { max-width: 600px; margin: 20px auto; padding: 0 20px; }
+        .search-input { 
+            width: 100%; padding: 12px 20px; background: rgba(0,0,0,0.7); border: 1px solid var(--gold); 
+            border-radius: 25px; color: #fff; font-family: 'Open Sans'; outline: none; transition: 0.3s;
+            box-shadow: 0 0 10px rgba(212,175,55,0.1);
+        }
+        .search-input:focus { box-shadow: 0 0 20px rgba(212,175,55,0.3); background: rgba(0,0,0,0.9); }
+
         /* CALLER MODAL */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9998; backdrop-filter: blur(5px); }
         #caller-modal {
             display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 420px; background: #0f1216; border: 2px solid var(--gold); border-radius: 15px;
+            width: 90%; max-width: 420px; background: #0f1216; border: 2px solid var(--gold); border-radius: 15px;
             padding: 30px; z-index: 9999; box-shadow: 0 0 50px #000; text-align: center;
         }
 
         .page-section { min-height: 100vh; padding: 20px; box-sizing: border-box; position: relative; border-bottom: 1px solid rgba(212,175,55,0.1); }
-        .server-time { position: absolute; top: 20px; right: 40px; color: var(--gold); font-family: 'Cinzel'; border: 1px solid var(--gold); padding: 5px 15px; border-radius: 5px; background: rgba(0,0,0,0.5); font-size: 0.8rem; }
+        .server-time { position: absolute; top: 20px; right: 40px; color: var(--gold); font-family: 'Cinzel'; border: 1px solid var(--gold); padding: 5px 15px; border-radius: 5px; background: rgba(0,0,0,0.5); font-size: 0.8rem; z-index: 100; }
 
         .top-header { text-align: center; margin-bottom: 30px; }
         .ally-logo { width: 140px; height: auto; filter: drop-shadow(0 0 15px var(--gold)); margin-bottom: 10px; }
         .ally-title { font-family: 'Cinzel Decorative', cursive; font-size: 2.2rem; color: var(--gold); display: block; letter-spacing: 2px; }
         
-        /* CALLERS ROW - FLEXIBLE FOR MORE */
         .leaders-row { display: flex; justify-content: center; flex-wrap: wrap; gap: 40px; margin-top: 30px; max-width: 1200px; margin-left: auto; margin-right: auto; }
         .leader-card { text-align: center; cursor: pointer; transition: 0.3s; min-width: 120px; }
         .leader-card:hover { transform: scale(1.1); }
@@ -45,8 +53,8 @@
 
         /* DASHBOARD */
         .main-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; max-width: 1600px; margin: 40px auto; }
-        .clan-column { background: rgba(15, 18, 22, 0.95); height: 750px; display: flex; flex-direction: column; border: 1px solid #333; border-radius: 10px; border-top: 4px solid var(--gold); }
-        .column-header { padding: 18px; text-align: center; font-family: 'Cinzel'; font-size: 1.1rem; border-bottom: 1px solid #222; display: flex; align-items: center; justify-content: center; gap: 12px; }
+        .clan-column { background: rgba(15, 18, 22, 0.95); height: 750px; display: flex; flex-direction: column; border: 1px solid #333; border-radius: 10px; border-top: 4px solid var(--gold); overflow: hidden; }
+        .column-header { padding: 18px; text-align: center; font-family: 'Cinzel'; font-size: 1.1rem; border-bottom: 1px solid #222; display: flex; align-items: center; justify-content: center; gap: 12px; position: sticky; top: 0; background: #0f1216; z-index: 5; }
         .clan-mini-logo { width: 35px; height: 35px; object-fit: contain; }
 
         .scroll-area { overflow-y: auto; padding: 10px; flex-grow: 1; }
@@ -55,8 +63,8 @@
 
         /* CP BOXES */
         .cp-box { margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.3); border-radius: 6px; overflow: hidden; transition: 0.3s; }
+        .cp-box:hover { border-color: var(--gold); background: rgba(212, 175, 55, 0.05); }
         
-        /* TOP 3 CP HIGHLIGHT */
         .top-cp { border: 1px solid var(--gold); background: rgba(212, 175, 55, 0.05); box-shadow: inset 0 0 10px rgba(212, 175, 55, 0.1); }
         .top-cp .points-tag { background: var(--gold); color: #000; }
 
@@ -66,7 +74,6 @@
         .member-list { display: none; background: rgba(0,0,0,0.5); border-top: 1px solid #222; padding: 5px 0; }
         .active > .member-list { display: block; }
 
-        /* MEMBERS MENU */
         .member-item { border-bottom: 1px solid rgba(255,255,255,0.03); }
         .member-btn { width: 100%; background: none; border: none; padding: 10px 20px; color: #ccc; text-align: left; cursor: pointer; display: flex; justify-content: space-between; font-size: 0.85rem; align-items: center; }
         .member-btn:hover { color: var(--gold); background: rgba(255,255,255,0.02); }
@@ -75,35 +82,40 @@
         .member-stats { display: none; background: #000; padding: 15px; border-top: 1px solid #333; }
         .active-member > .member-stats { display: block; }
 
-        /* STATS GRID */
         .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
         .stat-box { background: #15181c; padding: 8px; border: 1px solid #222; text-align: center; border-radius: 4px; }
         .stat-name { display: block; color: var(--gold); font-size: 0.55rem; font-weight: bold; text-transform: uppercase; margin-bottom: 2px; }
         .stat-val { font-size: 0.9rem; color: #fff; font-family: 'Cinzel'; }
 
-        /* LOOT SECTION */
         .loot-section { padding: 12px; background: rgba(212, 175, 55, 0.03); border-top: 1px solid #333; }
         .loot-toggle-btn { width: 100%; background: rgba(212,175,55,0.1); color: var(--gold); border: 1px solid var(--gold); padding: 8px; font-family: 'Cinzel'; cursor: pointer; border-radius: 4px; font-size: 0.75rem; transition: 0.3s; }
         .loot-toggle-btn:hover { background: var(--gold); color: #000; }
         .loot-content { display: none; margin-top: 10px; font-size: 0.8rem; color: #aaa; padding-left: 12px; border-left: 2px solid var(--gold); }
 
-        /* SECTION 2 & 3 STYLES */
         .section-flex { display: flex; flex-wrap: wrap; gap: 30px; justify-content: center; max-width: 1400px; margin: 0 auto; }
         .epic-table-container { background: rgba(10, 12, 15, 0.9); border: 2px solid var(--gold); border-radius: 10px; padding: 15px; flex: 1; min-width: 300px; }
         .epic-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
         .epic-table th { border-bottom: 2px solid var(--gold); color: var(--gold); font-family: 'Cinzel'; padding: 10px; text-align: left; }
         .epic-table td { padding: 8px 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
         .mini-icon { width: 22px; height: 22px; vertical-align: middle; margin-right: 10px; }
-        .rules-container { background: rgba(15, 18, 22, 0.95); border-left: 4px solid var(--gold); border-radius: 8px; padding: 20px; flex: 1.5; min-width: 400px; font-size: 0.85rem; line-height: 1.6; }
+        .rules-container { background: rgba(15, 18, 22, 0.95); border-left: 4px solid var(--gold); border-radius: 8px; padding: 20px; flex: 1.5; min-width: 320px; font-size: 0.85rem; line-height: 1.6; }
         .rules-container h3 { font-family: 'Cinzel'; color: var(--gold); margin-top: 0; border-bottom: 1px solid #333; padding-bottom: 10px; }
         .rule-item { margin-bottom: 8px; display: flex; gap: 10px; }
         .highlight { color: var(--gold); font-weight: bold; }
         .tab-container { max-width: 1200px; margin: 30px auto; background: rgba(15,18,22,0.9); border: 1px solid #333; border-radius: 10px; overflow: hidden; }
-        .tab-menu { display: flex; background: #111; border-bottom: 1px solid #333; }
+        .tab-menu { display: flex; background: #111; border-bottom: 1px solid #333; flex-wrap: wrap; }
         .tab-link { padding: 15px 25px; cursor: pointer; color: #777; font-family: 'Cinzel'; border-right: 1px solid #222; }
         .tab-link.active { color: var(--gold); background: rgba(212,175,55,0.1); border-bottom: 2px solid var(--gold); }
         .tab-content { padding: 25px; display: none; }
         .tab-content.active { display: block; }
+
+        /* RESPONSIVE */
+        @media (max-width: 900px) {
+            .main-wrapper { grid-template-columns: 1fr; }
+            .server-time { position: static; text-align: center; margin: 10px auto; display: table; }
+            .ally-title { font-size: 1.5rem; }
+            .clan-column { height: 600px; }
+        }
     </style>
 </head>
 <body>
@@ -118,7 +130,7 @@
     </div>
 
     <div class="page-section" id="section1">
-        <div class="server-time" id="clock">SERVER TIME: 00:00:00</div>
+        <div class="server-time" id="clock">SERVER TIME: 00:00:00 UTC</div>
         
         <div class="top-header">
             <img src="https://i.ibb.co/6R9q5PGv/ALLIANCE-LOGO.png" class="ally-logo">
@@ -135,7 +147,11 @@
                     <span class="leader-name">TSAKNORRIS</span>
                     <span class="leader-role">SHOT CALLER</span>
                 </div>
-                </div>
+            </div>
+        </div>
+
+        <div class="search-container">
+            <input type="text" id="cpSearch" class="search-input" placeholder="Search CP or Member name..." onkeyup="filterCPs()">
         </div>
 
         <div class="main-wrapper">
@@ -215,8 +231,9 @@
             const render = (names, elId) => {
                 document.getElementById(elId).innerHTML = names.map((name, index) => {
                     const isTop3 = index < 3;
+                    const safeId = name.replace(/[^a-z0-9]/gi, '');
                     return `
-                    <div class="cp-box ${isTop3 ? 'top-cp' : ''}">
+                    <div class="cp-box ${isTop3 ? 'top-cp' : ''}" data-name="${name.toLowerCase()}">
                         <button class="cp-btn" onclick="this.parentElement.classList.toggle('active')">
                             <span>${isTop3 ? '⭐ ' : ''}${name}</span>
                             <span class="points-tag">2500 PTS</span>
@@ -241,8 +258,8 @@
                                 </div>
                             `).join('')}
                             <div class="loot-section">
-                                <button class="loot-toggle-btn" onclick="toggleLoot('${name}')">VIEW CP LOOT HISTORY</button>
-                                <div class="loot-content" id="loot-${name.replace(/\s+/g, '')}">No items yet.</div>
+                                <button class="loot-toggle-btn" onclick="toggleLoot('${safeId}')">VIEW CP LOOT HISTORY</button>
+                                <div class="loot-content" id="loot-${safeId}">No items yet.</div>
                             </div>
                         </div>
                     </div>
@@ -253,8 +270,17 @@
             document.getElementById('prices-table-body').innerHTML = pricesData.map(p => `<tr><td><img src="${p.img}" class="mini-icon"> ${p.name}</td><td style="color:var(--gold); font-weight:bold;">${p.pts}</td></tr>`).join('');
         }
 
-        function toggleLoot(name) {
-            const el = document.getElementById('loot-' + name.replace(/\s+/g, ''));
+        function filterCPs() {
+            let input = document.getElementById('cpSearch').value.toLowerCase();
+            let boxes = document.querySelectorAll('.cp-box');
+            boxes.forEach(box => {
+                let name = box.getAttribute('data-name');
+                box.style.display = name.includes(input) ? "block" : "none";
+            });
+        }
+
+        function toggleLoot(id) {
+            const el = document.getElementById('loot-' + id);
             el.style.display = (el.style.display === 'block') ? 'none' : 'block';
         }
 
@@ -262,12 +288,17 @@
             document.getElementById('modal-name').innerText = name;
             document.getElementById('modal-title').innerText = title;
             document.getElementById('modal-img').src = img;
-            document.getElementById('modal-stats').innerHTML = bosses.map(b => `<div class="stat-box"><span class="stat-name">${b}</span><span class="stat-val">${Math.floor(Math.random()*15)}</span></div>`).join('');
+            document.getElementById('modal-stats').innerHTML = bosses.map(b => {
+                const val = Math.floor(Math.random()*15);
+                const goldClass = val > 10 ? 'style="color:var(--gold)"' : '';
+                return `<div class="stat-box"><span class="stat-name">${b}</span><span class="stat-val" ${goldClass}>${val}</span></div>`
+            }).join('');
             document.getElementById('caller-modal').style.display = 'block';
             document.getElementById('overlay').style.display = 'block';
         }
 
         function closeModal() { document.getElementById('caller-modal').style.display = 'none'; document.getElementById('overlay').style.display = 'none'; }
+        
         function openTab(evt, tabName) {
             let i, tabcontent, tablinks;
             tabcontent = document.getElementsByClassName("tab-content");
@@ -278,7 +309,13 @@
             evt.currentTarget.classList.add("active");
         }
 
-        setInterval(() => { document.getElementById('clock').innerText = "SERVER TIME: " + new Date().toLocaleTimeString('el-GR'); }, 1000);
+        // Clock Update UTC+0
+        setInterval(() => { 
+            const now = new Date();
+            const utcTime = now.toLocaleTimeString('el-GR', { timeZone: 'UTC', hour12: false });
+            document.getElementById('clock').innerText = "SERVER TIME: " + utcTime + " UTC"; 
+        }, 1000);
+
         renderLists();
     </script>
 </body>
