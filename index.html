@@ -20,40 +20,33 @@
         }
         body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-overlay); z-index: -1; }
 
-        /* HEADER CONTROLS */
-        .header-controls { position: absolute; top: 20px; right: 40px; display: flex; gap: 10px; z-index: 100; }
-        .control-btn { color: var(--gold); font-family: 'Cinzel'; border: 1px solid var(--gold); padding: 5px 15px; border-radius: 5px; background: rgba(0,0,0,0.6); font-size: 0.75rem; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 8px; }
-        .control-btn:hover { background: var(--gold); color: #000; }
-
         .top-header { text-align: center; padding-top: 20px; }
         .ally-logo { width: 110px; filter: drop-shadow(0 0 15px var(--gold)); }
         .ally-title { font-family: 'Cinzel Decorative', cursive; font-size: 1.8rem; color: var(--gold); display: block; letter-spacing: 2px; margin-bottom: 20px;}
 
-        /* MAIN NAVIGATION */
         .main-nav { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-        .nav-link { text-decoration: none; }
-        .nav-btn { background: rgba(212, 175, 55, 0.1); border: 1px solid var(--gold); color: var(--gold); padding: 8px 15px; font-family: 'Cinzel'; cursor: pointer; transition: 0.3s; font-size: 0.75rem; border-radius: 4px; }
-        .nav-btn:hover { background: var(--gold); color: #000; }
-        .nav-btn.active { background: var(--gold); color: #000; box-shadow: 0 0 10px rgba(212, 175, 55, 0.5); }
+        .nav-btn { background: rgba(212, 175, 55, 0.1); border: 1px solid var(--gold); color: var(--gold); padding: 8px 15px; font-family: 'Cinzel'; cursor: pointer; transition: 0.3s; font-size: 0.75rem; border-radius: 4px; text-decoration: none; }
+        .nav-btn:hover, .nav-btn.active { background: var(--gold); color: #000; }
 
-        /* LEADERS */
         .leaders-row { display: flex; justify-content: center; gap: 40px; margin-bottom: 20px; }
-        .leader-card { text-align: center; width: 110px; cursor: pointer; }
-        .img-frame { width: 80px; height: 80px; margin: 0 auto; background: #000; border: 2px solid var(--gold); border-radius: 50%; overflow: hidden; box-shadow: 0 0 15px rgba(212,175,55,0.2); }
+        .leader-card { text-align: center; width: 110px; }
+        .img-frame { width: 80px; height: 80px; margin: 0 auto; background: #000; border: 2px solid var(--gold); border-radius: 50%; overflow: hidden; }
         .leader-img { width: 100%; height: 100%; object-fit: contain; }
         .leader-name { color: var(--gold); font-size: 0.8rem; font-family: 'Cinzel'; display: block; margin-top: 8px; font-weight: bold; }
 
-        /* SEARCH BAR - ΣΤΑΘΕΡΗ ΘΕΣΗ ΠΟΥ ΔΕΝ ΧΑΛΑΕΙ ΤΟ GRID */
-        .search-container { max-width: 400px; margin: 0 auto 20px auto; }
-        .search-bar { width: 100%; background: rgba(0,0,0,0.6); border: 1px solid var(--gold); padding: 10px; border-radius: 20px; color: var(--gold); text-align: center; font-family: 'Cinzel'; outline: none; box-sizing: border-box; }
+        .tabs-nav { display: flex; justify-content: center; gap: 15px; margin: 25px 0; }
+        .tab-btn { background: rgba(0,0,0,0.6); border: 1px solid var(--gold); color: var(--gold); padding: 10px 25px; font-family: 'Cinzel'; cursor: pointer; transition: 0.3s; font-size: 0.8rem; }
+        .tab-btn.active { background: var(--gold); color: #000; font-weight: bold; }
 
-        /* LISTS (750px Height) */
-        .main-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; max-width: 1400px; margin: 0 auto; padding: 0 20px 40px; }
+        .page { display: none; max-width: 1500px; margin: 0 auto; padding: 0 20px; animation: fadeIn 0.4s; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .main-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px; }
         .clan-column { background: rgba(15, 18, 22, 0.95); height: 750px; display: flex; flex-direction: column; border: 1px solid #333; border-radius: 10px; border-top: 4px solid var(--gold); }
         .column-header { padding: 15px; text-align: center; font-family: 'Cinzel'; font-size: 1.1rem; border-bottom: 1px solid #222; background: rgba(0,0,0,0.4); }
         .scroll-area { overflow-y: auto; padding: 10px; flex-grow: 1; }
 
-        /* CP BOXES */
         .cp-box { margin-bottom: 8px; border-radius: 5px; border: 1px solid rgba(255,255,255,0.05); }
         .cp-noldor { border-left: 4px solid var(--noldor-sky); background: var(--noldor-grad); }
         .cp-krim { border-left: 4px solid var(--krim-red); background: var(--krim-grad); }
@@ -61,39 +54,33 @@
         .cp-content { display: none; background: rgba(0,0,0,0.85); padding: 15px; border-top: 1px solid #333; }
         .cp-box.active .cp-content { display: block; }
 
-        /* STATS GRID */
-        .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        /* STATS GRID - 9 ITEMS */
+        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
         .stat-box { background: #15181c; padding: 6px; border: 1px solid #333; text-align: center; border-radius: 4px; }
         .boss-icon { width: 22px; height: 22px; margin-bottom: 4px; }
-        .stat-val { font-size: 0.75rem; color: #fff; display: block; }
+        .stat-val { font-size: 0.75rem; color: #fff; font-family: 'Cinzel'; display: block; }
 
-        /* MOBILE PATCH */
+        .info-wrapper { display: grid; grid-template-columns: 1fr 1.5fr; gap: 30px; }
+        .info-card { background: rgba(15, 18, 22, 0.9); border: 1px solid #333; border-radius: 12px; padding: 25px; }
+        .market-table { width: 100%; border-collapse: collapse; }
+        .market-table td { padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.85rem;}
+
         @media (max-width: 900px) {
-            .header-controls { position: relative; top: 0; right: 0; justify-content: center; padding: 10px; }
-            .main-wrapper { grid-template-columns: 1fr; }
-            .clan-column { height: 550px; }
-            .stat-grid { grid-template-columns: repeat(3, 1fr); }
-            .ally-title { font-size: 1.4rem; }
+            .main-wrapper, .info-wrapper { grid-template-columns: 1fr; }
+            .clan-column { height: 500px; }
         }
     </style>
 </head>
 <body>
 
-    <div class="header-controls">
-        <div class="control-btn" id="clock">00:00:00 UTC</div>
-    </div>
-
     <div class="top-header">
         <img src="https://i.ibb.co/6R9q5PGv/ALLIANCE-LOGO.png" class="ally-logo">
         <span class="ally-title">BROKEN MIRROR ALLIANCE</span>
-        
         <div class="main-nav">
-            <a href="index.html" class="nav-link"><button class="nav-btn active">DASHBOARD</button></a>
-            <a href="info.html" class="nav-link"><button class="nav-btn">MARKET & POLICIES</button></a>
-            <a href="history.html" class="nav-link"><button class="nav-btn">LEAVERS HISTORY</button></a>
-            <a href="pvpzone.html" class="nav-link"><button class="nav-btn">PVP ZONE</button></a>
+            <a href="index.html" class="nav-btn active">DASHBOARD</a>
+            <a href="history.html" class="nav-btn">LEAVERS</a>
+            <a href="pvpzone.html" class="nav-btn">PVP ZONE</a>
         </div>
-
         <div class="leaders-row">
             <div class="leader-card">
                 <div class="img-frame"><img src="https://i.ibb.co/5X3NDQFR/niklaus.png" class="leader-img"></div>
@@ -106,30 +93,45 @@
         </div>
     </div>
 
-    <div class="search-container">
-        <input type="text" id="cpSearch" class="search-bar" placeholder="🔍 SEARCH CP BY NAME..." onkeyup="filterCPs()">
+    <div class="tabs-nav">
+        <button class="tab-btn active" onclick="showPage('dashboard', this)">ALLIANCE CP LIST</button>
+        <button class="tab-btn" onclick="showPage('info', this)">MARKET & POLICIES</button>
     </div>
 
-    <div class="main-wrapper">
-        <div class="clan-column">
-            <div class="column-header" style="color:var(--noldor-sky)">NOLDOR CLAN</div>
-            <div class="scroll-area" id="noldor-list"></div>
+    <div id="dashboard" class="page active">
+        <div class="main-wrapper">
+            <div class="clan-column">
+                <div class="column-header" style="color:var(--noldor-sky)">NOLDOR CLAN</div>
+                <div class="scroll-area" id="noldor-list"></div>
+            </div>
+            <div class="clan-column">
+                <div class="column-header" style="color:var(--krim-red)">KRIMINALIDES CLAN</div>
+                <div class="scroll-area" id="krim-list"></div>
+            </div>
         </div>
-        <div class="clan-column">
-            <div class="column-header" style="color:var(--krim-red)">KRIMINALIDES CLAN</div>
-            <div class="scroll-area" id="krim-list"></div>
+    </div>
+
+    <div id="info" class="page">
+        <div class="info-wrapper">
+            <div class="info-card">
+                <h3>MARKETPLACE</h3>
+                <table class="market-table" id="market-table"></table>
+            </div>
+            <div class="info-card">
+                <h3>ALLIANCE POLICIES</h3>
+                <div style="color:#ccc; font-size: 0.85rem; line-height:1.7;">
+                    <b style="color:var(--gold); font-family:'Cinzel';">ATTENDANCE POINTS:</b><br>
+                    • Mid Epics (Orfen, Core, Queen Ant, Zaken) = 1 pt<br>
+                    • Baium / Frintezza = 2 pts<br>
+                    • Valakas / Antharas = 3 pts<br><br>
+                    <b style="color:var(--gold); font-family:'Cinzel';">LOOT RULES:</b><br>
+                    Priority based on points. 3-week cooldown for big jewels.
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        function filterCPs() {
-            let input = document.getElementById('cpSearch').value.toLowerCase();
-            document.querySelectorAll('.cp-box').forEach(box => {
-                let name = box.querySelector('span').innerText.toLowerCase();
-                box.style.display = name.includes(input) ? "block" : "none";
-            });
-        }
-
         const bossIcons = {
             "VAL": "https://i.ibb.co/84gZPVRP/necklace-valakas.png",
             "ANT": "https://i.ibb.co/rfqvc6mv/earring-antharas.png",
@@ -147,12 +149,9 @@
 
         function render() {
             const stats = Object.keys(bossIcons).map(b => `
-                <div class="stat-box">
-                    <img src="${bossIcons[b]}" class="boss-icon">
-                    <span class="stat-val">0</span>
-                </div>`).join('');
+                <div class="stat-box"><img src="${bossIcons[b]}" class="boss-icon"><span class="stat-val">0</span></div>`).join('');
 
-            const makeHtml = (list, style) => list.map(name => `
+            const makeList = (list, style) => list.map(name => `
                 <div class="cp-box ${style}">
                     <button class="cp-btn" onclick="this.parentElement.classList.toggle('active')">
                         <span>${name}</span><span style="color:var(--gold)">0 PTS</span>
@@ -160,13 +159,24 @@
                     <div class="cp-content"><div class="stat-grid">${stats}</div></div>
                 </div>`).join('');
 
-            document.getElementById('noldor-list').innerHTML = makeHtml(noldor, "cp-noldor");
-            document.getElementById('krim-list').innerHTML = makeHtml(krim, "cp-krim");
+            document.getElementById('noldor-list').innerHTML = makeList(noldor, "cp-noldor");
+            document.getElementById('krim-list').innerHTML = makeList(krim, "cp-krim");
+
+            const prices = [
+                {n:"Valakas",p:3100,i:bossIcons.VAL}, {n:"Antharas",p:1100,i:bossIcons.ANT},
+                {n:"Baium",p:950,i:bossIcons.BAI}, {n:"Frintezza",p:225,i:bossIcons.FRI},
+                {n:"Zaken",p:175,i:bossIcons.ZAK}, {n:"Orfen",p:150,i:bossIcons.ORF},
+                {n:"Queen Ant",p:150,i:bossIcons.AQ}, {n:"Core",p:100,i:bossIcons.COR}
+            ];
+            document.getElementById('market-table').innerHTML = prices.map(p => `<tr><td><img src="${p.i}" width="20" style="vertical-align:middle; margin-right:10px;"> ${p.n}</td><td style="color:var(--gold); font-weight:bold; text-align:right;">${p.p} PTS</td></tr>`).join('');
         }
 
-        setInterval(() => { 
-            document.getElementById('clock').innerText = new Date().toLocaleTimeString('el-GR', {timeZone:'UTC', hour12:false}) + " UTC"; 
-        }, 1000);
+        function showPage(id, btn) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            btn.classList.add('active');
+        }
 
         render();
     </script>
