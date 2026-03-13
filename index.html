@@ -7,9 +7,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --gold: #d4af37; --noldor-sky: #00d9ff; --krim-red: #ff3333;
-            --noldor-grad: linear-gradient(90deg, rgba(0,217,255,0.18) 0%, rgba(0,0,0,0) 100%);
-            --krim-grad: linear-gradient(90deg, rgba(255,51,51,0.18) 0%, rgba(0,0,0,0) 100%);
+            --gold: #d4af37; --silver: #c0c0c0; --bronze: #cd7f32;
+            --noldor-sky: #00d9ff; --krim-red: #ff3333;
             --bg-overlay: rgba(10, 12, 15, 0.96); 
         }
         body { 
@@ -45,19 +44,15 @@
         .page.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* SEARCH */
-        .search-container { max-width: 500px; margin: 0 auto 30px; }
-        .search-input { width: 100%; padding: 12px 25px; background: rgba(0,0,0,0.7); border: 1px solid var(--gold); border-radius: 30px; color: #fff; outline: none; text-align: center;}
-
         /* LISTS */
         .main-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px; }
         .clan-column { background: rgba(15, 18, 22, 0.95); height: 750px; display: flex; flex-direction: column; border: 1px solid #333; border-radius: 10px; border-top: 4px solid var(--gold); }
         .column-header { padding: 15px; text-align: center; font-family: 'Cinzel'; font-size: 1.1rem; border-bottom: 1px solid #222; display: flex; align-items: center; justify-content: center; gap: 12px; background: rgba(0,0,0,0.4); }
         .scroll-area { overflow-y: auto; padding: 10px; flex-grow: 1; }
 
-        .cp-box { margin-bottom: 8px; border-radius: 5px; border: 1px solid rgba(255,255,255,0.05); }
-        .cp-noldor-bg { background: var(--noldor-grad); border-left: 3px solid var(--noldor-sky); }
-        .cp-krim-bg { background: var(--krim-grad); border-left: 3px solid var(--krim-red); }
+        .cp-box { margin-bottom: 8px; border-radius: 5px; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s; }
+        .cp-noldor { border-left: 3px solid var(--noldor-sky); }
+        .cp-krim { border-left: 3px solid var(--krim-red); }
         
         .cp-btn { width: 100%; background: none; border: none; padding: 12px 15px; color: #fff; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 0.85rem; }
         .cp-content { display: none; background: rgba(0,0,0,0.85); padding: 15px; border-top: 1px solid #333; }
@@ -65,7 +60,7 @@
 
         .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 15px; }
         .stat-box { background: #15181c; padding: 6px; border: 1px solid #333; text-align: center; border-radius: 4px; }
-        .boss-icon { width: 20px; height: 20px; margin-bottom: 4px; }
+        .boss-icon { width: 22px; height: 22px; margin-bottom: 4px; }
         .stat-val { font-size: 0.75rem; color: #fff; font-family: 'Cinzel'; display: block; }
 
         .roster-section { background: rgba(255,255,255,0.03); border: 1px solid #333; padding: 10px; border-radius: 5px; margin-top: 10px; font-size: 0.75rem; }
@@ -74,33 +69,26 @@
         .loot-btn { width: 100%; background: rgba(212,175,55,0.1); border: 1px solid #444; color: var(--gold); padding: 8px; font-family: 'Cinzel'; font-size: 0.65rem; cursor: pointer; border-radius: 4px; margin-top:10px; }
         .loot-panel { display: none; padding: 12px; background: rgba(0,0,0,0.5); margin-top: 8px; border-radius: 4px; font-size: 0.75rem; border: 1px solid #222; color: #aaa; }
 
-        /* OTHER CLANS */
-        .other-clans-section { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 20px; }
-        .new-clan-card { background: rgba(15, 18, 22, 0.95); border: 1px solid #333; border-top: 3px solid var(--gold); border-radius: 10px; padding: 15px; text-align: center; }
-        .new-clan-icon { width: 50px; height: 50px; margin-bottom: 10px; }
-        .new-clan-name { display: block; font-family: 'Cinzel'; color: #fff; font-size: 0.9rem; }
-        .new-clan-lead { display: block; color: var(--gold); font-size: 0.75rem; font-style: italic; margin-top: 5px; }
-
-        /* MODAL */
-        #caller-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 380px; background: #0f1216; border: 2px solid var(--gold); border-radius: 15px; padding: 25px; z-index: 9999; text-align: center; }
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9998; backdrop-filter: blur(5px); }
-
         /* MARKET & POLICIES */
         .info-wrapper { display: grid; grid-template-columns: 1fr 1.5fr; gap: 30px; }
         .info-card { background: rgba(15, 18, 22, 0.9); border: 1px solid #333; border-radius: 12px; padding: 25px; }
         .info-card h3 { font-family: 'Cinzel'; color: var(--gold); border-bottom: 1px solid rgba(212,175,55,0.3); padding-bottom: 10px; margin-top: 0; }
         .market-table { width: 100%; border-collapse: collapse; }
-        .market-table td { padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.85rem;}
+        .market-table td { padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.85rem;}
+
+        /* MODAL */
+        #caller-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 380px; background: #0f1216; border: 2px solid var(--gold); border-radius: 15px; padding: 25px; z-index: 9999; text-align: center; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9998; backdrop-filter: blur(5px); }
     </style>
 </head>
-<body>
+<body onclick="tryAutoPlay()">
 
     <div class="header-controls">
-        <div class="control-btn" onclick="toggleMusic()">
+        <div class="control-btn" onclick="toggleMusic(event)">
             <span id="music-icon">🔇</span> <span id="track-name">DION THEME</span>
         </div>
-        <div class="control-btn" onclick="nextTrack()">⏭ NEXT</div>
-        <div class="control-btn" id="clock">00:00:00 UTC</div>
+        <div class="control-btn" onclick="nextTrack(event)">⏭ NEXT</div>
+        <div class="control-btn" id="clock">SERVER TIME: 00:00:00 UTC</div>
     </div>
 
     <audio id="bg-music" loop>
@@ -140,10 +128,6 @@
     </div>
 
     <div id="dashboard" class="page active">
-        <div class="search-container">
-            <input type="text" id="mainSearch" class="search-input" placeholder="Search CP name or Member..." onkeyup="searchFunction()">
-        </div>
-        
         <div class="main-wrapper">
             <div class="clan-column">
                 <div class="column-header" style="color:var(--noldor-sky)">
@@ -156,24 +140,6 @@
                     <img src="https://i.ibb.co/VYMZjzYr/kriminalides.png" style="width:25px;"> KRIMINALIDES CLAN
                 </div>
                 <div class="scroll-area" id="krim-list"></div>
-            </div>
-        </div>
-
-        <div class="other-clans-section">
-            <div class="new-clan-card">
-                <img src="https://i.ibb.co/6cgvyHHW/orzelbialy.png" class="new-clan-icon">
-                <span class="new-clan-name">OrzelBialy Clan</span>
-                <span class="new-clan-lead">Leader: Unqual</span>
-            </div>
-            <div class="new-clan-card">
-                <img src="https://i.ibb.co/Y4spJqVy/exitgaming.png" class="new-clan-icon">
-                <span class="new-clan-name">ExitGaming Clan</span>
-                <span class="new-clan-lead">Leader: basilio</span>
-            </div>
-            <div class="new-clan-card">
-                <img src="https://i.ibb.co/xqg1qNFw/lastkingdom.png" class="new-clan-icon">
-                <span class="new-clan-name">LastKingdom Clan</span>
-                <span class="new-clan-lead">Leader: Concrete</span>
             </div>
         </div>
     </div>
@@ -205,7 +171,7 @@
     </div>
 
     <script>
-        // MUSIC LOGIC
+        // MUSIC CONFIG
         const tracks = [
             { name: "DION THEME", url: "https://www.dropbox.com/scl/fi/ypzqrr336iewt62gncy6u/Lineage-2-Dion-Theme-Song.mp3?rlkey=nl1quliuqleuljgkt5jhqq6hh&st=sb8ij16g&raw=1" },
             { name: "GIRAN THEME", url: "https://www.dropbox.com/scl/fi/iu8j9wn9wky8fav176ayf/Lineage-2-Giran-Theme.mp3?rlkey=xp1j0upa076sy21tgcta6t9c3&st=0a4ihyhg&raw=1" },
@@ -214,20 +180,29 @@
         let currentIdx = 0;
         const audio = document.getElementById('bg-music');
         const mIcon = document.getElementById('music-icon');
-        const tName = document.getElementById('track-name');
+        const tLabel = document.getElementById('track-name');
 
-        function toggleMusic() {
+        function toggleMusic(e) {
+            if(e) e.stopPropagation();
             if (audio.paused) { audio.play(); mIcon.innerText = "🔊"; }
             else { audio.pause(); mIcon.innerText = "🔇"; }
         }
-        function nextTrack() {
+        function nextTrack(e) {
+            if(e) e.stopPropagation();
             currentIdx = (currentIdx + 1) % tracks.length;
             audio.src = tracks[currentIdx].url;
-            tName.innerText = tracks[currentIdx].name;
+            tLabel.innerText = tracks[currentIdx].name;
             audio.play(); mIcon.innerText = "🔊";
         }
+        function tryAutoPlay() {
+            if(audio.paused && mIcon.innerText === "🔇") {
+                audio.play();
+                mIcon.innerText = "🔊";
+            }
+        }
 
-        // BOSS CONFIG
+        // DASHBOARD DATA
+        const bosses = ["VAL", "ANT", "BAI", "FRI", "ZAK", "AQ", "ORF", "COR", "SIE"];
         const bossIcons = {
             "VAL": "https://i.ibb.co/84gZPVRP/necklace-valakas.png",
             "ANT": "https://i.ibb.co/rfqvc6mv/earring-antharas.png",
@@ -240,33 +215,28 @@
             "SIE": "https://i.ibb.co/Txfby6wD/images.png"
         };
 
-        const noldorCPs = ["Noldor Clan", "Noldor Archer", "Noldor Archer 2", "Outlaw CP", "Ronin CP", "Brazilians CP", "Shadow CP", "Viking CP", "Elders CP", "Spartans CP", "Noldor Support"];
-        const krimCPs = ["Hattrick CP", "55 Room CP", "Legion CP", "Criminal Record CP", "Avalanche CP", "Gankly Crew CP", "Animals CP", "Mafia CP", "NoMercy CP", "Chaos CP", "Krim Scouts"];
+        const noldorNames = ["Noldor Clan", "Noldor Archer", "Noldor Archer 2", "Outlaw CP", "Ronin CP", "Brazilians CP", "Shadow CP", "Viking CP", "Elders CP", "Spartans CP", "Noldor Support"];
+        const krimNames = ["Hattrick CP", "55 Room CP", "Legion CP", "Criminal Record CP", "Avalanche CP", "Gankly Crew CP", "Animals CP", "Mafia CP", "NoMercy CP", "Chaos CP", "Krim Scouts"];
 
-        function getStatsHtml(includeSiege = false) {
-            let list = Object.keys(bossIcons);
-            if (!includeSiege) list = list.filter(k => k !== "SIE");
-            return list.map(k => `<div class="stat-box"><img src="${bossIcons[k]}" class="boss-icon"><span class="stat-val">0</span></div>`).join('');
-        }
-
-        function toggleLoot(btn) {
-            const panel = btn.nextElementSibling;
-            const isVisible = panel.style.display === "block";
-            panel.style.display = isVisible ? "none" : "block";
-            btn.innerText = isVisible ? "VIEW LOOT HISTORY" : "HIDE LOOT HISTORY";
+        function getStatsHtml(includeSiege = true) {
+            return bosses.filter(b => includeSiege || b !== "SIE").map(b => `
+                <div class="stat-box">
+                    <img src="${bossIcons[b]}" class="boss-icon">
+                    <span class="stat-val">0</span>
+                </div>`).join('');
         }
 
         function renderLists() {
-            const render = (names, bgClass) => names.map(n => `
-                <div class="cp-box ${bgClass}" data-name="${n.toLowerCase()}" data-roster="leader member member2">
+            const renderClan = (list, style) => list.map(name => `
+                <div class="cp-box ${style}">
                     <button class="cp-btn" onclick="this.parentElement.classList.toggle('active')">
-                        <span>${n}</span>
+                        <span>${name}</span>
                         <span style="color:var(--gold); font-size:0.75rem;">4000 PTS</span>
                     </button>
                     <div class="cp-content">
-                        <div class="stat-grid">${getStatsHtml(false)}</div>
-                        <button class="loot-btn" onclick="toggleLoot(this)">VIEW LOOT HISTORY</button>
-                        <div class="loot-panel">No history recorded.</div>
+                        <div class="stat-grid">${getStatsHtml(true)}</div>
+                        <button class="loot-btn" onclick="const p=this.nextElementSibling; p.style.display=p.style.display==='block'?'none':'block'; this.innerText=p.style.display==='block'?'HIDE LOOT HISTORY':'VIEW LOOT HISTORY'">VIEW LOOT HISTORY</button>
+                        <div class="loot-panel">No history found.</div>
                         <div class="roster-section">
                             <span class="leader-item">👑 CP_Leader</span><br>
                             <span style="color:#888;">Members: Member 1, Member 2, Member 3, Member 4</span>
@@ -274,16 +244,16 @@
                     </div>
                 </div>`).join('');
 
-            document.getElementById('noldor-list').innerHTML = render(noldorCPs, 'cp-noldor-bg');
-            document.getElementById('krim-list').innerHTML = render(krimCPs, 'cp-krim-bg');
+            document.getElementById('noldor-list').innerHTML = renderClan(noldorNames, "cp-noldor");
+            document.getElementById('krim-list').innerHTML = renderClan(krimNames, "cp-krim");
 
             const prices = [
-                {n:"Valakas",p:3100,i:bossIcons.VAL}, {n:"Antharas",p:1100,i:bossIcons.ANT}, 
-                {n:"Baium",p:950,i:bossIcons.BAI}, {n:"Zaken",p:175,i:bossIcons.ZAK},
-                {n:"Frintezza",p:225,i:bossIcons.FRI}, {n:"Queen Ant",p:150,i:bossIcons.AQ},
-                {n:"Orfen",p:75,i:bossIcons.ORF}, {n:"Core",p:75,i:bossIcons.COR}
+                {n:\"Valakas\",p:3100,i:bossIcons.VAL}, {n:\"Antharas\",p:1100,i:bossIcons.ANT},
+                {n:\"Baium\",p:950,i:bossIcons.BAI}, {n:\"Zaken\",p:175,i:bossIcons.ZAK},
+                {n:\"Frintezza\",p:225,i:bossIcons.FRI}, {n:\"Queen Ant\",p:150,i:bossIcons.AQ},
+                {n:\"Orfen\",p:75,i:bossIcons.ORF}, {n:\"Core\",p:75,i:bossIcons.COR}
             ];
-            document.getElementById('market-table').innerHTML = prices.map(p => `<tr><td><img src="${p.i}" style="width:20px; vertical-align:middle; margin-right:12px;"> ${p.n}</td><td style="color:var(--gold); text-align:right; font-weight:bold;">${p.p} PTS</td></tr>`).join('');
+            document.getElementById('market-table').innerHTML = prices.map(p => `<tr><td><img src=\"${p.i}\" style=\"width:22px; vertical-align:middle; margin-right:12px;\"> ${p.n}</td><td style=\"color:var(--gold); font-weight:bold; text-align:right;\">${p.p} PTS</td></tr>`).join('');
         }
 
         function showPage(id, btn) {
@@ -293,20 +263,11 @@
             btn.classList.add('active');
         }
 
-        function searchFunction() {
-            const val = document.getElementById('mainSearch').value.toLowerCase();
-            document.querySelectorAll('.cp-box').forEach(b => {
-                const match = b.dataset.name.includes(val) || b.dataset.roster.includes(val);
-                b.style.display = match ? "block" : "none";
-                if(match && val !== "") b.classList.add('active');
-            });
-        }
-
         function openCaller(name, role, img) {
             document.getElementById('modal-name').innerText = name;
             document.getElementById('modal-title').innerText = role;
             document.getElementById('modal-img').src = img;
-            document.getElementById('modal-stats').innerHTML = getStatsHtml(true); // ΕΔΩ ΜΠΑΙΝΕΙ ΤΟ SIEGE
+            document.getElementById('modal-stats').innerHTML = getStatsHtml(true);
             document.getElementById('caller-modal').style.display = 'block';
             document.getElementById('overlay').style.display = 'block';
         }
@@ -314,7 +275,7 @@
         function closeModal() { document.getElementById('caller-modal').style.display='none'; document.getElementById('overlay').style.display='none'; }
         
         setInterval(() => { 
-            document.getElementById('clock').innerText = new Date().toLocaleTimeString('el-GR', {timeZone:'UTC', hour12:false}) + " UTC"; 
+            document.getElementById('clock').innerText = "SERVER TIME: " + new Date().toLocaleTimeString('el-GR', {timeZone:'UTC', hour12:false}) + " UTC"; 
         }, 1000);
         
         renderLists();
