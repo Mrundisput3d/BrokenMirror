@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Broken Mirror Alliance | Stable Dashboard</title>
+    <title>Broken Mirror Alliance | Pro Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -19,6 +19,20 @@
         }
         body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-overlay); z-index: -1; }
 
+        /* FLOATING NAVIGATION */
+        .floating-nav {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 15px; background: rgba(0,0,0,0.8);
+            padding: 12px 25px; border-radius: 50px; border: 1px solid var(--gold);
+            z-index: 10000; box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+        .nav-btn {
+            color: var(--gold); text-decoration: none; font-family: 'Cinzel';
+            font-size: 0.8rem; letter-spacing: 1px; transition: 0.3s;
+            padding: 5px 10px; border-radius: 5px;
+        }
+        .nav-btn:hover { background: var(--gold); color: #000; }
+
         /* MODALS */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9998; backdrop-filter: blur(5px); }
         #caller-modal {
@@ -27,123 +41,92 @@
             padding: 30px; z-index: 9999; box-shadow: 0 0 50px #000; text-align: center;
         }
 
-        /* SECTION SEPARATION */
-        .page-section { min-height: 100vh; width: 100%; position: relative; padding: 60px 20px; box-sizing: border-box; border-bottom: 2px solid rgba(212,175,55,0.1); clear: both; }
-
+        .page-section { min-height: 100vh; width: 100%; position: relative; padding: 80px 20px; box-sizing: border-box; border-bottom: 2px solid rgba(212,175,55,0.1); }
         .server-time { position: absolute; top: 20px; right: 40px; color: var(--gold); font-family: 'Cinzel'; border: 1px solid var(--gold); padding: 5px 15px; border-radius: 5px; background: rgba(0,0,0,0.5); font-size: 0.8rem; }
 
-        /* HEADER */
-        .top-header { text-align: center; margin-bottom: 40px; }
-        .ally-logo { width: 140px; height: auto; filter: drop-shadow(0 0 15px var(--gold)); margin-bottom: 15px; }
-        .ally-title { font-family: 'Cinzel Decorative', cursive; font-size: 2.2rem; color: var(--gold); display: block; letter-spacing: 2px; text-transform: uppercase; }
-        
-        /* CALLERS */
-        .leaders-row { display: flex; justify-content: center; flex-wrap: wrap; gap: 40px; margin-top: 30px; }
-        .leader-card { text-align: center; cursor: pointer; transition: 0.3s; }
-        .leader-card:hover { transform: scale(1.1); }
-        .img-frame { width: 90px; height: 90px; margin: 0 auto; background: #000; border: 2px solid var(--gold); border-radius: 50%; overflow: hidden; }
-        .leader-img { width: 100%; height: 100%; object-fit: contain; }
-        .leader-name { color: var(--gold); font-size: 0.85rem; font-family: 'Cinzel'; display: block; margin-top: 10px; font-weight: bold; }
-
-        /* SECTION 1: CP TRACKER GRID */
+        /* ROSTER GRID */
         .main-wrapper { display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 30px; max-width: 1600px; margin: 0 auto; }
-        .clan-column { background: rgba(15, 18, 22, 0.95); height: 800px; display: flex; flex-direction: column; border: 1px solid #333; border-radius: 10px; border-top: 4px solid var(--gold); }
-        .column-header { padding: 20px; text-align: center; font-family: 'Cinzel'; font-size: 1.2rem; border-bottom: 1px solid #222; display: flex; align-items: center; justify-content: center; gap: 15px; }
-        .clan-mini-logo { width: 35px; height: 35px; }
-
+        .clan-column { background: rgba(15, 18, 22, 0.95); height: 750px; display: flex; flex-direction: column; border: 1px solid #333; border-radius: 10px; border-top: 4px solid var(--gold); }
+        .column-header { padding: 15px; text-align: center; font-family: 'Cinzel'; font-size: 1.1rem; border-bottom: 1px solid #222; display: flex; align-items: center; justify-content: center; gap: 12px; }
         .scroll-area { overflow-y: auto; padding: 15px; flex-grow: 1; }
-        .scroll-area::-webkit-scrollbar { width: 6px; }
-        .scroll-area::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
+        .scroll-area::-webkit-scrollbar { width: 5px; }
+        .scroll-area::-webkit-scrollbar-thumb { background: var(--gold); }
 
-        /* CP & MEMBERS */
-        .cp-box { margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.3); border-radius: 8px; overflow: hidden; }
-        .top-cp { border: 1px solid var(--gold); background: rgba(212, 175, 55, 0.05); }
-        .cp-btn { width: 100%; background: none; border: none; padding: 15px; color: #fff; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 600; }
-        .points-tag { border: 1px solid var(--gold); padding: 2px 12px; border-radius: 4px; font-size: 0.85rem; color: var(--gold); }
+        /* CP BOXES */
+        .cp-box { margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.3); border-radius: 6px; overflow: hidden; }
+        .cp-btn { width: 100%; background: none; border: none; padding: 15px; color: #fff; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .points-tag { border: 1px solid var(--gold); padding: 2px 10px; border-radius: 4px; font-size: 0.8rem; color: var(--gold); }
 
-        .member-list { display: none; background: rgba(0,0,0,0.5); padding: 5px 0; border-top: 1px solid #222; }
-        .active > .member-list { display: block; }
-        .member-btn { width: 100%; background: none; border: none; padding: 12px 20px; color: #ccc; text-align: left; cursor: pointer; display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.03); }
-        
-        .member-stats { display: none; background: #000; padding: 15px; }
-        .active-member > .member-stats { display: block; }
-        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-        .stat-box { background: #15181c; padding: 10px; border: 1px solid #222; text-align: center; border-radius: 4px; }
-        .stat-name { display: block; color: var(--gold); font-size: 0.6rem; font-weight: bold; text-transform: uppercase; }
-        .stat-val { font-size: 1rem; color: #fff; font-family: 'Cinzel'; }
-
-        /* SECTION 2: MARKET & PROTOCOL */
-        .marketplace-wrapper { display: flex; flex-wrap: wrap; gap: 40px; max-width: 1400px; margin: 0 auto; align-items: flex-start; }
-        .epic-table-container { background: rgba(10, 12, 15, 0.9); border: 2px solid var(--gold); border-radius: 12px; padding: 20px; flex: 1; min-width: 350px; }
+        /* MARKETPLACE & PROTOCOL */
+        .marketplace-wrapper { display: flex; flex-wrap: wrap; gap: 30px; max-width: 1400px; margin: 0 auto; }
+        .epic-table-container { background: rgba(10, 12, 15, 0.95); border: 2px solid var(--gold); border-radius: 12px; padding: 20px; flex: 1.2; min-width: 400px; }
         .epic-table { width: 100%; border-collapse: collapse; }
         .epic-table th { border-bottom: 2px solid var(--gold); color: var(--gold); font-family: 'Cinzel'; padding: 12px; text-align: left; }
-        .epic-table td { padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); vertical-align: middle; }
-        .mini-icon { width: 28px; height: 28px; vertical-align: middle; margin-right: 12px; border: 1px solid #444; }
+        .epic-table td { padding: 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+        .mini-icon { width: 25px; height: 25px; vertical-align: middle; margin-right: 12px; border: 1px solid #444; border-radius: 3px; }
 
-        .protocol-container { background: rgba(15, 18, 22, 0.95); border-left: 5px solid var(--gold); border-radius: 10px; padding: 30px; flex: 1.5; min-width: 450px; }
-        .protocol-container h3 { font-family: 'Cinzel Decorative'; color: var(--gold); margin-top: 0; border-bottom: 1px solid #333; padding-bottom: 15px; font-size: 1.4rem; text-align: center; }
-        .protocol-text { font-size: 0.95rem; line-height: 1.8; color: #ddd; }
-        .protocol-text p { margin-bottom: 15px; }
+        .protocol-container { background: rgba(15, 18, 22, 0.95); border-left: 5px solid var(--gold); border-radius: 10px; padding: 30px; flex: 1; min-width: 350px; }
+        .protocol-container h3 { font-family: 'Cinzel Decorative'; color: var(--gold); margin-bottom: 20px; text-align: center; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        .protocol-item { margin-bottom: 20px; line-height: 1.6; font-size: 0.9rem; }
         .highlight { color: var(--gold); font-weight: bold; }
-
-        /* SECTION 3: MANAGEMENT */
-        .management-box { max-width: 1200px; margin: 0 auto; background: rgba(15,18,22,0.9); border: 1px solid #333; border-radius: 15px; padding: 50px; text-align: center; }
     </style>
 </head>
 <body>
 
+    <nav class="floating-nav">
+        <a href="#section1" class="nav-btn">ROSTER</a>
+        <a href="#section2" class="nav-btn">MARKET & RULES</a>
+        <a href="#section3" class="nav-btn">MANAGEMENT</a>
+    </nav>
+
     <div class="modal-overlay" id="overlay" onclick="closeModal()"></div>
+    
     <div id="caller-modal">
         <img id="modal-img" src="" style="width:100px; height:100px; border-radius:50%; border:2px solid var(--gold); margin-bottom:15px; background:#000;">
         <h2 id="modal-name" style="font-family:'Cinzel Decorative'; color:var(--gold); margin:0;"></h2>
         <p id="modal-title" style="color:#888; font-size:0.7rem; letter-spacing:2px; margin-bottom:20px;"></p>
-        <div class="stat-grid" id="modal-stats"></div>
+        <div id="modal-stats" style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px;"></div>
         <button onclick="closeModal()" style="margin-top:20px; background:var(--gold); color:#000; border:none; padding:10px 30px; cursor:pointer; font-weight:bold; font-family:'Cinzel'; border-radius:4px;">CLOSE</button>
     </div>
 
     <div class="page-section" id="section1">
         <div class="server-time" id="clock">SERVER TIME: 00:00:00</div>
-        
-        <div class="top-header">
-            <img src="https://i.ibb.co/6R9q5PGv/ALLIANCE-LOGO.png" class="ally-logo">
-            <span class="ally-title">Broken Mirror Alliance</span>
+        <div style="text-align: center; margin-bottom: 40px;">
+            <img src="https://i.ibb.co/6R9q5PGv/ALLIANCE-LOGO.png" style="width:120px; filter: drop-shadow(0 0 10px var(--gold));">
+            <h1 style="font-family: 'Cinzel Decorative'; color: var(--gold); margin-top: 10px;">BROKEN MIRROR ALLIANCE</h1>
             
-            <div class="leaders-row">
-                <div class="leader-card" onclick="openCaller('NIKLAUS', 'ALLIANCE LEADER', 'https://i.ibb.co/5X3NDQFR/niklaus.png')">
-                    <div class="img-frame"><img src="https://i.ibb.co/5X3NDQFR/niklaus.png" class="leader-img"></div>
-                    <span class="leader-name">NIKLAUS</span>
+            <div style="display:flex; justify-content:center; gap:40px; margin-top:20px;">
+                <div onclick="openCaller('NIKLAUS', 'LEADER', 'https://i.ibb.co/5X3NDQFR/niklaus.png')" style="cursor:pointer;">
+                    <img src="https://i.ibb.co/5X3NDQFR/niklaus.png" style="width:70px; border-radius:50%; border:2px solid var(--gold);">
+                    <div style="color:var(--gold); font-size:0.7rem; font-family:Cinzel;">NIKLAUS</div>
                 </div>
-                <div class="leader-card" onclick="openCaller('TSAKNORRIS', 'SHOT CALLER', 'https://i.ibb.co/xSVgzBPB/tsaknorris.png')">
-                    <div class="img-frame"><img src="https://i.ibb.co/xSVgzBPB/tsaknorris.png" class="leader-img"></div>
-                    <span class="leader-name">TSAKNORRIS</span>
+                <div onclick="openCaller('TSAKNORRIS', 'CALLER', 'https://i.ibb.co/xSVgzBPB/tsaknorris.png')" style="cursor:pointer;">
+                    <img src="https://i.ibb.co/xSVgzBPB/tsaknorris.png" style="width:70px; border-radius:50%; border:2px solid var(--gold);">
+                    <div style="color:var(--gold); font-size:0.7rem; font-family:Cinzel;">TSAKNORRIS</div>
                 </div>
             </div>
         </div>
 
         <div class="main-wrapper">
-            <div class="clan-column">
-                <div class="column-header" style="color:var(--noldor-sky)">
-                    <img src="https://i.ibb.co/8LvFNQkC/noldor.png" class="clan-mini-logo"> NOLDOR CLAN
-                </div>
+            <div class="clan-column" style="border-top-color: var(--noldor-sky);">
+                <div class="column-header">NOLDOR CLAN</div>
                 <div class="scroll-area" id="noldor-list"></div>
             </div>
-            <div class="clan-column">
-                <div class="column-header" style="color:var(--krim-red)">
-                    <img src="https://i.ibb.co/VYMZjzYr/kriminalides.png" class="clan-mini-logo"> KRIMINALIDES CLAN
-                </div>
+            <div class="clan-column" style="border-top-color: var(--krim-red);">
+                <div class="column-header">KRIMINALIDES CLAN</div>
                 <div class="scroll-area" id="krim-list"></div>
             </div>
         </div>
     </div>
 
-    <div class="page-section" id="section2" style="background: rgba(0,0,0,0.5);">
-        <h2 style="font-family:'Cinzel Decorative'; color:var(--gold); text-align:center; margin-bottom:50px; font-size: 2rem;">MARKETPLACE & PROTOCOL</h2>
+    <div class="page-section" id="section2" style="background: rgba(0,0,0,0.6);">
+        <h2 style="font-family:'Cinzel Decorative'; color:var(--gold); text-align:center; margin-bottom:40px;">MARKETPLACE & PROTOCOL</h2>
         
         <div class="marketplace-wrapper">
             <div class="epic-table-container">
                 <table class="epic-table">
                     <thead>
-                        <tr><th>EPIC JEWEL</th><th>DKP PRICE</th></tr>
+                        <tr><th>EPIC JEWEL</th><th>PRICE (DKP)</th></tr>
                     </thead>
                     <tbody id="prices-table-body">
                         </tbody>
@@ -152,80 +135,82 @@
 
             <div class="protocol-container">
                 <h3>ALLIANCE PROTOCOL</h3>
-                <div class="protocol-text">
-                    <p><span class="highlight">1. ATTENDANCE POINTS:</span> <br>
-                    • <span class="highlight">1 Point:</span> Mid-level Epics (Core, Orfen, AQ, Zaken). <br>
-                    • <span class="highlight">2 Points:</span> Major Epics (Baium, Frintezza). <br>
-                    • <span class="highlight">3 Points:</span> Grand Epics & Sieges (Antharas, Valakas, Castle Sieges).</p>
-                    
-                    <p><span class="highlight">2. LOOT DISTRIBUTION:</span> <br>
-                    Items are purchased using CP accumulated points. If multiple CPs want the same item, priority is given based on <span class="highlight">Class Need</span> (e.g., Baium Ring to Archers, Valakas to Mages).</p>
-                    
-                    <p><span class="highlight">3. DISCIPLINE:</span> <br>
-                    Absolute silence during Shotcalls. Failure to follow instructions or absence from mandatory events without notice leads to point deduction.</p>
+                <div class="protocol-item">
+                    <p class="highlight">I. ATTENDANCE SYSTEM</p>
+                    <p>• Mid Epics (Core, Orfen, AQ, Zaken): <span class="highlight">1 Point</span></p>
+                    <p>• Major Epics (Baium, Frintezza): <span class="highlight">2 Points</span></p>
+                    <p>• Grand Epics (Antharas, Valakas): <span class="highlight">3 Points</span></p>
+                </div>
+                <div class="protocol-item">
+                    <p class="highlight">II. DISTRIBUTION RULES</p>
+                    <p>Items are distributed based on CP Points. Priority is given to <span class="highlight">Class Synergy</span>. Mages have priority on Valakas, Archers on Baium.</p>
+                </div>
+                <div class="protocol-item">
+                    <p class="highlight">III. CONDUCT</p>
+                    <p>Total silence in Discord during raids. Failure to follow Shotcalls results in <span class="highlight">-5 Points</span> penalty.</p>
                 </div>
             </div>
         </div>
     </div>
 
     <div class="page-section" id="section3">
-        <h2 style="font-family:'Cinzel Decorative'; color:var(--gold); text-align:center; margin-bottom:50px; font-size: 2rem;">MANAGEMENT CENTER</h2>
-        <div class="management-box">
-            <p style="color:var(--gold); font-family:'Cinzel'; font-size: 1.2rem;">ALL SYSTEMS OPERATIONAL</p>
-            <p style="color:#666;">Security Clearence: Alliance Member | Data Encryption: Active</p>
+        <h2 style="font-family:'Cinzel Decorative'; color:var(--gold); text-align:center; margin-bottom:40px;">MANAGEMENT CENTER</h2>
+        <div style="max-width: 800px; margin: 0 auto; background: rgba(15,18,22,0.9); padding: 40px; border: 1px solid #333; text-align: center; border-radius: 15px;">
+            <p style="color: var(--gold); font-family: 'Cinzel'; font-size: 1.5rem;">ALL SYSTEMS ONLINE</p>
+            <p style="color: #666; margin-top: 20px;">Data encryption active. Access level: Alliance Member.</p>
         </div>
     </div>
 
     <script>
         const bosses = ["VAL", "ANT", "BAI", "FRI", "ZAK", "ORF", "AQ", "CORE", "SIEGE"];
-        const noldorNames = ["Noldor Clan", "Noldor Archer", "Noldor Archer 2", "Noldor Dummy", "Noldor Tank", "Outlaw CP", "Ronin CP", "Brazilians CP", "I am Groot CP"];
-        const krimNames = ["Hattrick CP", "55 Room CP", "Legion CP", "Criminal Record CP", "Avalanche CP", "Gankly Crew CP", "Animals CP", "Dracaris CP", "Sinaloa CP"];
-
         const pricesData = [
             { name: "Ring of Core", pts: 25, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/ring-of-core.png?raw=true" },
+            { name: "Ring of Orfen", pts: 35, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/earring-of-orfen.png?raw=true" },
             { name: "Ring of Queen Ant", pts: 150, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/ring-of-queen-ant.png?raw=true" },
             { name: "Earring of Zaken", pts: 175, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/zaken-earring.png?raw=true" },
+            { name: "Necklace of Frintezza", pts: 450, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/frintezza-necklace.png?raw=true" },
             { name: "Ring of Baium", pts: 950, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/ring-of-baium.png?raw=true" },
+            { name: "Earring of Antharas", pts: 2800, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/earring-antharas.png?raw=true" },
             { name: "Necklace of Valakas", pts: 3100, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/necklace-valakas.png?raw=true" }
         ];
 
-        function renderLists() {
-            const render = (names, elId) => {
-                document.getElementById(elId).innerHTML = names.map((name, index) => `
-                    <div class="cp-box ${index < 3 ? 'top-cp' : ''}">
-                        <button class="cp-btn" onclick="this.parentElement.classList.toggle('active')">
-                            <span>${index < 3 ? '⭐ ' : ''}${name}</span>
-                            <span class="points-tag">${20 + index} PTS</span>
-                        </button>
-                        <div class="member-list">
-                            <div class="member-item">
-                                <button class="member-btn" onclick="this.parentElement.classList.toggle('active-member')">
-                                    <span>👑 CP LEADER</span><span>▼</span>
-                                </button>
-                                <div class="member-stats">
-                                    <div class="stat-grid">${bosses.map(b => `<div class="stat-box"><span class="stat-name">${b}</span><span class="stat-val">0</span></div>`).join('')}</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `).join('');
-            };
-            render(noldorNames, 'noldor-list');
-            render(krimNames, 'krim-list');
-            
+        function renderAll() {
+            // Render Marketplace
             document.getElementById('prices-table-body').innerHTML = pricesData.map(p => `
                 <tr>
                     <td><img src="${p.img}" class="mini-icon"> ${p.name}</td>
-                    <td style="color:var(--gold); font-weight:bold; font-family:Cinzel;">${p.pts}</td>
+                    <td style="color:var(--gold); font-weight:bold;">${p.pts}</td>
                 </tr>
             `).join('');
+
+            // Render CPs (Dummy Data)
+            const noldor = ["Noldor Clan", "Noldor Archer", "Outlaw CP", "Ronin CP", "Groot CP"];
+            const krim = ["Hattrick CP", "Legion CP", "Animals CP", "Dracaris CP", "Sinaloa CP"];
+
+            const listRender = (arr, id) => {
+                document.getElementById(id).innerHTML = arr.map(name => `
+                    <div class="cp-box">
+                        <button class="cp-btn">
+                            <span>${name}</span>
+                            <span class="points-tag">2500 PTS</span>
+                        </button>
+                    </div>
+                `).join('');
+            };
+            listRender(noldor, 'noldor-list');
+            listRender(krim, 'krim-list');
         }
 
         function openCaller(name, title, img) {
             document.getElementById('modal-name').innerText = name;
             document.getElementById('modal-title').innerText = title;
             document.getElementById('modal-img').src = img;
-            document.getElementById('modal-stats').innerHTML = bosses.map(b => `<div class="stat-box"><span class="stat-name">${b}</span><span class="stat-val">${Math.floor(Math.random()*20)}</span></div>`).join('');
+            document.getElementById('modal-stats').innerHTML = bosses.map(b => `
+                <div style="background:#222; padding:5px; border-radius:3px;">
+                    <div style="font-size:0.5rem; color:var(--gold);">${b}</div>
+                    <div style="font-family:Cinzel;">${Math.floor(Math.random()*15)}</div>
+                </div>
+            `).join('');
             document.getElementById('caller-modal').style.display = 'block';
             document.getElementById('overlay').style.display = 'block';
         }
@@ -233,7 +218,7 @@
         function closeModal() { document.getElementById('caller-modal').style.display = 'none'; document.getElementById('overlay').style.display = 'none'; }
         
         setInterval(() => { document.getElementById('clock').innerText = "SERVER TIME: " + new Date().toLocaleTimeString('el-GR'); }, 1000);
-        renderLists();
+        renderAll();
     </script>
 </body>
 </html>
