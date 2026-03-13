@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Broken Mirror Alliance | Pro Dashboard</title>
+    <title>Broken Mirror Alliance | Stable Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --gold: #d4af37; --silver: #c0c0c0; --bronze: #cd7f32;
-            --noldor-sky: #00d9ff; --krim-red: #ff3333;
+            --gold: #d4af37; --noldor-sky: #00d9ff; --krim-red: #ff3333;
             --bg-overlay: rgba(10, 12, 15, 0.96); 
         }
         html { scroll-behavior: smooth; }
@@ -19,206 +18,166 @@
         }
         body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-overlay); z-index: -1; }
 
-        /* FLOATING NAVIGATION */
-        .floating-nav {
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            display: flex; gap: 15px; background: rgba(0,0,0,0.8);
-            padding: 12px 25px; border-radius: 50px; border: 1px solid var(--gold);
-            z-index: 10000; box-shadow: 0 0 20px rgba(0,0,0,0.5);
-        }
-        .nav-btn {
-            color: var(--gold); text-decoration: none; font-family: 'Cinzel';
-            font-size: 0.8rem; letter-spacing: 1px; transition: 0.3s;
-            padding: 5px 10px; border-radius: 5px;
-        }
-        .nav-btn:hover { background: var(--gold); color: #000; }
+        /* NAVIGATION */
+        .floating-nav { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; background: rgba(0,0,0,0.9); padding: 10px 20px; border-radius: 30px; border: 1px solid var(--gold); z-index: 10000; }
+        .nav-btn { color: var(--gold); text-decoration: none; font-family: 'Cinzel'; font-size: 0.75rem; padding: 5px 12px; transition: 0.3s; }
+        .nav-btn:hover { background: var(--gold); color: #000; border-radius: 15px; }
 
-        /* MODALS */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9998; backdrop-filter: blur(5px); }
-        #caller-modal {
-            display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 420px; background: #0f1216; border: 2px solid var(--gold); border-radius: 15px;
-            padding: 30px; z-index: 9999; box-shadow: 0 0 50px #000; text-align: center;
-        }
+        .page-section { min-height: 100vh; padding: 40px 20px; box-sizing: border-box; position: relative; border-bottom: 1px solid rgba(212,175,55,0.1); }
+        .server-time { position: absolute; top: 20px; right: 40px; color: var(--gold); font-family: 'Cinzel'; border: 1px solid var(--gold); padding: 4px 12px; border-radius: 5px; font-size: 0.75rem; }
 
-        .page-section { min-height: 100vh; width: 100%; position: relative; padding: 80px 20px; box-sizing: border-box; border-bottom: 2px solid rgba(212,175,55,0.1); }
-        .server-time { position: absolute; top: 20px; right: 40px; color: var(--gold); font-family: 'Cinzel'; border: 1px solid var(--gold); padding: 5px 15px; border-radius: 5px; background: rgba(0,0,0,0.5); font-size: 0.8rem; }
+        /* ROSTER COMPACT */
+        .main-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 1400px; margin: 20px auto; }
+        .clan-column { background: rgba(15, 18, 22, 0.95); height: 600px; display: flex; flex-direction: column; border: 1px solid #333; border-radius: 8px; border-top: 3px solid var(--gold); }
+        .column-header { padding: 12px; text-align: center; font-family: 'Cinzel'; font-size: 1rem; border-bottom: 1px solid #222; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .clan-mini-logo { width: 30px; height: 30px; object-fit: contain; }
 
-        /* ROSTER GRID */
-        .main-wrapper { display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 30px; max-width: 1600px; margin: 0 auto; }
-        .clan-column { background: rgba(15, 18, 22, 0.95); height: 750px; display: flex; flex-direction: column; border: 1px solid #333; border-radius: 10px; border-top: 4px solid var(--gold); }
-        .column-header { padding: 15px; text-align: center; font-family: 'Cinzel'; font-size: 1.1rem; border-bottom: 1px solid #222; display: flex; align-items: center; justify-content: center; gap: 12px; }
-        .scroll-area { overflow-y: auto; padding: 15px; flex-grow: 1; }
-        .scroll-area::-webkit-scrollbar { width: 5px; }
+        .scroll-area { overflow-y: auto; padding: 8px; flex-grow: 1; }
+        .scroll-area::-webkit-scrollbar { width: 4px; }
         .scroll-area::-webkit-scrollbar-thumb { background: var(--gold); }
 
-        /* CP BOXES */
-        .cp-box { margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.3); border-radius: 6px; overflow: hidden; }
-        .cp-btn { width: 100%; background: none; border: none; padding: 15px; color: #fff; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
-        .points-tag { border: 1px solid var(--gold); padding: 2px 10px; border-radius: 4px; font-size: 0.8rem; color: var(--gold); }
+        .cp-box { margin-bottom: 6px; border: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.3); border-radius: 4px; }
+        .cp-btn { width: 100%; background: none; border: none; padding: 8px 12px; color: #fff; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; }
+        .points-tag { border: 1px solid var(--gold); padding: 1px 8px; border-radius: 3px; font-size: 0.7rem; color: var(--gold); }
 
         /* MARKETPLACE & PROTOCOL */
-        .marketplace-wrapper { display: flex; flex-wrap: wrap; gap: 30px; max-width: 1400px; margin: 0 auto; }
-        .epic-table-container { background: rgba(10, 12, 15, 0.95); border: 2px solid var(--gold); border-radius: 12px; padding: 20px; flex: 1.2; min-width: 400px; }
-        .epic-table { width: 100%; border-collapse: collapse; }
-        .epic-table th { border-bottom: 2px solid var(--gold); color: var(--gold); font-family: 'Cinzel'; padding: 12px; text-align: left; }
-        .epic-table td { padding: 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
-        .mini-icon { width: 25px; height: 25px; vertical-align: middle; margin-right: 12px; border: 1px solid #444; border-radius: 3px; }
+        .marketplace-wrapper { display: flex; flex-wrap: wrap; gap: 20px; max-width: 1400px; margin: 0 auto; }
+        .epic-table-container { background: rgba(10, 12, 15, 0.9); border: 2px solid var(--gold); border-radius: 10px; padding: 15px; flex: 1; }
+        .epic-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+        .epic-table th { border-bottom: 2px solid var(--gold); color: var(--gold); font-family: 'Cinzel'; padding: 10px; text-align: left; }
+        .epic-table td { padding: 8px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+        .mini-icon { width: 22px; height: 22px; vertical-align: middle; margin-right: 8px; }
 
-        .protocol-container { background: rgba(15, 18, 22, 0.95); border-left: 5px solid var(--gold); border-radius: 10px; padding: 30px; flex: 1; min-width: 350px; }
-        .protocol-container h3 { font-family: 'Cinzel Decorative'; color: var(--gold); margin-bottom: 20px; text-align: center; border-bottom: 1px solid #333; padding-bottom: 10px; }
-        .protocol-item { margin-bottom: 20px; line-height: 1.6; font-size: 0.9rem; }
+        .protocol-container { background: rgba(15, 18, 22, 0.95); border-left: 4px solid var(--gold); border-radius: 8px; padding: 20px; flex: 1.2; font-size: 0.85rem; line-height: 1.6; }
+        .protocol-container h3 { font-family: 'Cinzel'; color: var(--gold); margin-top: 0; border-bottom: 1px solid #333; padding-bottom: 10px; }
         .highlight { color: var(--gold); font-weight: bold; }
+
+        /* CALLER MODAL */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9998; backdrop-filter: blur(5px); }
+        #caller-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 350px; background: #0f1216; border: 2px solid var(--gold); border-radius: 15px; padding: 25px; z-index: 9999; text-align: center; }
     </style>
 </head>
 <body>
 
     <nav class="floating-nav">
         <a href="#section1" class="nav-btn">ROSTER</a>
-        <a href="#section2" class="nav-btn">MARKET & RULES</a>
-        <a href="#section3" class="nav-btn">MANAGEMENT</a>
+        <a href="#section2" class="nav-btn">MARKET</a>
+        <a href="#section3" class="nav-btn">MGMT</a>
     </nav>
 
     <div class="modal-overlay" id="overlay" onclick="closeModal()"></div>
-    
     <div id="caller-modal">
-        <img id="modal-img" src="" style="width:100px; height:100px; border-radius:50%; border:2px solid var(--gold); margin-bottom:15px; background:#000;">
-        <h2 id="modal-name" style="font-family:'Cinzel Decorative'; color:var(--gold); margin:0;"></h2>
-        <p id="modal-title" style="color:#888; font-size:0.7rem; letter-spacing:2px; margin-bottom:20px;"></p>
-        <div id="modal-stats" style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px;"></div>
-        <button onclick="closeModal()" style="margin-top:20px; background:var(--gold); color:#000; border:none; padding:10px 30px; cursor:pointer; font-weight:bold; font-family:'Cinzel'; border-radius:4px;">CLOSE</button>
+        <img id="modal-img" src="" style="width:80px; height:80px; border-radius:50%; border:2px solid var(--gold); margin-bottom:10px;">
+        <h3 id="modal-name" style="font-family:'Cinzel'; color:var(--gold); margin:0;"></h3>
+        <p id="modal-title" style="color:#888; font-size:0.6rem; letter-spacing:1px;"></p>
+        <div id="modal-stats" style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px; margin-top:15px;"></div>
+        <button onclick="closeModal()" style="margin-top:20px; background:var(--gold); border:none; padding:8px 20px; cursor:pointer; font-family:'Cinzel';">CLOSE</button>
     </div>
 
     <div class="page-section" id="section1">
         <div class="server-time" id="clock">SERVER TIME: 00:00:00</div>
-        <div style="text-align: center; margin-bottom: 40px;">
-            <img src="https://i.ibb.co/6R9q5PGv/ALLIANCE-LOGO.png" style="width:120px; filter: drop-shadow(0 0 10px var(--gold));">
-            <h1 style="font-family: 'Cinzel Decorative'; color: var(--gold); margin-top: 10px;">BROKEN MIRROR ALLIANCE</h1>
+        
+        <div style="text-align: center; margin-bottom: 20px;">
+            <img src="https://i.ibb.co/6R9q5PGv/ALLIANCE-LOGO.png" style="width:100px; filter: drop-shadow(0 0 10px var(--gold));">
+            <span style="font-family: 'Cinzel Decorative'; font-size: 1.8rem; color: var(--gold); display: block;">Broken Mirror Alliance</span>
             
-            <div style="display:flex; justify-content:center; gap:40px; margin-top:20px;">
+            <div style="display:flex; justify-content:center; gap:30px; margin-top:15px;">
                 <div onclick="openCaller('NIKLAUS', 'LEADER', 'https://i.ibb.co/5X3NDQFR/niklaus.png')" style="cursor:pointer;">
-                    <img src="https://i.ibb.co/5X3NDQFR/niklaus.png" style="width:70px; border-radius:50%; border:2px solid var(--gold);">
-                    <div style="color:var(--gold); font-size:0.7rem; font-family:Cinzel;">NIKLAUS</div>
+                    <img src="https://i.ibb.co/5X3NDQFR/niklaus.png" style="width:60px; border-radius:50%; border:2px solid var(--gold);">
+                    <div style="color:var(--gold); font-size:0.6rem; font-family:Cinzel;">NIKLAUS</div>
                 </div>
                 <div onclick="openCaller('TSAKNORRIS', 'CALLER', 'https://i.ibb.co/xSVgzBPB/tsaknorris.png')" style="cursor:pointer;">
-                    <img src="https://i.ibb.co/xSVgzBPB/tsaknorris.png" style="width:70px; border-radius:50%; border:2px solid var(--gold);">
-                    <div style="color:var(--gold); font-size:0.7rem; font-family:Cinzel;">TSAKNORRIS</div>
+                    <img src="https://i.ibb.co/xSVgzBPB/tsaknorris.png" style="width:60px; border-radius:50%; border:2px solid var(--gold);">
+                    <div style="color:var(--gold); font-size:0.6rem; font-family:Cinzel;">TSAKNORRIS</div>
                 </div>
             </div>
         </div>
 
         <div class="main-wrapper">
             <div class="clan-column" style="border-top-color: var(--noldor-sky);">
-                <div class="column-header">NOLDOR CLAN</div>
+                <div class="column-header" style="color:var(--noldor-sky)">
+                    <img src="https://i.ibb.co/8LvFNQkC/noldor.png" class="clan-mini-logo"> NOLDOR CLAN
+                </div>
                 <div class="scroll-area" id="noldor-list"></div>
             </div>
             <div class="clan-column" style="border-top-color: var(--krim-red);">
-                <div class="column-header">KRIMINALIDES CLAN</div>
+                <div class="column-header" style="color:var(--krim-red)">
+                    <img src="https://i.ibb.co/VYMZjzYr/kriminalides.png" class="clan-mini-logo"> KRIMINALIDES CLAN
+                </div>
                 <div class="scroll-area" id="krim-list"></div>
             </div>
         </div>
     </div>
 
-    <div class="page-section" id="section2" style="background: rgba(0,0,0,0.6);">
-        <h2 style="font-family:'Cinzel Decorative'; color:var(--gold); text-align:center; margin-bottom:40px;">MARKETPLACE & PROTOCOL</h2>
-        
+    <div class="page-section" id="section2">
+        <h2 style="font-family:'Cinzel Decorative'; color:var(--gold); text-align:center; margin-bottom:30px;">MARKETPLACE & PROTOCOL</h2>
         <div class="marketplace-wrapper">
             <div class="epic-table-container">
                 <table class="epic-table">
-                    <thead>
-                        <tr><th>EPIC JEWEL</th><th>PRICE (DKP)</th></tr>
-                    </thead>
-                    <tbody id="prices-table-body">
-                        </tbody>
+                    <thead><tr><th>JEWEL</th><th>DKP</th></tr></thead>
+                    <tbody id="prices-table-body"></tbody>
                 </table>
             </div>
-
             <div class="protocol-container">
-                <h3>ALLIANCE PROTOCOL</h3>
-                <div class="protocol-item">
-                    <p class="highlight">I. ATTENDANCE SYSTEM</p>
-                    <p>• Mid Epics (Core, Orfen, AQ, Zaken): <span class="highlight">1 Point</span></p>
-                    <p>• Major Epics (Baium, Frintezza): <span class="highlight">2 Points</span></p>
-                    <p>• Grand Epics (Antharas, Valakas): <span class="highlight">3 Points</span></p>
-                </div>
-                <div class="protocol-item">
-                    <p class="highlight">II. DISTRIBUTION RULES</p>
-                    <p>Items are distributed based on CP Points. Priority is given to <span class="highlight">Class Synergy</span>. Mages have priority on Valakas, Archers on Baium.</p>
-                </div>
-                <div class="protocol-item">
-                    <p class="highlight">III. CONDUCT</p>
-                    <p>Total silence in Discord during raids. Failure to follow Shotcalls results in <span class="highlight">-5 Points</span> penalty.</p>
-                </div>
+                <h3>POINTS SYSTEM & POLICIES</h3>
+                <p>• <span class="highlight">Attendance:</span> Mid-Low Epics = 1 | Baium = 2 | Siege/Valakas/Antharas = 3.</p>
+                <p>• <span class="highlight">Purchases:</span> Points are deducted from the CP's total balance.</p>
+                <p>• <span class="highlight">Priority:</span> <span style="color:var(--noldor-sky)">Baium</span> (Archer CPs) | <span style="color:var(--krim-red)">Valakas</span> (Mage CPs) | <span style="color:#00ff88">Antharas</span> (Stoppers).</p>
+                <p>• <span class="highlight">Caller Bonus:</span> Active callers receive personal x9 multiplier.</p>
             </div>
         </div>
     </div>
 
     <div class="page-section" id="section3">
-        <h2 style="font-family:'Cinzel Decorative'; color:var(--gold); text-align:center; margin-bottom:40px;">MANAGEMENT CENTER</h2>
-        <div style="max-width: 800px; margin: 0 auto; background: rgba(15,18,22,0.9); padding: 40px; border: 1px solid #333; text-align: center; border-radius: 15px;">
-            <p style="color: var(--gold); font-family: 'Cinzel'; font-size: 1.5rem;">ALL SYSTEMS ONLINE</p>
-            <p style="color: #666; margin-top: 20px;">Data encryption active. Access level: Alliance Member.</p>
+        <h2 style="font-family:'Cinzel Decorative'; color:var(--gold); text-align:center; margin-bottom:30px;">ALLIANCE MANAGEMENT</h2>
+        <div style="max-width: 800px; margin: 0 auto; background: rgba(15,18,22,0.9); padding: 30px; border: 1px solid #333; text-align: center; border-radius: 10px;">
+            <p style="color: var(--gold); font-family: 'Cinzel';">SYSTEMS OPERATIONAL</p>
         </div>
     </div>
 
     <script>
         const bosses = ["VAL", "ANT", "BAI", "FRI", "ZAK", "ORF", "AQ", "CORE", "SIEGE"];
         const pricesData = [
-            { name: "Ring of Core", pts: 25, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/ring-of-core.png?raw=true" },
-            { name: "Ring of Orfen", pts: 35, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/earring-of-orfen.png?raw=true" },
-            { name: "Ring of Queen Ant", pts: 150, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/ring-of-queen-ant.png?raw=true" },
-            { name: "Earring of Zaken", pts: 175, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/zaken-earring.png?raw=true" },
-            { name: "Necklace of Frintezza", pts: 450, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/frintezza-necklace.png?raw=true" },
-            { name: "Ring of Baium", pts: 950, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/ring-of-baium.png?raw=true" },
-            { name: "Earring of Antharas", pts: 2800, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/earring-antharas.png?raw=true" },
-            { name: "Necklace of Valakas", pts: 3100, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/necklace-valakas.png?raw=true" }
+            { name: "Core Ring", pts: 25, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/ring-of-core.png?raw=true" },
+            { name: "Orfen Earring", pts: 35, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/earring-of-orfen.png?raw=true" },
+            { name: "Queen Ant Ring", pts: 150, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/ring-of-queen-ant.png?raw=true" },
+            { name: "Zaken Earring", pts: 175, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/zaken-earring.png?raw=true" },
+            { name: "Baium Ring", pts: 950, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/ring-of-baium.png?raw=true" },
+            { name: "Antharas Earring", pts: 2800, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/earring-antharas.png?raw=true" },
+            { name: "Valakas Necklace", pts: 3100, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/necklace-valakas.png?raw=true" }
         ];
 
-        function renderAll() {
-            // Render Marketplace
-            document.getElementById('prices-table-body').innerHTML = pricesData.map(p => `
-                <tr>
-                    <td><img src="${p.img}" class="mini-icon"> ${p.name}</td>
-                    <td style="color:var(--gold); font-weight:bold;">${p.pts}</td>
-                </tr>
-            `).join('');
-
-            // Render CPs (Dummy Data)
-            const noldor = ["Noldor Clan", "Noldor Archer", "Outlaw CP", "Ronin CP", "Groot CP"];
-            const krim = ["Hattrick CP", "Legion CP", "Animals CP", "Dracaris CP", "Sinaloa CP"];
-
-            const listRender = (arr, id) => {
+        function render() {
+            const noldor = ["Noldor Clan", "Noldor Archer", "Outlaw CP", "Ronin CP", "Groot CP", "Brazilians CP", "Noldor Tank"];
+            const krim = ["Hattrick CP", "Legion CP", "Animals CP", "Dracaris CP", "Sinaloa CP", "55 Room CP", "Avalanche CP"];
+            
+            const listFn = (arr, id) => {
                 document.getElementById(id).innerHTML = arr.map(name => `
                     <div class="cp-box">
-                        <button class="cp-btn">
-                            <span>${name}</span>
-                            <span class="points-tag">2500 PTS</span>
-                        </button>
+                        <button class="cp-btn"><span>${name}</span><span class="points-tag">2500 PTS</span></button>
                     </div>
                 `).join('');
             };
-            listRender(noldor, 'noldor-list');
-            listRender(krim, 'krim-list');
+            listFn(noldor, 'noldor-list');
+            listFn(krim, 'krim-list');
+            
+            document.getElementById('prices-table-body').innerHTML = pricesData.map(p => `
+                <tr><td><img src="${p.img}" class="mini-icon"> ${p.name}</td><td style="color:var(--gold); font-weight:bold;">${p.pts}</td></tr>
+            `).join('');
         }
 
         function openCaller(name, title, img) {
             document.getElementById('modal-name').innerText = name;
             document.getElementById('modal-title').innerText = title;
             document.getElementById('modal-img').src = img;
-            document.getElementById('modal-stats').innerHTML = bosses.map(b => `
-                <div style="background:#222; padding:5px; border-radius:3px;">
-                    <div style="font-size:0.5rem; color:var(--gold);">${b}</div>
-                    <div style="font-family:Cinzel;">${Math.floor(Math.random()*15)}</div>
-                </div>
-            `).join('');
+            document.getElementById('modal-stats').innerHTML = bosses.map(b => `<div style="background:#222; padding:3px; border-radius:2px;"><div style="font-size:0.5rem; color:var(--gold);">${b}</div><div style="font-family:Cinzel;">${Math.floor(Math.random()*15)}</div></div>`).join('');
             document.getElementById('caller-modal').style.display = 'block';
             document.getElementById('overlay').style.display = 'block';
         }
 
         function closeModal() { document.getElementById('caller-modal').style.display = 'none'; document.getElementById('overlay').style.display = 'none'; }
-        
         setInterval(() => { document.getElementById('clock').innerText = "SERVER TIME: " + new Date().toLocaleTimeString('el-GR'); }, 1000);
-        renderAll();
+        render();
     </script>
 </body>
 </html>
