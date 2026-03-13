@@ -32,7 +32,7 @@
         .leader-role { color: #888; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; display: block; margin-top: 2px; }
 
         .search-container { max-width: 600px; margin: 20px auto; padding: 0 20px; text-align: center; }
-        .search-input { width: 100%; padding: 12px 20px; background: rgba(0,0,0,0.7); border: 1px solid var(--gold); border-radius: 25px; color: #fff; font-family: 'Open Sans'; outline: none; transition: 0.3s; }
+        .search-input { width: 100%; padding: 12px 20px; background: rgba(0,0,0,0.7); border: 1px solid var(--gold); border-radius: 25px; color: #fff; font-family: 'Open Sans'; outline: none; }
 
         .main-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; max-width: 1600px; margin: 20px auto; padding: 0 20px; }
         .clan-column { background: rgba(15, 18, 22, 0.95); height: 750px; display: flex; flex-direction: column; border: 1px solid #333; border-radius: 10px; border-top: 4px solid var(--gold); overflow: hidden; }
@@ -41,16 +41,16 @@
         .cp-box { margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.3); border-radius: 6px; overflow: hidden; }
         .cp-btn { width: 100%; background: none; border: none; padding: 12px 15px; color: #fff; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-family: 'Open Sans'; font-weight: 700; }
         
-        .cp-rank-1 { color: var(--gold) !important; text-shadow: 0 0 10px rgba(212,175,55,0.6); }
-        .cp-rank-2 { color: var(--silver) !important; text-shadow: 0 0 8px rgba(192,192,192,0.5); }
-        .cp-rank-3 { color: var(--bronze) !important; text-shadow: 0 0 8px rgba(205,127,50,0.5); }
+        .cp-rank-1 { color: var(--gold) !important; }
+        .cp-rank-2 { color: var(--silver) !important; }
+        .cp-rank-3 { color: var(--bronze) !important; }
         .cp-noldor { color: var(--noldor-sky); }
         .cp-krim { color: var(--krim-red); }
 
         .member-list { display: none; background: rgba(0,0,0,0.5); border-top: 1px solid #222; }
         .active > .member-list { display: block; }
-        .member-row { padding: 10px 20px; border-bottom: 1px solid rgba(255,255,255,0.03); display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; cursor: pointer; }
-        .member-stats { display: none; background: #000; padding: 15px; }
+        .member-row { padding: 10px 20px; border-bottom: 1px solid rgba(255,255,255,0.03); display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; cursor: pointer; color: #ccc; }
+        .member-stats { display: none; background: #000; padding: 15px; border-bottom: 1px solid #222; }
         .active-member + .member-stats { display: block; }
 
         .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
@@ -58,16 +58,15 @@
         .boss-icon { width: 24px; height: 24px; margin-bottom: 3px; }
         .stat-val { font-size: 0.85rem; color: #fff; font-family: 'Cinzel'; font-weight: bold; }
 
-        .loot-section { background: rgba(212, 175, 55, 0.05); padding: 15px; border-top: 1px solid #333; }
+        /* LOOT TOGGLE */
+        .loot-section { background: rgba(212, 175, 55, 0.05); border-top: 1px solid #333; }
+        .loot-btn { width: 100%; background: none; border: none; padding: 10px; color: var(--gold); font-family: 'Cinzel'; cursor: pointer; font-size: 0.7rem; letter-spacing: 1px; }
+        .loot-content { display: none; padding: 15px; border-top: 1px solid rgba(212,175,55,0.2); }
         .loot-item { display: flex; align-items: center; gap: 10px; font-size: 0.75rem; color: #ddd; margin-bottom: 8px; }
 
-        /* MARKET & RULES - RESTORED */
         .market-section { background: rgba(0,0,0,0.7); border-top: 2px solid var(--gold); padding: 60px 20px; margin-top: 40px; }
         .market-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 40px; max-width: 1400px; margin: 0 auto; }
         .rules-box { background: rgba(15, 18, 22, 0.95); border-left: 4px solid var(--gold); padding: 30px; border-radius: 8px; }
-        .rules-box h3 { font-family: 'Cinzel'; color: var(--gold); margin-top: 0; font-size: 1.3rem; }
-        .rule-item { margin-bottom: 15px; display: flex; align-items: flex-start; gap: 10px; line-height: 1.6; font-size: 0.9rem; color: #ccc; }
-        .highlight { color: var(--gold); font-weight: bold; }
 
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9998; backdrop-filter: blur(5px); }
         #caller-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 420px; background: #0f1216; border: 2px solid var(--gold); border-radius: 15px; padding: 30px; z-index: 9999; text-align: center; }
@@ -104,7 +103,7 @@
     </div>
 
     <div class="search-container">
-        <input type="text" id="cpSearch" class="search-input" placeholder="Search CP or Member name..." onkeyup="filterCPs()">
+        <input type="text" id="cpSearch" class="search-input" placeholder="Search CP or Member..." onkeyup="filterCPs()">
     </div>
 
     <div class="main-wrapper">
@@ -121,15 +120,15 @@
     <div class="market-section">
         <div class="market-grid">
             <h2 style="grid-column: span 2; font-family:'Cinzel Decorative'; color:var(--gold); text-align:center;">MARKETPLACE & PROTOCOL</h2>
-            <div class="epic-table-container">
-                <table style="width:100%; border-collapse: collapse;" id="market-table"></table>
-            </div>
+            <div class="epic-table-container"><table style="width:100%; border-collapse: collapse;" id="market-table"></table></div>
             <div class="rules-box">
-                <h3>ALLIANCE POLICIES</h3>
-                <div class="rule-item"><span>» <span class="highlight">Attendance:</span> Mid Epics = 1pt | Baium = 2pts | Valakas/Antharas = 3pts.</span></div>
-                <div class="rule-item"><span>» <span class="highlight">Jewel Priority:</span> <span style="color:var(--noldor-sky)">Archer CPs</span> get priority on Baium. <span style="color:var(--krim-red)">Mage CPs</span> get priority on Valakas.</span></div>
-                <div class="rule-item"><span>» <span class="highlight">Cooldown:</span> 3-week restriction for members who received a mid-level jewel.</span></div>
-                <div class="rule-item"><span>» <span class="highlight">Points Deduction:</span> When a jewel is taken, the CP's total points are reduced by the marketplace price.</span></div>
+                <h3 style="font-family:'Cinzel'; color:var(--gold); margin-top:0;">POLICIES</h3>
+                <div style="line-height:1.6; color:#ccc; font-size: 0.85rem;">
+                    <p>» <b style="color:var(--gold);">Attendance:</b> Mid Epics = 1pt | Baium = 2pts | Valakas/Antharas = 3pts.</p>
+                    <p>» <b style="color:var(--gold);">Jewel Priority:</b> <span style="color:var(--noldor-sky)">Archer CPs</span> get Baium. <span style="color:var(--krim-red)">Mage CPs</span> get Valakas.</p>
+                    <p>» <b style="color:var(--gold);">Cooldown:</b> 3-week restriction for mid-level jewels.</p>
+                    <p>» <b style="color:var(--gold);">Deduction:</b> CP points reduced by marketplace price upon loot.</p>
+                </div>
             </div>
         </div>
     </div>
@@ -149,79 +148,74 @@
 
         const cpData = {
             noldor: [
-                { name: "Noldor Clan", pts: 4200, members: ["Niklaus", "Player2", "Player3"], loot: [{n: "Baium Ring", date: "10/03", img: bossConfig.BAI.img}] },
-                { name: "Noldor Archer", pts: 3800, members: ["ArcherX", "ArcherY"], loot: [] },
-                { name: "Outlaw CP", pts: 1500, members: ["Out1", "Out2"], loot: [] }
+                { name: "Noldor Clan", pts: 4200, members: ["Niklaus", "Noldor_M1", "Noldor_M2"], loot: [{n: "Baium Ring", d: "10/03", i: bossConfig.BAI.img}] },
+                { name: "Noldor Archer", pts: 3800, members: ["Archer_X", "Archer_Y"], loot: [] },
+                { name: "Noldor Archer 2", pts: 2100, members: ["Archer_Z", "Archer_W"], loot: [] },
+                { name: "Outlaw CP", pts: 1500, members: ["Out_L", "Out_M"], loot: [] },
+                { name: "Ronin CP", pts: 1200, members: ["Ron_L", "Ron_M"], loot: [] },
+                { name: "Brazilians CP", pts: 900, members: ["Br_L", "Br_M"], loot: [] }
             ],
             krim: [
-                { name: "Hattrick CP", pts: 4500, members: ["HattLead", "PlayerA", "PlayerB"], loot: [{n: "Core Ring", date: "05/03", img: bossConfig.CORE.img}, {n: "Orfen Earring", date: "01/03", img: bossConfig.ORF.img}] },
-                { name: "55 Room CP", pts: 3100, members: ["RoomL", "RoomM"], loot: [] },
-                { name: "Animals CP", pts: 800, members: ["AnimL", "AnimM"], loot: [] }
+                { name: "Hattrick CP", pts: 4500, members: ["Tsaknorris", "Hatt_M1", "Hatt_M2"], loot: [{n: "Core Ring", d: "05/03", i: bossConfig.CORE.img}, {n: "Orfen Earring", d: "01/03", i: bossConfig.ORF.img}] },
+                { name: "55 Room CP", pts: 3100, members: ["Room_L", "Room_M"], loot: [] },
+                { name: "Legion CP", pts: 2800, members: ["Leg_L", "Leg_M"], loot: [] },
+                { name: "Criminal Record CP", pts: 2400, members: ["Crim_L", "Crim_M"], loot: [] },
+                { name: "Avalanche CP", pts: 1900, members: ["Ava_L", "Ava_M"], loot: [] },
+                { name: "Gankly Crew CP", pts: 1100, members: ["Gank_L", "Gank_M"], loot: [] },
+                { name: "Animals CP", pts: 800, members: ["Anim_L", "Anim_M"], loot: [] }
             ]
         };
 
         const prices = [
-            {n: "Orfen Earring", p: 75, img: bossConfig.ORF.img},
-            {n: "Core Ring", p: 75, img: bossConfig.CORE.img},
-            {n: "Queen Ant Ring", p: 150, img: bossConfig.AQ.img},
-            {n: "Zaken Earring", p: 175, img: bossConfig.ZAK.img},
-            {n: "Frintezza Neck", p: 225, img: bossConfig.FRI.img},
-            {n: "Baium Ring", p: 950, img: bossConfig.BAI.img},
-            {n: "Antharas Earring", p: 1100, img: bossConfig.ANT.img},
-            {n: "Valakas Necklace", p: 3100, img: bossConfig.VAL.img}
+            {n: "Orfen Earring", p: 75, img: bossConfig.ORF.img}, {n: "Core Ring", p: 75, img: bossConfig.CORE.img},
+            {n: "Queen Ant Ring", p: 150, img: bossConfig.AQ.img}, {n: "Zaken Earring", p: 175, img: bossConfig.ZAK.img},
+            {n: "Frintezza Neck", p: 225, img: bossConfig.FRI.img}, {n: "Baium Ring", p: 950, img: bossConfig.BAI.img},
+            {n: "Antharas Earring", p: 1100, img: bossConfig.ANT.img}, {n: "Valakas Necklace", p: 3100, img: bossConfig.VAL.img}
         ];
 
         function getStatsHtml(isModal = false) {
             return Object.keys(bossConfig).map(b => `
-                <div class="stat-box">
-                    <img src="${bossConfig[b].img}" class="boss-icon">
-                    <span class="stat-val">${isModal ? Math.floor(Math.random()*15) : 0}</span>
-                </div>
+                <div class="stat-box"><img src="${bossConfig[b].img}" class="boss-icon">
+                <span class="stat-val">${isModal ? Math.floor(Math.random()*15) : 0}</span></div>
             `).join('');
         }
 
         function render() {
             const allSorted = [...cpData.noldor, ...cpData.krim].sort((a,b) => b.pts - a.pts);
-            
             const makeList = (arr, clanClass) => arr.map(cp => {
                 const rank = allSorted.findIndex(x => x.name === cp.name);
-                let colorClass = clanClass;
-                let medal = "";
-                if(rank === 0) { colorClass="cp-rank-1"; medal="🥇 "; }
-                else if(rank === 1) { colorClass="cp-rank-2"; medal="🥈 "; }
-                else if(rank === 2) { colorClass="cp-rank-3"; medal="🥉 "; }
+                let color = clanClass, medal = "";
+                if(rank === 0) { color="cp-rank-1"; medal="🥇 "; }
+                else if(rank === 1) { color="cp-rank-2"; medal="🥈 "; }
+                else if(rank === 2) { color="cp-rank-3"; medal="🥉 "; }
 
                 return `
                 <div class="cp-box" data-name="${cp.name.toLowerCase()}">
                     <button class="cp-btn" onclick="this.parentElement.classList.toggle('active')">
-                        <span class="${colorClass}">${medal}${cp.name}</span>
-                        <span class="points-tag">${cp.pts} PTS</span>
+                        <span class="${color}">${medal}${cp.name}</span><span class="points-tag">${cp.pts} PTS</span>
                     </button>
                     <div class="member-list">
                         ${cp.members.map(m => `
-                            <div class="member-row" onclick="this.classList.toggle('active-member')">
-                                <span>${m}</span><small>▼</small>
-                            </div>
+                            <div class="member-row" onclick="this.classList.toggle('active-member')"><span>${m}</span><small>▼</small></div>
                             <div class="member-stats"><div class="stat-grid">${getStatsHtml()}</div></div>
                         `).join('')}
                         <div class="loot-section">
-                            <div style="font-family:'Cinzel'; font-size:0.75rem; color:var(--gold); margin-bottom:8px;">CP LOOT HISTORY:</div>
-                            ${cp.loot.length ? cp.loot.map(l => `<div class="loot-item"><img src="${l.img}" style="width:18px;"><span>${l.n} (${l.date})</span></div>`).join('') : '<span style="font-size:0.7rem; color:#666;">No loot recorded.</span>'}
+                            <button class="loot-btn" onclick="const e=this.nextElementSibling; e.style.display=e.style.display==='block'?'none':'block'">▼ VIEW LOOT HISTORY</button>
+                            <div class="loot-content">
+                                ${cp.loot.length ? cp.loot.map(l => `<div class="loot-item"><img src="${l.i}" style="width:18px;"><span>${l.n} (${l.d})</span></div>`).join('') : '<span style="color:#666; font-size:0.7rem;">No items recorded.</span>'}
+                            </div>
                         </div>
                     </div>
                 </div>`;
             }).join('');
-
             document.getElementById('noldor-list').innerHTML = makeList(cpData.noldor, "cp-noldor");
             document.getElementById('krim-list').innerHTML = makeList(cpData.krim, "cp-krim");
-            document.getElementById('market-table').innerHTML = prices.map(p => `<tr style="border-bottom:1px solid #222;"><td style="padding:10px;"><img src="${p.img}" style="width:20px; vertical-align:middle; margin-right:10px;"> ${p.n}</td><td style="color:var(--gold); font-weight:bold; text-align:right;">${p.p} PTS</td></tr>`).join('');
+            document.getElementById('market-table').innerHTML = prices.map(p => `<tr><td style="padding:8px;"><img src="${p.img}" style="width:20px; vertical-align:middle; margin-right:10px;"> ${p.n}</td><td style="color:var(--gold); text-align:right;">${p.p} PTS</td></tr>`).join('');
         }
 
         function filterCPs() {
             let input = document.getElementById('cpSearch').value.toLowerCase();
-            document.querySelectorAll('.cp-box').forEach(box => {
-                box.style.display = box.getAttribute('data-name').includes(input) ? "block" : "none";
-            });
+            document.querySelectorAll('.cp-box').forEach(box => { box.style.display = box.getAttribute('data-name').includes(input) ? "block" : "none"; });
         }
 
         function openCaller(name, role, img) {
@@ -233,12 +227,8 @@
             document.getElementById('overlay').style.display = 'block';
         }
 
-        function closeModal() { document.getElementById('caller-modal').style.display = 'none'; document.getElementById('overlay').style.display = 'none'; }
-        
-        setInterval(() => {
-            document.getElementById('clock').innerText = "SERVER TIME: " + new Date().toLocaleTimeString('el-GR', {timeZone:'UTC', hour12:false}) + " UTC";
-        }, 1000);
-
+        function closeModal() { document.getElementById('caller-modal').style.display='none'; document.getElementById('overlay').style.display='none'; }
+        setInterval(() => { document.getElementById('clock').innerText = "SERVER TIME: " + new Date().toLocaleTimeString('el-GR', {timeZone:'UTC', hour12:false}) + " UTC"; }, 1000);
         render();
     </script>
 </body>
