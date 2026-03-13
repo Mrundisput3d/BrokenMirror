@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BMA | Market & Policies</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #d4af37;
+            --bg-overlay: rgba(10, 12, 15, 0.98);
+        }
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background: #0a0c0f url('https://i.ibb.co/1GmpSyxZ/BACKGROUND.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: #eee;
+            margin: 0;
+            padding: 20px;
+        }
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-overlay);
+            z-index: -1;
+        }
+        .container { max-width: 1100px; margin: 0 auto; }
+        
+        .back-nav { margin-bottom: 30px; }
+        .back-btn {
+            color: var(--gold);
+            text-decoration: none;
+            font-family: 'Cinzel';
+            border: 1px solid var(--gold);
+            padding: 8px 20px;
+            border-radius: 5px;
+            transition: 0.3s;
+            background: rgba(0,0,0,0.4);
+        }
+        .back-btn:hover { background: var(--gold); color: #000; }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 40px;
+            align-items: start;
+        }
+
+        .card {
+            background: rgba(15, 18, 22, 0.9);
+            border: 1px solid #333;
+            border-top: 4px solid var(--gold);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        h2 {
+            font-family: 'Cinzel';
+            color: var(--gold);
+            margin-top: 0;
+            border-bottom: 1px solid rgba(212,175,55,0.2);
+            padding-bottom: 15px;
+            text-align: center;
+            letter-spacing: 2px;
+        }
+
+        /* MARKET TABLE */
+        .market-table { width: 100%; border-collapse: collapse; }
+        .market-table tr { border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .market-table td { padding: 12px 10px; font-size: 0.95rem; }
+        .item-info { display: flex; align-items: center; gap: 15px; }
+        .item-icon { width: 32px; height: 32px; border: 1px solid #444; border-radius: 4px; }
+        .price-tag { color: var(--gold); font-family: 'Cinzel'; font-weight: bold; text-align: right; }
+
+        /* POLICIES */
+        .policy-section { margin-bottom: 25px; }
+        .policy-section h4 { color: var(--gold); font-family: 'Cinzel'; margin-bottom: 10px; border-left: 3px solid var(--gold); padding-left: 10px; }
+        .policy-section p { font-size: 0.9rem; color: #ccc; line-height: 1.6; margin: 0; }
+        
+        ul { padding-left: 20px; color: #ccc; font-size: 0.9rem; }
+        li { margin-bottom: 8px; }
+
+        @media (max-width: 900px) {
+            .info-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="back-nav">
+            <a href="index.html" class="back-btn">← DASHBOARD</a>
+        </div>
+
+        <div class="info-grid">
+            <div class="card">
+                <h2>MARKETPLACE</h2>
+                <table class="market-table">
+                    <tr>
+                        <td><div class="item-info"><img src="https://i.ibb.co/84gZPVRP/necklace-valakas.png" class="item-icon"> Valakas</div></td>
+                        <td class="price-tag">3100 PTS</td>
+                    </tr>
+                    <tr>
+                        <td><div class="item-info"><img src="https://i.ibb.co/rfqvc6mv/earring-antharas.png" class="item-icon"> Antharas</div></td>
+                        <td class="price-tag">1100 PTS</td>
+                    </tr>
+                    <tr>
+                        <td><div class="item-info"><img src="https://i.ibb.co/XrZkv67h/ring-of-baium.png" class="item-icon"> Baium</div></td>
+                        <td class="price-tag">950 PTS</td>
+                    </tr>
+                    <tr>
+                        <td><div class="item-info"><img src="https://i.ibb.co/gF4YKGTM/frintezza-necklace.png" class="item-icon"> Frintezza</div></td>
+                        <td class="price-tag">225 PTS</td>
+                    </tr>
+                    <tr>
+                        <td><div class="item-info"><img src="https://i.ibb.co/spkC6Gzz/zaken-earring.png" class="item-icon"> Zaken</div></td>
+                        <td class="price-tag">175 PTS</td>
+                    </tr>
+                    <tr>
+                        <td><div class="item-info"><img src="https://i.ibb.co/0X6mPzYV/orfen-earring.png" class="item-icon"> Orfen</div></td>
+                        <td class="price-tag">150 PTS</td>
+                    </tr>
+                    <tr>
+                        <td><div class="item-info"><img src="https://i.ibb.co/rKRtZmBG/ring-of-queen-ant.png" class="item-icon"> Ant Queen</div></td>
+                        <td class="price-tag">150 PTS</td>
+                    </tr>
+                    <tr>
+                        <td><div class="item-info"><img src="https://i.ibb.co/3mN9R0sK/ring-of-core.png" class="item-icon"> Core</div></td>
+                        <td class="price-tag">100 PTS</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="card">
+                <h2>ALLIANCE POLICIES</h2>
+                
+                <div class="policy-section">
+                    <h4>Attendance Points</h4>
+                    <ul>
+                        <li><strong>Mid Epics (AQ, Orfen, Zaken, Core):</strong> 1 Point</li>
+                        <li><strong>High Epics (Baium, Frintezza):</strong> 2 Points</li>
+                        <li><strong>Grand Bosses (Valakas, Antharas):</strong> 3 Points</li>
+                        <li><strong>Sieges & Territory Wars:</strong> 1 Point ανά κάστρο/σημαία.</li>
+                    </ul>
+                </div>
+
+                <div class="policy-section">
+                    <h4>Loot Rules</h4>
+                    <p>Το Loot δίνεται στο CP με τους περισσότερους πόντους που έχει δηλώσει ενδιαφέρον για το συγκεκριμένο item.</p>
+                </div>
+
+                <div class="policy-section">
+                    <h4>Cooldown System</h4>
+                    <p>Κάθε CP που παίρνει Epic Jewel μπαίνει σε 3 εβδομάδες cooldown για το επόμενο "Big Jewel" (Valakas/Antharas/Baium).</p>
+                </div>
+
+                <div class="policy-section">
+                    <h4>Member Conduct</h4>
+                    <p>Σεβασμός στους Shot Callers κατά τη διάρκεια του war. Το "Griefing" ή η μη προσέλευση χωρίς ενημέρωση τιμωρείται με αφαίρεση πόντων.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
