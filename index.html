@@ -20,7 +20,7 @@
         }
         body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-overlay); z-index: -1; }
 
-        /* HEADER & NAVIGATION */
+        /* HEADER CONTROLS */
         .header-controls { position: absolute; top: 20px; right: 40px; display: flex; gap: 10px; z-index: 100; }
         .control-btn { color: var(--gold); font-family: 'Cinzel'; border: 1px solid var(--gold); padding: 5px 15px; border-radius: 5px; background: rgba(0,0,0,0.6); font-size: 0.75rem; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 8px; }
         .control-btn:hover { background: var(--gold); color: #000; }
@@ -29,22 +29,25 @@
         .ally-logo { width: 110px; filter: drop-shadow(0 0 15px var(--gold)); }
         .ally-title { font-family: 'Cinzel Decorative', cursive; font-size: 1.8rem; color: var(--gold); display: block; letter-spacing: 2px; margin-bottom: 20px;}
 
+        /* MAIN NAVIGATION */
         .main-nav { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-        .nav-btn { background: rgba(212, 175, 55, 0.1); border: 1px solid var(--gold); color: var(--gold); padding: 8px 15px; font-family: 'Cinzel'; cursor: pointer; transition: 0.3s; font-size: 0.75rem; border-radius: 4px; text-decoration: none; display: inline-block; }
-        .nav-btn:hover, .nav-btn.active { background: var(--gold); color: #000; }
+        .nav-link { text-decoration: none; }
+        .nav-btn { background: rgba(212, 175, 55, 0.1); border: 1px solid var(--gold); color: var(--gold); padding: 8px 15px; font-family: 'Cinzel'; cursor: pointer; transition: 0.3s; font-size: 0.75rem; border-radius: 4px; }
+        .nav-btn:hover { background: var(--gold); color: #000; }
+        .nav-btn.active { background: var(--gold); color: #000; box-shadow: 0 0 10px rgba(212, 175, 55, 0.5); }
 
         /* LEADERS */
         .leaders-row { display: flex; justify-content: center; gap: 40px; margin-bottom: 20px; }
-        .leader-card { text-align: center; width: 110px; }
-        .img-frame { width: 80px; height: 80px; margin: 0 auto; background: #000; border: 2px solid var(--gold); border-radius: 50%; overflow: hidden; }
+        .leader-card { text-align: center; width: 110px; cursor: pointer; }
+        .img-frame { width: 80px; height: 80px; margin: 0 auto; background: #000; border: 2px solid var(--gold); border-radius: 50%; overflow: hidden; box-shadow: 0 0 15px rgba(212,175,55,0.2); }
         .leader-img { width: 100%; height: 100%; object-fit: contain; }
         .leader-name { color: var(--gold); font-size: 0.8rem; font-family: 'Cinzel'; display: block; margin-top: 8px; font-weight: bold; }
 
-        /* SEARCH BAR */
-        .search-container { max-width: 400px; margin: 0 auto 20px; }
-        .search-bar { width: 100%; background: rgba(0,0,0,0.6); border: 1px solid var(--gold); padding: 10px; border-radius: 20px; color: #fff; text-align: center; font-family: 'Cinzel'; outline: none; }
+        /* SEARCH BAR - ΣΤΑΘΕΡΗ ΘΕΣΗ ΠΟΥ ΔΕΝ ΧΑΛΑΕΙ ΤΟ GRID */
+        .search-container { max-width: 400px; margin: 0 auto 20px auto; }
+        .search-bar { width: 100%; background: rgba(0,0,0,0.6); border: 1px solid var(--gold); padding: 10px; border-radius: 20px; color: var(--gold); text-align: center; font-family: 'Cinzel'; outline: none; box-sizing: border-box; }
 
-        /* GRID & LISTS (DESKTOP 750px) */
+        /* LISTS (750px Height) */
         .main-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; max-width: 1400px; margin: 0 auto; padding: 0 20px 40px; }
         .clan-column { background: rgba(15, 18, 22, 0.95); height: 750px; display: flex; flex-direction: column; border: 1px solid #333; border-radius: 10px; border-top: 4px solid var(--gold); }
         .column-header { padding: 15px; text-align: center; font-family: 'Cinzel'; font-size: 1.1rem; border-bottom: 1px solid #222; background: rgba(0,0,0,0.4); }
@@ -58,22 +61,23 @@
         .cp-content { display: none; background: rgba(0,0,0,0.85); padding: 15px; border-top: 1px solid #333; }
         .cp-box.active .cp-content { display: block; }
 
-        /* STATS GRID (8 ITEMS) */
+        /* STATS GRID */
         .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
         .stat-box { background: #15181c; padding: 6px; border: 1px solid #333; text-align: center; border-radius: 4px; }
         .boss-icon { width: 22px; height: 22px; margin-bottom: 4px; }
         .stat-val { font-size: 0.75rem; color: #fff; display: block; }
 
-        /* MOBILE FIX */
+        /* MOBILE PATCH */
         @media (max-width: 900px) {
             .header-controls { position: relative; top: 0; right: 0; justify-content: center; padding: 10px; }
             .main-wrapper { grid-template-columns: 1fr; }
-            .clan-column { height: 500px; }
+            .clan-column { height: 550px; }
             .stat-grid { grid-template-columns: repeat(3, 1fr); }
+            .ally-title { font-size: 1.4rem; }
         }
     </style>
 </head>
-<body onclick="tryAutoPlay()">
+<body>
 
     <div class="header-controls">
         <div class="control-btn" id="clock">00:00:00 UTC</div>
@@ -84,10 +88,10 @@
         <span class="ally-title">BROKEN MIRROR ALLIANCE</span>
         
         <div class="main-nav">
-            <a href="index.html" class="nav-btn active">DASHBOARD</a>
-            <a href="info.html" class="nav-btn">MARKET & POLICIES</a>
-            <a href="history.html" class="nav-btn">HISTORY</a>
-            <a href="pvpzone.html" class="nav-btn">PVP ZONE</a>
+            <a href="index.html" class="nav-link"><button class="nav-btn active">DASHBOARD</button></a>
+            <a href="info.html" class="nav-link"><button class="nav-btn">MARKET & POLICIES</button></a>
+            <a href="history.html" class="nav-link"><button class="nav-btn">LEAVERS HISTORY</button></a>
+            <a href="pvpzone.html" class="nav-link"><button class="nav-btn">PVP ZONE</button></a>
         </div>
 
         <div class="leaders-row">
