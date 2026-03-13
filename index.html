@@ -3,110 +3,283 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BMA | Alliance Dashboard</title>
+    <title>Broken Mirror Alliance | Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        :root { --gold: #d4af37; --noldor-sky: #00d9ff; --krim-red: #ff3333; --bg-overlay: rgba(10, 12, 15, 0.96); }
+        :root {
+            --gold: #d4af37; --silver: #c0c0c0; --bronze: #cd7f32;
+            --noldor-sky: #00d9ff; --krim-red: #ff3333;
+            --bg-overlay: rgba(10, 12, 15, 0.96); 
+        }
         html { scroll-behavior: smooth; }
-        body { font-family: 'Open Sans', sans-serif; background: #0a0c0f url('https://i.ibb.co/1GmpSyxZ/BACKGROUND.jpg') no-repeat center center fixed; background-size: cover; color: #eee; margin: 0; padding: 0; }
+        body { 
+            font-family: 'Open Sans', sans-serif; 
+            background: #0a0c0f url('https://i.ibb.co/1GmpSyxZ/BACKGROUND.jpg') no-repeat center center fixed; 
+            background-size: cover; color: #eee; margin: 0; padding: 0;
+        }
         body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-overlay); z-index: -1; }
 
-        /* NAVIGATION */
-        .floating-nav { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 20px; background: rgba(0,0,0,0.95); padding: 12px 30px; border-radius: 40px; border: 1px solid var(--gold); z-index: 10000; }
-        .nav-btn { color: var(--gold); text-decoration: none; font-family: 'Cinzel'; font-size: 0.85rem; font-weight: bold; }
-        .pvp-link { color: #ff3333; border-left: 1px solid #444; padding-left: 20px; }
+        /* CALLER MODAL */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9998; backdrop-filter: blur(5px); }
+        #caller-modal {
+            display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 420px; background: #0f1216; border: 2px solid var(--gold); border-radius: 15px;
+            padding: 30px; z-index: 9999; box-shadow: 0 0 50px #000; text-align: center;
+        }
 
-        /* HEADER & CALLERS */
-        .page-section { min-height: 100vh; padding: 40px 20px; }
+        .page-section { min-height: 100vh; padding: 20px; box-sizing: border-box; position: relative; border-bottom: 1px solid rgba(212,175,55,0.1); }
+        .server-time { position: absolute; top: 20px; right: 40px; color: var(--gold); font-family: 'Cinzel'; border: 1px solid var(--gold); padding: 5px 15px; border-radius: 5px; background: rgba(0,0,0,0.5); font-size: 0.8rem; }
+
         .top-header { text-align: center; margin-bottom: 30px; }
-        .ally-logo { width: 100px; filter: drop-shadow(0 0 10px var(--gold)); }
-        .ally-title { font-family: 'Cinzel Decorative'; font-size: 2rem; color: var(--gold); display: block; margin-top: 10px; }
+        .ally-logo { width: 140px; height: auto; filter: drop-shadow(0 0 15px var(--gold)); margin-bottom: 10px; }
+        .ally-title { font-family: 'Cinzel Decorative', cursive; font-size: 2.2rem; color: var(--gold); display: block; letter-spacing: 2px; }
+        
+        /* CALLERS ROW - FLEXIBLE FOR MORE */
+        .leaders-row { display: flex; justify-content: center; flex-wrap: wrap; gap: 40px; margin-top: 30px; max-width: 1200px; margin-left: auto; margin-right: auto; }
+        .leader-card { text-align: center; cursor: pointer; transition: 0.3s; min-width: 120px; }
+        .leader-card:hover { transform: scale(1.1); }
+        .img-frame { width: 90px; height: 90px; margin: 0 auto; background: #000; border: 2px solid var(--gold); border-radius: 50%; overflow: hidden; box-shadow: 0 0 15px rgba(212,175,55,0.3); }
+        .leader-img { width: 100%; height: 100%; object-fit: contain; }
+        .leader-name { color: var(--gold); font-size: 0.85rem; font-family: 'Cinzel'; display: block; margin-top: 10px; font-weight: bold; }
+        .leader-role { color: #888; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; display: block; margin-top: 2px; }
 
-        .leaders-row { display: flex; justify-content: center; gap: 30px; margin-top: 20px; }
-        .leader-card { text-align: center; width: 80px; }
-        .img-frame { width: 60px; height: 60px; margin: 0 auto; background: #000; border: 2px solid var(--gold); border-radius: 50%; overflow: hidden; }
-        .leader-img { width: 100%; height: 100%; object-fit: cover; }
-        .leader-name { color: var(--gold); font-size: 0.7rem; font-family: 'Cinzel'; display: block; margin-top: 5px; }
+        /* DASHBOARD */
+        .main-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; max-width: 1600px; margin: 40px auto; }
+        .clan-column { background: rgba(15, 18, 22, 0.95); height: 750px; display: flex; flex-direction: column; border: 1px solid #333; border-radius: 10px; border-top: 4px solid var(--gold); }
+        .column-header { padding: 18px; text-align: center; font-family: 'Cinzel'; font-size: 1.1rem; border-bottom: 1px solid #222; display: flex; align-items: center; justify-content: center; gap: 12px; }
+        .clan-mini-logo { width: 35px; height: 35px; object-fit: contain; }
 
-        /* ROSTER */
-        .main-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; max-width: 1400px; margin: 0 auto; }
-        .clan-column { background: rgba(15, 18, 22, 0.95); height: 600px; display: flex; flex-direction: column; border: 1px solid #333; border-radius: 10px; border-top: 4px solid var(--gold); }
-        .column-header { padding: 15px; text-align: center; font-family: 'Cinzel'; font-size: 1.1rem; border-bottom: 1px solid #222; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .scroll-area { overflow-y: auto; padding: 10px; flex-grow: 1; }
+        .scroll-area::-webkit-scrollbar { width: 5px; }
+        .scroll-area::-webkit-scrollbar-thumb { background: var(--gold); }
 
-        /* CP & MEMBERS */
-        .cp-box { margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.3); border-radius: 6px; overflow: hidden; }
-        .top-cp { border: 1px solid var(--gold); background: rgba(212, 175, 55, 0.05); }
-        .cp-btn { width: 100%; background: none; border: none; padding: 12px 15px; color: #fff; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 600; }
-        .points-tag { border: 1px solid var(--gold); padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; color: var(--gold); }
+        /* CP BOXES */
+        .cp-box { margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.3); border-radius: 6px; overflow: hidden; transition: 0.3s; }
+        
+        /* TOP 3 CP HIGHLIGHT */
+        .top-cp { border: 1px solid var(--gold); background: rgba(212, 175, 55, 0.05); box-shadow: inset 0 0 10px rgba(212, 175, 55, 0.1); }
+        .top-cp .points-tag { background: var(--gold); color: #000; }
 
-        .member-list { display: none; background: rgba(0,0,0,0.4); border-top: 1px solid #222; }
+        .cp-btn { width: 100%; background: none; border: none; padding: 12px 15px; color: #fff; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-family: 'Open Sans'; font-weight: 600; }
+        .points-tag { border: 1px solid var(--gold); padding: 2px 10px; border-radius: 4px; font-size: 0.8rem; color: var(--gold); }
+
+        .member-list { display: none; background: rgba(0,0,0,0.5); border-top: 1px solid #222; padding: 5px 0; }
         .active > .member-list { display: block; }
-        .member-item { padding: 8px 20px; font-size: 0.85rem; border-bottom: 1px solid rgba(255,255,255,0.02); color: #ccc; }
-        .is-leader { color: var(--gold); font-weight: bold; }
 
-        .server-time { position: absolute; top: 20px; right: 40px; color: var(--gold); font-family: 'Cinzel'; border: 1px solid var(--gold); padding: 5px 15px; border-radius: 5px; font-size: 0.8rem; }
+        /* MEMBERS MENU */
+        .member-item { border-bottom: 1px solid rgba(255,255,255,0.03); }
+        .member-btn { width: 100%; background: none; border: none; padding: 10px 20px; color: #ccc; text-align: left; cursor: pointer; display: flex; justify-content: space-between; font-size: 0.85rem; align-items: center; }
+        .member-btn:hover { color: var(--gold); background: rgba(255,255,255,0.02); }
+        .leader-crown { color: var(--gold); margin-right: 8px; font-size: 0.9rem; }
+
+        .member-stats { display: none; background: #000; padding: 15px; border-top: 1px solid #333; }
+        .active-member > .member-stats { display: block; }
+
+        /* STATS GRID */
+        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+        .stat-box { background: #15181c; padding: 8px; border: 1px solid #222; text-align: center; border-radius: 4px; }
+        .stat-name { display: block; color: var(--gold); font-size: 0.55rem; font-weight: bold; text-transform: uppercase; margin-bottom: 2px; }
+        .stat-val { font-size: 0.9rem; color: #fff; font-family: 'Cinzel'; }
+
+        /* LOOT SECTION */
+        .loot-section { padding: 12px; background: rgba(212, 175, 55, 0.03); border-top: 1px solid #333; }
+        .loot-toggle-btn { width: 100%; background: rgba(212,175,55,0.1); color: var(--gold); border: 1px solid var(--gold); padding: 8px; font-family: 'Cinzel'; cursor: pointer; border-radius: 4px; font-size: 0.75rem; transition: 0.3s; }
+        .loot-toggle-btn:hover { background: var(--gold); color: #000; }
+        .loot-content { display: none; margin-top: 10px; font-size: 0.8rem; color: #aaa; padding-left: 12px; border-left: 2px solid var(--gold); }
+
+        /* SECTION 2 & 3 STYLES */
+        .section-flex { display: flex; flex-wrap: wrap; gap: 30px; justify-content: center; max-width: 1400px; margin: 0 auto; }
+        .epic-table-container { background: rgba(10, 12, 15, 0.9); border: 2px solid var(--gold); border-radius: 10px; padding: 15px; flex: 1; min-width: 300px; }
+        .epic-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        .epic-table th { border-bottom: 2px solid var(--gold); color: var(--gold); font-family: 'Cinzel'; padding: 10px; text-align: left; }
+        .epic-table td { padding: 8px 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+        .mini-icon { width: 22px; height: 22px; vertical-align: middle; margin-right: 10px; }
+        .rules-container { background: rgba(15, 18, 22, 0.95); border-left: 4px solid var(--gold); border-radius: 8px; padding: 20px; flex: 1.5; min-width: 400px; font-size: 0.85rem; line-height: 1.6; }
+        .rules-container h3 { font-family: 'Cinzel'; color: var(--gold); margin-top: 0; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        .rule-item { margin-bottom: 8px; display: flex; gap: 10px; }
+        .highlight { color: var(--gold); font-weight: bold; }
+        .tab-container { max-width: 1200px; margin: 30px auto; background: rgba(15,18,22,0.9); border: 1px solid #333; border-radius: 10px; overflow: hidden; }
+        .tab-menu { display: flex; background: #111; border-bottom: 1px solid #333; }
+        .tab-link { padding: 15px 25px; cursor: pointer; color: #777; font-family: 'Cinzel'; border-right: 1px solid #222; }
+        .tab-link.active { color: var(--gold); background: rgba(212,175,55,0.1); border-bottom: 2px solid var(--gold); }
+        .tab-content { padding: 25px; display: none; }
+        .tab-content.active { display: block; }
     </style>
 </head>
 <body>
 
-    <nav class="floating-nav">
-        <a href="index.html" class="nav-btn">ROSTER</a>
-        <a href="marketplace.html" class="nav-btn">MARKETPLACE</a>
-        <a href="videos.html" class="nav-btn pvp-link">PVP ZONE</a>
-    </nav>
+    <div class="modal-overlay" id="overlay" onclick="closeModal()"></div>
+    <div id="caller-modal">
+        <img id="modal-img" src="" style="width:100px; height:100px; border-radius:50%; border:2px solid var(--gold); margin-bottom:15px; background:#000;">
+        <h2 id="modal-name" style="font-family:'Cinzel Decorative'; color:var(--gold); margin:0;"></h2>
+        <p id="modal-title" style="color:#888; font-size:0.7rem; letter-spacing:2px; margin-bottom:20px;"></p>
+        <div class="stat-grid" id="modal-stats"></div>
+        <button onclick="closeModal()" style="margin-top:20px; background:var(--gold); color:#000; border:none; padding:10px 30px; cursor:pointer; font-weight:bold; font-family:'Cinzel'; border-radius:4px;">CLOSE</button>
+    </div>
 
-    <div class="page-section">
-        <div class="server-time" id="clock">00:00:00</div>
+    <div class="page-section" id="section1">
+        <div class="server-time" id="clock">SERVER TIME: 00:00:00</div>
         
         <div class="top-header">
             <img src="https://i.ibb.co/6R9q5PGv/ALLIANCE-LOGO.png" class="ally-logo">
             <span class="ally-title">BROKEN MIRROR ALLIANCE</span>
             
             <div class="leaders-row">
-                <div class="leader-card">
+                <div class="leader-card" onclick="openCaller('NIKLAUS', 'ALLY LEADER', 'https://i.ibb.co/5X3NDQFR/niklaus.png')">
                     <div class="img-frame"><img src="https://i.ibb.co/5X3NDQFR/niklaus.png" class="leader-img"></div>
                     <span class="leader-name">NIKLAUS</span>
+                    <span class="leader-role">ALLY LEADER</span>
                 </div>
-                <div class="leader-card">
+                <div class="leader-card" onclick="openCaller('TSAKNORRIS', 'SHOT CALLER', 'https://i.ibb.co/xSVgzBPB/tsaknorris.png')">
                     <div class="img-frame"><img src="https://i.ibb.co/xSVgzBPB/tsaknorris.png" class="leader-img"></div>
                     <span class="leader-name">TSAKNORRIS</span>
+                    <span class="leader-role">SHOT CALLER</span>
                 </div>
-            </div>
+                </div>
         </div>
 
         <div class="main-wrapper">
-            <div class="clan-column" style="border-top-color: var(--noldor-sky);"><div class="column-header" style="color:var(--noldor-sky)">NOLDOR CLAN</div><div class="scroll-area" id="noldor-list"></div></div>
-            <div class="clan-column" style="border-top-color: var(--krim-red);"><div class="column-header" style="color:var(--krim-red)">KRIMINALIDES CLAN</div><div class="scroll-area" id="krim-list"></div></div>
+            <div class="clan-column">
+                <div class="column-header" style="color:var(--noldor-sky)">
+                    <img src="https://i.ibb.co/8LvFNQkC/noldor.png" class="clan-mini-logo"> NOLDOR CLAN — CPs
+                </div>
+                <div class="scroll-area" id="noldor-list"></div>
+            </div>
+            <div class="clan-column">
+                <div class="column-header" style="color:var(--krim-red)">
+                    <img src="https://i.ibb.co/VYMZjzYr/kriminalides.png" class="clan-mini-logo"> KRIMINALIDES CLAN — CPs
+                </div>
+                <div class="scroll-area" id="krim-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page-section" id="section2" style="background: rgba(0,0,0,0.6);">
+        <h2 style="font-family:'Cinzel Decorative'; color:var(--gold); text-align:center; margin:30px 0;">MARKETPLACE & PROTOCOL</h2>
+        <div class="section-flex">
+            <div class="epic-table-container">
+                <table class="epic-table">
+                    <thead><tr><th>JEWEL</th><th>PRICE</th></tr></thead>
+                    <tbody id="prices-table-body"></tbody>
+                </table>
+            </div>
+            <div class="rules-container">
+                <h3>POINTS SYSTEM & POLICIES</h3>
+                <div class="rule-item"><span>» <span class="highlight">Attendance:</span> Mid-Low Epics = 1 | Baium = 2 | Siege/Valakas/Antharas = 3.</span></div>
+                <div class="rule-item"><span>» <span class="highlight">Purchases:</span> Points are deducted from the CP's total balance.</span></div>
+                <div class="rule-item"><span>» <span class="highlight">Priority:</span> <span style="color:var(--noldor-sky)">Baium</span> (Archer CPs) | <span style="color:var(--krim-red)">Valakas</span> (Mage CPs) | <span style="color:#00ff88">Antharas</span> (Stoppers).</span></div>
+                <div class="rule-item"><span>» <span class="highlight">Cooldown:</span> 3-week restriction for the same jewel (Frintezza+).</span></div>
+                <div class="rule-item"><span>» <span class="highlight">Caller Bonus:</span> Callers receive personal points (x9 multiplier).</span></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page-section" id="section3">
+        <h2 style="font-family:'Cinzel Decorative'; color:var(--gold); text-align:center; margin:30px 0;">ALLIANCE MANAGEMENT CENTER</h2>
+        <div class="tab-container">
+            <div class="tab-menu">
+                <div class="tab-link active" onclick="openTab(event, 'rules')">RULES</div>
+                <div class="tab-link" onclick="openTab(event, 'siege')">SIEGES</div>
+                <div class="tab-link" onclick="openTab(event, 'announcements')">ANNOUNCEMENTS</div>
+            </div>
+            <div id="rules" class="tab-content active">
+                <p>• Respect the Shotcallers. • Mandatory Discord. • DKP distribution.</p>
+            </div>
+            <div id="siege" class="tab-content">
+                <p>Main Target: Aden. Secondary: Giran.</p>
+            </div>
+            <div id="announcements" class="tab-content">
+                <p>Alliance meeting this Friday at 21:00.</p>
+            </div>
         </div>
     </div>
 
     <script>
-        const noldor = [
-            { name: "Noldor Archer", pts: 4800, members: ["Niklaus (L)", "Member1", "Member2", "Member3", "Member4", "Member5", "Member6", "Member7", "Member8"] },
-            { name: "Outlaw CP", pts: 3100, members: ["Outlaw (L)", "M1", "M2"] }
-        ];
-        const krim = [
-            { name: "Hattrick CP", pts: 5500, members: ["Hattrick (L)", "Player1", "Player2", "Player3", "Player4", "Player5", "Player6", "Player7", "Player8"] }
+        const bosses = ["VAL", "ANT", "BAI", "FRI", "ZAK", "ORF", "AQ", "CORE", "SIEGE"];
+        
+        const noldorNames = ["Noldor Clan", "Noldor Archer", "Noldor Archer 2", "Noldor Dummy", "Noldor Tank", "Kriminalides CP", "Outlaw CP", "Ronin CP", "Brazilians CP", "Brazilians 2 CP", "I am Groot CP"];
+        const krimNames = ["Hattrick CP", "55 Room CP", "Legion CP", "Criminal Record CP", "Avalanche CP", "Gankly Crew CP", "Furious Wolves CP", "Animals CP", "Dracaris CP", "Sinaloa CP", "Knockout CP", "VaBank CP"];
+
+        const pricesData = [
+            { name: "Core Ring", pts: 25, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/ring-of-core.png?raw=true" },
+            { name: "Orfen Earring", pts: 75, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/earring-orfen.png?raw=true" },
+            { name: "Queen Ant Ring", pts: 150, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/ring-of-queen-ant.png?raw=true" },
+            { name: "Zaken Earring", pts: 175, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/zaken-earring.png?raw=true" },
+            { name: "Frintezza Neck", pts: 225, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/frintezza-necklace.png?raw=true" },
+            { name: "Baium Ring", pts: 950, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/ring-of-baium.png?raw=true" },
+            { name: "Antharas Earring", pts: 1100, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/earring-antharas.png?raw=true" },
+            { name: "Valakas Necklace", pts: 3100, img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/necklace-valakas.png?raw=true" }
         ];
 
-        function render() {
-            const listFn = (data, el) => {
-                document.getElementById(el).innerHTML = data.sort((a,b)=>b.pts-a.pts).map((cp, idx) => `
-                    <div class="cp-box ${idx === 0 ? 'top-cp' : ''}">
+        function renderLists() {
+            const render = (names, elId) => {
+                document.getElementById(elId).innerHTML = names.map((name, index) => {
+                    const isTop3 = index < 3;
+                    return `
+                    <div class="cp-box ${isTop3 ? 'top-cp' : ''}">
                         <button class="cp-btn" onclick="this.parentElement.classList.toggle('active')">
-                            <span>${idx===0?'⭐ ':''}${cp.name}</span><span class="points-tag">${cp.pts} PTS</span>
+                            <span>${isTop3 ? '⭐ ' : ''}${name}</span>
+                            <span class="points-tag">2500 PTS</span>
                         </button>
                         <div class="member-list">
-                            ${cp.members.map(m => `<div class="member-item ${m.includes('(L)')?'is-leader':''}">${m}</div>`).join('')}
+                            <div class="member-item">
+                                <button class="member-btn" onclick="this.parentElement.classList.toggle('active-member')">
+                                    <span><span class="leader-crown">👑</span>CP Leader</span><small>▼</small>
+                                </button>
+                                <div class="member-stats">
+                                    <div class="stat-grid">${bosses.map(b => `<div class="stat-box"><span class="stat-name">${b}</span><span class="stat-val">0</span></div>`).join('')}</div>
+                                </div>
+                            </div>
+                            ${["Member A", "Member B", "Member C"].map(m => `
+                                <div class="member-item">
+                                    <button class="member-btn" onclick="this.parentElement.classList.toggle('active-member')">
+                                        <span>${m}</span><small>▼</small>
+                                    </button>
+                                    <div class="member-stats">
+                                        <div class="stat-grid">${bosses.map(b => `<div class="stat-box"><span class="stat-name">${b}</span><span class="stat-val">0</span></div>`).join('')}</div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                            <div class="loot-section">
+                                <button class="loot-toggle-btn" onclick="toggleLoot('${name}')">VIEW CP LOOT HISTORY</button>
+                                <div class="loot-content" id="loot-${name.replace(/\s+/g, '')}">No items yet.</div>
+                            </div>
                         </div>
                     </div>
-                `).join('');
+                `}).join('');
             };
-            listFn(noldor, 'noldor-list'); listFn(krim, 'krim-list');
+            render(noldorNames, 'noldor-list');
+            render(krimNames, 'krim-list');
+            document.getElementById('prices-table-body').innerHTML = pricesData.map(p => `<tr><td><img src="${p.img}" class="mini-icon"> ${p.name}</td><td style="color:var(--gold); font-weight:bold;">${p.pts}</td></tr>`).join('');
         }
+
+        function toggleLoot(name) {
+            const el = document.getElementById('loot-' + name.replace(/\s+/g, ''));
+            el.style.display = (el.style.display === 'block') ? 'none' : 'block';
+        }
+
+        function openCaller(name, title, img) {
+            document.getElementById('modal-name').innerText = name;
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-img').src = img;
+            document.getElementById('modal-stats').innerHTML = bosses.map(b => `<div class="stat-box"><span class="stat-name">${b}</span><span class="stat-val">${Math.floor(Math.random()*15)}</span></div>`).join('');
+            document.getElementById('caller-modal').style.display = 'block';
+            document.getElementById('overlay').style.display = 'block';
+        }
+
+        function closeModal() { document.getElementById('caller-modal').style.display = 'none'; document.getElementById('overlay').style.display = 'none'; }
+        function openTab(evt, tabName) {
+            let i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) tabcontent[i].classList.remove("active");
+            tablinks = document.getElementsByClassName("tab-link");
+            for (i = 0; i < tablinks.length; i++) tablinks[i].classList.remove("active");
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+
         setInterval(() => { document.getElementById('clock').innerText = "SERVER TIME: " + new Date().toLocaleTimeString('el-GR'); }, 1000);
-        render();
+        renderLists();
     </script>
 </body>
 </html>
