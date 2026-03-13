@@ -25,14 +25,16 @@
         .control-btn { color: var(--gold); font-family: 'Cinzel'; border: 1px solid var(--gold); padding: 5px 15px; border-radius: 5px; background: rgba(0,0,0,0.6); font-size: 0.75rem; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 8px; }
         .control-btn:hover { background: var(--gold); color: #000; }
 
-        .top-header {<div class="tabs-nav" style="margin-top: 10px;">
-    <a href="index.html" style="text-decoration:none;"><button class="tab-btn active">ALLIANCE DASHBOARD</button></a>
-    <a href="history.html" style="text-decoration:none;"><button class="tab-btn">LEAVERS HISTORY</button></a>
-    <a href="pvpzone.html" style="text-decoration:none;"><button class="tab-btn">PVP ZONE</button></a>
-    <a href="halloffame.html" style="text-decoration:none;"><button class="tab-btn">HALL OF FAME</button></a>
-</div>}
+        .top-header { text-align: center; padding-top: 20px; }
         .ally-logo { width: 110px; filter: drop-shadow(0 0 15px var(--gold)); }
         .ally-title { font-family: 'Cinzel Decorative', cursive; font-size: 1.8rem; color: var(--gold); display: block; letter-spacing: 2px; margin-bottom: 20px;}
+
+        /* MAIN NAVIGATION */
+        .main-nav { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .nav-link { text-decoration: none; }
+        .nav-btn { background: rgba(212, 175, 55, 0.1); border: 1px solid var(--gold); color: var(--gold); padding: 8px 15px; font-family: 'Cinzel'; cursor: pointer; transition: 0.3s; font-size: 0.75rem; border-radius: 4px; }
+        .nav-btn:hover { background: var(--gold); color: #000; }
+        .nav-btn.active { background: var(--gold); color: #000; box-shadow: 0 0 10px rgba(212, 175, 55, 0.5); }
 
         /* LEADERS */
         .leaders-row { display: flex; justify-content: center; gap: 40px; margin-bottom: 20px; }
@@ -129,6 +131,13 @@
         <img src="https://i.ibb.co/6R9q5PGv/ALLIANCE-LOGO.png" class="ally-logo">
         <span class="ally-title">BROKEN MIRROR ALLIANCE</span>
         
+        <div class="main-nav">
+            <a href="index.html" class="nav-link"><button class="nav-btn active">DASHBOARD</button></a>
+            <a href="history.html" class="nav-link"><button class="nav-btn">LEAVERS HISTORY</button></a>
+            <a href="pvpzone.html" class="nav-link"><button class="nav-btn">PVP ZONE</button></a>
+            <a href="halloffame.html" class="nav-link"><button class="nav-btn">HALL OF FAME</button></a>
+        </div>
+
         <div class="leaders-row">
             <div class="leader-card" onclick="openCaller('NIKLAUS', 'ALLY LEADER', 'https://i.ibb.co/5X3NDQFR/niklaus.png')">
                 <div class="img-frame"><img src="https://i.ibb.co/5X3NDQFR/niklaus.png" class="leader-img"></div>
@@ -144,7 +153,7 @@
     </div>
 
     <div class="tabs-nav">
-        <button class="tab-btn active" onclick="showPage('dashboard', this)">ALLIANCE DASHBOARD</button>
+        <button class="tab-btn active" onclick="showPage('dashboard', this)">ALLIANCE CP LIST</button>
         <button class="tab-btn" onclick="showPage('info', this)">MARKET & POLICIES</button>
     </div>
 
@@ -201,7 +210,7 @@
                     • Mage CPs: Valakas Necklace<br>
                     • Stopper Party: Antharas Earring<br><br>
                     <b style="color:var(--gold); font-family:'Cinzel';">COOLDOWN PROTOCOL:</b><br>
-                    3-week restriction for mid jewels.<br><br>
+                    3-week restriction for major jewels.<br><br>
                     <b style="color:var(--gold); font-family:'Cinzel';">DEDUCTIONS:</b><br>
                     Points are deducted automatically based on Marketplace price.
                 </div>
@@ -218,7 +227,7 @@
         ];
         let currentIdx = 0;
         let userInteracted = false;
-        let isMutedManually = false; // New flag for manual mute
+        let isMutedManually = false;
 
         const audio = document.getElementById('bg-music');
         const mIcon = document.getElementById('music-icon');
@@ -230,11 +239,10 @@
                 audio.play(); 
                 mIcon.innerText = "🔊";
                 isMutedManually = false;
-            }
-            else { 
+            } else { 
                 audio.pause(); 
                 mIcon.innerText = "🔇"; 
-                isMutedManually = true; // Set flag when user mutes
+                isMutedManually = true;
             }
         }
         function nextTrack(e) {
@@ -242,13 +250,9 @@
             currentIdx = (currentIdx + 1) % tracks.length;
             audio.src = tracks[currentIdx].url;
             tLabel.innerText = tracks[currentIdx].name;
-            if (!isMutedManually) {
-                audio.play(); 
-                mIcon.innerText = "🔊";
-            }
+            if (!isMutedManually) { audio.play(); mIcon.innerText = "🔊"; }
         }
         function tryAutoPlay() {
-            // Only play if not interacted yet AND not manually muted
             if(!userInteracted && !isMutedManually) {
                 audio.play().then(() => {
                     mIcon.innerText = "🔊";
@@ -301,7 +305,7 @@
                 {n:"Valakas",p:3100,i:bossIcons.VAL}, {n:"Antharas",p:1100,i:bossIcons.ANT},
                 {n:"Baium",p:950,i:bossIcons.BAI}, {n:"Zaken",p:175,i:bossIcons.ZAK},
                 {n:"Frintezza",p:225,i:bossIcons.FRI}, {n:"Queen Ant",p:150,i:bossIcons.AQ},
-                {n:"Orfen",p:75,i:bossIcons.ORF}, {n:"Core",p:25,i:bossIcons.COR}
+                {n:"Orfen",p:75,i:bossIcons.ORF}, {n:"Core",p:75,i:bossIcons.COR}
             ];
             document.getElementById('market-table').innerHTML = prices.map(p => `<tr><td><img src="${p.i}" style="width:22px; vertical-align:middle; margin-right:12px;"> ${p.n}</td><td style="color:var(--gold); font-weight:bold; text-align:right;">${p.p} PTS</td></tr>`).join('');
         }
@@ -319,12 +323,9 @@
             document.getElementById('modal-img').src = img;
             document.getElementById('modal-stats').innerHTML = Object.keys(bossIcons).map(b => `
                 <div class="stat-box"><img src="${bossIcons[b]}" class="boss-icon"><span class="stat-val">0</span></div>`).join('');
-            
-            // Reset Loot Panel
             const panel = document.getElementById('leader-loot-panel');
             panel.style.display = 'none';
             document.querySelector('#caller-modal .loot-btn').innerText = 'VIEW LOOT HISTORY';
-            
             document.getElementById('caller-modal').style.display = 'block';
             document.getElementById('overlay').style.display = 'block';
         }
