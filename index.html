@@ -9,6 +9,8 @@
         :root {
             --gold: #d4af37; --silver: #c0c0c0; --bronze: #cd7f32;
             --noldor-sky: #00d9ff; --krim-red: #ff3333;
+            --noldor-grad: linear-gradient(90deg, rgba(0,217,255,0.15) 0%, rgba(0,0,0,0) 100%);
+            --krim-grad: linear-gradient(90deg, rgba(255,51,51,0.15) 0%, rgba(0,0,0,0) 100%);
             --bg-overlay: rgba(10, 12, 15, 0.96); 
         }
         body { 
@@ -50,12 +52,14 @@
         .column-header { padding: 15px; text-align: center; font-family: 'Cinzel'; font-size: 1.1rem; border-bottom: 1px solid #222; display: flex; align-items: center; justify-content: center; gap: 12px; background: rgba(0,0,0,0.4); }
         .scroll-area { overflow-y: auto; padding: 10px; flex-grow: 1; }
 
+        /* GLOW COLORS & GRADIENTS */
         .cp-box { margin-bottom: 8px; border-radius: 5px; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s; }
-        .cp-noldor { border-left: 3px solid var(--noldor-sky); }
-        .cp-krim { border-left: 3px solid var(--krim-red); }
+        .cp-noldor { border-left: 4px solid var(--noldor-sky); background: var(--noldor-grad); box-shadow: inset 5px 0 15px rgba(0, 217, 255, 0.05); }
+        .cp-krim { border-left: 4px solid var(--krim-red); background: var(--krim-grad); box-shadow: inset 5px 0 15px rgba(255, 51, 51, 0.05); }
         
         .cp-btn { width: 100%; background: none; border: none; padding: 12px 15px; color: #fff; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 0.85rem; }
         .cp-content { display: none; background: rgba(0,0,0,0.85); padding: 15px; border-top: 1px solid #333; }
+        .cp-box.active { background: rgba(255,255,255,0.05); }
         .cp-box.active .cp-content { display: block; }
 
         .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 15px; }
@@ -68,6 +72,14 @@
 
         .loot-btn { width: 100%; background: rgba(212,175,55,0.1); border: 1px solid #444; color: var(--gold); padding: 8px; font-family: 'Cinzel'; font-size: 0.65rem; cursor: pointer; border-radius: 4px; margin-top:10px; }
         .loot-panel { display: none; padding: 12px; background: rgba(0,0,0,0.5); margin-top: 8px; border-radius: 4px; font-size: 0.75rem; border: 1px solid #222; color: #aaa; }
+
+        /* OTHER CLANS SECTION */
+        .other-clans-section { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 20px; margin-bottom: 40px; }
+        .new-clan-card { background: rgba(15, 18, 22, 0.95); border: 1px solid #333; border-top: 3px solid var(--gold); border-radius: 10px; padding: 20px; text-align: center; transition: 0.3s; }
+        .new-clan-card:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(212, 175, 55, 0.1); }
+        .new-clan-icon { width: 55px; height: 55px; margin-bottom: 12px; filter: drop-shadow(0 0 5px rgba(255,255,255,0.1)); }
+        .new-clan-name { display: block; font-family: 'Cinzel'; color: #fff; font-size: 0.95rem; letter-spacing: 1px; }
+        .new-clan-lead { display: block; color: var(--gold); font-size: 0.75rem; font-style: italic; margin-top: 6px; }
 
         /* MARKET & POLICIES */
         .info-wrapper { display: grid; grid-template-columns: 1fr 1.5fr; gap: 30px; }
@@ -142,6 +154,24 @@
                 <div class="scroll-area" id="krim-list"></div>
             </div>
         </div>
+
+        <div class="other-clans-section">
+            <div class="new-clan-card">
+                <img src="https://i.ibb.co/6cgvyHHW/orzelbialy.png" class="new-clan-icon">
+                <span class="new-clan-name">OrzelBialy Clan</span>
+                <span class="new-clan-lead">Leader: Unqual</span>
+            </div>
+            <div class="new-clan-card">
+                <img src="https://i.ibb.co/Y4spJqVy/exitgaming.png" class="new-clan-icon">
+                <span class="new-clan-name">ExitGaming Clan</span>
+                <span class="new-clan-lead">Leader: basilio</span>
+            </div>
+            <div class="new-clan-card">
+                <img src="https://i.ibb.co/xqg1qNFw/lastkingdom.png" class="new-clan-icon">
+                <span class="new-clan-name">LastKingdom Clan</span>
+                <span class="new-clan-lead">Leader: Concrete</span>
+            </div>
+        </div>
     </div>
 
     <div id="info" class="page">
@@ -196,7 +226,7 @@
         }
         function tryAutoPlay() {
             if(audio.paused && mIcon.innerText === "🔇") {
-                audio.play();
+                audio.play().catch(() => {});
                 mIcon.innerText = "🔊";
             }
         }
