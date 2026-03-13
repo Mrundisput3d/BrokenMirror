@@ -38,37 +38,14 @@
         .column-header { padding: 20px; text-align: center; font-family: 'Cinzel'; font-size: 1.2rem; border-bottom: 1px solid #222; display: flex; align-items: center; justify-content: center; gap: 12px; background: rgba(0,0,0,0.4); }
         .scroll-area { overflow-y: auto; padding: 15px; flex-grow: 1; scrollbar-width: thin; scrollbar-color: var(--gold) #111; }
 
-        /* CP BOX ENHANCED VISUALS */
-        .cp-box { 
-            margin-bottom: 12px; 
-            border: 1px solid rgba(212, 175, 55, 0.1); 
-            background: rgba(255, 255, 255, 0.02); 
-            border-radius: 8px; 
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        .cp-box:hover {
-            border-color: rgba(212, 175, 55, 0.5);
-            background: rgba(212, 175, 55, 0.05);
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.1);
-            transform: translateX(5px);
-        }
+        /* CP BOX */
+        .cp-box { margin-bottom: 12px; border: 1px solid rgba(212, 175, 55, 0.1); background: rgba(255, 255, 255, 0.02); border-radius: 8px; transition: all 0.3s ease; position: relative; overflow: hidden; }
+        .cp-box:hover { border-color: rgba(212, 175, 55, 0.5); background: rgba(212, 175, 55, 0.05); transform: translateX(5px); }
+        .cp-btn { width: 100%; background: none; border: none; padding: 16px; color: #fff; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-family: 'Open Sans'; font-weight: 700; text-transform: uppercase; font-size: 0.85rem; }
 
-        .cp-btn { 
-            width: 100%; background: none; border: none; padding: 16px; color: #fff; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; 
-            font-family: 'Open Sans'; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; font-size: 0.85rem;
-        }
-
-        /* GLOW EFFECTS */
-        .cp-box:hover .cp-btn span:first-child { text-shadow: 0 0 10px currentColor; filter: brightness(1.2); }
-        .cp-noldor { color: var(--noldor-sky); filter: drop-shadow(0 0 2px rgba(0, 217, 255, 0.2)); }
-        .cp-krim { color: var(--krim-red); filter: drop-shadow(0 0 2px rgba(255, 51, 51, 0.2)); }
-
-        .points-tag { 
-            font-size: 0.75rem; border: 1px solid rgba(212, 175, 55, 0.4); padding: 3px 10px; border-radius: 4px; font-family: 'Cinzel'; background: rgba(0, 0, 0, 0.3); color: var(--gold); transition: 0.3s;
-        }
-        .cp-box:hover .points-tag { border-color: var(--gold); box-shadow: 0 0 8px rgba(212, 175, 55, 0.3); }
+        .cp-noldor { color: var(--noldor-sky); }
+        .cp-krim { color: var(--krim-red); }
+        .points-tag { font-size: 0.75rem; border: 1px solid rgba(212, 175, 55, 0.4); padding: 3px 10px; border-radius: 4px; font-family: 'Cinzel'; background: rgba(0, 0, 0, 0.3); color: var(--gold); }
 
         /* MEMBER LISTS */
         .member-list { display: none; background: rgba(0,0,0,0.5); border-top: 1px solid #222; }
@@ -83,10 +60,10 @@
         .stat-val { font-size: 0.8rem; color: #fff; font-family: 'Cinzel'; font-weight: bold; display: block; }
 
         /* LOOT */
-        .loot-btn { width: 100%; background: rgba(212,175,55,0.05); border: none; padding: 12px; color: var(--gold); font-family: 'Cinzel'; cursor: pointer; font-size: 0.7rem; letter-spacing: 1px; border-top: 1px solid #333; }
+        .loot-btn { width: 100%; background: rgba(212,175,55,0.05); border: none; padding: 12px; color: var(--gold); font-family: 'Cinzel'; cursor: pointer; font-size: 0.7rem; border-top: 1px solid #333; }
         .loot-content { display: none; padding: 15px; background: rgba(0,0,0,0.4); border-top: 1px solid rgba(212,175,55,0.2); }
 
-        /* INFO SECTION (MARKET & POLICIES) */
+        /* INFO SECTION */
         .info-section { background: rgba(10, 12, 15, 0.98); border-top: 3px solid var(--gold); padding: 60px 20px; margin-top: 60px; }
         .info-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 50px; max-width: 1400px; margin: 0 auto; }
         .info-card { background: rgba(15, 18, 22, 0.8); border: 1px solid #333; border-radius: 12px; padding: 35px; }
@@ -184,14 +161,14 @@
 
     <script>
         const bossConfig = {
-            "VAL": { name: "Valakas", img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/necklace-valakas.png?raw=true" },
-            "ANT": { name: "Antharas", img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/earring-antharas.png?raw=true" },
-            "BAI": { name: "Baium", img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/ring-of-baium.png?raw=true" },
-            "FRI": { name: "Frintezza", img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/frintezza-necklace.png?raw=true" },
-            "ZAK": { name: "Zaken", img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/zaken-earring.png?raw=true" },
-            "CORE": { name: "Core", img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/ring-of-core.png?raw=true" },
-            "ORF": { name: "Orfen", img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/earring-orfen.png?raw=true" },
-            "AQ":  { name: "Queen Ant", img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/ring-of-queen-ant.png?raw=true" },
+            "VAL": { name: "Valakas", img: "https://i.ibb.co/84gZPVRP/necklace-valakas.png" },
+            "ANT": { name: "Antharas", img: "https://i.ibb.co/rfqvc6mv/earring-antharas.png" },
+            "BAI": { name: "Baium", img: "https://i.ibb.co/XrZkv67h/ring-of-baium.png" },
+            "FRI": { name: "Frintezza", img: "https://i.ibb.co/gF4YKGTM/frintezza-necklace.png" },
+            "ZAK": { name: "Zaken", img: "https://i.ibb.co/spkC6Gzz/zaken-earring.png" },
+            "CORE": { name: "Core", img: "https://i.ibb.co/ksv37fNZ/ring-of-core.png" },
+            "ORF": { name: "Orfen", img: "https://i.ibb.co/j9dDnXwH/earring-orfen.png" },
+            "AQ":  { name: "Queen Ant", img: "https://i.ibb.co/rKRtZmBG/ring-of-queen-ant.png" },
             "SIEGE": { name: "Siege", img: "https://i.ibb.co/Txfby6wD/images.png" }
         };
 
