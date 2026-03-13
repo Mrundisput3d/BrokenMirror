@@ -20,7 +20,7 @@
 
         /* HEADER & CLOCK */
         .server-time { position: absolute; top: 20px; right: 40px; color: var(--gold); font-family: 'Cinzel'; border: 1px solid var(--gold); padding: 5px 15px; border-radius: 5px; background: rgba(0,0,0,0.5); font-size: 0.8rem; z-index: 100; }
-        .top-header { text-align: center; padding-top: 30px; margin-bottom: 40px; }
+        .top-header { text-align: center; padding-top: 30px; margin-bottom: 20px; }
         .ally-logo { width: 140px; filter: drop-shadow(0 0 15px var(--gold)); margin-bottom: 10px; }
         .ally-title { font-family: 'Cinzel Decorative', cursive; font-size: 2.2rem; color: var(--gold); display: block; letter-spacing: 2px; }
 
@@ -31,6 +31,26 @@
         .leader-img { width: 100%; height: 100%; object-fit: contain; }
         .leader-name { color: var(--gold); font-size: 0.9rem; font-family: 'Cinzel'; display: block; margin-top: 10px; font-weight: bold; }
         .leader-role { color: #888; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; display: block; }
+
+        /* SEARCH BAR */
+        .search-container { max-width: 600px; margin: 40px auto; padding: 0 20px; position: relative; }
+        .search-input { 
+            width: 100%; 
+            padding: 15px 25px; 
+            background: rgba(0,0,0,0.7); 
+            border: 1px solid var(--gold); 
+            border-radius: 30px; 
+            color: #fff; 
+            outline: none; 
+            font-family: 'Open Sans'; 
+            font-size: 1rem;
+            transition: 0.3s;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+        }
+        .search-input:focus { 
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+            background: rgba(0,0,0,0.9);
+        }
 
         /* DASHBOARD GRID */
         .main-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; max-width: 1500px; margin: 0 auto; padding: 0 20px; }
@@ -109,6 +129,10 @@
                 <span class="leader-role">SHOT CALLER</span>
             </div>
         </div>
+    </div>
+
+    <div class="search-container">
+        <input type="text" id="mainSearch" class="search-input" placeholder="Αναζήτηση CP ή Μέλους..." onkeyup="searchFunction()">
     </div>
 
     <div class="main-wrapper">
@@ -193,14 +217,16 @@
             const renderClan = (names, clanClass) => names.map((name, index) => {
                 const pts = 5000 - (index * 400);
                 return `
-                <div class="cp-box">
+                <div class="cp-box" data-cp-name="${name.toLowerCase()}">
                     <button class="cp-btn" onclick="this.parentElement.classList.toggle('active')">
                         <span class="${clanClass}">${name}</span>
                         <span class="points-tag">${pts} PTS</span>
                     </button>
                     <div class="member-list">
                         ${[1,2,3].map(m => `
-                            <div class="member-row" onclick="this.classList.toggle('active-member')"><span>Member_${m}</span><small>▼</small></div>
+                            <div class="member-row" data-member-name="member_${m}" onclick="this.classList.toggle('active-member')">
+                                <span>Member_${m}</span><small>▼</small>
+                            </div>
                             <div class="member-stats"><div class="stat-grid">${getStatsHtml()}</div></div>
                         `).join('')}
                         <div class="loot-section">
@@ -216,6 +242,36 @@
             document.getElementById('noldor-list').innerHTML = renderClan(noldorNames, "cp-noldor");
             document.getElementById('krim-list').innerHTML = renderClan(krimNames, "cp-krim");
             document.getElementById('market-table').innerHTML = prices.map(p => `<tr><td><img src="${p.i}" style="width:22px; vertical-align:middle; margin-right:12px;"> ${p.n}</td><td style="color:var(--gold); font-weight:bold; text-align:right;">${p.p} PTS</td></tr>`).join('');
+        }
+
+        // SEARCH FUNCTION
+        function searchFunction() {
+            const input = document.getElementById('mainSearch').value.toLowerCase();
+            const cpBoxes = document.querySelectorAll('.cp-box');
+
+            cpBoxes.forEach(box => {
+                const cpName = box.getAttribute('data-cp-name');
+                const memberRows = box.querySelectorAll('.member-row');
+                let memberMatch = false;
+
+                // Check if any member inside this CP matches
+                memberRows.forEach(row => {
+                    if (row.getAttribute('data-member-name').toLowerCase().includes(input)) {
+                        memberMatch = true;
+                    }
+                });
+
+                if (cpName.includes(input) || memberMatch) {
+                    box.style.display = "block";
+                    // If it's a member match, optionally open the CP box
+                    if (memberMatch && input !== "") {
+                        box.classList.add('active');
+                    }
+                } else {
+                    box.style.display = "none";
+                    box.classList.remove('active');
+                }
+            });
         }
 
         function openCaller(name, role, img) {
