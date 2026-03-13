@@ -18,7 +18,6 @@
         }
         body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-overlay); z-index: -1; }
 
-        /* HEADER & TIME */
         .server-time { position: absolute; top: 20px; right: 40px; color: var(--gold); font-family: 'Cinzel'; border: 1px solid var(--gold); padding: 5px 15px; border-radius: 5px; background: rgba(0,0,0,0.5); font-size: 0.8rem; z-index: 100; }
         .top-header { text-align: center; margin-bottom: 30px; padding-top: 20px; }
         .ally-logo { width: 140px; height: auto; filter: drop-shadow(0 0 15px var(--gold)); margin-bottom: 10px; }
@@ -32,17 +31,13 @@
         .leader-name { color: var(--gold); font-size: 0.85rem; font-family: 'Cinzel'; display: block; margin-top: 10px; font-weight: bold; }
         .leader-role { color: #888; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; display: block; margin-top: 2px; }
 
-        /* SEARCH BAR */
         .search-container { max-width: 600px; margin: 20px auto; padding: 0 20px; text-align: center; }
-        .search-input { width: 100%; padding: 12px 20px; background: rgba(0,0,0,0.7); border: 1px solid var(--gold); border-radius: 25px; color: #fff; font-family: 'Open Sans'; outline: none; transition: 0.3s; box-shadow: 0 0 10px rgba(212,175,55,0.1); }
+        .search-input { width: 100%; padding: 12px 20px; background: rgba(0,0,0,0.7); border: 1px solid var(--gold); border-radius: 25px; color: #fff; font-family: 'Open Sans'; outline: none; transition: 0.3s; }
 
-        /* MAIN LAYOUT */
         .main-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; max-width: 1600px; margin: 20px auto; padding: 0 20px; }
         .clan-column { background: rgba(15, 18, 22, 0.95); height: 750px; display: flex; flex-direction: column; border: 1px solid #333; border-radius: 10px; border-top: 4px solid var(--gold); overflow: hidden; }
-        .column-header { padding: 18px; text-align: center; font-family: 'Cinzel'; font-size: 1.1rem; border-bottom: 1px solid #222; background: #0f1216; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .scroll-area { overflow-y: auto; padding: 10px; flex-grow: 1; }
 
-        /* CP & RANK COLORS */
         .cp-box { margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.3); border-radius: 6px; overflow: hidden; }
         .cp-btn { width: 100%; background: none; border: none; padding: 12px 15px; color: #fff; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-family: 'Open Sans'; font-weight: 700; }
         
@@ -51,38 +46,31 @@
         .cp-rank-3 { color: var(--bronze) !important; text-shadow: 0 0 8px rgba(205,127,50,0.5); }
         .cp-noldor { color: var(--noldor-sky); }
         .cp-krim { color: var(--krim-red); }
-        .points-tag { border: 1px solid currentColor; padding: 2px 10px; border-radius: 4px; font-size: 0.8rem; font-family: 'Cinzel'; }
 
-        /* STATS GRID */
         .member-list { display: none; background: rgba(0,0,0,0.5); border-top: 1px solid #222; }
         .active > .member-list { display: block; }
-        .member-stats { display: none; background: #000; padding: 15px; border-top: 1px solid #333; }
-        .active-member > .member-stats { display: block; }
-        .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-        .stat-box { background: #15181c; padding: 10px; border: 1px solid #222; text-align: center; border-radius: 4px; display: flex; flex-direction: column; align-items: center; }
-        .boss-icon { width: 26px; height: 26px; margin-bottom: 5px; border: 1px solid #333; }
-        .stat-val { font-size: 0.9rem; color: #fff; font-family: 'Cinzel'; font-weight: bold; }
+        .member-row { padding: 10px 20px; border-bottom: 1px solid rgba(255,255,255,0.03); display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; cursor: pointer; }
+        .member-stats { display: none; background: #000; padding: 15px; }
+        .active-member + .member-stats { display: block; }
 
-        /* LOOT SECTION */
-        .loot-section { background: rgba(212, 175, 55, 0.05); border-top: 1px solid #333; padding: 10px; }
-        .loot-toggle-btn { width: 100%; background: none; border: 1px solid var(--gold); color: var(--gold); padding: 8px; font-family: 'Cinzel'; cursor: pointer; border-radius: 4px; font-size: 0.75rem; }
-        .loot-content { display: none; padding: 15px; color: #aaa; font-size: 0.8rem; border-left: 2px solid var(--gold); margin-top: 10px; background: rgba(0,0,0,0.2); }
+        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        .stat-box { background: #15181c; padding: 8px; border: 1px solid #222; text-align: center; border-radius: 4px; display: flex; flex-direction: column; align-items: center; }
+        .boss-icon { width: 24px; height: 24px; margin-bottom: 3px; }
+        .stat-val { font-size: 0.85rem; color: #fff; font-family: 'Cinzel'; font-weight: bold; }
 
-        /* MARKETPLACE & RULES */
+        .loot-section { background: rgba(212, 175, 55, 0.05); padding: 15px; border-top: 1px solid #333; }
+        .loot-item { display: flex; align-items: center; gap: 10px; font-size: 0.75rem; color: #ddd; margin-bottom: 8px; }
+
+        /* MARKET & RULES - RESTORED */
         .market-section { background: rgba(0,0,0,0.7); border-top: 2px solid var(--gold); padding: 60px 20px; margin-top: 40px; }
         .market-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 40px; max-width: 1400px; margin: 0 auto; }
-        .market-title { font-family: 'Cinzel Decorative'; color: var(--gold); text-align: center; margin-bottom: 30px; font-size: 1.8rem; grid-column: span 2; }
-        .epic-table-container { background: rgba(15, 18, 22, 0.95); border: 1px solid #333; border-radius: 10px; padding: 20px; }
-        .epic-table { width: 100%; border-collapse: collapse; }
-        .epic-table th { color: var(--gold); font-family: 'Cinzel'; border-bottom: 2px solid var(--gold); padding: 12px; text-align: left; }
-        .epic-table td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); color: #ddd; }
         .rules-box { background: rgba(15, 18, 22, 0.95); border-left: 4px solid var(--gold); padding: 30px; border-radius: 8px; }
+        .rules-box h3 { font-family: 'Cinzel'; color: var(--gold); margin-top: 0; font-size: 1.3rem; }
+        .rule-item { margin-bottom: 15px; display: flex; align-items: flex-start; gap: 10px; line-height: 1.6; font-size: 0.9rem; color: #ccc; }
+        .highlight { color: var(--gold); font-weight: bold; }
 
-        /* MODAL */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9998; backdrop-filter: blur(5px); }
         #caller-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 420px; background: #0f1216; border: 2px solid var(--gold); border-radius: 15px; padding: 30px; z-index: 9999; text-align: center; }
-
-        @media (max-width: 1000px) { .main-wrapper, .market-grid { grid-template-columns: 1fr; } .market-title { grid-column: span 1; } }
     </style>
 </head>
 <body>
@@ -116,41 +104,32 @@
     </div>
 
     <div class="search-container">
-        <input type="text" id="cpSearch" class="search-input" placeholder="Αναζήτηση CP ή Μέλους..." onkeyup="filterCPs()">
+        <input type="text" id="cpSearch" class="search-input" placeholder="Search CP or Member name..." onkeyup="filterCPs()">
     </div>
 
     <div class="main-wrapper">
         <div class="clan-column">
-            <div class="column-header" style="color:var(--noldor-sky)">
-                <img src="https://i.ibb.co/8LvFNQkC/noldor.png" style="width:30px;"> NOLDOR CLAN
-            </div>
+            <div style="padding:15px; text-align:center; color:var(--noldor-sky); font-family:'Cinzel'; border-bottom:1px solid #222;">NOLDOR CLAN</div>
             <div class="scroll-area" id="noldor-list"></div>
         </div>
         <div class="clan-column">
-            <div class="column-header" style="color:var(--krim-red)">
-                <img src="https://i.ibb.co/VYMZjzYr/kriminalides.png" style="width:30px;"> KRIMINALIDES CLAN
-            </div>
+            <div style="padding:15px; text-align:center; color:var(--krim-red); font-family:'Cinzel'; border-bottom:1px solid #222;">KRIMINALIDES CLAN</div>
             <div class="scroll-area" id="krim-list"></div>
         </div>
     </div>
 
     <div class="market-section">
         <div class="market-grid">
-            <h2 class="market-title">MARKETPLACE & PROTOCOL</h2>
+            <h2 style="grid-column: span 2; font-family:'Cinzel Decorative'; color:var(--gold); text-align:center;">MARKETPLACE & PROTOCOL</h2>
             <div class="epic-table-container">
-                <table class="epic-table">
-                    <thead><tr><th>JEWEL</th><th>PRICE</th></tr></thead>
-                    <tbody id="prices-table-body"></tbody>
-                </table>
+                <table style="width:100%; border-collapse: collapse;" id="market-table"></table>
             </div>
             <div class="rules-box">
-                <h3 style="font-family:'Cinzel'; color:var(--gold); margin-top:0;">ALLIANCE POLICIES</h3>
-                <div style="line-height:1.6; color:#ccc; font-size: 0.9rem;">
-                    <p>» <b style="color:var(--gold);">Attendance:</b> Mid Epics (1pt), Baium (2pts), Val/Ant (3pts).</p>
-                    <p>» <b style="color:var(--gold);">Jewel Priority:</b> Archers (Baium), Mages (Valakas).</p>
-                    <p>» <b style="color:var(--gold);">Deduction:</b> Η αγορά ενός item αφαιρεί τους πόντους από το CP.</p>
-                    <p>» <b style="color:var(--gold);">Cooldown:</b> 3 εβδομάδες περιορισμός για όποιον πήρε Mid Jewel.</p>
-                </div>
+                <h3>ALLIANCE POLICIES</h3>
+                <div class="rule-item"><span>» <span class="highlight">Attendance:</span> Mid Epics = 1pt | Baium = 2pts | Valakas/Antharas = 3pts.</span></div>
+                <div class="rule-item"><span>» <span class="highlight">Jewel Priority:</span> <span style="color:var(--noldor-sky)">Archer CPs</span> get priority on Baium. <span style="color:var(--krim-red)">Mage CPs</span> get priority on Valakas.</span></div>
+                <div class="rule-item"><span>» <span class="highlight">Cooldown:</span> 3-week restriction for members who received a mid-level jewel.</span></div>
+                <div class="rule-item"><span>» <span class="highlight">Points Deduction:</span> When a jewel is taken, the CP's total points are reduced by the marketplace price.</span></div>
             </div>
         </div>
     </div>
@@ -162,83 +141,80 @@
             "BAI": { name: "Baium", img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/ring-of-baium.png?raw=true" },
             "FRI": { name: "Frintezza", img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/frintezza-necklace.png?raw=true" },
             "ZAK": { name: "Zaken", img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/zaken-earring.png?raw=true" },
+            "CORE": { name: "Core", img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/ring-of-core.png?raw=true" },
             "ORF": { name: "Orfen", img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/earring-orfen.png?raw=true" },
             "AQ":  { name: "Queen Ant", img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/ring-of-queen-ant.png?raw=true" },
             "SIEGE": { name: "Siege", img: "https://i.ibb.co/Txfby6wD/images.png" }
         };
 
-        const noldorCPs = [
-            { name: "Noldor Clan", pts: 4200 }, { name: "Noldor Archer", pts: 3800 },
-            { name: "Noldor Archer 2", pts: 2100 }, { name: "Outlaw CP", pts: 1500 },
-            { name: "Ronin CP", pts: 1200 }, { name: "Brazilians CP", pts: 900 }
-        ];
-        const krimCPs = [
-            { name: "Hattrick CP", pts: 4500 }, { name: "55 Room CP", pts: 3100 },
-            { name: "Legion CP", pts: 2800 }, { name: "Criminal Record CP", pts: 2400 },
-            { name: "Avalanche CP", pts: 1900 }, { name: "Gankly Crew CP", pts: 1100 },
-            { name: "Animals CP", pts: 800 }
-        ];
+        const cpData = {
+            noldor: [
+                { name: "Noldor Clan", pts: 4200, members: ["Niklaus", "Player2", "Player3"], loot: [{n: "Baium Ring", date: "10/03", img: bossConfig.BAI.img}] },
+                { name: "Noldor Archer", pts: 3800, members: ["ArcherX", "ArcherY"], loot: [] },
+                { name: "Outlaw CP", pts: 1500, members: ["Out1", "Out2"], loot: [] }
+            ],
+            krim: [
+                { name: "Hattrick CP", pts: 4500, members: ["HattLead", "PlayerA", "PlayerB"], loot: [{n: "Core Ring", date: "05/03", img: bossConfig.CORE.img}, {n: "Orfen Earring", date: "01/03", img: bossConfig.ORF.img}] },
+                { name: "55 Room CP", pts: 3100, members: ["RoomL", "RoomM"], loot: [] },
+                { name: "Animals CP", pts: 800, members: ["AnimL", "AnimM"], loot: [] }
+            ]
+        };
 
-        const pricesData = [
-            { name: "Orfen Earring", pts: 75, img: bossConfig.ORF.img },
-            { name: "Queen Ant Ring", pts: 150, img: bossConfig.AQ.img },
-            { name: "Zaken Earring", pts: 175, img: bossConfig.ZAK.img },
-            { name: "Frintezza Neck", pts: 225, img: bossConfig.FRI.img },
-            { name: "Baium Ring", pts: 950, img: bossConfig.BAI.img },
-            { name: "Antharas Earring", pts: 1100, img: bossConfig.ANT.img },
-            { name: "Valakas Necklace", pts: 3100, img: bossConfig.VAL.img }
+        const prices = [
+            {n: "Orfen Earring", p: 75, img: bossConfig.ORF.img},
+            {n: "Core Ring", p: 75, img: bossConfig.CORE.img},
+            {n: "Queen Ant Ring", p: 150, img: bossConfig.AQ.img},
+            {n: "Zaken Earring", p: 175, img: bossConfig.ZAK.img},
+            {n: "Frintezza Neck", p: 225, img: bossConfig.FRI.img},
+            {n: "Baium Ring", p: 950, img: bossConfig.BAI.img},
+            {n: "Antharas Earring", p: 1100, img: bossConfig.ANT.img},
+            {n: "Valakas Necklace", p: 3100, img: bossConfig.VAL.img}
         ];
 
         function getStatsHtml(isModal = false) {
-            return Object.keys(bossConfig).map(b => {
-                const val = isModal ? Math.floor(Math.random()*15) : 0;
-                return `
-                    <div class="stat-box" title="${bossConfig[b].name}">
-                        <img src="${bossConfig[b].img}" class="boss-icon">
-                        <span class="stat-val">${val}</span>
-                    </div>
-                `;
-            }).join('');
+            return Object.keys(bossConfig).map(b => `
+                <div class="stat-box">
+                    <img src="${bossConfig[b].img}" class="boss-icon">
+                    <span class="stat-val">${isModal ? Math.floor(Math.random()*15) : 0}</span>
+                </div>
+            `).join('');
         }
 
-        function renderLists() {
-            const allSorted = [...noldorCPs, ...krimCPs].sort((a,b) => b.pts - a.pts);
+        function render() {
+            const allSorted = [...cpData.noldor, ...cpData.krim].sort((a,b) => b.pts - a.pts);
             
-            const makeList = (arr, clanClass) => {
-                return arr.map(cp => {
-                    const rank = allSorted.findIndex(x => x.name === cp.name);
-                    let colorClass = clanClass;
-                    let medal = "";
-                    if(rank === 0) { colorClass="cp-rank-1"; medal="🥇 "; }
-                    else if(rank === 1) { colorClass="cp-rank-2"; medal="🥈 "; }
-                    else if(rank === 2) { colorClass="cp-rank-3"; medal="🥉 "; }
+            const makeList = (arr, clanClass) => arr.map(cp => {
+                const rank = allSorted.findIndex(x => x.name === cp.name);
+                let colorClass = clanClass;
+                let medal = "";
+                if(rank === 0) { colorClass="cp-rank-1"; medal="🥇 "; }
+                else if(rank === 1) { colorClass="cp-rank-2"; medal="🥈 "; }
+                else if(rank === 2) { colorClass="cp-rank-3"; medal="🥉 "; }
 
-                    const safeId = cp.name.replace(/[^a-z0-9]/gi, '');
-                    return `
-                    <div class="cp-box" data-name="${cp.name.toLowerCase()}">
-                        <button class="cp-btn" onclick="this.parentElement.classList.toggle('active')">
-                            <span class="${colorClass}">${medal}${cp.name}</span>
-                            <span class="points-tag">${cp.pts} PTS</span>
-                        </button>
-                        <div class="member-list">
-                            <div class="member-item">
-                                <button class="member-btn" onclick="this.parentElement.classList.toggle('active-member')">
-                                    <span>👑 CP Leader</span><small>▼</small>
-                                </button>
-                                <div class="member-stats"><div class="stat-grid">${getStatsHtml()}</div></div>
+                return `
+                <div class="cp-box" data-name="${cp.name.toLowerCase()}">
+                    <button class="cp-btn" onclick="this.parentElement.classList.toggle('active')">
+                        <span class="${colorClass}">${medal}${cp.name}</span>
+                        <span class="points-tag">${cp.pts} PTS</span>
+                    </button>
+                    <div class="member-list">
+                        ${cp.members.map(m => `
+                            <div class="member-row" onclick="this.classList.toggle('active-member')">
+                                <span>${m}</span><small>▼</small>
                             </div>
-                            <div class="loot-section">
-                                <button class="loot-toggle-btn" onclick="const e=document.getElementById('loot-${safeId}'); e.style.display=e.style.display==='block'?'none':'block'">VIEW LOOT HISTORY</button>
-                                <div class="loot-content" id="loot-${safeId}">No items recorded yet.</div>
-                            </div>
+                            <div class="member-stats"><div class="stat-grid">${getStatsHtml()}</div></div>
+                        `).join('')}
+                        <div class="loot-section">
+                            <div style="font-family:'Cinzel'; font-size:0.75rem; color:var(--gold); margin-bottom:8px;">CP LOOT HISTORY:</div>
+                            ${cp.loot.length ? cp.loot.map(l => `<div class="loot-item"><img src="${l.img}" style="width:18px;"><span>${l.n} (${l.date})</span></div>`).join('') : '<span style="font-size:0.7rem; color:#666;">No loot recorded.</span>'}
                         </div>
-                    </div>`;
-                }).join('');
-            };
+                    </div>
+                </div>`;
+            }).join('');
 
-            document.getElementById('noldor-list').innerHTML = makeList(noldorCPs, "cp-noldor");
-            document.getElementById('krim-list').innerHTML = makeList(krimCPs, "cp-krim");
-            document.getElementById('prices-table-body').innerHTML = pricesData.map(p => `<tr><td><img src="${p.img}" style="width:25px; vertical-align:middle; margin-right:10px;"> ${p.name}</td><td style="color:var(--gold); font-weight:bold;">${p.pts}</td></tr>`).join('');
+            document.getElementById('noldor-list').innerHTML = makeList(cpData.noldor, "cp-noldor");
+            document.getElementById('krim-list').innerHTML = makeList(cpData.krim, "cp-krim");
+            document.getElementById('market-table').innerHTML = prices.map(p => `<tr style="border-bottom:1px solid #222;"><td style="padding:10px;"><img src="${p.img}" style="width:20px; vertical-align:middle; margin-right:10px;"> ${p.n}</td><td style="color:var(--gold); font-weight:bold; text-align:right;">${p.p} PTS</td></tr>`).join('');
         }
 
         function filterCPs() {
@@ -258,12 +234,12 @@
         }
 
         function closeModal() { document.getElementById('caller-modal').style.display = 'none'; document.getElementById('overlay').style.display = 'none'; }
-
+        
         setInterval(() => {
             document.getElementById('clock').innerText = "SERVER TIME: " + new Date().toLocaleTimeString('el-GR', {timeZone:'UTC', hour12:false}) + " UTC";
         }, 1000);
 
-        renderLists();
+        render();
     </script>
 </body>
 </html>
