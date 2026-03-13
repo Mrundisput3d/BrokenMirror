@@ -19,10 +19,8 @@
         }
         body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-overlay); z-index: -1; }
 
-        /* SERVER TIME */
         .server-time { position: absolute; top: 20px; right: 40px; color: var(--gold); font-family: 'Cinzel'; border: 1px solid var(--gold); padding: 5px 15px; border-radius: 5px; background: rgba(0,0,0,0.5); font-size: 0.8rem; z-index: 100; }
 
-        /* SEARCH BAR */
         .search-container { max-width: 600px; margin: 20px auto; padding: 0 20px; text-align: center; }
         .search-input { 
             width: 100%; padding: 12px 20px; background: rgba(0,0,0,0.7); border: 1px solid var(--gold); 
@@ -30,7 +28,6 @@
             box-shadow: 0 0 10px rgba(212,175,55,0.1);
         }
 
-        /* MODAL */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9998; backdrop-filter: blur(5px); }
         #caller-modal {
             display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -47,8 +44,8 @@
         .img-frame { width: 90px; height: 90px; margin: 0 auto; background: #000; border: 2px solid var(--gold); border-radius: 50%; overflow: hidden; box-shadow: 0 0 15px rgba(212,175,55,0.3); }
         .leader-img { width: 100%; height: 100%; object-fit: contain; }
         .leader-name { color: var(--gold); font-size: 0.85rem; font-family: 'Cinzel'; display: block; margin-top: 10px; font-weight: bold; }
+        .leader-role { color: #888; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; display: block; margin-top: 2px; }
 
-        /* DASHBOARD SECTION */
         .page-section { min-height: 100vh; padding: 40px 20px; box-sizing: border-box; position: relative; }
         .main-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; max-width: 1600px; margin: 20px auto; }
         .clan-column { background: rgba(15, 18, 22, 0.95); height: 750px; display: flex; flex-direction: column; border: 1px solid #333; border-radius: 10px; border-top: 4px solid var(--gold); overflow: hidden; }
@@ -59,7 +56,6 @@
         .scroll-area::-webkit-scrollbar { width: 5px; }
         .scroll-area::-webkit-scrollbar-thumb { background: var(--gold); }
 
-        /* CP & MEMBERS */
         .cp-box { margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.3); border-radius: 6px; overflow: hidden; transition: 0.3s; }
         .cp-btn { width: 100%; background: none; border: none; padding: 12px 15px; color: #fff; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-family: 'Open Sans'; font-weight: 600; }
         .points-tag { border: 1px solid var(--gold); padding: 2px 10px; border-radius: 4px; font-size: 0.8rem; color: var(--gold); }
@@ -73,16 +69,14 @@
 
         .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
         .stat-box { background: #15181c; padding: 10px; border: 1px solid #222; text-align: center; border-radius: 4px; display: flex; flex-direction: column; align-items: center; }
-        .boss-icon { width: 24px; height: 24px; margin-bottom: 5px; border: 1px solid #444; border-radius: 3px; }
+        .boss-icon { width: 24px; height: 24px; margin-bottom: 5px; border: 1px solid #444; border-radius: 3px; background: #000; }
         .stat-val { font-size: 0.9rem; color: #fff; font-family: 'Cinzel'; font-weight: bold; }
 
-        /* LOOT HISTORY MENU */
         .loot-section { background: rgba(212, 175, 55, 0.05); border-top: 1px solid #333; padding: 10px; }
         .loot-toggle-btn { width: 100%; background: none; border: 1px solid var(--gold); color: var(--gold); padding: 8px; font-family: 'Cinzel'; cursor: pointer; border-radius: 4px; font-size: 0.75rem; transition: 0.3s; }
         .loot-toggle-btn:hover { background: var(--gold); color: #000; }
         .loot-content { display: none; padding: 15px; color: #aaa; font-size: 0.8rem; line-height: 1.5; border-left: 2px solid var(--gold); margin-top: 10px; background: rgba(0,0,0,0.2); }
 
-        /* MARKETPLACE SECTION */
         .market-section { background: rgba(0,0,0,0.7); border-top: 2px solid var(--gold); padding: 60px 20px; }
         .market-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 40px; max-width: 1400px; margin: 0 auto; }
         .market-title { font-family: 'Cinzel Decorative'; color: var(--gold); text-align: center; margin-bottom: 30px; font-size: 1.8rem; grid-column: span 2; }
@@ -125,10 +119,12 @@
                 <div class="leader-card" onclick="openCaller('NIKLAUS', 'ALLY LEADER', 'https://i.ibb.co/5X3NDQFR/niklaus.png')">
                     <div class="img-frame"><img src="https://i.ibb.co/5X3NDQFR/niklaus.png" class="leader-img"></div>
                     <span class="leader-name">NIKLAUS</span>
+                    <span class="leader-role">ALLY LEADER</span>
                 </div>
                 <div class="leader-card" onclick="openCaller('TSAKNORRIS', 'SHOT CALLER', 'https://i.ibb.co/xSVgzBPB/tsaknorris.png')">
                     <div class="img-frame"><img src="https://i.ibb.co/xSVgzBPB/tsaknorris.png" class="leader-img"></div>
                     <span class="leader-name">TSAKNORRIS</span>
+                    <span class="leader-role">SHOT CALLER</span>
                 </div>
             </div>
         </div>
@@ -181,7 +177,7 @@
             "ZAK": { name: "Zaken", img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/zaken-earring.png?raw=true" },
             "ORF": { name: "Orfen", img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/earring-orfen.png?raw=true" },
             "AQ":  { name: "Queen Ant", img: "https://github.com/Mrundisput3d/animals-cp-tracker/blob/master/images/ring-of-queen-ant.png?raw=true" },
-            "SIEGE": { name: "Siege", img: "https://l2central.info/mw/images/d/df/Icon_Skill_0344.jpg" }
+            "SIEGE": { name: "Siege", img: "https://i.ibb.co/3ykfLpC/Icon-Skill-0344.jpg" }
         };
 
         const bosses = Object.keys(bossConfig);
@@ -260,9 +256,9 @@
             });
         }
 
-        function openCaller(name, title, img) {
+        function openCaller(name, role, img) {
             document.getElementById('modal-name').innerText = name;
-            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-title').innerText = role;
             document.getElementById('modal-img').src = img;
             document.getElementById('modal-stats').innerHTML = getStatsHtml(true);
             document.getElementById('caller-modal').style.display = 'block';
