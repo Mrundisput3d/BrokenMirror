@@ -2,119 +2,101 @@
 <html lang="el">
 <head>
     <meta charset="UTF-8">
-    <title>BMA | Supreme Command Center V9</title>
+    <title>BMA | Command Center V11</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <style>
-        :root { --gold: #d4af37; --bg: #0a0c0f; --card: #15181c; --red: #ff4444; --green: #28a745; --blue: #3498db; }
+        :root { --gold: #d4af37; --bg: #0a0c0f; --card: #15181c; --red: #ff4444; --green: #28a745; }
         body { background: var(--bg); color: #eee; font-family: 'Open Sans', sans-serif; margin: 0; padding: 20px; font-size: 14px; }
-        h1, h2 { font-family: 'Cinzel'; color: var(--gold); text-align: center; margin: 10px 0; }
-        .layout { display: grid; grid-template-columns: 380px 1fr; gap: 20px; }
+        .layout { display: grid; grid-template-columns: 350px 1fr; gap: 20px; }
         .panel { background: var(--card); border: 1px solid #333; padding: 15px; border-radius: 10px; border-top: 3px solid var(--gold); }
         
-        /* CP List */
-        #cp-list-container { max-height: 450px; overflow-y: auto; margin-bottom: 15px; }
-        .cp-item { background: #000; padding: 10px; margin-bottom: 5px; border-radius: 5px; border: 1px solid #222; display: flex; justify-content: space-between; cursor: pointer; transition: 0.2s; }
-        .cp-item.matched { border-color: var(--green); background: rgba(40, 167, 69, 0.1); }
-        .cp-item.selected { border: 2px solid var(--gold); background: #1a1a1a; }
-
-        /* Inputs */
-        input, select, textarea { width: 100%; padding: 8px; margin: 5px 0; background: #000; color: #fff; border: 1px solid #444; border-radius: 4px; box-sizing: border-box; }
-        textarea { font-family: monospace; }
+        /* Selection List */
+        .detected-cp-row { background: #000; padding: 10px; margin: 5px 0; border-radius: 5px; display: flex; align-items: center; border: 1px solid #333; transition: 0.2s; }
+        .detected-cp-row:hover { border-color: var(--gold); }
+        .detected-cp-row input[type="checkbox"] { width: 18px; height: 18px; margin-right: 12px; cursor: pointer; accent-color: var(--gold); }
         
         /* Boss Grid */
-        .boss-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 15px 0; }
-        .boss-btn { background: #222; border: 1px solid #444; padding: 8px; text-align: center; cursor: pointer; border-radius: 5px; }
-        .boss-btn:hover { border-color: var(--gold); }
-        .boss-btn img { width: 30px; display: block; margin: 0 auto 5px; }
-        .boss-btn span { font-size: 0.7rem; color: var(--gold); font-weight: bold; }
+        .boss-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 20px 0; }
+        .boss-btn { background: #111; border: 1px solid #444; padding: 10px; text-align: center; cursor: pointer; border-radius: 8px; transition: 0.2s; }
+        .boss-btn:hover { border-color: var(--gold); background: #1a1a1a; transform: translateY(-2px); }
+        .boss-btn img { width: 35px; display: block; margin: 0 auto 5px; }
+        .boss-btn span { font-size: 0.7rem; color: var(--gold); font-weight: bold; display: block; }
+        .boss-btn small { font-size: 0.6rem; color: #888; }
 
-        /* Buttons */
-        .btn { width: 100%; padding: 10px; border: none; border-radius: 4px; cursor: pointer; font-family: 'Cinzel'; font-weight: bold; margin-top: 5px; transition: 0.3s; }
+        input, select, textarea { width: 100%; padding: 10px; margin: 5px 0; background: #000; color: #fff; border: 1px solid #444; border-radius: 4px; box-sizing: border-box; }
+        .btn { width: 100%; padding: 12px; border: none; border-radius: 4px; cursor: pointer; font-family: 'Cinzel'; font-weight: bold; margin-top: 10px; transition: 0.2s; }
         .btn-gold { background: var(--gold); color: #000; }
         .btn-red { background: var(--red); color: #fff; }
-        .btn-blue { background: var(--blue); color: #fff; }
-        
-        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-top: 10px; }
-        .stat-box { background: #222; padding: 5px; border-radius: 3px; text-align: center; font-size: 0.7rem; border: 1px solid #333; }
+        .btn-gold:hover { opacity: 0.8; }
     </style>
 </head>
 <body>
 
-    <h1>BMA SUPREME COMMANDER V9</h1>
+    <h1>BMA SUPREME ADMIN V11</h1>
 
     <div class="layout">
         <div class="panel">
-            <h2>CP MANAGEMENT</h2>
-            <div id="cp-list-container"></div>
+            <h2>CP LIST</h2>
+            <div id="cp-list-simple" style="max-height: 300px; overflow-y: auto; border: 1px solid #222; padding: 5px; margin-bottom: 15px;"></div>
             
             <hr style="border-color:#333;">
-            <h3>CREATE NEW CP</h3>
-            <input type="text" id="new-name" placeholder="CP Name (e.g. Noldor Archer)">
-            <input type="text" id="new-leader" placeholder="Leader Name">
+            <h3>QUICK CREATE</h3>
+            <input type="text" id="new-name" placeholder="CP Name">
+            <input type="text" id="new-leader" placeholder="Leader">
             <select id="new-clan">
-                <option value="noldor">Noldor Clan</option>
-                <option value="kriminalides">Kriminalides Clan</option>
-                <option value="caller">Leader / Caller</option>
+                <option value="noldor">Noldor</option>
+                <option value="kriminalides">Kriminalides</option>
+                <option value="caller">Leader/Caller</option>
             </select>
-            <button class="btn btn-gold" onclick="createNewCP()">+ CREATE NEW CP</button>
+            <button class="btn btn-gold" onclick="createNewCP()">CREATE CP</button>
         </div>
 
         <div class="panel">
-            <h2>EVENT & MARKETPLACE LOGGER</h2>
-            <textarea id="mass-input" rows="4" placeholder="Paste names from Discord/Game here..." oninput="analyzeAttendance()"></textarea>
+            <h2>1. ATTENDANCE INPUT</h2>
+            <textarea id="mass-input" rows="5" placeholder="Paste names from Discord or Game..." oninput="analyzeAttendance()"></textarea>
             
-            <div id="attendance-report" style="display:none; padding:10px; background:#000; border-left:4px solid var(--green); margin:10px 0;">
-                <div id="detected-details" style="font-size: 0.85rem;"></div>
+            <div id="detection-area" style="margin-top:15px;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <h3>2. VALIDATE TARGETS</h3>
+                    <button onclick="toggleAllChecks()" style="background:none; border:1px solid var(--gold); color:var(--gold); cursor:pointer; font-size:0.7rem; padding:2px 5px;">Toggle All</button>
+                </div>
+                <div id="detected-list"></div>
             </div>
 
             <div class="boss-grid">
-                <div class="boss-btn" onclick="logEvent('VAL', 3)"><img src="https://i.ibb.co/84gZPVRP/necklace-valakas.png"><span>VAL x3</span></div>
-                <div class="boss-btn" onclick="logEvent('ANT', 3)"><img src="https://i.ibb.co/rfqvc6mv/earring-antharas.png"><span>ANT x3</span></div>
-                <div class="boss-btn" onclick="logEvent('BAI', 2)"><img src="https://i.ibb.co/XrZkv67h/ring-of-baium.png"><span>BAI x2</span></div>
-                <div class="boss-btn" onclick="logEvent('SIE', 3)"><img src="https://i.ibb.co/Txfby6wD/images.png"><span>SIE x3</span></div>
-                <div class="boss-btn" onclick="logEvent('ZAK', 1)"><img src="https://i.ibb.co/spkC6Gzz/zaken-earring.png"><span>ZAK x1</span></div>
-                <div class="boss-btn" onclick="logEvent('AQ', 1)"><img src="https://i.ibb.co/rKRtZmBG/ring-of-queen-ant.png"><span>AQ x1</span></div>
-                <div class="boss-btn" onclick="logEvent('ORF', 1)"><img src="https://i.ibb.co/j9dDnXwH/earring-orfen.png"><span>ORF x1</span></div>
-                <div class="boss-btn" onclick="logEvent('COR', 1)"><img src="https://i.ibb.co/ksv37fNZ/ring-of-.png"><span>CORE x1</span></div>
-                <div class="boss-btn" onclick="logEvent('FRI', 1)"><img src="https://i.ibb.co/gF4YKGTM/frintezza-necklace.png"><span>FRIN x1</span></div>
+                <div class="boss-btn" onclick="logValidatedEvent('VAL', 3)"><img src="https://i.ibb.co/84gZPVRP/necklace-valakas.png"><span>VALAKAS</span><small>x3 pts</small></div>
+                <div class="boss-btn" onclick="logValidatedEvent('ANT', 3)"><img src="https://i.ibb.co/rfqvc6mv/earring-antharas.png"><span>ANTHARAS</span><small>x3 pts</small></div>
+                <div class="boss-btn" onclick="logValidatedEvent('BAI', 2)"><img src="https://i.ibb.co/XrZkv67h/ring-of-baium.png"><span>BAIUM</span><small>x2 pts</small></div>
+                <div class="boss-btn" onclick="logValidatedEvent('SIE', 3)"><img src="https://i.ibb.co/Txfby6wD/images.png"><span>SIEGE</span><small>x3 pts</small></div>
+                <div class="boss-btn" onclick="logValidatedEvent('ZAK', 1)"><img src="https://i.ibb.co/spkC6Gzz/zaken-earring.png"><span>ZAKEN</span><small>x1 pt</small></div>
+                <div class="boss-btn" onclick="logValidatedEvent('FRI', 1)"><img src="https://i.ibb.co/gF4YKGTM/frintezza-necklace.png"><span>FRINTEZZA</span><small>x1 pt</small></div>
+                <div class="boss-btn" onclick="logValidatedEvent('AQ', 1)"><img src="https://i.ibb.co/rKRtZmBG/ring-of-queen-ant.png"><span>QUEEN ANT</span><small>x1 pt</small></div>
+                <div class="boss-btn" onclick="logValidatedEvent('ORF', 1)"><img src="https://i.ibb.co/j9dDnXwH/earring-orfen.png"><span>ORFEN</span><small>x1 pt</small></div>
             </div>
 
-            <div id="edit-section" style="display:none; border-top: 1px solid #333; padding-top:15px; margin-top:20px;">
-                <h2 id="edit-title" style="text-align:left; color:var(--gold);"></h2>
-                <div style="display:grid; grid-template-columns: 1.2fr 1fr; gap:20px;">
+            <div id="edit-section" style="display:none; border-top:2px solid var(--gold); padding-top:15px; margin-top:20px;">
+                <h2 id="edit-title" style="color:var(--gold); text-align:left;"></h2>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
                     <div>
-                        <label>Roster (One name per line)</label>
+                        <label>Edit Roster</label>
                         <textarea id="edit-members" rows="10"></textarea>
-                        <button class="btn btn-gold" onclick="updateCP()">SAVE ROSTER & STATS</button>
+                        <button class="btn btn-gold" onclick="updateCP()">SAVE ROSTER</button>
                     </div>
                     <div>
-                        <h3 style="color:var(--red); margin-top:0;">LOOT MARKETPLACE</h3>
+                        <h3 style="color:var(--red); margin-top:0;">MARKETPLACE BUY</h3>
                         <select id="loot-market">
-                            <option value="">-- SELECT ITEM --</option>
-                            <option value="900|Valakas Necklace">Valakas Necklace (900 pts)</option>
-                            <option value="800|Antharas Earring">Antharas Earring (800 pts)</option>
-                            <option value="600|Baium Ring">Baium Ring (600 pts)</option>
-                            <option value="350|Frintezza Necklace">Frintezza Necklace (350 pts)</option>
-                            <option value="300|Zaken Earring">Zaken Earring (300 pts)</option>
-                            <option value="250|Queen Ant Ring">Queen Ant Ring (250 pts)</option>
-                            <option value="150|Orfen Earring">Orfen Earring (150 pts)</option>
-                            <option value="150|Core Ring">Core Ring (150 pts)</option>
+                            <option value="3100|Valakas Necklace">Valakas Necklace (3100)</option>
+                            <option value="1100|Antharas Earring">Antharas Earring (1100)</option>
+                            <option value="950|Baium Ring">Baium Ring (950)</option>
+                            <option value="175|Zaken Earring">Zaken Earring (175)</option>
+                            <option value="225|Frintezza Necklace">Frintezza Necklace (225)</option>
+                            <option value="150|Queen Ant Ring">Queen Ant Ring (150)</option>
+                            <option value="75|Orfen Earring">Orfen Earring (75)</option>
+                            <option value="25|Core Ring">Core Ring (25)</option>
                         </select>
-                        <button class="btn btn-red" onclick="addMarketLoot()">DEDUCT POINTS & LOG</button>
-                        
-                        <hr style="border-color:#333; margin:15px 0;">
-                        
-                        <label>Leader Name</label>
-                        <input type="text" id="edit-leader">
-                        <label>Total Points (Manual)</label>
-                        <input type="number" id="edit-points">
-                        
-                        <div class="stat-grid" id="stat-grid"></div>
-                        
-                        <button class="btn btn-blue" style="margin-top:20px;" onclick="moveToHistory()">MOVE TO HISTORY</button>
-                        <button class="btn btn-red" style="font-size:0.7rem; padding:5px; margin-top:10px;" onclick="deleteCP()">DELETE PERMANENTLY</button>
+                        <button class="btn btn-red" onclick="addMarketLoot()">DEDUCT POINTS</button>
                     </div>
                 </div>
             </div>
@@ -122,158 +104,125 @@
     </div>
 
 <script>
-    const firebaseConfig = { 
-        apiKey: "AIzaSyDRL8EehxdcgVYJ0LJ1khVYkSJcaCMKRes", 
-        databaseURL: "https://brokenmirrordb-default-rtdb.europe-west1.firebasedatabase.app" 
-    };
+    const firebaseConfig = { apiKey: "AIzaSyDRL8EehxdcgVYJ0LJ1khVYkSJcaCMKRes", databaseURL: "https://brokenmirrordb-default-rtdb.europe-west1.firebasedatabase.app" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
     let allCPs = {};
-    let attendanceMap = {};
+    let matchedData = {}; 
     let currentEditID = null;
-    const bossKeys = ['VAL', 'ANT', 'BAI', 'SIE', 'ZAK', 'AQ', 'ORF', 'COR', 'FRI'];
 
     db.ref('cps/').on('value', snap => {
         allCPs = snap.val() || {};
-        renderCPList();
+        renderSimpleList();
     });
 
-    function renderCPList() {
-        const container = document.getElementById('cp-list-container');
-        container.innerHTML = "";
-        Object.keys(allCPs).forEach(id => {
-            const cp = allCPs[id];
-            if(cp.clan === 'history') return;
-            const div = document.createElement('div');
-            div.className = `cp-item ${attendanceMap[id] ? 'matched' : ''} ${currentEditID === id ? 'selected' : ''}`;
-            div.innerHTML = `<span>${cp.name} (${attendanceMap[id] || 0})</span> <b>${cp.totalPoints}</b>`;
-            div.onclick = () => loadEdit(id);
-            container.appendChild(div);
-        });
+    function renderSimpleList() {
+        const container = document.getElementById('cp-list-simple');
+        container.innerHTML = Object.keys(allCPs)
+            .filter(id => allCPs[id].clan !== 'history')
+            .map(id => `<div onclick="loadEdit('${id}')" style="cursor:pointer; padding:8px; border-bottom:1px solid #222; font-size:0.8rem;">${allCPs[id].name}</div>`)
+            .join('');
     }
 
     function analyzeAttendance() {
         const input = document.getElementById('mass-input').value.toLowerCase();
-        const rawNames = input.match(/[a-z0-9_]+/g) || [];
-        attendanceMap = {};
-        
-        if(rawNames.length > 0) {
-            Object.keys(allCPs).forEach(id => {
-                const cp = allCPs[id];
-                if(cp.clan === 'history') return;
-                const roster = (cp.members || "").toLowerCase();
-                const leader = (cp.leader || "").toLowerCase();
-                let count = 0;
-                rawNames.forEach(name => {
-                    if (name.length < 3) return;
-                    const regex = new RegExp("\\b" + name + "\\b", "g");
-                    if (roster.match(regex) || leader === name) count++;
-                });
-                if(count > 0) attendanceMap[id] = count;
-            });
-            document.getElementById('attendance-report').style.display = 'block';
-            document.getElementById('detected-details').innerHTML = Object.keys(attendanceMap)
-                .map(id => `<b>${allCPs[id].name}</b>: ${attendanceMap[id]} members detected`).join('<br>');
-        } else {
-            document.getElementById('attendance-report').style.display = 'none';
-        }
-        renderCPList();
-    }
+        const names = input.match(/[a-z0-9_]+/g) || [];
+        const listDiv = document.getElementById('detected-list');
+        listDiv.innerHTML = "";
+        matchedData = {};
 
-    async function logEvent(bossId, multiplier) {
-        const ids = Object.keys(attendanceMap);
-        if(ids.length === 0) return alert("Paste names first!");
-        
-        for (const id of ids) {
-            const count = attendanceMap[id];
-            const pts = count * multiplier;
-            await db.ref('cps/' + id).transaction(cp => {
-                if(cp) {
-                    if(!cp.bossStats) cp.bossStats = {};
-                    cp.bossStats[bossId] = (cp.bossStats[bossId] || 0) + 1; // CP συμμετοχή (icon +1)
-                    cp.totalPoints = (cp.totalPoints || 0) + pts; // Points (Members x Mult)
-                }
-                return cp;
-            });
-        }
-        alert("Success! Check Firebase.");
-        document.getElementById('mass-input').value = "";
-        attendanceMap = {};
-        analyzeAttendance();
-    }
+        Object.keys(allCPs).forEach(id => {
+            const cp = allCPs[id];
+            if(cp.clan === 'history') return;
+            const roster = (cp.members || "").toLowerCase();
+            const leader = (cp.leader || "").toLowerCase();
+            let count = 0;
+            names.forEach(n => { if(n.length > 2 && (roster.includes(n) || leader === n)) count++; });
 
-    function addMarketLoot() {
-        const lootValue = document.getElementById('loot-market').value;
-        if(!lootValue || !currentEditID) return alert("Select Loot & CP!");
-        const [cost, name] = lootValue.split('|');
-        
-        db.ref('cps/' + currentEditID).transaction(cp => {
-            if(cp) {
-                cp.totalPoints -= parseInt(cost);
-                if(!cp.lootHistory) cp.lootHistory = [];
-                cp.lootHistory.push({ item: name, cost: parseInt(cost), date: new Date().toLocaleDateString('el-GR') });
+            if(count > 0) {
+                matchedData[id] = count;
+                listDiv.innerHTML += `
+                    <div class="detected-cp-row">
+                        <input type="checkbox" class="cp-checkbox" id="check-${id}" checked>
+                        <span><b>${cp.name}</b>: ${count} members detected</span>
+                    </div>`;
             }
-            return cp;
         });
-        alert("Loot Registered!");
+    }
+
+    function toggleAllChecks() {
+        const cbs = document.querySelectorAll('.cp-checkbox');
+        const firstVal = cbs[0] ? cbs[0].checked : false;
+        cbs.forEach(cb => cb.checked = !firstVal);
+    }
+
+    async function logValidatedEvent(bossId, multiplier) {
+        const checkboxes = document.querySelectorAll('.cp-checkbox');
+        let done = false;
+
+        for (const cb of checkboxes) {
+            if (cb.checked) {
+                const id = cb.id.replace('check-', '');
+                const membersCount = matchedData[id];
+                const pointsToAdd = membersCount * multiplier;
+
+                await db.ref('cps/' + id).transaction(cp => {
+                    if(cp) {
+                        if(!cp.bossStats) cp.bossStats = {};
+                        // Math: 1 member = 1 icon point
+                        cp.bossStats[bossId] = (cp.bossStats[bossId] || 0) + membersCount;
+                        cp.totalPoints = (cp.totalPoints || 0) + pointsToAdd;
+                    }
+                    return cp;
+                });
+                done = true;
+            }
+        }
+        if(done) {
+            alert("Success!");
+            document.getElementById('mass-input').value = "";
+            document.getElementById('detected-list').innerHTML = "";
+        }
     }
 
     function loadEdit(id) {
         currentEditID = id;
         const cp = allCPs[id];
         document.getElementById('edit-section').style.display = 'block';
-        document.getElementById('edit-title').innerText = "EDIT: " + cp.name;
+        document.getElementById('edit-title').innerText = "Managing: " + cp.name;
         document.getElementById('edit-members').value = cp.members || "";
-        document.getElementById('edit-leader').value = cp.leader || "";
-        document.getElementById('edit-points').value = cp.totalPoints || 0;
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+
+    function addMarketLoot() {
+        const loot = document.getElementById('loot-market').value.split('|');
+        if(!currentEditID) return;
         
-        let statsHtml = "";
-        bossKeys.forEach(k => {
-            const val = (cp.bossStats && cp.bossStats[k]) ? cp.bossStats[k] : 0;
-            statsHtml += `<div class="stat-box">${k}<br><input type="number" id="inp-${k}" value="${val}" style="width:40px; text-align:center; background:#000; color:#fff; border:none;"></div>`;
+        db.ref('cps/' + currentEditID).transaction(cp => {
+            if(cp) {
+                cp.totalPoints -= parseInt(loot[0]);
+                if(!cp.lootHistory) cp.lootHistory = [];
+                cp.lootHistory.push({ item: loot[1], cost: loot[0], date: new Date().toLocaleDateString('el-GR') });
+            }
+            return cp;
         });
-        document.getElementById('stat-grid').innerHTML = statsHtml;
-        renderCPList();
+        alert(`Purchased ${loot[1]} for ${loot[0]} PTS`);
     }
 
     function updateCP() {
-        const stats = {};
-        bossKeys.forEach(k => stats[k] = parseInt(document.getElementById('inp-' + k).value) || 0);
-        db.ref('cps/' + currentEditID).update({
-            members: document.getElementById('edit-members').value,
-            leader: document.getElementById('edit-leader').value,
-            totalPoints: parseInt(document.getElementById('edit-points').value),
-            bossStats: stats
-        });
-        alert("CP Updated!");
+        db.ref('cps/' + currentEditID).update({ members: document.getElementById('edit-members').value });
+        alert("Roster Updated!");
     }
 
     function createNewCP() {
         const name = document.getElementById('new-name').value;
         const leader = document.getElementById('new-leader').value;
         const clan = document.getElementById('new-clan').value;
-        if(!name) return alert("Name is required!");
+        if(!name) return;
         const id = name.replace(/\s+/g, '-').toLowerCase();
-        db.ref('cps/' + id).set({
-            name, leader, clan, totalPoints: 0, members: "",
-            bossStats: { VAL:0, ANT:0, BAI:0, SIE:0, ZAK:0, AQ:0, ORF:0, COR:0, FRI:0 }
-        });
-        alert("New CP Created!");
-    }
-
-    function moveToHistory() {
-        if(confirm("Move to History?")) {
-            db.ref('cps/' + currentEditID).update({ clan: 'history' });
-            document.getElementById('edit-section').style.display = 'none';
-        }
-    }
-
-    function deleteCP() {
-        if(confirm("DANGER: Delete forever?")) {
-            db.ref('cps/' + currentEditID).remove();
-            document.getElementById('edit-section').style.display = 'none';
-        }
+        db.ref('cps/' + id).set({ name, leader, clan, totalPoints: 0, members: "", bossStats: { VAL:0, ANT:0, BAI:0, SIE:0, ZAK:0, AQ:0, ORF:0, COR:0, FRI:0 } });
+        alert("CP Created!");
     }
 </script>
 </body>
