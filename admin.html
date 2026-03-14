@@ -86,22 +86,22 @@
         // Σπάμε το κείμενο σε γραμμές
         const lines = rawData.split('\n').map(l => l.trim()).filter(l => l !== "");
         
-        if (lines.length < 1) return alert("Δεν βρέθηκαν δεδομένα.");
+        if (lines.length < 2) return alert("Χρειάζονται τουλάχιστον 2 γραμμές (Όνομα CP και Leader).");
 
-        const cpName = lines[0]; // Η πρώτη γραμμή είναι το όνομα του CP
-        const leader = lines[1] || "Unknown"; // Η δεύτερη γραμμή (συνήθως) είναι ο leader
-        const members = lines.slice(1).join(', '); // Όλοι οι υπόλοιποι
+        const cpName = lines[0]; // 1η γραμμή: CP Name
+        const leader = lines[1]; // 2η γραμμή: Leader
+        const members = lines.slice(1).join(', '); // Όλοι από τη 2η γραμμή και κάτω είναι members (συμπεριλαμβανομένου του leader)
 
-        if(confirm(`Θέλεις να αποθηκεύσεις το CP: ${cpName} με ${lines.length - 1} μέλη;`)) {
+        if(confirm(`Αποθήκευση CP: ${cpName}\nLeader: ${leader}\nΣύνολο μελών: ${lines.length - 1}`)) {
             set(ref(db, 'cps/' + cpName), {
                 name: cpName,
                 clan: clan,
                 totalPoints: pts,
-                leader: leader,
+                leader: leader, // Εδώ αποθηκεύεται ο Leader ξεχωριστά
                 members: members,
                 updatedAt: Date.now()
             }).then(() => {
-                alert("Επιτυχία!");
+                alert("Το CP " + cpName + " προστέθηκε με Leader τον " + leader);
                 document.getElementById('bulk-input').value = "";
             });
         }
