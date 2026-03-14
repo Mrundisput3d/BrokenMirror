@@ -5,40 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Broken Mirror Alliance | Leavers History</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --gold: #d4af37; --bg-overlay: rgba(10, 12, 15, 0.96); 
-        }
-        body { 
-            font-family: 'Open Sans', sans-serif; 
-            background: #0a0c0f url('https://i.ibb.co/1GmpSyxZ/BACKGROUND.jpg') no-repeat center center fixed; 
-            background-size: cover; color: #eee; margin: 0; padding: 0;
-        }
-        body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-overlay); z-index: -1; }
+    
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
+    <style>
+        :root { --gold: #d4af37; --bg-overlay: rgba(10, 12, 15, 0.96); }
+        body { font-family: 'Open Sans', sans-serif; background: #0a0c0f url('https://i.ibb.co/1GmpSyxZ/BACKGROUND.jpg') no-repeat center center fixed; background-size: cover; color: #eee; margin: 0; padding: 0; }
+        body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-overlay); z-index: -1; }
         .top-header { text-align: center; padding-top: 20px; }
         .ally-logo { width: 110px; filter: drop-shadow(0 0 15px var(--gold)); }
         .ally-title { font-family: 'Cinzel Decorative', cursive; font-size: 1.8rem; color: var(--gold); display: block; letter-spacing: 2px; margin-bottom: 20px;}
-
-        /* NAVIGATION */
         .main-nav { display: flex; justify-content: center; gap: 10px; margin-bottom: 30px; }
         .nav-btn { background: rgba(212, 175, 55, 0.1); border: 1px solid var(--gold); color: var(--gold); padding: 8px 15px; font-family: 'Cinzel'; cursor: pointer; transition: 0.3s; font-size: 0.75rem; border-radius: 4px; text-decoration: none; }
         .nav-btn:hover { background: var(--gold); color: #000; }
         .nav-btn.active { background: var(--gold); color: #000; }
-
-        /* ARCHIVE LIST */
-        .archive-container { max-width: 900px; margin: 0 auto; padding: 20px; background: rgba(15, 18, 22, 0.95); border: 1px solid #333; border-top: 4px solid #555; border-radius: 10px; }
+        .archive-container { max-width: 900px; margin: 0 auto; padding: 20px; background: rgba(15, 18, 22, 0.95); border: 1px solid #333; border-top: 4px solid #555; border-radius: 10px; min-height: 400px; }
         .archive-header { text-align: center; font-family: 'Cinzel'; font-size: 1.2rem; color: #888; border-bottom: 1px solid #222; padding-bottom: 15px; margin-bottom: 20px; }
-        
         .cp-box { margin-bottom: 10px; border-radius: 5px; border: 1px solid rgba(255,255,255,0.05); background: rgba(255,255,255,0.02); }
         .cp-btn { width: 100%; background: none; border: none; padding: 15px; color: #fff; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
         .cp-content { display: none; background: rgba(0,0,0,0.5); padding: 20px; border-top: 1px solid #333; }
         .cp-box.active .cp-content { display: block; }
-        
-        .loot-panel { background: rgba(0,0,0,0.3); border-radius: 5px; padding: 15px; border-left: 3px solid var(--gold); }
+        .loot-panel { background: rgba(0,0,0,0.3); border-radius: 5px; padding: 15px; border-left: 3px solid #555; }
         .loot-item { font-size: 0.85rem; margin-bottom: 8px; color: #ccc; display: flex; align-items: center; gap: 10px; }
         .loot-date { color: #666; font-size: 0.75rem; font-family: 'Cinzel'; }
-        
         .status-tag { font-size: 0.65rem; padding: 3px 8px; border-radius: 3px; background: #444; color: #aaa; text-transform: uppercase; }
     </style>
 </head>
@@ -47,7 +37,6 @@
     <div class="top-header">
         <img src="https://i.ibb.co/6R9q5PGv/ALLIANCE-LOGO.png" class="ally-logo">
         <span class="ally-title">BROKEN MIRROR ALLIANCE</span>
-        
         <div class="main-nav">
             <a href="index.html" class="nav-btn">DASHBOARD</a>
             <a href="history.html" class="nav-btn active">LEAVERS HISTORY</a>
@@ -58,85 +47,86 @@
 
     <div class="archive-container">
         <div class="archive-header">ARCHIVED CP DATA & LOOT HISTORY</div>
-        
         <div id="history-list">
-            <div class="cp-box">
-                <button class="cp-btn" onclick="this.parentElement.classList.toggle('active')">
-                    <div>
-                        <span>TITANS CP</span>
-                        <span class="status-tag" style="margin-left:10px;">Leaved Jan 2024</span>
-                    </div>
-                    <span style="color:var(--gold);">FINAL PTS: 1,450</span>
-                </button>
-                <div class="cp-content">
-                    <div class="loot-panel">
-                        <div class="loot-item">
-                            <img src="https://i.ibb.co/84gZPVRP/necklace-valakas.png" width="20"> 
-                            <span>Valakas Necklace</span>
-                            <span class="loot-date">[12/12/2023]</span>
-                        </div>
-                        <div class="loot-item">
-                            <img src="https://i.ibb.co/XrZkv67h/ring-of-baium.png" width="20"> 
-                            <span>Baium Ring</span>
-                            <span class="loot-date">[05/01/2024]</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="cp-box">
-                <button class="cp-btn" onclick="this.parentElement.classList.toggle('active')">
-                    <div>
-                        <span>DARK LEGION</span>
-                        <span class="status-tag" style="margin-left:10px;">Leaved Feb 2024</span>
-                    </div>
-                    <span style="color:var(--gold);">FINAL PTS: 820</span>
-                </button>
-                <div class="cp-content">
-                    <div class="loot-panel">
-                        <div class="loot-item">
-                            <img src="https://i.ibb.co/rfqvc6mv/earring-antharas.png" width="20"> 
-                            <span>Antharas Earring</span>
-                            <span class="loot-date">[20/01/2024]</span>
-                        </div>
-                        <div class="loot-item">
-                            <img src="https://i.ibb.co/spkC6Gzz/zaken-earring.png" width="20"> 
-                            <span>Zaken Earring</span>
-                            <span class="loot-date">[15/02/2024]</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="cp-box">
-                <button class="cp-btn" onclick="this.parentElement.classList.toggle('active')">
-                    <div>
-                        <span>BERSERKERS</span>
-                        <span class="status-tag" style="margin-left:10px;">Leaved March 2024</span>
-                    </div>
-                    <span style="color:var(--gold);">FINAL PTS: 2,100</span>
-                </button>
-                <div class="cp-content">
-                    <div class="loot-panel">
-                        <div class="loot-item">
-                            <img src="https://i.ibb.co/XrZkv67h/ring-of-baium.png" width="20"> 
-                            <span>Baium Ring</span>
-                            <span class="loot-date">[02/02/2024]</span>
-                        </div>
-                        <div class="loot-item">
-                            <img src="https://i.ibb.co/rKRtZmBG/ring-of-queen-ant.png" width="20"> 
-                            <span>Queen Ant Ring</span>
-                            <span class="loot-date">[10/03/2024]</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <p style="text-align:center; color:#555;">Loading archive...</p>
         </div>
     </div>
 
-    <div style="text-align:center; margin-top:30px; color:#555; font-size:0.7rem;">
-        Broken Mirror Alliance Archive System © 2024
-    </div>
+    <script>
+        const firebaseConfig = { 
+            apiKey: "AIzaSyDRL8EehxdcgVYJ0LJ1khVYkSJcaCMKRes", 
+            authDomain: "brokenmirrordb.firebaseapp.com", 
+            databaseURL: "https://brokenmirrordb-default-rtdb.europe-west1.firebasedatabase.app", 
+            projectId: "brokenmirrordb" 
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
 
+        // Λίστα με τα Icons για το Loot
+        const itemIcons = {
+            "Valakas Necklace": "https://i.ibb.co/84gZPVRP/necklace-valakas.png",
+            "Antharas Earring": "https://i.ibb.co/rfqvc6mv/earring-antharas.png",
+            "Baium Ring": "https://i.ibb.co/XrZkv67h/ring-of-baium.png",
+            "Zaken Earring": "https://i.ibb.co/spkC6Gzz/zaken-earring.png",
+            "Queen Ant Ring": "https://i.ibb.co/rKRtZmBG/ring-of-queen-ant.png",
+            "Frintezza Necklace": "https://i.ibb.co/gF4YKGTM/frintezza-necklace.png",
+            "Orfen Earring": "https://i.ibb.co/j9dDnXwH/earring-orfen.png"
+        };
+
+        db.ref('cps/').on('value', (snapshot) => {
+            const data = snapshot.val() || {};
+            const historyList = document.getElementById('history-list');
+            historyList.innerHTML = "";
+
+            let hasHistory = false;
+
+            Object.keys(data).forEach(id => {
+                const cp = data[id];
+                
+                // Δείχνουμε ΜΟΝΟ όσους έχουν clan "history"
+                if(cp.clan === 'history') {
+                    hasHistory = true;
+                    
+                    let lootHtml = "No loot history recorded.";
+                    if(cp.lootHistory && cp.lootHistory.length > 0) {
+                        lootHtml = cp.lootHistory.map(l => {
+                            // Προσπάθεια εύρεσης icon, αλλιώς default
+                            const icon = itemIcons[l.item] || "https://i.ibb.co/Txfby6wD/images.png";
+                            return `
+                                <div class="loot-item">
+                                    <img src="${icon}" width="20"> 
+                                    <span>${l.item}</span>
+                                    <span class="loot-date">[${l.date}]</span>
+                                </div>`;
+                        }).join('');
+                    }
+
+                    const html = `
+                        <div class="cp-box">
+                            <button class="cp-btn" onclick="this.parentElement.classList.toggle('active')">
+                                <div>
+                                    <span>${cp.name}</span>
+                                    <span class="status-tag" style="margin-left:10px;">ARCHIVED</span>
+                                </div>
+                                <span style="color:var(--gold);">FINAL PTS: ${cp.totalPoints || 0}</span>
+                            </button>
+                            <div class="cp-content">
+                                <div class="loot-panel">
+                                    ${lootHtml}
+                                </div>
+                                <div style="margin-top:15px; font-size:0.75rem; color:#666;">
+                                    Leader: ${cp.leader || 'Unknown'} | Members: ${cp.members || 'N/A'}
+                                </div>
+                            </div>
+                        </div>`;
+                    historyList.innerHTML += html;
+                }
+            });
+
+            if(!hasHistory) {
+                historyList.innerHTML = '<p style="text-align:center; color:#555;">No archived CPs found in database.</p>';
+            }
+        });
+    </script>
 </body>
 </html>
