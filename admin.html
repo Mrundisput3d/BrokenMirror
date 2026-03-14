@@ -2,226 +2,182 @@
 <html lang="el">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BMA | System Admin</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <title>BMA | Admin Fixed</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel&family=Open+Sans&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
     <style>
-        :root { --gold: #d4af37; --bg: #0a0c0f; --card: #15181c; --blue: #00d9ff; --red: #ff3333; }
-        body { font-family: 'Open Sans', sans-serif; background: var(--bg); color: #eee; margin: 0; padding: 20px; }
-        h1, h2 { font-family: 'Cinzel'; color: var(--gold); text-align: center; }
-        .container { max-width: 1100px; margin: 0 auto; }
-        .card { background: var(--card); border: 1px solid #333; padding: 20px; border-radius: 12px; margin-bottom: 25px; }
-        input, select, textarea { background: #000; border: 1px solid #444; color: #fff; padding: 12px; margin: 8px 0; width: 100%; border-radius: 6px; box-sizing: border-box; }
-        .btn { background: var(--gold); color: #000; border: none; padding: 14px; font-weight: bold; cursor: pointer; border-radius: 6px; width: 100%; font-family: 'Cinzel'; font-size: 1rem; }
-        .btn:hover { background: #fff; }
+        :root { --gold: #d4af37; --bg: #0a0c0f; --card: #15181c; --blue: #00d9ff; }
+        body { font-family: 'Open Sans', sans-serif; background: var(--bg); color: #eee; padding: 20px; }
+        .card { background: var(--card); border: 1px solid #333; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
+        input, textarea, select { background: #000; border: 1px solid #444; color: #fff; padding: 10px; width: 100%; box-sizing: border-box; margin: 10px 0; }
+        .btn { background: var(--gold); color: #000; border: none; padding: 12px; font-weight: bold; cursor: pointer; width: 100%; font-family: 'Cinzel'; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #333; padding: 12px; text-align: left; }
-        th { background: #000; color: var(--gold); }
-        .status-msg { text-align: center; font-weight: bold; margin: 10px 0; color: var(--gold); }
-        #drop-zone { border: 2px dashed var(--gold); padding: 30px; text-align: center; background: rgba(212,175,55,0.05); cursor: pointer; border-radius: 8px; }
-        .detected-tag { display: inline-block; background: rgba(0,217,255,0.1); border: 1px solid var(--blue); color: var(--blue); padding: 5px 10px; border-radius: 4px; margin: 5px; font-size: 0.8rem; }
-        .clan-tag { padding: 3px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; }
-        .noldor { border: 1px solid var(--blue); color: var(--blue); }
-        .kriminalides { border: 1px solid var(--red); color: var(--red); }
-        .history { border: 1px solid #777; color: #777; }
+        th, td { border: 1px solid #333; padding: 10px; text-align: left; }
+        #drop-zone { border: 2px dashed var(--gold); padding: 20px; text-align: center; cursor: pointer; }
+        .clan-tag { padding: 2px 5px; border-radius: 3px; font-size: 0.8rem; font-weight: bold; }
+        .noldor { color: var(--blue); border: 1px solid var(--blue); }
+        .kriminalides { color: #ff3333; border: 1px solid #ff3333; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>BMA CONTROL PANEL</h1>
+    <h1>BMA SYSTEM ADMIN</h1>
 
     <div class="card">
-        <h2>DAILY ATTENDANCE</h2>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-            <select id="event-mult">
-                <option value="1">MID EPICS (x1)</option>
-                <option value="2">BAIUM (x2)</option>
-                <option value="3">HIGH EPICS (x3)</option>
-            </select>
-            <input type="text" id="event-name" placeholder="Όνομα Boss/Event">
-        </div>
-        <div id="drop-zone" onclick="document.getElementById('file-input').click()">
-            Κάντε κλικ εδώ για <b>Επιλογή Φωτογραφίας</b> ή <b>CTRL+V</b> (Paste)
-        </div>
-        <input type="file" id="file-input" accept="image/*" style="display:none">
-        <div id="ocr-status" class="status-msg">Αναμονή...</div>
-        <div id="detected-players" style="text-align: center; margin-bottom: 10px;"></div>
-        <button id="submit-points" class="btn" style="background:#28a745; color:white; display:none;">ΚΑΤΑΧΩΡΗΣΗ ΠΟΝΤΩΝ</button>
-    </div>
-
-    <div class="card">
-        <h2>ΠΡΟΣΘΗΚΗ CP / BULK IMPORT</h2>
-        <select id="bulk-clan">
-            <option value="noldor">NOLDOR</option>
-            <option value="kriminalides">KRIMINALIDES</option>
-            <option value="history">LEAVERS (HISTORY)</option>
-        </select>
-        <textarea id="bulk-data" rows="4" placeholder="Paste στήλη Excel (1η: CP Name, 2η: Leader, επόμενες: Members)"></textarea>
-        <button id="save-bulk" class="btn">ΑΠΟΘΗΚΕΥΣΗ ΣΤΗ ΒΑΣΗ</button>
-    </div>
-
-    <div class="card">
-        <h2>CP DATABASE</h2>
-        <table id="db-table">
+        <h3>1. ΔΙΑΧΕΙΡΙΣΗ CP (DATABASE)</h3>
+        <table id="cp-table">
             <thead>
-                <tr>
-                    <th>CP NAME</th>
-                    <th>CLAN</th>
-                    <th>POINTS</th>
-                    <th>ACTIONS</th>
-                </tr>
+                <tr><th>NAME</th><th>CLAN</th><th>POINTS</th><th>ACTION</th></tr>
             </thead>
-            <tbody id="cp-table-body">
-                <tr><td colspan="4" style="text-align:center;">Σύνδεση με Firebase...</td></tr>
+            <tbody id="cp-body">
+                <tr><td colspan="4" id="loading-msg">Προσπάθεια σύνδεσης με τη βάση...</td></tr>
             </tbody>
         </table>
     </div>
-</div>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getDatabase, ref, set, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-    import Tesseract from 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+    <div class="card">
+        <h3>2. ΠΡΟΣΘΗΚΗ CP / BULK</h3>
+        <input type="text" id="new-cp-name" placeholder="CP Name">
+        <select id="new-cp-clan">
+            <option value="noldor">NOLDOR</option>
+            <option value="kriminalides">KRIMINALIDES</option>
+        </select>
+        <textarea id="new-cp-members" rows="3" placeholder="Ονόματα μελών χωρισμένα με κόμμα (π.χ. Player1, Player2)"></textarea>
+        <button class="btn" onclick="saveCP()">ΑΠΟΘΗΚΕΥΣΗ CP</button>
+    </div>
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyDRL8EehxdcgVYJ0LJ1khVYkSJcaCMKRes",
-        authDomain: "brokenmirrordb.firebaseapp.com",
-        databaseURL: "https://brokenmirrordb-default-rtdb.europe-west1.firebasedatabase.app",
-        projectId: "brokenmirrordb",
-        storageBucket: "brokenmirrordb.firebasestorage.app",
-        messagingSenderId: "609120206504",
-        appId: "1:609120206504:web:3a35fbba3cecbbb0030c9d"
-    };
+    <div class="card">
+        <h3>3. ATTENDANCE SCANNER (OCR)</h3>
+        <div id="drop-zone" onclick="document.getElementById('file-input').click()">
+            ΚΛΙΚ ΓΙΑ ΦΩΤΟ Η CTRL+V
+        </div>
+        <input type="file" id="file-input" style="display:none" onchange="handleFile(this.files[0])">
+        <div id="ocr-results" style="margin-top:10px; color:var(--gold); font-weight:bold; text-align:center;"></div>
+        <button id="submit-ocr-btn" class="btn" style="display:none; background:green; color:white; margin-top:10px;" onclick="applyPoints()">ΕΠΙΒΕΒΑΙΩΣΗ ΠΟΝΤΩΝ (+1)</button>
+    </div>
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-    let currentData = {};
-    let detectedList = [];
+    <script>
+        // --- CONFIGURATION ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyDRL8EehxdcgVYJ0LJ1khVYkSJcaCMKRes",
+            authDomain: "brokenmirrordb.firebaseapp.com",
+            databaseURL: "https://brokenmirrordb-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "brokenmirrordb",
+            storageBucket: "brokenmirrordb.firebasestorage.app",
+        };
 
-    // --- 1. ΔΙΑΒΑΣΜΑ ΒΑΣΗΣ (REAL-TIME) ---
-    const tableBody = document.getElementById('cp-table-body');
-    onValue(ref(db, 'cps/'), (snapshot) => {
-        currentData = snapshot.val() || {};
-        tableBody.innerHTML = "";
-        
-        Object.keys(currentData).forEach(id => {
-            const cp = currentData[id];
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td><b>${cp.name}</b></td>
-                <td><span class="clan-tag ${cp.clan}">${cp.clan}</span></td>
-                <td style="color:var(--gold); font-weight:bold;">${cp.totalPoints}</td>
-                <td>
-                    <button class="action-btn" data-id="${id}" data-action="leave" style="background:#555; color:white; border:none; padding:5px; cursor:pointer; margin-right:5px;">LEAVE</button>
-                    <button class="action-btn" data-id="${id}" data-action="delete" style="background:red; color:white; border:none; padding:5px; cursor:pointer;">DEL</button>
-                </td>
-            `;
-            tableBody.appendChild(row);
-        });
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        let allCPs = {};
+        let detectedCPs = [];
 
-        // Event listeners για τα κουμπιά του πίνακα
-        document.querySelectorAll('.action-btn').forEach(btn => {
-            btn.onclick = (e) => {
-                const id = e.target.getAttribute('data-id');
-                const action = e.target.getAttribute('data-action');
-                if(action === 'delete' && confirm('Οριστική διαγραφή;')) remove(ref(db, 'cps/' + id));
-                if(action === 'leave' && confirm('Μετακίνηση στους Leavers;')) update(ref(db, 'cps/' + id), { clan: 'history' });
-            };
-        });
-    }, (error) => {
-        tableBody.innerHTML = `<tr><td colspan="4" style="color:red">Σφάλμα Firebase: ${error.message}</td></tr>`;
-    });
-
-    // --- 2. BULK IMPORT ---
-    document.getElementById('save-bulk').onclick = () => {
-        const raw = document.getElementById('bulk-data').value.trim();
-        const clan = document.getElementById('bulk-clan').value;
-        if(!raw) return alert("Βάλε δεδομένα!");
-
-        const lines = raw.split('\n').map(l => l.trim()).filter(l => l !== "");
-        const cpName = lines[0];
-        
-        set(ref(db, 'cps/' + cpName), {
-            name: cpName,
-            clan: clan,
-            leader: lines[1] || "N/A",
-            totalPoints: parseInt(document.getElementById('bulk-points').value) || 0,
-            members: lines.slice(1).join(', '),
-            updatedAt: Date.now()
-        }).then(() => {
-            alert("CP Saved!");
-            document.getElementById('bulk-data').value = "";
-        });
-    };
-
-    // --- 3. OCR ATTENDANCE ---
-    const status = document.getElementById('ocr-status');
-    const playerContainer = document.getElementById('detected-players');
-    const submitBtn = document.getElementById('submit-points');
-
-    document.getElementById('file-input').onchange = (e) => e.target.files[0] && processOCR(e.target.files[0]);
-    document.onpaste = (e) => {
-        const item = Array.from(e.clipboardData.items).find(x => x.type.includes('image'));
-        if(item) processOCR(item.getAsFile());
-    };
-
-    async function processOCR(blob) {
-        status.innerText = "⏳ Scanning... (Παρακαλώ περιμένετε)";
-        playerContainer.innerHTML = "";
-        submitBtn.style.display = "none";
-        detectedList = [];
-
-        try {
-            const worker = await Tesseract.createWorker('eng');
-            const { data: { text } } = await worker.recognize(blob);
-            await worker.terminate();
-
-            const words = text.toLowerCase().split(/[\s,]+/).map(w => w.replace(/[^a-z0-9]/g, ''));
+        // --- FETCH DATA ---
+        db.ref('cps/').on('value', (snapshot) => {
+            allCPs = snapshot.val() || {};
+            const tbody = document.getElementById('cp-body');
+            tbody.innerHTML = "";
             
-            Object.values(currentData).forEach(cp => {
-                const roster = cp.members.toLowerCase();
-                words.forEach(word => {
-                    if(word.length > 2 && roster.includes(word)) {
-                        if(!detectedList.find(p => p.name === word)) {
-                            detectedList.push({ name: word, cp: cp.name });
-                            const tag = document.createElement('span');
-                            tag.className = 'detected-tag';
-                            tag.innerText = `${word} (${cp.name})`;
-                            playerContainer.appendChild(tag);
-                        }
+            if (Object.keys(allCPs).length === 0) {
+                tbody.innerHTML = "<tr><td colspan='4'>Η βάση είναι άδεια. Προσθέστε ένα CP.</td></tr>";
+            }
+
+            Object.keys(allCPs).forEach(id => {
+                const cp = allCPs[id];
+                tbody.innerHTML += `
+                    <tr>
+                        <td><b>${cp.name}</b></td>
+                        <td><span class="clan-tag ${cp.clan}">${cp.clan}</span></td>
+                        <td style="color:var(--gold)">${cp.totalPoints || 0}</td>
+                        <td><button onclick="deleteCP('${id}')" style="background:red; color:white; border:none; cursor:pointer;">DEL</button></td>
+                    </tr>
+                `;
+            });
+            console.log("Data loaded from Firebase");
+        }, (error) => {
+            document.getElementById('loading-msg').innerText = "ΣΦΑΛΜΑ: " + error.message;
+        });
+
+        // --- SAVE CP ---
+        function saveCP() {
+            const name = document.getElementById('new-cp-name').value;
+            const clan = document.getElementById('new-cp-clan').value;
+            const members = document.getElementById('new-cp-members').value;
+            
+            if(!name || !members) return alert("Συμπλήρωσε Name και Members!");
+
+            db.ref('cps/' + name).set({
+                name: name,
+                clan: clan,
+                members: members,
+                totalPoints: 0,
+                updatedAt: Date.now()
+            }).then(() => {
+                alert("Το CP " + name + " αποθηκεύτηκε!");
+                document.getElementById('new-cp-name').value = "";
+                document.getElementById('new-cp-members').value = "";
+            });
+        }
+
+        function deleteCP(id) {
+            if(confirm("Διαγραφή;")) db.ref('cps/' + id).remove();
+        }
+
+        // --- OCR LOGIC ---
+        function handleFile(file) {
+            if(!file) return;
+            const resultsDiv = document.getElementById('ocr-results');
+            resultsDiv.innerText = "⏳ Scanning Image... παρακαλώ περιμένετε...";
+            
+            Tesseract.recognize(file, 'eng').then(({ data: { text } }) => {
+                const cleanText = text.toLowerCase();
+                detectedCPs = [];
+                resultsDiv.innerHTML = "";
+
+                Object.values(allCPs).forEach(cp => {
+                    const members = cp.members.toLowerCase().split(',').map(m => m.trim());
+                    let foundInThisCP = false;
+                    
+                    members.forEach(m => {
+                        if(m.length > 2 && cleanText.includes(m)) foundInThisCP = true;
+                    });
+
+                    if(foundInThisCP) {
+                        detectedCPs.push(cp.name);
+                        resultsDiv.innerHTML += `<div style="color:var(--blue)">✅ Found CP: ${cp.name}</div>`;
                     }
                 });
+
+                if(detectedCPs.length > 0) {
+                    document.getElementById('submit-ocr-btn').style.display = "block";
+                } else {
+                    resultsDiv.innerText = "❌ Κανένας παίκτης δεν βρέθηκε στη φωτογραφία.";
+                }
+            });
+        }
+
+        function applyPoints() {
+            const updates = {};
+            detectedCPs.forEach(cpName => {
+                const currentPts = allCPs[cpName].totalPoints || 0;
+                updates[`cps/${cpName}/totalPoints`] = currentPts + 1;
             });
 
-            status.innerText = detectedList.length > 0 ? `✅ Βρέθηκαν ${detectedList.length} παίκτες!` : "❌ Κανένα μέλος δεν αναγνωρίστηκε.";
-            if(detectedList.length > 0) submitBtn.style.display = "block";
-
-        } catch (err) {
-            status.innerText = "Σφάλμα OCR: " + err.message;
-        }
-    }
-
-    submitBtn.onclick = () => {
-        const mult = parseInt(document.getElementById('event-mult').value);
-        const updates = {};
-        const sums = {};
-        
-        detectedList.forEach(p => sums[p.cp] = (sums[p.cp] || 0) + mult);
-        
-        for(let cpKey in sums) {
-            const newPts = (currentData[cpKey].totalPoints || 0) + sums[cpKey];
-            updates[`cps/${cpKey}/totalPoints`] = newPts;
+            db.ref().update(updates).then(() => {
+                alert("Οι πόντοι προστέθηκαν στα " + detectedCPs.length + " CP!");
+                document.getElementById('submit-ocr-btn').style.display = "none";
+                document.getElementById('ocr-results').innerHTML = "";
+            });
         }
 
-        update(ref(db), updates).then(() => {
-            alert("Οι πόντοι προστέθηκαν!");
-            playerContainer.innerHTML = "";
-            submitBtn.style.display = "none";
-            status.innerText = "Αναμονή...";
+        // Paste support
+        window.addEventListener('paste', e => {
+            const file = e.clipboardData.files[0];
+            if(file) handleFile(file);
         });
-    };
-
-</script>
+    </script>
 </body>
 </html>
