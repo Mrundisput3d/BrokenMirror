@@ -2,14 +2,14 @@
 <html lang="el">
 <head>
     <meta charset="UTF-8">
-    <title>BMA | Supreme Admin V15</title>
+    <title>BMA | Command Center V17</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <style>
         :root { --gold: #d4af37; --bg: #0a0c0f; --card: #15181c; --red: #ff4444; --green: #28a745; --blue: #3498db; }
         body { background: var(--bg); color: #eee; font-family: 'Open Sans', sans-serif; margin: 0; padding: 20px; font-size: 13px; }
-        h1 { font-family: 'Cinzel'; color: var(--gold); text-align: center; text-shadow: 0 2px 10px rgba(212,175,55,0.3); }
+        h1 { font-family: 'Cinzel'; color: var(--gold); text-align: center; margin-bottom: 20px; }
         .layout { display: grid; grid-template-columns: 320px 1fr; gap: 20px; max-width: 1400px; margin: 0 auto; }
         .panel { background: var(--card); border: 1px solid #333; padding: 15px; border-radius: 10px; border-top: 3px solid var(--gold); }
         .detected-cp-row { background: #000; padding: 8px; margin: 4px 0; border-radius: 5px; display: flex; align-items: center; border: 1px solid #333; }
@@ -24,7 +24,7 @@
         .btn-gold { background: var(--gold); color: #000; }
         .btn-red { background: var(--red); color: #fff; }
         .btn-blue { background: var(--blue); color: #fff; }
-        .loot-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .loot-table { width: 100%; border-collapse: collapse; }
         .loot-table td { padding: 8px; border-bottom: 1px solid #222; font-size: 0.75rem; }
         .stat-edit-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 15px; }
         .stat-field { background: #111; padding: 8px; border-radius: 4px; text-align: center; border: 1px solid #333; }
@@ -33,7 +33,7 @@
 </head>
 <body>
 
-    <h1>BMA SUPREME ADMIN V15</h1>
+    <h1>BMA COMMAND CENTER V17</h1>
 
     <div class="layout">
         <div class="panel">
@@ -52,8 +52,8 @@
         </div>
 
         <div class="panel">
-            <h2>1. LOG EVENT (UNIQUE & CAPPED)</h2>
-            <textarea id="mass-input" rows="3" placeholder="Paste names..." oninput="analyzeAttendance()"></textarea>
+            <h2>1. LOG EVENT (MEMBER-BOSS LOCK)</h2>
+            <textarea id="mass-input" rows="3" placeholder="Paste names... (Smart filtering enabled)" oninput="analyzeAttendance()"></textarea>
             <div id="detected-list"></div>
 
             <div class="boss-grid">
@@ -112,14 +112,12 @@
     const firebaseConfig = { apiKey: "AIzaSyDRL8EehxdcgVYJ0LJ1khVYkSJcaCMKRes", databaseURL: "https://brokenmirrordb-default-rtdb.europe-west1.firebasedatabase.app" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
-    let allCPs = {}, matchedData = {}, currentEditID = null;
+    let allCPs = {}, matchedData = {}, currentEditID = null, globalDailyLogs = {};
     const bossKeys = ['VAL', 'ANT', 'BAI', 'SIE', 'ZAK', 'FRI', 'AQ', 'ORF', 'COR'];
 
-    db.ref('cps/').on('value', snap => {
-        allCPs = snap.val() || {};
-        renderSimpleList();
-        if(currentEditID) loadEdit(currentEditID);
-    });
+    // Realtime Syncs
+    db.ref('cps/').on('value', snap => { allCPs = snap.val() || {}; renderSimpleList(); if(currentEditID) loadEdit(currentEditID); });
+    db.ref('dailyLogs/').on('value', snap => { globalDailyLogs = snap.val() || {}; });
 
     function renderSimpleList() {
         document.getElementById('cp-list-simple').innerHTML = Object.keys(allCPs).filter(id => allCPs[id].clan !== 'history').map(id => 
@@ -131,44 +129,57 @@
         let names = [...new Set(input.match(/[a-z0-9_]+/g) || [])];
         const listDiv = document.getElementById('detected-list');
         listDiv.innerHTML = ""; matchedData = {};
+        
         Object.keys(allCPs).forEach(id => {
             if(allCPs[id].clan === 'history') return;
             const roster = (allCPs[id].members || "").toLowerCase();
             const leader = (allCPs[id].leader || "").toLowerCase();
-            let count = 0;
-            names.forEach(n => { if(n.length > 2 && (roster.includes(n) || leader === n)) count++; });
-            if(count > 0) {
-                matchedData[id] = count;
-                listDiv.innerHTML += `<div class="detected-cp-row"><input type="checkbox" class="cp-checkbox" id="check-${id}" checked><span><b>${allCPs[id].name}</b> (${count > 9 ? '9 Capped' : count})</span></div>`;
+            let found = names.filter(n => (n.length > 2 && (roster.includes(n) || leader === n)));
+            if(found.length > 0) {
+                matchedData[id] = found;
+                listDiv.innerHTML += `<div class="detected-cp-row"><input type="checkbox" class="cp-checkbox" id="check-${id}" checked><span><b>${allCPs[id].name}</b> (${found.length} members found)</span></div>`;
             }
         });
     }
 
     async function logValidatedEvent(bossId, multiplier) {
         const checkboxes = document.querySelectorAll('.cp-checkbox');
-        let loggedCount = 0, skippedCount = 0;
-        const today = new Date().toLocaleDateString('el-GR');
+        const today = new Date().toLocaleDateString('el-GR').replace(/\//g, '-');
+        let totalUpdated = 0, skippedTotal = 0;
 
         for (const cb of checkboxes) {
             if (cb.checked) {
                 const id = cb.id.replace('check-', '');
-                if (allCPs[id].lastLogs && allCPs[id].lastLogs[bossId] === today) { skippedCount++; continue; }
-                const finalCount = Math.min(matchedData[id], 9);
+                const namesFound = matchedData[id];
+                
+                // ΦΙΛΤΡΑΡΙΣΜΑ: Μόνο όσοι ΔΕΝ έχουν κάνει ΤΟ ΣΥΓΚΕΚΡΙΜΕΝΟ BOSS σήμερα
+                let eligible = namesFound.filter(name => {
+                    const alreadyDone = globalDailyLogs[today] && globalDailyLogs[today][name] && globalDailyLogs[today][name][bossId];
+                    if (alreadyDone) { skippedTotal++; return false; }
+                    return true;
+                });
+
+                if (eligible.length === 0) continue;
+
+                const finalNames = eligible.slice(0, 9);
+                const finalCount = finalNames.length;
+
                 await db.ref('cps/' + id).transaction(cp => {
                     if(cp) {
                         if(!cp.bossStats) cp.bossStats = {};
-                        if(!cp.lastLogs) cp.lastLogs = {};
                         cp.bossStats[bossId] = (cp.bossStats[bossId] || 0) + finalCount;
                         cp.totalPoints = (cp.totalPoints || 0) + (finalCount * multiplier);
-                        cp.lastLogs[bossId] = today;
                     }
                     return cp;
                 });
-                loggedCount++;
+
+                for(let name of finalNames) {
+                    await db.ref(`dailyLogs/${today}/${name}/${bossId}`).set({ cp: id, time: new Date().toLocaleTimeString() });
+                }
+                totalUpdated++;
             }
         }
-        if(loggedCount > 0) alert(`Success: ${loggedCount} CPs updated.`);
-        if(skippedCount > 0) alert(`Blocked: ${skippedCount} CPs already logged for ${bossId} today.`);
+        alert(`Updated ${totalUpdated} CP(s). Skipped ${skippedTotal} duplicate member-boss entries.`);
         document.getElementById('mass-input').value = ""; document.getElementById('detected-list').innerHTML = "";
     }
 
