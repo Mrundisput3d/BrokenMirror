@@ -2,7 +2,7 @@
 <html lang="el">
 <head>
     <meta charset="UTF-8">
-    <title>BMA | Supreme Intelligence Admin</title>
+    <title>BMA | Intelligence Command Center V6</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -13,17 +13,13 @@
         .layout { display: grid; grid-template-columns: 380px 1fr; gap: 20px; }
         .panel { background: var(--card); border: 1px solid #333; padding: 15px; border-radius: 10px; border-top: 3px solid var(--gold); }
         
-        /* SEARCH & MATCHING */
         #mass-input { width: 100%; height: 120px; background: #000; color: var(--green); border: 1px solid #444; padding: 10px; font-family: monospace; border-radius: 5px; }
         .match-card { background: #000; border: 1px solid #444; padding: 10px; margin-top: 10px; border-radius: 5px; border-left: 4px solid var(--green); }
         
-        /* CP LIST */
         .cp-item { background: #000; padding: 10px; margin-bottom: 5px; border-radius: 5px; border: 1px solid #222; display: flex; justify-content: space-between; cursor: pointer; }
-        .cp-item:hover { border-color: var(--gold); }
         .cp-item.matched { border-color: var(--green); background: rgba(40, 167, 69, 0.1); }
         .cp-item.selected { border: 2px solid var(--gold); }
 
-        /* BOSS GRID */
         .boss-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 15px 0; }
         .boss-btn { background: #222; border: 1px solid #444; padding: 8px; text-align: center; cursor: pointer; border-radius: 5px; transition: 0.2s; }
         .boss-btn:hover { border-color: var(--gold); background: #333; }
@@ -42,16 +38,15 @@
 </head>
 <body>
 
-    <h1>BMA SUPREME ADMIN V5</h1>
+    <h1>BMA SUPREME ADMIN V6</h1>
 
     <div class="layout">
         <div class="panel">
             <h2>CP LIST & NEW</h2>
             <div id="cp-list-container" style="max-height: 400px; overflow-y: auto;"></div>
-            
             <hr style="border-color:#333; margin:15px 0;">
             <h3>CREATE CP / CALLER</h3>
-            <input type="text" id="new-name" placeholder="CP Name (e.g. Noldor Archer)">
+            <input type="text" id="new-name" placeholder="CP Name">
             <input type="text" id="new-leader" placeholder="Leader Name">
             <select id="new-clan">
                 <option value="noldor">Noldor Clan</option>
@@ -63,8 +58,7 @@
 
         <div class="panel">
             <h2>INTELLIGENT EVENT LOGGER</h2>
-            <label style="font-size:0.8rem; color:#888;">Paste Names from Game/Discord:</label>
-            <textarea id="mass-input" placeholder="Mitsos&#10;Kostas..." oninput="analyzeAttendance()"></textarea>
+            <textarea id="mass-input" placeholder="Επικόλληση ονομάτων από Discord/Game..." oninput="analyzeAttendance()"></textarea>
             
             <div id="attendance-report" class="match-card" style="display:none;">
                 <b>Detected Attendance:</b>
@@ -87,7 +81,7 @@
                 <h2 id="edit-title" style="text-align:left;">EDIT CP</h2>
                 <div style="display:grid; grid-template-columns: 1.5fr 1fr; gap:15px;">
                     <div>
-                        <label>Roster (One name per line or comma)</label>
+                        <label>Roster (Ένα όνομα ανά γραμμή ή με κόμμα)</label>
                         <textarea id="edit-members" rows="8"></textarea>
                         <button class="btn btn-gold" onclick="updateCP()">SAVE CHANGES</button>
                     </div>
@@ -111,7 +105,7 @@
     const db = firebase.database();
 
     let allCPs = {};
-    let attendanceMap = {}; // { cpId: count }
+    let attendanceMap = {};
     let currentEditID = null;
     const bossKeys = ['VAL', 'ANT', 'BAI', 'SIE', 'ZAK', 'AQ', 'ORF', 'COR', 'FRI'];
 
@@ -134,7 +128,6 @@
         });
     }
 
-    // SMART ATTENDANCE LOGIC
     function analyzeAttendance() {
         const input = document.getElementById('mass-input').value.toLowerCase();
         const rawNames = input.split(/[\n,]+/).map(n => n.trim()).filter(n => n.length > 1);
@@ -142,45 +135,45 @@
         
         if(rawNames.length > 0) {
             Object.keys(allCPs).forEach(id => {
-                const roster = (allCPs[id].members || "").toLowerCase();
-                const leader = (allCPs[id].leader || "").toLowerCase();
+                const cp = allCPs[id];
+                if(cp.clan === 'history') return;
+                const rosterArray = (cp.members || "").toLowerCase().split(/[\n,]+/).map(n => n.trim());
+                const leaderName = (cp.leader || "").toLowerCase().trim();
                 let count = 0;
                 rawNames.forEach(name => {
-                    if(roster.includes(name) || leader.includes(name)) count++;
+                    if(rosterArray.includes(name) || leaderName === name) count++;
                 });
                 if(count > 0) attendanceMap[id] = count;
             });
             document.getElementById('attendance-report').style.display = 'block';
             document.getElementById('detected-details').innerHTML = Object.keys(attendanceMap)
-                .map(id => `${allCPs[id].name}: <span style="color:var(--gold)">${attendanceMap[id]} members</span>`).join('<br>');
+                .map(id => `<b>${allCPs[id].name}</b>: <span style="color:var(--gold)">${attendanceMap[id]} άτομα</span>`).join('<br>');
         } else {
             document.getElementById('attendance-report').style.display = 'none';
         }
         renderCPList();
     }
 
-    // LOG EVENT WITH MULTIPLIER (Points = Count * Multiplier)
-    function logEvent(bossId, multiplier) {
+    async function logEvent(bossId, multiplier) {
         const ids = Object.keys(attendanceMap);
-        if(ids.length === 0) return alert("No members detected from the pasted list!");
-        
+        if(ids.length === 0) return alert("No members detected!");
         if(!confirm(`Apply ${bossId} to ${ids.length} CPs?`)) return;
 
-        ids.forEach(id => {
+        for (const id of ids) {
             const count = attendanceMap[id];
             const pointsToAdd = count * multiplier;
-            
-            db.ref('cps/' + id).transaction(cp => {
-                if(cp) {
-                    if(!cp.bossStats) cp.bossStats = {};
-                    cp.bossStats[bossId] = (cp.bossStats[bossId] || 0) + 1; // +1 participation for CP
-                    cp.totalPoints = (cp.totalPoints || 0) + pointsToAdd; // members * multiplier
-                }
-                return cp;
-            });
-        });
-        
-        alert("Success! Points distributed.");
+            try {
+                await db.ref('cps/' + id).transaction(cp => {
+                    if(cp) {
+                        if(!cp.bossStats) cp.bossStats = {};
+                        cp.bossStats[bossId] = (cp.bossStats[bossId] || 0) + 1;
+                        cp.totalPoints = (cp.totalPoints || 0) + pointsToAdd;
+                    }
+                    return cp;
+                });
+            } catch (e) { console.error("Error updating CP: " + id, e); }
+        }
+        alert("Success!");
         document.getElementById('mass-input').value = "";
         attendanceMap = {};
         analyzeAttendance();
@@ -194,7 +187,6 @@
         document.getElementById('edit-members').value = cp.members || "";
         document.getElementById('edit-leader').value = cp.leader || "";
         document.getElementById('edit-points').value = cp.totalPoints || 0;
-        
         let gridHtml = "";
         bossKeys.forEach(k => {
             const val = (cp.bossStats && cp.bossStats[k]) ? cp.bossStats[k] : 0;
@@ -230,14 +222,14 @@
     }
 
     function moveToHistory() {
-        if(confirm("Move this CP to History page?")) {
+        if(confirm("Move to History?")) {
             db.ref('cps/' + currentEditID).update({ clan: 'history' });
             document.getElementById('edit-section').style.display = 'none';
         }
     }
 
     function deleteCP() {
-        if(confirm("DANGER: This will delete the CP and all its data FOREVER!")) {
+        if(confirm("DANGER: Delete forever?")) {
             db.ref('cps/' + currentEditID).remove();
             document.getElementById('edit-section').style.display = 'none';
         }
