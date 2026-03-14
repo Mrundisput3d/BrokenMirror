@@ -2,83 +2,62 @@
 <html lang="el">
 <head>
     <meta charset="UTF-8">
-    <title>BMA | Professional Admin System v2.0</title>
+    <title>BMA | Admin Control Panel</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
     <style>
-        :root { --gold: #d4af37; --bg: #0a0c0f; --card: #15181c; --blue: #00d9ff; --red: #ff4444; --gray: #888; }
-        body { font-family: 'Open Sans', sans-serif; background: var(--bg); color: #eee; padding: 20px; margin: 0; }
-        .container { max-width: 1200px; margin: 0 auto; }
-        h1, h2, h3 { font-family: 'Cinzel'; color: var(--gold); text-align: center; }
-        .card { background: var(--card); border: 1px solid #333; padding: 25px; border-radius: 12px; margin-bottom: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        input, textarea, select { background: #000; border: 1px solid #444; color: #fff; padding: 12px; width: 100%; box-sizing: border-box; margin: 10px 0; border-radius: 5px; }
-        .btn { background: var(--gold); color: #000; border: none; padding: 15px; font-weight: bold; cursor: pointer; width: 100%; font-family: 'Cinzel'; border-radius: 5px; transition: 0.3s; }
-        .btn:hover { background: #fff; transform: translateY(-2px); }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.9rem; }
-        th, td { border: 1px solid #333; padding: 12px; text-align: left; }
-        th { background: #000; color: var(--gold); text-transform: uppercase; }
-        .clan-tag { padding: 3px 8px; border-radius: 4px; font-weight: bold; font-size: 0.75rem; text-transform: uppercase; }
+        :root { --gold: #d4af37; --bg: #0a0c0f; --card: #15181c; --blue: #00d9ff; --red: #ff4444; }
+        body { font-family: 'Open Sans', sans-serif; background: var(--bg); color: #eee; padding: 20px; }
+        .container { max-width: 1100px; margin: 0 auto; }
+        .card { background: var(--card); border: 1px solid #333; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
+        h1, h2 { font-family: 'Cinzel'; color: var(--gold); text-align: center; }
+        
+        /* OCR & Dropzone */
+        #drop-zone { border: 2px dashed var(--gold); padding: 30px; text-align: center; cursor: pointer; background: rgba(212,175,55,0.05); }
+        .btn { background: var(--gold); color: #000; border: none; padding: 12px; font-weight: bold; cursor: pointer; border-radius: 5px; width: 100%; font-family: 'Cinzel'; }
+        
+        /* Modal Styles */
+        #manual-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; overflow-y: auto; }
+        .modal-content { background: var(--card); max-width: 800px; margin: 50px auto; padding: 25px; border: 2px solid var(--gold); border-radius: 10px; }
+        
+        .cp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin: 20px 0; }
+        .cp-item { padding: 10px; border: 1px solid #444; text-align: center; cursor: pointer; border-radius: 5px; transition: 0.2s; font-weight: bold; }
+        .cp-item.selected { background: var(--gold); color: #000; border-color: #fff; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #333; padding: 10px; text-align: left; }
+        .clan-tag { padding: 3px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; }
         .noldor { color: var(--blue); border: 1px solid var(--blue); }
         .kriminalides { color: var(--red); border: 1px solid var(--red); }
-        .history { color: var(--gray); border: 1px solid var(--gray); }
-        #drop-zone { border: 2px dashed var(--gold); padding: 40px; text-align: center; background: rgba(212,175,55,0.05); cursor: pointer; border-radius: 10px; }
-        .detected-tag { display: inline-block; background: rgba(0,217,255,0.1); border: 1px solid var(--blue); color: var(--blue); padding: 5px 10px; border-radius: 4px; margin: 5px; line-height: 1.4; }
-        .action-btns { display: flex; gap: 5px; }
-        .small-btn { padding: 5px 8px; border: none; border-radius: 3px; cursor: pointer; font-size: 0.7rem; font-weight: bold; color: white; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>BMA ALLIANCE MANAGEMENT</h1>
+    <h1>BMA CONTROL PANEL</h1>
 
-    <div class="card" style="border-top: 4px solid var(--blue);">
-        <h3>1. PARTY ATTENDANCE (L2 OPTIMIZED)</h3>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-            <div>
-                <label>Boss Multiplier</label>
-                <select id="event-multiplier">
-                    <option value="1">Mid Epic / Daily (x1)</option>
-                    <option value="2">Baium / Special (x2)</option>
-                    <option value="3">Antharas / Valakas / Siege (x3)</option>
-                </select>
-            </div>
-            <div>
-                <label>Event Name</label>
-                <input type="text" id="event-name" placeholder="π.χ. Antharas Run">
-            </div>
+    <div class="card">
+        <h2>1. ATTENDANCE & OCR</h2>
+        <div style="display:flex; gap:10px; margin-bottom:15px;">
+            <select id="event-mult" style="flex:1; padding:10px; background:#000; color:#fff; border:1px solid #444;">
+                <option value="1">Mid Epic (x1)</option>
+                <option value="2">Baium (x2)</option>
+                <option value="3">High Epic (x3)</option>
+            </select>
+            <button class="btn" style="flex:1; background:#007bff; color:white;" onclick="openManualModal()">ΧΕΙΡΟΚΙΝΗΤΗ ΕΠΙΛΟΓΗ (NO PHOTO)</button>
         </div>
-
         <div id="drop-zone" onclick="document.getElementById('file-input').click()">
-            Σύρετε το Screenshot εδώ ή <b>Κάντε Κλικ</b> (ή CTRL+V)
+            Σύρετε τη φωτογραφία εδώ ή CTRL+V (Paste) για OCR
         </div>
         <input type="file" id="file-input" style="display:none" onchange="handleFile(this.files[0])">
-        
-        <div id="ocr-results" style="margin-top:20px; text-align:center;"></div>
-        <button id="submit-ocr-btn" class="btn" style="display:none; background:#28a745; color:white; margin-top:15px;" onclick="applyPoints()">ΚΑΤΑΧΩΡΗΣΗ ΠΟΝΤΩΝ</button>
-    </div>
-
-    <div class="card" style="border-top: 4px solid var(--gold);">
-        <h3>2. CP REGISTRATION</h3>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-            <select id="new-cp-clan">
-                <option value="noldor">NOLDOR CLAN</option>
-                <option value="kriminalides">KRIMINALIDES</option>
-                <option value="history">HISTORY (LEAVERS)</option>
-            </select>
-            <input type="number" id="new-cp-points" placeholder="Start Pts" value="0">
-        </div>
-        <input type="text" id="new-cp-name" placeholder="CP Name">
-        <textarea id="new-cp-members" rows="3" placeholder="Ονόματα μελών (κόμμα ή Enter)"></textarea>
-        <button class="btn" onclick="saveCP()">SAVE TO DATABASE</button>
     </div>
 
     <div class="card">
-        <h3>3. ACTIVE DATABASE</h3>
-        <table>
+        <h2>2. CP ROSTER</h2>
+        <table id="main-table">
             <thead>
                 <tr><th>CP NAME</th><th>CLAN</th><th>POINTS</th><th>ACTIONS</th></tr>
             </thead>
@@ -86,18 +65,30 @@
         </table>
     </div>
 
-    <div class="card" style="opacity: 0.7;">
-        <h3>4. LEAVERS / HISTORY</h3>
-        <table>
-            <thead>
-                <tr><th>CP NAME</th><th>FINAL PTS</th><th>ACTIONS</th></tr>
-            </thead>
-            <tbody id="history-body"></tbody>
-        </table>
+    <div class="card">
+        <h3>ΠΡΟΣΘΗΚΗ ΝΕΟΥ CP</h3>
+        <input type="text" id="new-name" placeholder="CP Name" style="width:100%; padding:10px; margin-bottom:5px; background:#000; color:#fff; border:1px solid #444;">
+        <textarea id="new-members" placeholder="Members (comma separated)" style="width:100%; padding:10px; background:#000; color:#fff; border:1px solid #444;"></textarea>
+        <button class="btn" onclick="saveNewCP()" style="margin-top:10px;">SAVE CP</button>
+    </div>
+</div>
+
+<div id="manual-modal">
+    <div class="modal-content">
+        <h2 id="modal-title">Επιλογή CP για Πόντους</h2>
+        <p style="text-align:center; color: var(--gold);">Κάντε κλικ στα CP που συμμετείχαν (τα επιλεγμένα είναι με χρυσό χρώμα)</p>
+        
+        <div class="cp-grid" id="modal-grid"></div>
+        
+        <div style="display:flex; gap:10px;">
+            <button class="btn" style="background:#28a745; color:#fff;" onclick="submitAttendance()">ΕΠΙΒΕΒΑΙΩΣΗ & ΠΡΟΣΘΗΚΗ ΠΟΝΤΩΝ</button>
+            <button class="btn" style="background:#555; color:#fff;" onclick="closeModal()">ΑΚΥΡΩΣΗ</button>
+        </div>
     </div>
 </div>
 
 <script>
+    // --- FIREBASE CONFIG ---
     const firebaseConfig = {
         apiKey: "AIzaSyDRL8EehxdcgVYJ0LJ1khVYkSJcaCMKRes",
         authDomain: "brokenmirrordb.firebaseapp.com",
@@ -105,100 +96,112 @@
         projectId: "brokenmirrordb",
         storageBucket: "brokenmirrordb.firebasestorage.app",
     };
-
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
+    
     let allCPs = {};
-    let detectedList = [];
+    let selectedCPs = new Set();
 
-    // --- REAL-TIME SYNC ---
+    // --- SYNC DATA ---
     db.ref('cps/').on('value', (snapshot) => {
         allCPs = snapshot.val() || {};
-        const tbody = document.getElementById('cp-body');
-        const hbody = document.getElementById('history-body');
-        tbody.innerHTML = ""; hbody.innerHTML = "";
-        
-        Object.keys(allCPs).forEach(id => {
-            const cp = allCPs[id];
-            if(cp.clan !== 'history') {
-                tbody.innerHTML += `<tr><td><b>${cp.name}</b></td><td><span class="clan-tag ${cp.clan}">${cp.clan}</span></td><td style="color:var(--gold)">${cp.totalPoints || 0}</td><td class="action-btns"><button class="small-btn" style="background:#555;" onclick="moveToHistory('${id}')">LEAVE</button><button class="small-btn" style="background:red;" onclick="deleteCP('${id}')">DEL</button></td></tr>`;
-            } else {
-                hbody.innerHTML += `<tr><td>${cp.name}</td><td>${cp.totalPoints || 0}</td><td class="action-btns"><button class="small-btn" style="background:var(--blue);color:#000;" onclick="restoreCP('${id}')">RESTORE</button></td></tr>`;
-            }
-        });
+        renderTable();
     });
 
-    // --- DATABASE FUNCTIONS ---
-    function saveCP() {
-        const name = document.getElementById('new-cp-name').value.trim();
-        const clan = document.getElementById('new-cp-clan').value;
-        const pts = parseInt(document.getElementById('new-cp-points').value) || 0;
-        const members = document.getElementById('new-cp-members').value.split(/[\n,]+/).map(m => m.trim().toLowerCase()).filter(m => m !== "").join(', ');
-        if(!name || !members) return alert("Missing Data!");
-        db.ref('cps/' + name).set({ name, clan, totalPoints: pts, members, updatedAt: Date.now() }).then(() => alert("Saved!"));
+    function renderTable() {
+        const tbody = document.getElementById('cp-body');
+        tbody.innerHTML = "";
+        Object.keys(allCPs).forEach(id => {
+            const cp = allCPs[id];
+            tbody.innerHTML += `<tr>
+                <td><b>${cp.name}</b></td>
+                <td><span class="clan-tag ${cp.clan}">${cp.clan}</span></td>
+                <td style="color:var(--gold); font-weight:bold;">${cp.totalPoints || 0}</td>
+                <td><button onclick="deleteCP('${id}')" style="background:red; color:white; border:none; padding:5px; cursor:pointer;">DEL</button></td>
+            </tr>`;
+        });
     }
 
-    function moveToHistory(id) { if(confirm("Move to History?")) db.ref('cps/' + id).update({ clan: 'history' }); }
-    function restoreCP(id) { const c = prompt("Clan? (noldor/kriminalides)"); if(c) db.ref('cps/' + id).update({ clan: c }); }
-    function deleteCP(id) { if(confirm("Delete Permanently?")) db.ref('cps/' + id).remove(); }
+    // --- MODAL LOGIC ---
+    function openManualModal() {
+        selectedCPs.clear();
+        renderModalGrid();
+        document.getElementById('manual-modal').style.display = 'block';
+    }
 
-    // --- ENHANCED L2 OCR LOGIC ---
+    function renderModalGrid() {
+        const grid = document.getElementById('modal-grid');
+        grid.innerHTML = "";
+        Object.keys(allCPs).forEach(id => {
+            if(allCPs[id].clan === 'history') return;
+            const div = document.createElement('div');
+            div.className = `cp-item ${selectedCPs.has(id) ? 'selected' : ''}`;
+            div.innerText = id;
+            div.onclick = () => {
+                if(selectedCPs.has(id)) selectedCPs.delete(id);
+                else selectedCPs.add(id);
+                renderModalGrid();
+            };
+            grid.appendChild(div);
+        });
+    }
+
+    function closeModal() { document.getElementById('manual-modal').style.display = 'none'; }
+
+    // --- OCR LOGIC ---
     async function handleFile(file) {
         if(!file) return;
-        const resultsDiv = document.getElementById('ocr-results');
-        resultsDiv.innerHTML = "<b style='color:var(--gold)'>⏳ Processing Image (Applying Contrast Filters)...</b>";
-        document.getElementById('submit-ocr-btn').style.display = "none";
-        detectedList = [];
+        const dz = document.getElementById('drop-zone');
+        dz.innerText = "⏳ Scanning Party... (AI Analysis)";
+        
+        const worker = await Tesseract.createWorker('eng');
+        await worker.setParameters({ tessedit_char_whitelist: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789' });
+        
+        const { data: { text } } = await worker.recognize(file);
+        await worker.terminate();
+        
+        const cleanText = text.toLowerCase();
+        selectedCPs.clear();
 
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const img = new Image();
-            img.src = e.target.result;
-            img.onload = async () => {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                canvas.width = img.width; canvas.height = img.height;
-                
-                // Φίλτρο για να "πεταχτούν" τα λευκά γράμματα από το σκούρο φόντο
-                ctx.filter = 'grayscale(100%) contrast(300%) brightness(150%)';
-                ctx.drawImage(img, 0, 0);
-                
-                const worker = await Tesseract.createWorker('eng');
-                await worker.setParameters({ tessedit_char_whitelist: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ' });
-                
-                const { data: { text } } = await worker.recognize(canvas.toDataURL());
-                await worker.terminate();
+        Object.values(allCPs).forEach(cp => {
+            if(cp.clan === 'history') return;
+            const members = cp.members.toLowerCase().split(',').map(m => m.trim());
+            members.forEach(m => {
+                if(m.length > 2 && cleanText.includes(m)) selectedCPs.add(cp.name);
+            });
+        });
 
-                const fullText = text.toLowerCase();
-                resultsDiv.innerHTML = "<h4>Party Recognition:</h4>";
-
-                Object.values(allCPs).forEach(cp => {
-                    if(cp.clan === 'history') return;
-                    const members = cp.members.split(', ');
-                    let found = [];
-                    members.forEach(m => { if(m.length > 2 && fullText.includes(m.toLowerCase())) found.push(m); });
-
-                    if(found.length > 0) {
-                        detectedList.push(cp.name);
-                        resultsDiv.innerHTML += `<div class="detected-tag">✅ ${cp.name}<br><small>Detected: ${found.join(', ')}</small></div>`;
-                    }
-                });
-
-                if(detectedList.length > 0) document.getElementById('submit-ocr-btn').style.display = "block";
-                else resultsDiv.innerHTML = "<p style='color:red'>No members detected. Try a clearer screenshot.</p>";
-            };
-        };
-        reader.readAsDataURL(file);
+        dz.innerText = "Σύρετε τη φωτογραφία εδώ ή CTRL+V (Paste) για OCR";
+        openManualModal(); // Ανοίγει το modal με τα ήδη επιλεγμένα από το OCR
     }
 
-    function applyPoints() {
-        const mult = parseInt(document.getElementById('event-multiplier').value);
+    // --- FINAL SUBMIT ---
+    function submitAttendance() {
+        const mult = parseInt(document.getElementById('event-mult').value);
+        if(selectedCPs.size === 0) return alert("Δεν επιλέχθηκε κανένα CP!");
+
         const updates = {};
-        detectedList.forEach(name => { updates[`cps/${name}/totalPoints`] = (allCPs[name].totalPoints || 0) + mult; });
-        db.ref().update(updates).then(() => { alert("Points Added!"); document.getElementById('submit-ocr-btn').style.display = "none"; });
+        selectedCPs.forEach(id => {
+            updates[`cps/${id}/totalPoints`] = (allCPs[id].totalPoints || 0) + mult;
+        });
+
+        db.ref().update(updates).then(() => {
+            alert(`Προστέθηκαν ${mult} πόντοι σε ${selectedCPs.size} CP!`);
+            closeModal();
+        });
     }
 
-    window.addEventListener('paste', e => { const f = e.clipboardData.files[0]; if(f) handleFile(f); });
+    function saveNewCP() {
+        const name = document.getElementById('new-name').value;
+        const members = document.getElementById('new-members').value;
+        if(!name) return;
+        db.ref('cps/' + name).set({ name, clan: 'noldor', totalPoints: 0, members });
+    }
+
+    function deleteCP(id) { if(confirm("Διαγραφή;")) db.ref('cps/' + id).remove(); }
+
+    window.addEventListener('paste', e => { if(e.clipboardData.files[0]) handleFile(e.clipboardData.files[0]); });
 </script>
+
 </body>
 </html>
