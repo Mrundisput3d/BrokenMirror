@@ -7,104 +7,172 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <style>
-        body { font-family: 'Open Sans', sans-serif; background: #1a1c20; color: #eee; padding: 40px; }
-        .admin-container { max-width: 1000px; margin: 0 auto; background: #25282e; padding: 30px; border-radius: 10px; border: 1px solid var(--gold); }
-        h2 { font-family: 'Cinzel'; color: #d4af37; text-align: center; }
-        .cp-edit-row { background: #2f333a; padding: 15px; margin-bottom: 10px; border-radius: 5px; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 10px; align-items: center; border-left: 4px solid #d4af37; }
-        .cp-edit-row.is-history { border-left-color: #555; opacity: 0.8; }
-        input, select { background: #1a1c20; border: 1px solid #444; color: #fff; padding: 8px; border-radius: 4px; width: 90%; }
-        .save-btn { background: #d4af37; color: #000; border: none; padding: 10px; cursor: pointer; font-weight: bold; border-radius: 4px; }
-        .add-box { border: 2px dashed #444; padding: 20px; margin-top: 30px; text-align: center; }
-        .history-label { font-size: 10px; color: #888; display: block; }
+        :root { --gold: #d4af37; --dark: #0a0c0f; }
+        body { font-family: 'Open Sans', sans-serif; background: var(--dark); color: #eee; margin: 0; padding: 20px; }
+        .admin-wrapper { max-width: 1200px; margin: 0 auto; background: rgba(255,255,255,0.02); border: 1px solid #333; border-radius: 15px; padding: 30px; }
+        h2 { font-family: 'Cinzel'; color: var(--gold); text-align: center; border-bottom: 2px solid var(--gold); padding-bottom: 10px; }
+        
+        .admin-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid #444; padding-bottom: 10px; }
+        .admin-tab-btn { background: #222; border: 1px solid #444; color: #888; padding: 10px 20px; cursor: pointer; font-family: 'Cinzel'; }
+        .admin-tab-btn.active { border-color: var(--gold); color: var(--gold); background: rgba(212,175,55,0.1); }
+
+        .cp-card { background: #15181c; border: 1px solid #333; border-left: 5px solid var(--gold); padding: 20px; margin-bottom: 15px; border-radius: 8px; }
+        .cp-card.history-mode { border-left-color: #555; opacity: 0.7; }
+        .grid-row { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(9, 1fr); gap: 10px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 5px; }
+        .stat-input-group { text-align: center; }
+        .stat-input-group label { font-size: 10px; color: var(--gold); display: block; margin-bottom: 3px; }
+        
+        input, select, textarea { background: #000; border: 1px solid #444; color: #fff; padding: 8px; border-radius: 4px; width: 100%; box-sizing: border-box; }
+        .btn-save { background: var(--gold); color: #000; border: none; padding: 10px 20px; cursor: pointer; font-weight: bold; font-family: 'Cinzel'; border-radius: 4px; }
+        .btn-delete { background: #722; color: #fff; border: none; padding: 5px 10px; cursor: pointer; font-size: 11px; margin-top: 10px; border-radius: 4px; }
+        
+        .add-new-section { background: rgba(212,175,55,0.05); border: 1px dashed var(--gold); padding: 20px; border-radius: 10px; margin-top: 40px; }
     </style>
 </head>
 <body>
 
-    <div class="admin-container">
-        <h2>ALLIANCE MANAGEMENT</h2>
-        <div id="admin-list">
-            </div>
+<div class="admin-wrapper">
+    <h2>ALLIANCE COMMAND CENTER</h2>
 
-        <div class="add-box">
-            <h3>ADD NEW CP</h3>
-            <input type="text" id="new-name" placeholder="CP Name (e.g. Titans)">
-            <select id="new-clan">
-                <option value="noldor">Noldor</option>
-                <option value="krim">Kriminalides</option>
-                <option value="caller">Shot Caller</option>
-                <option value="history">History (Leaver)</option>
-            </select>
-            <button class="save-btn" onclick="addNewCP()" style="margin-top:10px; width:200px;">CREATE CP</button>
-        </div>
+    <div class="admin-tabs">
+        <button class="admin-tab-btn active" onclick="filterClan('all', this)">ALL CPs</button>
+        <button class="admin-tab-btn" onclick="filterClan('noldor', this)">NOLDOR</button>
+        <button class="admin-tab-btn" onclick="filterClan('krim', this)">KRIMINALIDES</button>
+        <button class="admin-tab-btn" onclick="filterClan('history', this)">HISTORY (LEAVERS)</button>
     </div>
 
-    <script>
-        const firebaseConfig = { 
-            apiKey: "AIzaSyDRL8EehxdcgVYJ0LJ1khVYkSJcaCMKRes", 
-            authDomain: "brokenmirrordb.firebaseapp.com", 
-            databaseURL: "https://brokenmirrordb-default-rtdb.europe-west1.firebasedatabase.app", 
-            projectId: "brokenmirrordb" 
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
+    <div id="cp-list">
+        </div>
 
-        // LOAD ALL CPs
+    <div class="add-new-section">
+        <h3 style="font-family:'Cinzel'; color:var(--gold); margin-top:0;">ADD NEW COMBAT PARTY</h3>
+        <div class="grid-row">
+            <input type="text" id="new-name" placeholder="CP Name">
+            <select id="new-clan">
+                <option value="noldor">Noldor Clan</option>
+                <option value="krim">Kriminalides Clan</option>
+                <option value="caller">Shot Caller</option>
+                <option value="history">History (Archive)</option>
+            </select>
+            <input type="text" id="new-leader" placeholder="CP Leader Name">
+            <button class="btn-save" onclick="addNewCP()">CREATE CP</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const firebaseConfig = { 
+        apiKey: "AIzaSyDRL8EehxdcgVYJ0LJ1khVYkSJcaCMKRes", 
+        authDomain: "brokenmirrordb.firebaseapp.com", 
+        databaseURL: "https://brokenmirrordb-default-rtdb.europe-west1.firebasedatabase.app", 
+        projectId: "brokenmirrordb" 
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    let currentFilter = 'all';
+
+    function filterClan(clan, btn) {
+        currentFilter = clan;
+        document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        loadCPs();
+    }
+
+    function loadCPs() {
         db.ref('cps/').on('value', (snapshot) => {
             const data = snapshot.val() || {};
-            const list = document.getElementById('admin-list');
-            list.innerHTML = "";
+            const container = document.getElementById('cp-list');
+            container.innerHTML = "";
 
             Object.keys(data).forEach(id => {
                 const cp = data[id];
-                const isHistory = cp.clan === 'history';
+                if (currentFilter !== 'all' && cp.clan !== currentFilter) return;
+
+                const card = document.createElement('div');
+                card.className = `cp-card ${cp.clan === 'history' ? 'history-mode' : ''}`;
                 
-                const div = document.createElement('div');
-                div.className = `cp-edit-row ${isHistory ? 'is-history' : ''}`;
-                div.innerHTML = `
-                    <div>
-                        ${isHistory ? '<span class="history-label">[ARCHIVED]</span>' : ''}
-                        <input type="text" value="${cp.name}" onchange="updateCP('${id}', 'name', this.value)">
+                card.innerHTML = `
+                    <div class="grid-row">
+                        <div>
+                            <label style="font-size:11px; color:#888;">CP NAME</label>
+                            <input type="text" value="${cp.name}" onchange="updateValue('${id}', 'name', this.value)">
+                        </div>
+                        <div>
+                            <label style="font-size:11px; color:#888;">CLAN / STATUS</label>
+                            <select onchange="updateValue('${id}', 'clan', this.value)">
+                                <option value="noldor" ${cp.clan==='noldor'?'selected':''}>Noldor</option>
+                                <option value="krim" ${cp.clan==='krim'?'selected':''}>Kriminalides</option>
+                                <option value="caller" ${cp.clan==='caller'?'selected':''}>Shot Caller</option>
+                                <option value="history" ${cp.clan==='history'?'selected':''}>History</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="font-size:11px; color:#888;">TOTAL POINTS</label>
+                            <input type="number" value="${cp.totalPoints || 0}" onchange="updateValue('${id}', 'totalPoints', parseInt(this.value))">
+                        </div>
+                        <div>
+                            <label style="font-size:11px; color:#888;">LEADER</label>
+                            <input type="text" value="${cp.leader || ''}" onchange="updateValue('${id}', 'leader', this.value)">
+                        </div>
                     </div>
-                    <select onchange="updateCP('${id}', 'clan', this.value)">
-                        <option value="noldor" ${cp.clan==='noldor'?'selected':''}>Noldor</option>
-                        <option value="krim" ${cp.clan==='krim'?'selected':''}>Kriminalides</option>
-                        <option value="caller" ${cp.clan==='caller'?'selected':''}>Shot Caller</option>
-                        <option value="history" ${cp.clan==='history'?'selected':''}>History</option>
-                    </select>
-                    <input type="number" value="${cp.totalPoints || 0}" onchange="updateCP('${id}', 'totalPoints', parseInt(this.value))">
-                    <input type="text" value="${cp.leader || ''}" placeholder="Leader" onchange="updateCP('${id}', 'leader', this.value)">
-                    <button class="save-btn" style="background:#ff4444; color:white;" onclick="deleteCP('${id}')">DELETE</button>
+
+                    <div style="margin-bottom:15px;">
+                        <label style="font-size:11px; color:#888;">ROSTER MEMBERS</label>
+                        <input type="text" value="${cp.members || ''}" placeholder="Member1, Member2, Member3..." onchange="updateValue('${id}', 'members', this.value)">
+                    </div>
+
+                    <div class="stats-grid">
+                        ${['VAL','ANT','BAI','FRI','ZAK','AQ','ORF','COR','SIE'].map(boss => `
+                            <div class="stat-input-group">
+                                <label>${boss}</label>
+                                <input type="number" value="${(cp.bossStats && cp.bossStats[boss]) ? cp.bossStats[boss] : 0}" 
+                                       onchange="updateBossStat('${id}', '${boss}', this.value)">
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <button class="btn-delete" onclick="deleteCP('${id}')">DELETE CP PERMANENTLY</button>
                 `;
-                list.appendChild(div);
+                container.appendChild(card);
             });
         });
+    }
 
-        function updateCP(id, field, value) {
-            db.ref('cps/' + id).update({ [field]: value });
-        }
+    function updateValue(id, field, val) {
+        db.ref('cps/' + id).update({ [field]: val });
+    }
 
-        function addNewCP() {
-            const name = document.getElementById('new-name').value;
-            const clan = document.getElementById('new-clan').value;
-            if(!name) return alert("Enter CP Name");
-            
-            const newRef = db.ref('cps/').push();
-            newRef.set({
-                name: name,
-                clan: clan,
-                totalPoints: 0,
-                leader: "",
-                members: "",
-                bossStats: { VAL:0, ANT:0, BAI:0, FRI:0, ZAK:0, AQ:0, ORF:0, COR:0, SIE:0 }
-            });
-            document.getElementById('new-name').value = "";
-        }
+    function updateBossStat(id, boss, val) {
+        db.ref(`cps/${id}/bossStats`).update({ [boss]: parseInt(val) });
+    }
 
-        function deleteCP(id) {
-            if(confirm("Are you sure? This will erase all loot history too!")) {
-                db.ref('cps/' + id).remove();
-            }
+    function addNewCP() {
+        const name = document.getElementById('new-name').value;
+        const clan = document.getElementById('new-clan').value;
+        const leader = document.getElementById('new-leader').value;
+        if(!name) return alert("Enter CP Name");
+
+        db.ref('cps/').push({
+            name: name,
+            clan: clan,
+            leader: leader,
+            totalPoints: 0,
+            members: "",
+            bossStats: { VAL:0, ANT:0, BAI:0, FRI:0, ZAK:0, AQ:0, ORF:0, COR:0, SIE:0 }
+        });
+        document.getElementById('new-name').value = "";
+    }
+
+    function deleteCP(id) {
+        if(confirm("Are you sure? This cannot be undone.")) {
+            db.ref('cps/' + id).remove();
         }
-    </script>
+    }
+
+    loadCPs();
+</script>
+
 </body>
 </html>
