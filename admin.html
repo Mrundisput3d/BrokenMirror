@@ -131,7 +131,6 @@
         listDiv.innerHTML = ""; matchedData = {};
         
         Object.keys(allCPs).forEach(id => {
-            if(allCPs[id].clan === 'history') return;
             const roster = (allCPs[id].members || "").toLowerCase();
             const leader = (allCPs[id].leader || "").toLowerCase();
             let found = names.filter(n => (n.length > 2 && (roster.includes(n) || leader === n)));
