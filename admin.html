@@ -3,94 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BMA | Professional Admin Panel</title>
+    <title>BMA | Database Admin</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root { --gold: #d4af37; --bg: #0a0c0f; --card: #15181c; --blue: #00d9ff; --red: #ff3333; }
         body { font-family: 'Open Sans', sans-serif; background: var(--bg); color: #eee; margin: 0; padding: 20px; }
-        h1, h2 { font-family: 'Cinzel'; color: var(--gold); text-align: center; margin-bottom: 20px; }
+        h1, h2 { font-family: 'Cinzel'; color: var(--gold); text-align: center; }
         .container { max-width: 1200px; margin: 0 auto; }
-        
-        .admin-card { background: var(--card); border: 1px solid #333; padding: 25px; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-        input, select, textarea { background: #000; border: 1px solid #444; color: #fff; padding: 12px; margin: 8px 0; width: 100%; box-sizing: border-box; border-radius: 6px; font-size: 0.9rem; }
-        
-        .btn { background: var(--gold); color: #000; border: none; padding: 14px 20px; font-weight: bold; cursor: pointer; border-radius: 6px; transition: 0.3s; font-family: 'Cinzel'; width: 100%; font-size: 1rem; }
-        .btn:hover { background: #fff; transform: translateY(-2px); }
-        .btn-delete { background: var(--red); color: white; width: auto; padding: 5px 10px; font-size: 0.7rem; }
-
-        /* Attendance Styles */
-        #drop-zone { border: 2px dashed var(--gold); padding: 40px; text-align: center; background: rgba(212, 175, 55, 0.05); border-radius: 10px; cursor: pointer; transition: 0.3s; margin: 15px 0; }
-        #drop-zone:hover { background: rgba(212, 175, 55, 0.1); border-color: #fff; }
-        .detected-tag { display: inline-block; background: rgba(0, 217, 255, 0.2); border: 1px solid var(--blue); color: var(--blue); padding: 4px 10px; border-radius: 4px; margin: 4px; font-size: 0.8rem; font-weight: bold; }
-
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: rgba(0,0,0,0.2); }
-        th, td { border: 1px solid #333; padding: 12px; text-align: left; font-size: 0.85rem; }
-        th { background: #000; color: var(--gold); font-family: 'Cinzel'; }
-        .clan-tag { padding: 3px 8px; border-radius: 4px; font-weight: bold; font-size: 0.7rem; text-transform: uppercase; }
+        .admin-card { background: var(--card); border: 1px solid #333; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
+        input, select, textarea { background: #000; border: 1px solid #444; color: #fff; padding: 10px; margin: 5px 0; width: 100%; box-sizing: border-box; border-radius: 6px; }
+        .btn { background: var(--gold); color: #000; border: none; padding: 12px; font-weight: bold; cursor: pointer; border-radius: 6px; width: 100%; font-family: 'Cinzel'; }
+        .btn:hover { opacity: 0.8; }
+        #drop-zone { border: 2px dashed var(--gold); padding: 30px; text-align: center; background: rgba(212, 175, 55, 0.05); cursor: pointer; margin: 10px 0; }
+        .detected-tag { display: inline-block; background: rgba(0, 217, 255, 0.2); border: 1px solid var(--blue); color: var(--blue); padding: 4px 8px; border-radius: 4px; margin: 4px; font-size: 0.8rem; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #333; padding: 10px; text-align: left; }
+        th { background: #000; color: var(--gold); }
+        .clan-tag { padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 0.7rem; }
         .noldor { border: 1px solid var(--blue); color: var(--blue); }
         .kriminalides { border: 1px solid var(--red); color: var(--red); }
-        
-        #ocr-status { text-align: center; color: var(--gold); margin: 10px 0; font-weight: bold; min-height: 1.2em; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>ALLIANCE MANAGEMENT SYSTEM</h1>
+    <h1>ALLIANCE MANAGEMENT</h1>
 
-    <div class="admin-card" style="border-top: 4px solid var(--blue);">
-        <h2>DAILY ATTENDANCE (AUTO-SCAN)</h2>
+    <div class="admin-card">
+        <h2>DAILY ATTENDANCE (SCAN)</h2>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-            <div>
-                <label>Τύπος Event (Multiplier)</label>
-                <select id="event-type">
-                    <option value="1">MID EPICS (QA, Zaken, Orfen, Core, Fri) - x1</option>
-                    <option value="2">BAIUM - x2</option>
-                    <option value="3">HIGH EPICS (Valakas, Antharas, Siege) - x3</option>
-                </select>
-            </div>
-            <div>
-                <label>Όνομα Event (Προαιρετικό)</label>
-                <input type="text" id="event-name" placeholder="π.χ. Valakas Night Run">
-            </div>
-        </div>
-        
-        <div id="drop-zone">
-            <p style="margin:0; font-size:1.1rem;">Κάντε κλικ εδώ και πατήστε <b>CTRL + V</b></p>
-            <p style="margin:5px 0 0; font-size:0.8rem; color:#888;">(Επικόλληση Screenshot από Party Window)</p>
-        </div>
-        
-        <div id="ocr-status">Αναμονή για φωτογραφία...</div>
-        <div id="detected-players" style="margin-bottom: 15px; text-align: center;"></div>
-        
-        <button id="submit-attendance" class="btn" style="background: #28a745; color: #fff; display: none;" onclick="submitAttendance()">ΕΠΙΒΕΒΑΙΩΣΗ & ΠΡΟΣΘΗΚΗ ΠΟΝΤΩΝ</button>
-    </div>
-
-    <div class="admin-card" style="border-top: 4px solid var(--gold);">
-        <h2>ΜΑΖΙΚΗ ΕΙΣΑΓΩΓΗ CP (EXCEL COPY-PASTE)</h2>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-            <select id="bulk-clan">
-                <option value="noldor">ΕΙΣΑΓΩΓΗ ΣΕ: NOLDOR CLAN</option>
-                <option value="kriminalides">ΕΙΣΑΓΩΓΗ ΣΕ: KRIMINALIDES CLAN</option>
+            <select id="event-type">
+                <option value="1">MID EPICS (QA/Zaken/Fri) - x1</option>
+                <option value="2">BAIUM - x2</option>
+                <option value="3">HIGH EPICS (Valakas/Siege) - x3</option>
             </select>
-            <input type="number" id="bulk-points" placeholder="Starting Points (π.χ. 1000)">
+            <input type="text" id="event-name" placeholder="Όνομα Event">
         </div>
-        <textarea id="bulk-input" rows="6" placeholder="Επικολλήστε τη στήλη του Excel εδώ... (1η γραμμή: Όνομα CP, 2η γραμμή: Leader, επόμενες: Members)"></textarea>
-        <button class="btn" onclick="processBulk()">ΔΗΜΙΟΥΡΓΙΑ CP</button>
+        
+        <input type="file" id="file-input" accept="image/*" style="display:none">
+        <div id="drop-zone" onclick="document.getElementById('file-input').click()">
+            <p>Κάντε κλικ για <b>Επιλογή Φωτογραφίας</b> ή <b>CTRL+V</b></p>
+        </div>
+        
+        <div id="ocr-status" style="text-align:center; color:var(--gold); margin:10px 0;"></div>
+        <div id="detected-players" style="text-align:center;"></div>
+        <button id="submit-attendance" class="btn" style="background:#28a745; color:#fff; display:none;" onclick="window.submitAttendance()">ΕΠΙΒΕΒΑΙΩΣΗ ΠΟΝΤΩΝ</button>
     </div>
 
     <div class="admin-card">
-        <h2>ACTIVE ROSTERS & POINTS</h2>
-        <table id="cp-table">
+        <h2>ΜΑΖΙΚΗ ΕΙΣΑΓΩΓΗ CP</h2>
+        <select id="bulk-clan">
+            <option value="noldor">NOLDOR CLAN</option>
+            <option value="kriminalides">KRIMINALIDES CLAN</option>
+        </select>
+        <input type="number" id="bulk-points" placeholder="Starting Points">
+        <textarea id="bulk-input" rows="5" placeholder="Επικόλληση στήλης Excel..."></textarea>
+        <button class="btn" onclick="window.processBulk()">ΔΗΜΙΟΥΡΓΙΑ CP</button>
+    </div>
+
+    <div class="admin-card">
+        <table>
             <thead>
-                <tr>
-                    <th>CP NAME</th>
-                    <th>CLAN</th>
-                    <th>LEADER</th>
-                    <th>POINTS</th>
-                    <th>MEMBERS</th>
-                    <th>ACTIONS</th>
-                </tr>
+                <tr><th>CP NAME</th><th>CLAN</th><th>POINTS</th><th>ACTIONS</th></tr>
             </thead>
             <tbody id="cp-list-body"></tbody>
         </table>
@@ -117,141 +91,94 @@
     let allCPs = {};
     let detectedList = [];
 
-    // 1. BULK IMPORT LOGIC
+    // Εξαγωγή στο Window για να δουλεύουν τα κουμπιά
     window.processBulk = function() {
         const rawData = document.getElementById('bulk-input').value.trim();
         const clan = document.getElementById('bulk-clan').value;
         const pts = parseInt(document.getElementById('bulk-points').value) || 0;
-
-        if (!rawData) return alert("Παρακαλώ επικολλήστε δεδομένα.");
         const lines = rawData.split('\n').map(l => l.trim()).filter(l => l !== "");
-        if (lines.length < 2) return alert("Χρειάζονται τουλάχιστον 2 γραμμές (Όνομα CP και Leader).");
-
+        
+        if (lines.length < 2) return alert("Βάλε τουλάχιστον CP Name και Leader!");
+        
         const cpName = lines[0];
         const leader = lines[1];
-        const membersList = lines.slice(1).join(', '); // Ο leader συμπεριλαμβάνεται στα μέλη
+        const members = lines.slice(1).join(', ');
 
-        if(confirm(`Δημιουργία CP: ${cpName}\nLeader: ${leader}\nClan: ${clan}`)) {
-            set(ref(db, 'cps/' + cpName), {
-                name: cpName,
-                clan: clan,
-                leader: leader,
-                totalPoints: pts,
-                members: membersList,
-                updatedAt: Date.now()
-            }).then(() => {
-                alert("Επιτυχής καταχώρηση!");
-                document.getElementById('bulk-input').value = "";
-            });
-        }
+        set(ref(db, 'cps/' + cpName), {
+            name: cpName, clan, leader, totalPoints: pts, members, updatedAt: Date.now()
+        }).then(() => alert("Επιτυχία!"));
     };
 
-    // 2. OCR ATTENDANCE LOGIC
-    document.addEventListener('paste', async (e) => {
-        const items = e.clipboardData.items;
-        for (let i = 0; i < items.length; i++) {
-            if (items[i].type.indexOf('image') !== -1) {
-                const blob = items[i].getAsFile();
-                startOCR(blob);
-            }
-        }
+    window.deleteCP = (name) => {
+        if(confirm("Διαγραφή;")) remove(ref(db, 'cps/' + name));
+    };
+
+    // OCR Logic
+    document.getElementById('file-input').addEventListener('change', e => {
+        if(e.target.files[0]) startOCR(e.target.files[0]);
+    });
+
+    document.addEventListener('paste', e => {
+        const item = Array.from(e.clipboardData.items).find(x => x.type.indexOf('image') !== -1);
+        if(item) startOCR(item.getAsFile());
     });
 
     async function startOCR(blob) {
         const status = document.getElementById('ocr-status');
-        status.innerHTML = "🔍 Scanning Image... <span style='color:white'>Παρακαλώ περιμένετε</span>";
-        document.getElementById('detected-players').innerHTML = "";
+        status.innerText = "🔍 Σάρωση... παρακαλώ περιμένετε";
+        const { data: { text } } = await Tesseract.recognize(blob, 'eng');
+        const words = text.split(/\s+/).map(w => w.replace(/[^a-zA-Z0-9]/g, ''));
         
-        try {
-            const { data: { text } } = await Tesseract.recognize(blob, 'eng');
-            const words = text.split(/\s+/).map(w => w.replace(/[^a-zA-Z0-9]/g, ''));
-            matchPlayers(words);
-        } catch (err) {
-            status.innerText = "Σφάλμα κατά την ανάγνωση.";
-            console.error(err);
-        }
-    }
-
-    function matchPlayers(words) {
         detectedList = [];
         const container = document.getElementById('detected-players');
-        
+        container.innerHTML = "";
+
         words.forEach(word => {
-            if (word.length < 3) return;
-            // Ψάχνουμε σε όλα τα CP
+            if(word.length < 3) return;
             Object.values(allCPs).forEach(cp => {
-                // Έλεγχος αν το όνομα υπάρχει στη λίστα μελών του CP
-                if (cp.members.toLowerCase().includes(word.toLowerCase())) {
-                    if (!detectedList.find(p => p.name.toLowerCase() === word.toLowerCase())) {
-                        detectedList.push({ name: word, cp: cp.name });
-                        container.innerHTML += `<span class="detected-tag">${word} <small>(${cp.name})</small></span>`;
+                if(cp.members.toLowerCase().includes(word.toLowerCase())) {
+                    if(!detectedList.find(p => p.name === word)) {
+                        detectedList.push({name: word, cp: cp.name});
+                        container.innerHTML += `<span class="detected-tag">${word} (${cp.name})</span>`;
                     }
                 }
             });
         });
-
-        document.getElementById('ocr-status').innerText = `Αναγνωρίστηκαν ${detectedList.length} μέλη!`;
-        document.getElementById('submit-attendance').style.display = detectedList.length > 0 ? 'block' : 'none';
+        status.innerText = `Βρέθηκαν ${detectedList.length} παίκτες.`;
+        document.getElementById('submit-attendance').style.display = detectedList.length ? 'block' : 'none';
     }
 
-    window.submitAttendance = async function() {
-        const multiplier = parseInt(document.getElementById('event-type').value);
-        const eventTitle = document.getElementById('event-name').value || "Epic Boss";
-        
+    window.submitAttendance = function() {
+        const mult = parseInt(document.getElementById('event-type').value);
         const updates = {};
-        const pointsSummary = {};
-
-        detectedList.forEach(p => {
-            pointsSummary[p.cp] = (pointsSummary[p.cp] || 0) + (1 * multiplier);
-        });
-
-        for (const cpName in pointsSummary) {
-            const currentPoints = allCPs[cpName].totalPoints || 0;
-            const added = pointsSummary[cpName];
-            updates[`cps/${cpName}/totalPoints`] = currentPoints + added;
-            
-            // Log the event
-            const logKey = push(ref(db, 'logs')).key;
-            updates[`logs/${logKey}`] = {
-                cp: cpName,
-                points: added,
-                event: eventTitle,
-                timestamp: Date.now()
-            };
+        const summary = {};
+        
+        detectedList.forEach(p => summary[p.cp] = (summary[p.cp] || 0) + mult);
+        
+        for(let cp in summary) {
+            updates[`cps/${cp}/totalPoints`] = (allCPs[cp].totalPoints || 0) + summary[cp];
         }
-
+        
         update(ref(db), updates).then(() => {
-            alert("Οι πόντοι προστέθηκαν επιτυχώς!");
+            alert("Πόντοι προστέθηκαν!");
             document.getElementById('detected-players').innerHTML = "";
             document.getElementById('submit-attendance').style.display = 'none';
-            document.getElementById('ocr-status').innerText = "Αναμονή για νέα φωτογραφία...";
         });
     };
 
-    // 3. SYNC DATABASE WITH TABLE
-    onValue(ref(db, 'cps/'), (snapshot) => {
-        allCPs = snapshot.val() || {};
+    onValue(ref(db, 'cps/'), snap => {
+        allCPs = snap.val() || {};
         const tbody = document.getElementById('cp-list-body');
-        tbody.innerHTML = '';
-        
+        tbody.innerHTML = "";
         Object.values(allCPs).forEach(cp => {
-            tbody.innerHTML += `
-                <tr>
-                    <td><b>${cp.name}</b></td>
-                    <td><span class="clan-tag ${cp.clan}">${cp.clan}</span></td>
-                    <td>👑 ${cp.leader}</td>
-                    <td style="color:var(--gold); font-weight:bold;">${cp.totalPoints}</td>
-                    <td style="font-size:0.7rem; color:#aaa;">${cp.members}</td>
-                    <td><button class="btn btn-delete" onclick="deleteCP('${cp.name}')">DEL</button></td>
-                </tr>
-            `;
+            tbody.innerHTML += `<tr>
+                <td>${cp.name}</td>
+                <td><span class="clan-tag ${cp.clan}">${cp.clan}</span></td>
+                <td>${cp.totalPoints}</td>
+                <td><button onclick="window.deleteCP('${cp.name}')">DEL</button></td>
+            </tr>`;
         });
     });
-
-    window.deleteCP = (name) => {
-        if(confirm(`Οριστική διαγραφή του ${name};`)) remove(ref(db, 'cps/' + name));
-    };
-
 </script>
 </body>
 </html>
