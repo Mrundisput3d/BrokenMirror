@@ -2,7 +2,7 @@
 <html lang="el">
 <head>
     <meta charset="UTF-8">
-    <title>BMA | Command Center PRO</title>
+    <title>BMA | Admin Panel</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -11,76 +11,77 @@
     <style>
         :root { --gold: #d4af37; --bg: #0f1113; --card: #1a1d21; --accent: #00d9ff; --red: #ff4444; }
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: #e0e0e0; margin: 0; }
-        nav { background: #000; padding: 15px; display: flex; justify-content: center; gap: 15px; border-bottom: 2px solid var(--gold); position: sticky; top: 0; z-index: 100; }
+        nav { background: #000; padding: 15px; display: flex; justify-content: center; gap: 10px; border-bottom: 2px solid var(--gold); sticky: top; z-index: 1000; }
         nav button { background: none; border: 1px solid #333; color: #888; padding: 10px 15px; cursor: pointer; font-family: 'Cinzel'; border-radius: 4px; }
         nav button.active { color: var(--gold); border-color: var(--gold); background: rgba(212,175,55,0.1); }
-        .container { padding: 20px; max-width: 1100px; margin: 0 auto; }
+        .container { padding: 20px; max-width: 1000px; margin: 0 auto; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         .card { background: var(--card); border-radius: 8px; padding: 20px; margin-bottom: 20px; border: 1px solid #333; }
-        h2 { font-family: 'Cinzel'; color: var(--gold); margin-top: 0; font-size: 1.2rem; }
-        input, select, textarea { background: #000; border: 1px solid #444; color: #fff; padding: 10px; border-radius: 4px; width: 100%; margin: 8px 0; }
-        .btn { background: var(--gold); color: #000; border: none; padding: 12px; font-weight: bold; cursor: pointer; border-radius: 4px; font-family: 'Cinzel'; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #222; font-size: 0.9rem; }
-        .tag { padding: 3px 6px; border-radius: 3px; font-size: 0.7rem; font-weight: bold; }
+        h2 { font-family: 'Cinzel'; color: var(--gold); margin-top: 0; font-size: 1.1rem; }
+        input, select, textarea { background: #000; border: 1px solid #444; color: #fff; padding: 10px; border-radius: 4px; width: 100%; margin: 5px 0; box-sizing: border-box; }
+        .btn { background: var(--gold); color: #000; border: none; padding: 12px; font-weight: bold; cursor: pointer; border-radius: 4px; font-family: 'Cinzel'; width: 100%; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85rem; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #222; }
+        .tag { padding: 2px 6px; border-radius: 3px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; }
         .noldor { color: var(--accent); border: 1px solid var(--accent); }
         .kriminalides { color: var(--red); border: 1px solid var(--red); }
         .caller { color: #ccff00; border: 1px solid #ccff00; }
-        .history { color: #888; border: 1px solid #888; }
-        #drop-zone { border: 2px dashed #444; padding: 30px; text-align: center; color: #888; cursor: pointer; border-radius: 8px; }
-        .attendance-row { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #333; }
+        .history { color: #666; border: 1px solid #666; }
+        #drop-zone { border: 2px dashed #444; padding: 25px; text-align: center; color: #888; cursor: pointer; border-radius: 8px; margin-top: 10px; }
+        .attendance-row { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid #333; }
     </style>
 </head>
 <body>
 
 <nav>
     <button onclick="showTab('tab-scan')" id="btn-scan" class="active">SCANNER</button>
-    <button onclick="showTab('tab-manage')" id="btn-manage">ROSTER & MEMBERS</button>
-    <button onclick="showTab('tab-add')" id="btn-add">NEW CP / CALLER</button>
+    <button onclick="showTab('tab-manage')" id="btn-manage">ROSTER</button>
+    <button onclick="showTab('tab-add')" id="btn-add">ADD NEW</button>
 </nav>
 
 <div class="container">
     
     <div id="tab-scan" class="tab-content active">
         <div class="card">
-            <h2>1. SELECT EVENT & BOSS</h2>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <h2>EVENT & BOSS SELECTION</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                 <select id="boss-name">
-                    <option value="Antharas">Antharas</option>
                     <option value="Valakas">Valakas</option>
+                    <option value="Antharas">Antharas</option>
                     <option value="Baium">Baium</option>
+                    <option value="Frintezza">Frintezza</option>
+                    <option value="Zaken">Zaken</option>
                     <option value="Orfen">Orfen</option>
+                    <option value="Ant Queen">Ant Queen</option>
                     <option value="Core">Core</option>
-                    <option value="Queen Shyeed">Queen Shyeed</option>
                     <option value="Siege">Siege</option>
-                    <option value="Daily Raid">Daily Raid</option>
                 </select>
                 <select id="multiplier">
-                    <option value="1">Points per Member: x1</option>
-                    <option value="2">Points per Member: x2</option>
-                    <option value="3">Points per Member: x3</option>
+                    <option value="1">Points x1</option>
+                    <option value="2">Points x2</option>
+                    <option value="3">Points x3</option>
                 </select>
             </div>
-            <div id="drop-zone" onclick="document.getElementById('file-input').click()" style="margin-top:15px;">
-                Drop Party Screenshot or CTRL+V to Scan
+            <div id="drop-zone" onclick="document.getElementById('file-input').click()">
+                Drop Screenshot or Click to Start OCR
             </div>
             <input type="file" id="file-input" style="display:none" onchange="handleFile(this.files[0])">
         </div>
 
         <div id="results-area" class="card" style="display:none;">
-            <h2 id="summary-title">Attendance Summary</h2>
+            <h2 style="color:var(--gold)">Attendance List (Edit if Merge)</h2>
             <div id="attendance-list"></div>
-            <button class="btn" style="margin-top:20px; background:#28a745; color:#fff;" onclick="finalizePoints()">CONFIRM & POST TO INDEX</button>
+            <button class="btn" style="margin-top:20px; background:#28a745; color:#fff;" onclick="finalizePoints()">CONFIRM & SUBMIT POINTS</button>
         </div>
     </div>
 
     <div id="tab-manage" class="tab-content">
         <div class="card">
-            <h2>ACTIVE CP ROSTER</h2>
-            <table id="roster-table">
+            <h2>CURRENT ROSTER</h2>
+            <table>
                 <thead>
-                    <tr><th>Name</th><th>Role/Clan</th><th>Members</th><th>Actions</th></tr>
+                    <tr><th>Name</th><th>Role</th><th>Members</th><th>Actions</th></tr>
                 </thead>
                 <tbody id="roster-body"></tbody>
             </table>
@@ -89,15 +90,15 @@
 
     <div id="tab-add" class="tab-content">
         <div class="card">
-            <h2>ADD NEW ENTRY</h2>
-            <input type="text" id="add-name" placeholder="Name (CP Name or Caller Name)">
+            <h2>ADD NEW CP / CALLER</h2>
+            <input type="text" id="add-name" placeholder="Name (CP or Caller Name)">
             <select id="add-clan">
-                <option value="noldor">NOLDOR (Clan)</option>
-                <option value="kriminalides">KRIMINALIDES (Clan)</option>
-                <option value="caller">CALLER (Solo)</option>
-                <option value="history">HISTORY (Leaver)</option>
+                <option value="noldor">NOLDOR</option>
+                <option value="kriminalides">KRIMINALIDES</option>
+                <option value="caller">CALLER</option>
+                <option value="history">HISTORY (LEAVER)</option>
             </select>
-            <textarea id="add-members" rows="3" placeholder="Member Names (comma separated). If Caller, put just their name."></textarea>
+            <textarea id="add-members" rows="4" placeholder="Members (comma separated). If Caller, put just their name."></textarea>
             <button class="btn" onclick="saveNewEntry()">SAVE TO DATABASE</button>
         </div>
     </div>
@@ -131,7 +132,7 @@
 
     async function handleFile(file) {
         if(!file) return;
-        document.getElementById('drop-zone').innerText = "⌛ AI Analyzing Names...";
+        document.getElementById('drop-zone').innerText = "⌛ AI Reading Party...";
         const worker = await Tesseract.createWorker('eng');
         const { data: { text } } = await worker.recognize(file);
         await worker.terminate();
@@ -140,19 +141,20 @@
         tempAttendance = {};
 
         Object.keys(allData).forEach(id => {
-            if(allData[id].clan === 'history') return;
-            // Αν είναι Caller, παίρνει πόντους αν βρεθεί το όνομά του
-            if(allData[id].clan === 'caller') {
+            const entry = allData[id];
+            if(entry.clan === 'history') return;
+
+            if(entry.clan === 'caller') {
                 if(cleanText.includes(id.toLowerCase())) tempAttendance[id] = 1;
             } else {
-                const members = allData[id].members.toLowerCase().split(',').map(m => m.trim());
-                let foundCount = 0;
-                members.forEach(m => { if(m.length > 2 && cleanText.includes(m)) foundCount++; });
-                if(foundCount > 0) tempAttendance[id] = foundCount;
+                const members = entry.members.toLowerCase().split(',').map(m => m.trim());
+                let found = 0;
+                members.forEach(m => { if(m.length > 2 && cleanText.includes(m)) found++; });
+                if(found > 0) tempAttendance[id] = found;
             }
         });
         renderAttendance();
-        document.getElementById('drop-zone').innerText = "Scan Complete. Check results below.";
+        document.getElementById('drop-zone').innerText = "Scan Finished.";
     }
 
     function renderAttendance() {
@@ -163,9 +165,10 @@
             const div = document.createElement('div');
             div.className = "attendance-row";
             div.innerHTML = `
-                <span><b>${id}</b> (${allData[id].clan})</span>
+                <span><b>${id}</b> <small>(${allData[id].clan})</small></span>
                 <div>
-                    Members: <input type="number" style="width:50px;" value="${tempAttendance[id]}" onchange="tempAttendance['${id}']=this.value; renderAttendance();">
+                    Count: <input type="number" style="width:50px; background:#000; color:#fff; border:1px solid #444;" value="${tempAttendance[id]}" 
+                    onchange="tempAttendance['${id}']=this.value; renderAttendance();">
                     <span style="color:var(--gold); margin-left:10px;">+${tempAttendance[id] * mult} pts</span>
                 </div>`;
             list.appendChild(div);
@@ -177,19 +180,19 @@
         const boss = document.getElementById('boss-name').value;
         const mult = parseInt(document.getElementById('multiplier').value);
         const updates = {};
-        const logEntry = { boss, date: new Date().toLocaleString(), winners: [] };
+        const logWinners = [];
 
         Object.keys(tempAttendance).forEach(id => {
             const pts = parseInt(tempAttendance[id]) * mult;
             if(pts > 0) {
                 updates[`cps/${id}/totalPoints`] = (allData[id].totalPoints || 0) + pts;
-                logEntry.winners.push(`${id} (+${pts})`);
+                logWinners.push(`${id} (+${pts})`);
             }
         });
 
         db.ref().update(updates);
-        db.ref('logs/').push(logEntry); // Στέλνει το log για το index
-        alert("Points & Log Saved!");
+        db.ref('logs/').push({ boss, date: new Date().toLocaleString(), winners: logWinners });
+        alert("Points & History Logged!");
         document.getElementById('results-area').style.display = "none";
     }
 
@@ -202,17 +205,17 @@
                 <tr>
                     <td><b>${id}</b></td>
                     <td><span class="tag ${cp.clan}">${cp.clan}</span></td>
-                    <td><small>${cp.members}</small></td>
+                    <td><small style="color:#aaa;">${cp.members.substring(0, 30)}...</small></td>
                     <td>
-                        <button onclick="editMembers('${id}')" style="background:#333; color:#fff; border:none; padding:5px; cursor:pointer;">EDIT</button>
-                        <button onclick="deleteEntry('${id}')" style="background:red; color:#fff; border:none; padding:5px; cursor:pointer;">X</button>
+                        <button onclick="editEntry('${id}')" style="background:#333; color:#fff; border:none; padding:4px 8px; cursor:pointer;">Edit</button>
+                        <button onclick="deleteEntry('${id}')" style="background:red; color:#fff; border:none; padding:4px 8px; cursor:pointer;">X</button>
                     </td>
                 </tr>`;
         });
     }
 
-    function editMembers(id) {
-        const newM = prompt("Update members for " + id, allData[id].members);
+    function editEntry(id) {
+        const newM = prompt("Edit Members/Name for " + id, allData[id].members);
         if(newM) db.ref('cps/' + id).update({ members: newM });
     }
 
@@ -220,9 +223,9 @@
         const name = document.getElementById('add-name').value;
         const clan = document.getElementById('add-clan').value;
         const members = document.getElementById('add-members').value;
-        if(!name) return alert("Enter a name!");
+        if(!name) return alert("Name is required!");
         db.ref('cps/' + name).set({ name, clan, members, totalPoints: 0 }).then(() => {
-            alert("Saved!");
+            alert("Entry Saved!");
             showTab('tab-manage');
         });
     }
