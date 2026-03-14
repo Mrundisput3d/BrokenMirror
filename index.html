@@ -10,7 +10,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
     <style>
-        /* CSS ΑΚΡΙΒΩΣ ΟΠΩΣ ΤΟ ΕΙΧΕΣ */
         :root {
             --gold: #d4af37; --silver: #c0c0c0; --bronze: #cd7f32;
             --noldor-sky: #00d9ff; --krim-red: #ff3333;
@@ -162,33 +161,25 @@
     </div>
 
     <script>
-        // CONFIG & FIREBASE
         const firebaseConfig = { apiKey: "AIzaSyDRL8EehxdcgVYJ0LJ1khVYkSJcaCMKRes", authDomain: "brokenmirrordb.firebaseapp.com", databaseURL: "https://brokenmirrordb-default-rtdb.europe-west1.firebasedatabase.app", projectId: "brokenmirrordb" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         const bossIcons = { "VAL": "https://i.ibb.co/84gZPVRP/necklace-valakas.png", "ANT": "https://i.ibb.co/rfqvc6mv/earring-antharas.png", "BAI": "https://i.ibb.co/XrZkv67h/ring-of-baium.png", "FRI": "https://i.ibb.co/gF4YKGTM/frintezza-necklace.png", "ZAK": "https://i.ibb.co/spkC6Gzz/zaken-earring.png", "AQ":  "https://i.ibb.co/rKRtZmBG/ring-of-queen-ant.png", "ORF": "https://i.ibb.co/j9dDnXwH/earring-orfen.png", "COR": "https://i.ibb.co/ksv37fNZ/ring-of-.png", "SIE": "https://i.ibb.co/Txfby6wD/images.png" };
 
-        // FETCH DATA & RENDER
         db.ref('cps/').on('value', (snapshot) => {
             const data = snapshot.val() || {};
             const nList = document.getElementById('noldor-list');
             const kList = document.getElementById('krim-list');
             nList.innerHTML = ""; kList.innerHTML = "";
-
-            // Ταξινόμηση ανά πόντους
             const sortedIDs = Object.keys(data).sort((a,b) => (data[b].totalPoints || 0) - (data[a].totalPoints || 0));
-
             sortedIDs.forEach(id => {
                 const cp = data[id];
                 if(cp.clan === 'history') return;
                 const style = (cp.clan === 'noldor' || cp.clan === 'caller') ? 'cp-noldor' : 'cp-krim';
-                
-                // Δημιουργία Loot History κειμένου
                 let lootHtml = "No history found.";
                 if(cp.lootHistory && cp.lootHistory.length > 0) {
                     lootHtml = cp.lootHistory.map(l => `${l.date}: ${l.item} (-${l.cost})`).join('<br>');
                 }
-
                 const html = `
                     <div class="cp-box ${style}">
                         <button class="cp-btn" onclick="this.parentElement.classList.toggle('active')">
@@ -212,87 +203,72 @@
             });
         });
 
-        // UI FUNCTIONS
         function showPage(id, btn) { 
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); 
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); 
             document.getElementById(id).classList.add('active'); btn.classList.add('active'); 
         }
+
         function openCaller(name, role, img) {
             document.getElementById('modal-name').innerText = name;
             document.getElementById('modal-title').innerText = role;
             document.getElementById('modal-img').src = img;
-            
-            // Fetch caller specific stats if exists in DB
             db.ref('cps').once('value', snap => {
                 const data = snap.val() || {};
-                let callerID = Object.keys(data).find(k => data[k].name.toUpperCase() === name);
+                let callerID = Object.keys(data).find(k => data[k].name.toUpperCase() === name.toUpperCase());
                 const cp = callerID ? data[callerID] : null;
-                
                 document.getElementById('modal-stats').innerHTML = Object.keys(bossIcons).map(b => {
                     const val = (cp && cp.bossStats && cp.bossStats[b]) ? cp.bossStats[b] : 0;
                     return `<div class="stat-box"><img src="${bossIcons[b]}" class="boss-icon"><span class="stat-val">${val}</span></div>`;
                 }).join('');
-
                 let lootHtml = "No history found.";
-                if(cp && cp.lootHistory) lootHtml = cp.lootHistory.map(l => `${l.date}: ${l.item}`).join('<br>');
+                if(cp && cp.lootHistory) lootHtml = cp.lootHistory.map(l => `${l.date}: ${l.item} (-${l.cost})`).join('<br>');
                 document.getElementById('leader-loot-panel').innerHTML = lootHtml;
+                if(cp) document.getElementById('modal-name').innerText = `${name} (${cp.totalPoints || 0} PTS)`;
             });
-
             document.getElementById('caller-modal').style.display = 'block';
             document.getElementById('overlay').style.display = 'block';
         }
+
         function closeModal() { document.getElementById('caller-modal').style.display='none'; document.getElementById('overlay').style.display='none'; }
         function toggleLeaderLoot() { const p = document.getElementById('leader-loot-panel'); p.style.display = p.style.display==='none'?'block':'none'; }
 
-        // MUSIC LOGIC WITH LOCAL STORAGE
+        // MUSIC LOGIC - FIXED AUTOSTART & MEMORY
         const tracks = [{name:"DION THEME", url:"https://www.dropbox.com/scl/fi/ypzqrr336iewt62gncy6u/Lineage-2-Dion-Theme-Song.mp3?rlkey=nl1quliuqleuljgkt5jhqq6hh&st=sb8ij16g&raw=1"},{name:"GIRAN THEME", url:"https://www.dropbox.com/scl/fi/iu8j9wn9wky8fav176ayf/Lineage-2-Giran-Theme.mp3?rlkey=xp1j0upa076sy21tgcta6t9c3&st=0a4ihyhg&raw=1"}];
-        let currentIdx = 0; 
-        const audio = document.getElementById('bg-music');
-        const musicIcon = document.getElementById('music-icon');
+        let currentIdx = 0; const audio = document.getElementById('bg-music'); const musicIcon = document.getElementById('music-icon');
 
-        // Restore Music Preference
         window.addEventListener('DOMContentLoaded', () => {
             const savedMusic = localStorage.getItem('bmaMusicState');
-            if(savedMusic === 'playing') {
-                audio.play().catch(() => { 
-                    localStorage.setItem('bmaMusicState', 'paused');
-                    musicIcon.innerText = "🔇";
-                });
+            if (savedMusic === null || savedMusic === 'playing') {
+                localStorage.setItem('bmaMusicState', 'playing');
                 musicIcon.innerText = "🔊";
+                audio.play().catch(() => { console.log("Waiting for interaction..."); });
+            } else {
+                audio.pause(); musicIcon.innerText = "🔇";
             }
         });
 
         function toggleMusic(e) { 
-            e.stopPropagation(); 
+            if(e) e.stopPropagation(); 
             if (audio.paused) { 
-                audio.play(); 
-                musicIcon.innerText="🔊"; 
-                localStorage.setItem('bmaMusicState', 'playing');
+                audio.play(); musicIcon.innerText="🔊"; localStorage.setItem('bmaMusicState', 'playing');
             } else { 
-                audio.pause(); 
-                musicIcon.innerText="🔇"; 
-                localStorage.setItem('bmaMusicState', 'paused');
+                audio.pause(); musicIcon.innerText="🔇"; localStorage.setItem('bmaMusicState', 'paused');
             } 
         }
 
         function nextTrack(e) { 
-            e.stopPropagation(); 
-            currentIdx = (currentIdx + 1) % tracks.length; 
-            audio.src = tracks[currentIdx].url; 
-            document.getElementById('track-name').innerText = tracks[currentIdx].name; 
-            audio.play(); 
-            musicIcon.innerText="🔊";
-            localStorage.setItem('bmaMusicState', 'playing');
+            if(e) e.stopPropagation(); currentIdx = (currentIdx + 1) % tracks.length; 
+            audio.src = tracks[currentIdx].url; document.getElementById('track-name').innerText = tracks[currentIdx].name; 
+            audio.play(); musicIcon.innerText="🔊"; localStorage.setItem('bmaMusicState', 'playing');
         }
 
         function tryAutoPlay() { 
-            if(localStorage.getItem('bmaMusicState') === 'playing') audio.play().catch(() => {}); 
+            const state = localStorage.getItem('bmaMusicState');
+            if(state === 'playing' && audio.paused) { audio.play().then(() => musicIcon.innerText = "🔊").catch(() => {}); }
         }
 
         setInterval(() => { document.getElementById('clock').innerText = "SERVER TIME: " + new Date().toLocaleTimeString('el-GR', {timeZone:'UTC', hour12:false}) + " UTC"; }, 1000);
-        
-        // MARKET
         const prices = [{n:"Valakas",p:3100,i:bossIcons.VAL}, {n:"Antharas",p:1100,i:bossIcons.ANT}, {n:"Baium",p:950,i:bossIcons.BAI}, {n:"Zaken",p:175,i:bossIcons.ZAK}, {n:"Frintezza",p:225,i:bossIcons.FRI}, {n:"Queen Ant",p:150,i:bossIcons.AQ}, {n:"Orfen",p:75,i:bossIcons.ORF}, {n:"Core",p:25,i:bossIcons.COR} ];
         document.getElementById('market-table').innerHTML = prices.map(p => `<tr><td><img src="${p.i}" style="width:22px; vertical-align:middle; margin-right:12px;"> ${p.n}</td><td style="color:var(--gold); font-weight:bold; text-align:right;">${p.p} PTS</td></tr>`).join('');
     </script>
