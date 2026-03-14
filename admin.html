@@ -2,93 +2,112 @@
 <html lang="el">
 <head>
     <meta charset="UTF-8">
-    <title>BMA | Professional Admin System</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <title>BMA | Command Center</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
     <style>
-        :root { --gold: #d4af37; --bg: #0a0c0f; --card: #15181c; --blue: #00d9ff; --red: #ff4444; }
-        body { font-family: 'Open Sans', sans-serif; background: var(--bg); color: #eee; padding: 20px; }
-        .container { max-width: 1200px; margin: 0 auto; }
-        h1, h2, h3 { font-family: 'Cinzel'; color: var(--gold); text-align: center; }
-        .card { background: var(--card); border: 1px solid #333; padding: 25px; border-radius: 12px; margin-bottom: 25px; }
-        .btn { background: var(--gold); color: #000; border: none; padding: 12px; font-weight: bold; cursor: pointer; border-radius: 5px; font-family: 'Cinzel'; width: 100%; }
-        input, textarea, select { background: #000; border: 1px solid #444; color: #fff; padding: 10px; width: 100%; margin: 5px 0; border-radius: 5px; }
+        :root { --gold: #d4af37; --bg: #0f1113; --card: #1a1d21; --accent: #00d9ff; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: #e0e0e0; margin: 0; display: flex; flex-direction: column; height: 100vh; }
         
-        /* Modal */
-        #confirm-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; }
-        .modal-content { background: var(--card); max-width: 800px; margin: 50px auto; padding: 30px; border: 2px solid var(--gold); border-radius: 15px; }
+        /* Navigation */
+        nav { background: #000; padding: 15px; display: flex; justify-content: center; gap: 20px; border-bottom: 2px solid var(--gold); }
+        nav button { background: none; border: 1px solid #333; color: #888; padding: 10px 20px; cursor: pointer; font-family: 'Cinzel'; transition: 0.3s; }
+        nav button.active { color: var(--gold); border-color: var(--gold); background: rgba(212,175,55,0.1); }
+
+        .container { flex: 1; padding: 30px; overflow-y: auto; max-width: 1100px; margin: 0 auto; width: 100%; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s; }
+
+        /* General Styles */
+        .card { background: var(--card); border-radius: 8px; padding: 25px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        h1 { font-family: 'Cinzel'; color: var(--gold); text-align: center; margin-top: 0; }
+        input, select, textarea { background: #0a0c0e; border: 1px solid #333; color: #fff; padding: 12px; border-radius: 4px; width: 100%; margin: 10px 0; box-sizing: border-box; }
+        .btn { background: var(--gold); color: #000; border: none; padding: 12px 25px; font-weight: 700; cursor: pointer; border-radius: 4px; font-family: 'Cinzel'; width: 100%; }
         
-        .result-row { display: flex; align-items: center; justify-content: space-between; padding: 10px; border-bottom: 1px solid #333; }
-        .cp-selector { background: #222; padding: 10px; border-radius: 5px; margin-bottom: 10px; border: 1px solid #444; cursor: pointer; }
-        .cp-selector.active { border-color: var(--gold); background: rgba(212,175,55,0.1); }
-        
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #333; padding: 12px; text-align: left; }
-        .clan-tag { padding: 3px 8px; border-radius: 4px; font-weight: bold; font-size: 0.75rem; text-transform: uppercase; }
-        .noldor { color: var(--blue); border: 1px solid var(--blue); }
-        .kriminalides { color: var(--red); border: 1px solid var(--red); }
-        #drop-zone { border: 2px dashed var(--gold); padding: 40px; text-align: center; background: rgba(212,175,55,0.05); cursor: pointer; border-radius: 10px; }
+        /* Attendance List */
+        .attendance-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #333; background: rgba(255,255,255,0.02); margin-bottom: 5px; }
+        .attendance-item input { width: 60px; margin: 0; text-align: center; }
+
+        /* Tables */
+        table { width: 100%; border-collapse: collapse; background: var(--card); }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #333; }
+        th { color: var(--gold); text-transform: uppercase; font-size: 0.8rem; }
+        .tag { padding: 4px 8px; border-radius: 3px; font-size: 0.7rem; font-weight: bold; }
+        .noldor { background: rgba(0,217,255,0.1); color: var(--accent); }
+        .kriminalides { background: rgba(255,68,68,0.1); color: #ff4444; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        #drop-zone { border: 2px dashed #444; padding: 40px; text-align: center; color: #666; cursor: pointer; transition: 0.3s; }
+        #drop-zone:hover { border-color: var(--gold); color: #fff; }
     </style>
 </head>
 <body>
 
+<nav>
+    <button onclick="showTab('tab-scan')" id="btn-scan" class="active">SCANNER</button>
+    <button onclick="showTab('tab-manage')" id="btn-manage">MANAGE ROSTER</button>
+    <button onclick="showTab('tab-add')" id="btn-add">ADD NEW CP</button>
+</nav>
+
 <div class="container">
-    <h1>BMA ATTENDANCE ENGINE</h1>
+    <h1>BMA COMMAND CENTER</h1>
 
-    <div class="card">
-        <h3>1. SCAN PARTY SCREENSHOT</h3>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 15px;">
-            <div>
-                <label>Event Multiplier (Points per Member)</label>
+    <div id="tab-scan" class="tab-content active">
+        <div class="card">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 15px;">
                 <select id="multiplier">
-                    <option value="1">Daily Boss (x1)</option>
-                    <option value="2">Baium (x2)</option>
-                    <option value="3">Antharas/Valakas (x3)</option>
+                    <option value="1">Daily Event (1 pt/member)</option>
+                    <option value="2">Baium (2 pts/member)</option>
+                    <option value="3">Antharas/Valakas/Siege (3 pts/member)</option>
                 </select>
+                <button class="btn" onclick="processManual()" style="background: #333; color: #fff;">MANUAL SELECT</button>
             </div>
-            <div style="display:flex; align-items:flex-end;">
-                <button class="btn" style="background:#007bff; color:white;" onclick="openManual()">ΧΕΙΡΟΚΙΝΗΤΗ ΚΑΤΑΧΩΡΗΣΗ</button>
+            <div id="drop-zone" onclick="document.getElementById('file-input').click()">
+                Drop Screenshot or Click to Scan Party
             </div>
+            <input type="file" id="file-input" style="display:none" onchange="handleFile(this.files[0])">
         </div>
-        <div id="drop-zone" onclick="document.getElementById('file-input').click()">
-            Σύρετε τη φωτογραφία εδώ (ή CTRL+V)
+
+        <div id="scan-results" class="card" style="display:none;">
+            <h3 style="color:var(--gold)">Attendance List</h3>
+            <div id="attendance-list"></div>
+            <button class="btn" style="margin-top:20px; background:#28a745; color:#fff;" onclick="submitAttendance()">SUBMIT ALL POINTS</button>
         </div>
-        <input type="file" id="file-input" style="display:none" onchange="handleFile(this.files[0])">
     </div>
 
-    <div class="card">
-        <h3>2. CP ROSTER</h3>
-        <table>
-            <thead>
-                <tr><th>CP NAME</th><th>CLAN</th><th>POINTS</th><th>ACTIONS</th></tr>
-            </thead>
-            <tbody id="cp-body"></tbody>
-        </table>
+    <div id="tab-manage" class="tab-content">
+        <div class="card">
+            <table>
+                <thead>
+                    <tr><th>CP Name</th><th>Clan</th><th>Total Pts</th><th>Actions</th></tr>
+                </thead>
+                <tbody id="roster-body"></tbody>
+            </table>
+        </div>
     </div>
 
-    <div class="card">
-        <h3>NEW CP / EDIT MEMBERS</h3>
-        <input type="text" id="new-name" placeholder="CP Name">
-        <textarea id="new-members" placeholder="Members (Comma separated, e.g: Player1, Player2, Player3...)"></textarea>
-        <button class="btn" onclick="saveCP()">SAVE CP</button>
-    </div>
-</div>
-
-<div id="confirm-modal">
-    <div class="modal-content">
-        <h2>ΕΠΙΒΕΒΑΙΩΣΗ ΠΟΝΤΩΝ PARTY</h2>
-        <div id="modal-results"></div>
-        <div style="margin-top:20px; display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-            <button class="btn" style="background:#28a745; color:white;" onclick="applyPoints()">ΠΡΟΣΘΗΚΗ ΠΟΝΤΩΝ</button>
-            <button class="btn" style="background:#555; color:white;" onclick="closeModal()">ΑΚΥΡΩΣΗ</button>
+    <div id="tab-add" class="tab-content">
+        <div class="card">
+            <h3>Register New CP</h3>
+            <label>CP Name</label>
+            <input type="text" id="add-name" placeholder="e.g. XatTrik">
+            <label>Clan</label>
+            <select id="add-clan">
+                <option value="noldor">NOLDOR</option>
+                <option value="kriminalides">KRIMINALIDES</option>
+            </select>
+            <label>Members (comma separated)</label>
+            <textarea id="add-members" rows="5" placeholder="Player1, Player2, Player3..."></textarea>
+            <button class="btn" onclick="saveCP()">SAVE CP TO ROSTER</button>
         </div>
     </div>
 </div>
 
 <script>
+    // --- FIREBASE ---
     const firebaseConfig = {
         apiKey: "AIzaSyDRL8EehxdcgVYJ0LJ1khVYkSJcaCMKRes",
         authDomain: "brokenmirrordb.firebaseapp.com",
@@ -100,119 +119,120 @@
     const db = firebase.database();
     
     let allCPs = {};
-    let currentAttendance = {}; // Θα κρατάει { CPName: countOfMembersFound }
+    let attendanceData = {};
 
     db.ref('cps/').on('value', s => {
         allCPs = s.val() || {};
-        const tbody = document.getElementById('cp-body');
-        tbody.innerHTML = "";
-        Object.keys(allCPs).forEach(id => {
-            const cp = allCPs[id];
-            tbody.innerHTML += `<tr>
-                <td><b>${cp.name}</b></td>
-                <td><span class="clan-tag ${cp.clan}">${cp.clan}</span></td>
-                <td style="color:var(--gold); font-weight:bold;">${cp.totalPoints || 0}</td>
-                <td><button onclick="deleteCP('${id}')" style="background:red; color:white; border:none; padding:5px;">DEL</button></td>
-            </tr>`;
-        });
+        renderRoster();
     });
 
+    // --- NAVIGATION ---
+    function showTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        document.getElementById('btn-' + tabId.replace('tab-', '')).classList.add('active');
+    }
+
+    // --- SCANNER LOGIC ---
     async function handleFile(file) {
         if(!file) return;
-        document.getElementById('drop-zone').innerText = "⏳ AI ANALYSIS IN PROGRESS...";
-        
+        document.getElementById('drop-zone').innerText = "⌛ Scanning Party Window...";
         const worker = await Tesseract.createWorker('eng');
-        await worker.setParameters({ tessedit_char_whitelist: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789' });
         const { data: { text } } = await worker.recognize(file);
         await worker.terminate();
         
         const cleanText = text.toLowerCase();
-        currentAttendance = {};
+        attendanceData = {};
 
-        // Ψάχνουμε κάθε μέλος κάθε CP μέσα στο κείμενο
-        Object.values(allCPs).forEach(cp => {
-            if(cp.clan === 'history') return;
-            const members = cp.members.split(',').map(m => m.trim().toLowerCase());
-            let foundInParty = 0;
-            members.forEach(m => {
-                if(m.length > 2 && cleanText.includes(m)) foundInParty++;
-            });
-
-            if(foundInParty > 0) {
-                currentAttendance[cp.name] = foundInParty;
-            }
+        Object.keys(allCPs).forEach(id => {
+            if(allCPs[id].clan === 'history') return;
+            const members = allCPs[id].members.toLowerCase().split(',').map(m => m.trim());
+            let found = 0;
+            members.forEach(m => { if(m.length > 2 && cleanText.includes(m)) found++; });
+            if(found > 0) attendanceData[id] = found;
         });
 
-        showConfirmationModal();
-        document.getElementById('drop-zone').innerText = "Σύρετε τη φωτογραφία εδώ (ή CTRL+V)";
+        renderAttendance();
+        document.getElementById('drop-zone').innerText = "Drop Screenshot or Click to Scan Party";
     }
 
-    function showConfirmationModal() {
-        const resultsDiv = document.getElementById('modal-results');
-        const mult = parseInt(document.getElementById('multiplier').value);
-        resultsDiv.innerHTML = "";
-        
-        if(Object.keys(currentAttendance).length === 0) {
-            resultsDiv.innerHTML = "<p style='color:red;'>Δεν βρέθηκαν μέλη στη φωτογραφία. Παρακαλώ επιλέξτε χειροκίνητα.</p>";
-        }
+    function processManual() {
+        attendanceData = {};
+        Object.keys(allCPs).forEach(id => { if(allCPs[id].clan !== 'history') attendanceData[id] = 0; });
+        renderAttendance();
+    }
 
-        Object.keys(allCPs).forEach(cpName => {
-            if(allCPs[cpName].clan === 'history') return;
-            const count = currentAttendance[cpName] || 0;
-            const pts = count * mult;
-            
+    function renderAttendance() {
+        const list = document.getElementById('attendance-list');
+        list.innerHTML = "";
+        const mult = parseInt(document.getElementById('multiplier').value);
+
+        Object.keys(attendanceData).forEach(id => {
             const div = document.createElement('div');
-            div.className = `cp-selector ${count > 0 ? 'active' : ''}`;
+            div.className = "attendance-item";
             div.innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span><b>${cpName}</b></span>
-                    <span>
-                        Members: <input type="number" value="${count}" style="width:50px; display:inline;" 
-                        onchange="updateManualCount('${cpName}', this.value)"> 
-                        | Points: <b style="color:var(--gold)">+${pts}</b>
-                    </span>
+                <span><b>${id}</b></span>
+                <div>
+                    Members: <input type="number" value="${attendanceData[id]}" onchange="attendanceData['${id}']=this.value; renderAttendance();">
+                    <span style="margin-left:15px; color:var(--gold)">+${attendanceData[id] * mult} pts</span>
                 </div>
             `;
-            resultsDiv.appendChild(div);
+            list.appendChild(div);
         });
-        document.getElementById('confirm-modal').style.display = 'block';
+        document.getElementById('scan-results').style.display = "block";
     }
 
-    function updateManualCount(name, val) {
-        currentAttendance[name] = parseInt(val) || 0;
-        showConfirmationModal(); // Refresh points display
-    }
-
-    function applyPoints() {
+    function submitAttendance() {
         const mult = parseInt(document.getElementById('multiplier').value);
         const updates = {};
-        Object.keys(currentAttendance).forEach(name => {
-            const count = currentAttendance[name];
-            if(count > 0) {
-                const addedPoints = count * mult;
-                updates[`cps/${name}/totalPoints`] = (allCPs[name].totalPoints || 0) + addedPoints;
-            }
+        Object.keys(attendanceData).forEach(id => {
+            const pts = parseInt(attendanceData[id]) * mult;
+            if(pts > 0) updates[`cps/${id}/totalPoints`] = (allCPs[id].totalPoints || 0) + pts;
         });
-        
         db.ref().update(updates).then(() => {
-            alert("Οι πόντοι προστέθηκαν με επιτυχία!");
-            closeModal();
+            alert("Points updated successfully!");
+            document.getElementById('scan-results').style.display = "none";
         });
     }
 
-    function openManual() {
-        currentAttendance = {};
-        showConfirmationModal();
+    // --- MANAGEMENT ---
+    function renderRoster() {
+        const tbody = document.getElementById('roster-body');
+        tbody.innerHTML = "";
+        Object.keys(allCPs).forEach(id => {
+            const cp = allCPs[id];
+            tbody.innerHTML += `
+                <tr>
+                    <td>${id}</td>
+                    <td><span class="tag ${cp.clan}">${cp.clan}</span></td>
+                    <td>${cp.totalPoints || 0}</td>
+                    <td>
+                        <button onclick="toggleHistory('${id}')" style="background:#444; color:#fff; border:none; padding:5px 10px; cursor:pointer;">${cp.clan==='history'?'RESTORE':'LEAVE'}</button>
+                        <button onclick="deleteCP('${id}')" style="background:#900; color:#fff; border:none; padding:5px 10px; cursor:pointer; margin-left:5px;">DEL</button>
+                    </td>
+                </tr>`;
+        });
     }
 
-    function closeModal() { document.getElementById('confirm-modal').style.display = 'none'; }
-    function saveCP() {
-        const name = document.getElementById('new-name').value;
-        const members = document.getElementById('new-members').value;
-        if(!name) return;
-        db.ref('cps/' + name).update({ name, clan: 'noldor', members: members });
+    function toggleHistory(id) {
+        const newClan = allCPs[id].clan === 'history' ? 'noldor' : 'history';
+        db.ref('cps/' + id).update({ clan: newClan });
     }
-    function deleteCP(id) { if(confirm("Delete?")) db.ref('cps/' + id).remove(); }
+
+    function deleteCP(id) { if(confirm("Delete CP?")) db.ref('cps/' + id).remove(); }
+
+    function saveCP() {
+        const name = document.getElementById('add-name').value;
+        const clan = document.getElementById('add-clan').value;
+        const members = document.getElementById('add-members').value;
+        if(!name || !members) return alert("Fill all fields!");
+        db.ref('cps/' + name).set({ name, clan, members, totalPoints: 0 }).then(() => {
+            alert("CP Added!");
+            showTab('tab-manage');
+        });
+    }
+
     window.addEventListener('paste', e => { if(e.clipboardData.files[0]) handleFile(e.clipboardData.files[0]); });
 </script>
 </body>
