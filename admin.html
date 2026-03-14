@@ -2,69 +2,65 @@
 <html lang="el">
 <head>
     <meta charset="UTF-8">
-    <title>BMA | Advanced Command Center</title>
+    <title>BMA | Command Center</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <style>
-        body { background: #0a0c0f; color: #eee; font-family: sans-serif; padding: 20px; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .card { background: #15181c; border: 1px solid var(--gold); padding: 20px; border-radius: 8px; border-top: 3px solid #d4af37; }
-        h2 { font-family: 'Cinzel'; color: #d4af37; margin-top: 0; }
-        input, select, textarea { width: 100%; padding: 10px; margin: 10px 0; background: #000; color: #fff; border: 1px solid #444; }
-        .btn { background: #d4af37; color: #000; font-weight: bold; padding: 10px; border: none; cursor: pointer; width: 100%; font-family: 'Cinzel'; }
-        .event-grid { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
-        .cp-select-item { background: #222; padding: 10px; margin: 5px; border-radius: 4px; display: inline-block; cursor: pointer; }
-        .cp-select-item.selected { background: #d4af37; color: #000; }
+        :root { --gold: #d4af37; --bg: #0a0c0f; --card: #15181c; }
+        body { background: var(--bg); color: #eee; font-family: sans-serif; padding: 20px; }
+        h1, h2 { font-family: 'Cinzel'; color: var(--gold); text-align: center; }
+        .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .card { background: var(--card); border: 1px solid #333; padding: 20px; border-radius: 10px; border-top: 3px solid var(--gold); }
+        .cp-control-row { background: #000; padding: 15px; margin-bottom: 10px; border-radius: 5px; border-left: 4px solid var(--gold); }
+        .boss-btn-group { display: flex; gap: 5px; margin-top: 10px; flex-wrap: wrap; }
+        .boss-btn { background: #222; border: 1px solid #444; cursor: pointer; padding: 5px; border-radius: 4px; transition: 0.2s; }
+        .boss-btn:hover { border-color: var(--gold); background: #333; }
+        .boss-btn img { width: 25px; height: 25px; display: block; }
+        input, select, textarea { width: 100%; padding: 8px; margin: 5px 0; background: #000; color: #fff; border: 1px solid #444; }
+        .save-btn { background: var(--gold); color: #000; border: none; padding: 10px; font-weight: bold; cursor: pointer; width: 100%; font-family: 'Cinzel'; margin-top: 10px; }
+        .pts-badge { background: var(--gold); color: #000; padding: 2px 6px; border-radius: 3px; font-weight: bold; font-size: 0.8rem; }
     </style>
 </head>
 <body>
 
-    <div class="grid">
+    <h1>ALLIANCE ADMIN PANEL</h1>
+
+    <div class="admin-grid">
         <div class="card">
-            <h2>1. CP SETUP & ROSTERS</h2>
-            <input type="text" id="cp-name" placeholder="CP Name (π.χ. Noldor Archer)">
-            <input type="text" id="cp-leader" placeholder="CP Leader Name">
-            <select id="cp-clan">
+            <h2>CP MANAGEMENT</h2>
+            <div id="cp-list-admin">
+                </div>
+            <hr style="border:0; border-top:1px solid #333; margin:20px 0;">
+            <h3>ADD NEW CP</h3>
+            <input type="text" id="new-cp-name" placeholder="CP Name">
+            <input type="text" id="new-cp-leader" placeholder="Leader Name">
+            <select id="new-cp-clan">
                 <option value="noldor">Noldor</option>
                 <option value="kriminalides">Kriminalides</option>
-                <option value="caller">Callers</option>
+                <option value="caller">Callers / Niklaus</option>
             </select>
-            <textarea id="cp-roster" rows="4" placeholder="Members (Member1, Member2...)"></textarea>
-            <input type="number" id="cp-start-points" placeholder="Starting Points (για παλιά CP)">
-            <button class="btn" onclick="saveCP()">SAVE / UPDATE CP</button>
+            <button class="save-btn" onclick="addNewCP()">+ CREATE NEW CP</button>
         </div>
 
-        <div class="card">
-            <h2>2. LOG DAILY EVENT</h2>
-            <select id="event-type">
-                <option value="1">Mid Epic (QA/Zaken/Orfen/Core/Frin) - x1</option>
-                <option value="2">Baium - x2</option>
-                <option value="3">Siege / Valakas / Antharas - x3</option>
-            </select>
-            <div id="cp-check-list" class="event-grid">
-                </div>
-            <button class="btn" style="background:#28a745; color:white;" onclick="submitEvent()">LOG EVENT & ADD POINTS</button>
-        </div>
-
-        <div class="card">
-            <h2>3. LOOT & MARKETPLACE</h2>
-            <select id="loot-cp-id"></select>
-            <input type="text" id="loot-item" placeholder="Item Name (π.χ. Baium Ring)">
-            <input type="number" id="loot-cost" placeholder="Points Cost (π.χ. 950)">
-            <input type="date" id="loot-date">
-            <button class="btn" style="background:#dc3545; color:white;" onclick="addLoot()">REGISTER LOOT</button>
-        </div>
-
-        <div class="card">
-            <h2>4. ARCHIVE CP (LEAVERS)</h2>
-            <select id="archive-cp-id"></select>
-            <button class="btn" style="background:#555; color:white;" onclick="archiveCP()">MOVE TO HISTORY.HTML</button>
+        <div class="card" id="edit-panel" style="display:none;">
+            <h2>EDITING: <span id="editing-name" style="color:var(--gold);"></span></h2>
+            <label>Roster (Members separated by comma)</label>
+            <textarea id="edit-members" rows="5"></textarea>
+            <label>Current Total Points</label>
+            <input type="number" id="edit-points">
+            <button class="save-btn" onclick="updateCPData()">UPDATE ROSTER & POINTS</button>
+            
+            <h3 style="margin-top:30px;">ADD LOOT ITEM</h3>
+            <input type="text" id="loot-item" placeholder="e.g. Baium Ring">
+            <input type="number" id="loot-cost" placeholder="Points Cost">
+            <button class="save-btn" style="background:#dc3545; color:white;" onclick="addLoot()">SUBTRACT POINTS & LOG LOOT</button>
+            
+            <button class="save-btn" style="background:#555; color:white; margin-top:40px;" onclick="archiveCP()">MOVE TO HISTORY (LEAVER)</button>
         </div>
     </div>
 
 <script>
-    // Firebase Config (Το ίδιο που είχαμε)
     const firebaseConfig = { 
         apiKey: "AIzaSyDRL8EehxdcgVYJ0LJ1khVYkSJcaCMKRes", 
         databaseURL: "https://brokenmirrordb-default-rtdb.europe-west1.firebasedatabase.app" 
@@ -72,100 +68,123 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // 1. ΣΥΝΑΡΤΗΣΗ SAVE CP
-    function saveCP() {
-        const name = document.getElementById('cp-name').value;
-        const startPoints = parseInt(document.getElementById('cp-start-points').value) || 0;
-        const id = name.replace(/\s+/g, '-').toLowerCase();
+    const bossData = [
+        { id: 'VAL', multiplier: 3, img: 'https://i.ibb.co/84gZPVRP/necklace-valakas.png' },
+        { id: 'ANT', multiplier: 3, img: 'https://i.ibb.co/rfqvc6mv/earring-antharas.png' },
+        { id: 'BAI', multiplier: 2, img: 'https://i.ibb.co/XrZkv67h/ring-of-baium.png' },
+        { id: 'SIE', multiplier: 3, img: 'https://i.ibb.co/Txfby6wD/images.png' },
+        { id: 'ZAK', multiplier: 1, img: 'https://i.ibb.co/spkC6Gzz/zaken-earring.png' },
+        { id: 'AQ',  multiplier: 1, img: 'https://i.ibb.co/rKRtZmBG/ring-of-queen-ant.png' },
+        { id: 'ORF', multiplier: 1, img: 'https://i.ibb.co/j9dDnXwH/earring-orfen.png' },
+        { id: 'COR', multiplier: 1, img: 'https://i.ibb.co/ksv37fNZ/ring-of-.png' },
+        { id: 'FRI', multiplier: 1, img: 'https://i.ibb.co/gF4YKGTM/frintezza-necklace.png' }
+    ];
 
-        db.ref('cps/' + id).update({
-            name: name,
-            leader: document.getElementById('cp-leader').value,
-            clan: document.getElementById('cp-clan').value,
-            members: document.getElementById('cp-roster').value,
-            startingPoints: startPoints,
-            // Αν είναι καινούργιο, βάλε τα starting points ως σύνολο
-            totalPoints: startPoints 
-        });
-        alert("CP Saved!");
-    }
+    let currentEditingId = null;
 
-    // 2. ΦΟΡΤΩΣΗ CP ΓΙΑ ΤΑ DROPDOWNS
+    // Φόρτωση CP
     db.ref('cps/').on('value', snap => {
-        const data = snap.val();
-        const checkList = document.getElementById('cp-check-list');
-        const lootSelect = document.getElementById('loot-cp-id');
-        const archiveSelect = document.getElementById('archive-cp-id');
-        
-        checkList.innerHTML = "";
-        lootSelect.innerHTML = "";
-        archiveSelect.innerHTML = "";
+        const data = snap.val() || {};
+        const container = document.getElementById('cp-list-admin');
+        container.innerHTML = "";
 
         Object.keys(data).forEach(id => {
-            if(data[id].clan === 'history') return;
-            
-            // Για το Event Logging
-            checkList.innerHTML += `<div class="cp-select-item" onclick="this.classList.toggle('selected')" data-id="${id}">${data[id].name}</div>`;
-            
-            // Για τα Dropdowns
-            const opt = `<option value="${id}">${data[id].name}</option>`;
-            lootSelect.innerHTML += opt;
-            archiveSelect.innerHTML += opt;
+            const cp = data[id];
+            if(cp.clan === 'history') return;
+
+            const row = document.createElement('div');
+            row.className = 'cp-control-row';
+            row.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <b style="cursor:pointer;" onclick="loadEditPanel('${id}')">${cp.name} <span class="pts-badge">${cp.totalPoints}</span></b>
+                    <span style="font-size:0.7rem; color:#888;">${cp.clan.toUpperCase()}</span>
+                </div>
+                <div class="boss-btn-group">
+                    ${bossData.map(b => `
+                        <button class="boss-btn" onclick="addBossPoint('${id}', '${b.id}', ${b.multiplier})" title="${b.id} (+${b.multiplier} pts)">
+                            <img src="${b.img}">
+                            <small id="cnt-${id}-${b.id}">${cp.bossStats ? cp.bossStats[b.id] || 0 : 0}</small>
+                        </button>
+                    `).join('')}
+                </div>
+            `;
+            container.appendChild(row);
         });
     });
 
-    // 3. LOG EVENT & CALCULATE POINTS
-    function submitEvent() {
-        const multiplier = parseInt(document.getElementById('event-type').value);
-        const selectedCPs = document.querySelectorAll('.cp-select-item.selected');
-        
-        selectedCPs.forEach(item => {
-            const cpId = item.getAttribute('data-id');
-            const ref = db.ref('cps/' + cpId + '/totalPoints');
-            
-            ref.transaction(currentPoints => {
-                return (currentPoints || 0) + (1 * multiplier);
-            });
-
-            // Log event for Hall of Fame
-            db.ref('events/').push({
-                cpId: cpId,
-                type: multiplier, // 1, 2, or 3
-                date: Date.now()
-            });
+    // Προσθήκη Πόντου & Boss Stat
+    function addBossPoint(cpId, bossId, mult) {
+        const ref = db.ref('cps/' + cpId);
+        ref.transaction(cp => {
+            if (cp) {
+                if (!cp.bossStats) cp.bossStats = {};
+                cp.bossStats[bossId] = (cp.bossStats[bossId] || 0) + 1;
+                cp.totalPoints = (cp.totalPoints || 0) + mult;
+            }
+            return cp;
         });
-        alert("Event Logged!");
     }
 
-    // 4. ARCHIVE CP (Μεταφορά στο History)
-    function archiveCP() {
-        const id = document.getElementById('archive-cp-id').value;
+    // Πάνελ Επεξεργασίας
+    function loadEditPanel(id) {
+        currentEditingId = id;
         db.ref('cps/' + id).once('value', snap => {
-            const data = snap.val();
-            data.clan = 'history'; // Αλλάζουμε το clan σε history
-            db.ref('history_archive/' + id).set(data); // Το στέλνουμε στο αρχείο
-            db.ref('cps/' + id).remove(); // Το σβήνουμε από τα ενεργά
-            alert("Moved to History!");
+            const cp = snap.val();
+            document.getElementById('edit-panel').style.display = 'block';
+            document.getElementById('editing-name').innerText = cp.name;
+            document.getElementById('edit-members').value = cp.members || "";
+            document.getElementById('edit-points').value = cp.totalPoints || 0;
         });
     }
 
-    // 5. REGISTER LOOT
-    function addLoot() {
-        const cpId = document.getElementById('loot-cp-id').value;
-        const cost = parseInt(document.getElementById('loot-cost').value);
-        const item = document.getElementById('loot-item').value;
-        const date = document.getElementById('loot-date').value;
-
-        // Αφαίρεση πόντων
-        db.ref('cps/' + cpId + '/totalPoints').transaction(p => p - cost);
-        
-        // Καταγραφή στο ιστορικό του CP
-        db.ref('cps/' + cpId + '/lootHistory').push({
-            item: item,
-            cost: cost,
-            date: date
+    function updateCPData() {
+        if(!currentEditingId) return;
+        db.ref('cps/' + currentEditingId).update({
+            members: document.getElementById('edit-members').value,
+            totalPoints: parseInt(document.getElementById('edit-points').value)
         });
-        alert("Loot Registered!");
+        alert("Updated!");
+    }
+
+    function addNewCP() {
+        const name = document.getElementById('new-cp-name').value;
+        if(!name) return;
+        const id = name.replace(/\s+/g, '-').toLowerCase();
+        db.ref('cps/' + id).set({
+            name: name,
+            leader: document.getElementById('new-cp-leader').value,
+            clan: document.getElementById('new-cp-clan').value,
+            members: "",
+            totalPoints: 0,
+            bossStats: { VAL:0, ANT:0, BAI:0, SIE:0, ZAK:0, AQ:0, ORF:0, COR:0, FRI:0 }
+        });
+    }
+
+    function addLoot() {
+        const item = document.getElementById('loot-item').value;
+        const cost = parseInt(document.getElementById('loot-cost').value);
+        if(!item || !cost) return;
+
+        db.ref('cps/' + currentEditingId).transaction(cp => {
+            if(cp) {
+                cp.totalPoints -= cost;
+                if(!cp.lootHistory) cp.lootHistory = [];
+                cp.lootHistory.push({
+                    item: item,
+                    cost: cost,
+                    date: new Date().toLocaleDateString('el-GR')
+                });
+            }
+            return cp;
+        });
+        alert("Loot added and points deducted!");
+    }
+
+    function archiveCP() {
+        if(confirm("Move to History?")) {
+            db.ref('cps/' + currentEditingId).update({ clan: 'history' });
+            document.getElementById('edit-panel').style.display = 'none';
+        }
     }
 </script>
 </body>
