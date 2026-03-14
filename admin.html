@@ -3,64 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BMA | Admin Panel</title>
+    <title>BMA | Admin Bulk Panel</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root { --gold: #d4af37; --bg: #0a0c0f; --card: #15181c; }
         body { font-family: 'Open Sans', sans-serif; background: var(--bg); color: #eee; margin: 0; padding: 20px; }
         h1, h2 { font-family: 'Cinzel'; color: var(--gold); text-align: center; }
-        .container { max-width: 1000px; margin: 0 auto; }
-        
+        .container { max-width: 1100px; margin: 0 auto; }
         .admin-card { background: var(--card); border: 1px solid #333; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
-        input, select, textarea { 
-            background: #000; border: 1px solid #444; color: #fff; padding: 10px; 
-            margin: 5px 0; width: 100%; box-sizing: border-box; border-radius: 5px;
-        }
-        button { 
-            background: var(--gold); color: #000; border: none; padding: 12px 20px; 
-            font-weight: bold; cursor: pointer; border-radius: 5px; transition: 0.3s; width: 100%;
-            font-family: 'Cinzel';
-        }
+        input, select, textarea { background: #000; border: 1px solid #444; color: #fff; padding: 10px; margin: 5px 0; width: 100%; box-sizing: border-box; border-radius: 5px; }
+        button { background: var(--gold); color: #000; border: none; padding: 12px 20px; font-weight: bold; cursor: pointer; border-radius: 5px; transition: 0.3s; font-family: 'Cinzel'; margin-top: 10px; }
         button:hover { opacity: 0.8; }
-        
+        .bulk-area { border: 2px dashed var(--gold); padding: 15px; background: rgba(212, 175, 55, 0.05); }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #333; padding: 12px; text-align: left; font-size: 0.85rem; }
+        th, td { border: 1px solid #333; padding: 10px; text-align: left; font-size: 0.8rem; }
         th { background: #000; color: var(--gold); }
-        .clan-tag { padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; }
-        .noldor { background: #00d9ff22; color: #00d9ff; border: 1px solid #00d9ff; }
-        .krim { background: #ff333322; color: #ff3333; border: 1px solid #ff3333; }
+        .clan-tag { padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 0.7rem; }
+        .noldor { color: #00d9ff; border: 1px solid #00d9ff; }
+        .kriminalides { color: #ff3333; border: 1px solid #ff3333; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>ALLIANCE CONTROL PANEL</h1>
+    <h1>BMA DATABASE MANAGER</h1>
 
-    <div class="admin-card">
-        <h2>ΔΙΑΧΕΙΡΙΣΗ CP</h2>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <input type="text" id="cp-name" placeholder="Όνομα CP (π.χ. Ronin CP)">
-            <select id="cp-clan">
-                <option value="noldor">NOLDOR CLAN</option>
-                <option value="kriminalides">KRIMINALIDES CLAN</option>
-                <option value="history">LEAVERS / HISTORY</option>
-            </select>
-            <input type="number" id="cp-points" placeholder="Starting Points">
-            <input type="text" id="cp-leader" placeholder="CP Leader Name">
-        </div>
-        <textarea id="cp-members" rows="3" placeholder="Μέλη Roster (χωρισμένα με κόμμα: Player1, Player2, Player3...)"></textarea>
-        <button onclick="saveCP()">ΑΠΟΘΗΚΕΥΣΗ CP ΣΤΗ ΒΑΣΗ</button>
+    <div class="admin-card bulk-area">
+        <h2>ΜΑΖΙΚΗ ΕΙΣΑΓΩΓΗ ΑΠΟ EXCEL</h2>
+        <p style="font-size: 0.8rem; color: #888;">Κάνε copy μια στήλη από το Excel (συμπεριλαμβανομένου του τίτλου CP) και κάνε paste εδώ:</p>
+        <select id="bulk-clan">
+            <option value="noldor">ΕΙΣΑΓΩΓΗ ΣΕ: NOLDOR CLAN</option>
+            <option value="kriminalides">ΕΙΣΑΓΩΓΗ ΣΕ: KRIMINALIDES CLAN</option>
+        </select>
+        <input type="number" id="bulk-points" placeholder="Starting Points για αυτό το CP">
+        <textarea id="bulk-input" rows="8" placeholder="Επικόλληση στήλης εδώ..."></textarea>
+        <button onclick="processBulk()">ΕΠΕΞΕΡΓΑΣΙΑ & ΑΠΟΘΗΚΕΥΣΗ CP</button>
     </div>
 
     <div class="admin-card">
-        <h2>ACTIVE ROSTERS</h2>
-        <div id="loading-msg">Σύνδεση με Firebase...</div>
+        <h2>ACTIVE CP LIST</h2>
         <table id="cp-table">
             <thead>
                 <tr>
                     <th>CP NAME</th>
                     <th>CLAN</th>
                     <th>POINTS</th>
+                    <th>LEADER</th>
                     <th>MEMBERS</th>
                     <th>ACTION</th>
                 </tr>
@@ -72,9 +60,8 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getDatabase, ref, set, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    import { getDatabase, ref, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-    // ΤΟ CONFIG ΣΟΥ
     const firebaseConfig = {
         apiKey: "AIzaSyDRL8EehxdcgVYJ0LJ1khVYkSJcaCMKRes",
         authDomain: "brokenmirrordb.firebaseapp.com",
@@ -88,67 +75,59 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // SAVE CP FUNCTION
-    window.saveCP = function() {
-        const name = document.getElementById('cp-name').value;
-        const clan = document.getElementById('cp-clan').value;
-        const pts = parseInt(document.getElementById('cp-points').value) || 0;
-        const leader = document.getElementById('cp-leader').value;
-        const members = document.getElementById('cp-members').value;
+    // BULK PROCESSOR
+    window.processBulk = function() {
+        const rawData = document.getElementById('bulk-input').value.trim();
+        const clan = document.getElementById('bulk-clan').value;
+        const pts = parseInt(document.getElementById('bulk-points').value) || 0;
 
-        if(!name) return alert("Βάλε όνομα CP!");
+        if (!rawData) return alert("Επικόλλησε δεδομένα πρώτα!");
 
-        // Το αποθηκεύουμε στη διαδρομή cps/ΌνομαCP
-        set(ref(db, 'cps/' + name), {
-            name: name,
-            clan: clan,
-            totalPoints: pts,
-            leader: leader,
-            members: members,
-            updatedAt: Date.now()
-        }).then(() => {
-            alert("Το CP αποθηκεύτηκε!");
-            clearForm();
-        });
+        // Σπάμε το κείμενο σε γραμμές
+        const lines = rawData.split('\n').map(l => l.trim()).filter(l => l !== "");
+        
+        if (lines.length < 1) return alert("Δεν βρέθηκαν δεδομένα.");
+
+        const cpName = lines[0]; // Η πρώτη γραμμή είναι το όνομα του CP
+        const leader = lines[1] || "Unknown"; // Η δεύτερη γραμμή (συνήθως) είναι ο leader
+        const members = lines.slice(1).join(', '); // Όλοι οι υπόλοιποι
+
+        if(confirm(`Θέλεις να αποθηκεύσεις το CP: ${cpName} με ${lines.length - 1} μέλη;`)) {
+            set(ref(db, 'cps/' + cpName), {
+                name: cpName,
+                clan: clan,
+                totalPoints: pts,
+                leader: leader,
+                members: members,
+                updatedAt: Date.now()
+            }).then(() => {
+                alert("Επιτυχία!");
+                document.getElementById('bulk-input').value = "";
+            });
+        }
     }
 
-    function clearForm() {
-        document.getElementById('cp-name').value = '';
-        document.getElementById('cp-points').value = '';
-        document.getElementById('cp-leader').value = '';
-        document.getElementById('cp-members').value = '';
-    }
-
-    // READ CPS REALTIME
-    const cpRef = ref(db, 'cps/');
-    onValue(cpRef, (snapshot) => {
+    // LISTENER ΓΙΑ ΤΟΝ ΠΙΝΑΚΑ
+    onValue(ref(db, 'cps/'), (snapshot) => {
         const data = snapshot.val();
         const tbody = document.getElementById('cp-list-body');
-        document.getElementById('loading-msg').style.display = 'none';
         tbody.innerHTML = '';
-        
         if (data) {
             Object.keys(data).forEach(key => {
                 const cp = data[key];
-                const row = `<tr>
+                tbody.innerHTML += `<tr>
                     <td><b>${cp.name}</b></td>
                     <td><span class="clan-tag ${cp.clan}">${cp.clan.toUpperCase()}</span></td>
                     <td style="color:var(--gold)">${cp.totalPoints}</td>
-                    <td style="font-size:0.7rem; max-width:200px;">${cp.members}</td>
-                    <td><button onclick="deleteCP('${cp.name}')" style="background:#ff3333; padding:5px; font-size:0.7rem;">DELETE</button></td>
+                    <td>${cp.leader}</td>
+                    <td style="font-size:0.65rem;">${cp.members}</td>
+                    <td><button onclick="deleteCP('${cp.name}')" style="background:#ff3333; padding:5px 10px; font-size:0.6rem; color:#fff;">DEL</button></td>
                 </tr>`;
-                tbody.innerHTML += row;
             });
         }
     });
 
-    window.deleteCP = function(name) {
-        if(confirm("Διαγραφή του " + name + ";")) {
-            remove(ref(db, 'cps/' + name));
-        }
-    }
-
+    window.deleteCP = (name) => { if(confirm("Διαγραφή;")) remove(ref(db, 'cps/' + name)); };
 </script>
-
 </body>
 </html>
