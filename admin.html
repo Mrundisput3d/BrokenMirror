@@ -2,108 +2,87 @@
 <html lang="el">
 <head>
     <meta charset="UTF-8">
-    <title>BMA | Supreme Admin V14 (Bulletproof)</title>
+    <title>BMA | Supreme Admin V15</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <style>
         :root { --gold: #d4af37; --bg: #0a0c0f; --card: #15181c; --red: #ff4444; --green: #28a745; --blue: #3498db; }
         body { background: var(--bg); color: #eee; font-family: 'Open Sans', sans-serif; margin: 0; padding: 20px; font-size: 13px; }
-        h1 { font-family: 'Cinzel'; color: var(--gold); text-align: center; margin-bottom: 20px; text-shadow: 0 2px 10px rgba(212,175,55,0.3); }
+        h1 { font-family: 'Cinzel'; color: var(--gold); text-align: center; text-shadow: 0 2px 10px rgba(212,175,55,0.3); }
         .layout { display: grid; grid-template-columns: 320px 1fr; gap: 20px; max-width: 1400px; margin: 0 auto; }
         .panel { background: var(--card); border: 1px solid #333; padding: 15px; border-radius: 10px; border-top: 3px solid var(--gold); }
-        
-        /* Attendance List Styles */
         .detected-cp-row { background: #000; padding: 8px; margin: 4px 0; border-radius: 5px; display: flex; align-items: center; border: 1px solid #333; }
-        .detected-cp-row input { margin-right: 12px; width: 18px; height: 18px; accent-color: var(--gold); cursor: pointer; }
-        .cap-notice { font-size: 0.7rem; color: var(--red); font-weight: bold; margin-left: 5px; }
-
-        /* Boss Grid Styles */
+        .detected-cp-row input { margin-right: 12px; width: 18px; height: 18px; accent-color: var(--gold); }
         .boss-grid { display: grid; grid-template-columns: repeat(9, 1fr); gap: 6px; margin: 15px 0; }
         .boss-btn { background: #111; border: 1px solid #444; padding: 10px 2px; text-align: center; cursor: pointer; border-radius: 6px; transition: 0.2s; }
-        .boss-btn:hover { border-color: var(--gold); background: #1a1a1a; transform: translateY(-2px); }
+        .boss-btn:hover { border-color: var(--gold); background: #1a1a1a; }
         .boss-btn img { width: 28px; display: block; margin: 0 auto 5px; }
-        .boss-btn span { font-size: 0.6rem; color: var(--gold); font-weight: bold; display: block; }
-
+        .boss-btn span { font-size: 0.6rem; color: var(--gold); font-weight: bold; }
         input, select, textarea { width: 100%; padding: 10px; margin: 5px 0; background: #000; color: #fff; border: 1px solid #444; border-radius: 4px; box-sizing: border-box; }
-        .btn { width: 100%; padding: 12px; border: none; border-radius: 4px; cursor: pointer; font-family: 'Cinzel'; font-weight: bold; margin-top: 10px; transition: 0.2s; }
+        .btn { width: 100%; padding: 12px; border: none; border-radius: 4px; cursor: pointer; font-family: 'Cinzel'; font-weight: bold; margin-top: 10px; }
         .btn-gold { background: var(--gold); color: #000; }
         .btn-red { background: var(--red); color: #fff; }
         .btn-blue { background: var(--blue); color: #fff; }
-
-        /* Loot & Stats Table */
         .loot-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        .loot-table th { text-align: left; color: #888; border-bottom: 1px solid #333; padding: 8px; font-size: 0.7rem; }
         .loot-table td { padding: 8px; border-bottom: 1px solid #222; font-size: 0.75rem; }
-        .del-loot { color: var(--red); cursor: pointer; font-weight: bold; text-align: center; }
-
         .stat-edit-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 15px; }
         .stat-field { background: #111; padding: 8px; border-radius: 4px; text-align: center; border: 1px solid #333; }
-        .stat-field input { width: 50px; text-align: center; padding: 3px; border-color: var(--gold); color: var(--gold); margin: 5px 0 0 0; }
-        
-        #cp-list-simple div:hover { background: #222; }
+        .stat-field input { width: 50px; text-align: center; border-color: var(--gold); color: var(--gold); }
     </style>
 </head>
 <body>
 
-    <h1>BMA COMMAND CENTER V14</h1>
+    <h1>BMA SUPREME ADMIN V15</h1>
 
     <div class="layout">
         <div class="panel">
             <h2>CP LIST</h2>
-            <div id="cp-list-simple" style="max-height: 400px; overflow-y: auto; border: 1px solid #222; padding: 5px; border-radius: 5px;"></div>
-            
+            <div id="cp-list-simple" style="max-height: 400px; overflow-y: auto;"></div>
             <hr style="border-color:#333; margin: 20px 0;">
-            <h3>CREATE NEW ENTITY</h3>
-            <input type="text" id="new-name" placeholder="CP Name">
-            <input type="text" id="new-leader" placeholder="Leader Name">
+            <h3>NEW CP</h3>
+            <input type="text" id="new-name" placeholder="Name">
+            <input type="text" id="new-leader" placeholder="Leader">
             <select id="new-clan">
-                <option value="noldor">Noldor Clan</option>
-                <option value="kriminalides">Kriminalides Clan</option>
-                <option value="caller">Leader / Caller</option>
+                <option value="noldor">Noldor</option>
+                <option value="kriminalides">Kriminalides</option>
+                <option value="caller">Caller</option>
             </select>
-            <button class="btn btn-gold" onclick="createNewCP()">+ REGISTER CP</button>
+            <button class="btn btn-gold" onclick="createNewCP()">REGISTER</button>
         </div>
 
         <div class="panel">
-            <h2>1. MASS ATTENDANCE & EVENTS</h2>
-            <textarea id="mass-input" rows="4" placeholder="Paste names from Discord/Game (duplicates will be auto-removed)..." oninput="analyzeAttendance()"></textarea>
-            
-            <div id="detection-area">
-                <div id="detected-list"></div>
-            </div>
+            <h2>1. LOG EVENT (UNIQUE & CAPPED)</h2>
+            <textarea id="mass-input" rows="3" placeholder="Paste names..." oninput="analyzeAttendance()"></textarea>
+            <div id="detected-list"></div>
 
             <div class="boss-grid">
-                <div class="boss-btn" onclick="logValidatedEvent('VAL', 3)"><img src="https://i.ibb.co/84gZPVRP/necklace-valakas.png"><span>VAL x3</span></div>
-                <div class="boss-btn" onclick="logValidatedEvent('ANT', 3)"><img src="https://i.ibb.co/rfqvc6mv/earring-antharas.png"><span>ANT x3</span></div>
-                <div class="boss-btn" onclick="logValidatedEvent('BAI', 2)"><img src="https://i.ibb.co/XrZkv67h/ring-of-baium.png"><span>BAI x2</span></div>
-                <div class="boss-btn" onclick="logValidatedEvent('SIE', 3)"><img src="https://i.ibb.co/Txfby6wD/images.png"><span>SIEGE x3</span></div>
-                <div class="boss-btn" onclick="logValidatedEvent('ZAK', 1)"><img src="https://i.ibb.co/spkC6Gzz/zaken-earring.png"><span>ZAK x1</span></div>
-                <div class="boss-btn" onclick="logValidatedEvent('FRI', 1)"><img src="https://i.ibb.co/gF4YKGTM/frintezza-necklace.png"><span>FRIN x1</span></div>
-                <div class="boss-btn" onclick="logValidatedEvent('AQ', 1)"><img src="https://i.ibb.co/rKRtZmBG/ring-of-queen-ant.png"><span>AQ x1</span></div>
-                <div class="boss-btn" onclick="logValidatedEvent('ORF', 1)"><img src="https://i.ibb.co/j9dDnXwH/earring-orfen.png"><span>ORF x1</span></div>
-                <div class="boss-btn" onclick="logValidatedEvent('COR', 1)"><img src="https://i.ibb.co/ksv37fNZ/ring-of-.png"><span>CORE x1</span></div>
+                <div class="boss-btn" onclick="logValidatedEvent('VAL', 3)"><img src="https://i.ibb.co/84gZPVRP/necklace-valakas.png"><span>VAL</span></div>
+                <div class="boss-btn" onclick="logValidatedEvent('ANT', 3)"><img src="https://i.ibb.co/rfqvc6mv/earring-antharas.png"><span>ANT</span></div>
+                <div class="boss-btn" onclick="logValidatedEvent('BAI', 2)"><img src="https://i.ibb.co/XrZkv67h/ring-of-baium.png"><span>BAI</span></div>
+                <div class="boss-btn" onclick="logValidatedEvent('SIE', 3)"><img src="https://i.ibb.co/Txfby6wD/images.png"><span>SIEGE</span></div>
+                <div class="boss-btn" onclick="logValidatedEvent('ZAK', 1)"><img src="https://i.ibb.co/spkC6Gzz/zaken-earring.png"><span>ZAK</span></div>
+                <div class="boss-btn" onclick="logValidatedEvent('FRI', 1)"><img src="https://i.ibb.co/gF4YKGTM/frintezza-necklace.png"><span>FRIN</span></div>
+                <div class="boss-btn" onclick="logValidatedEvent('AQ', 1)"><img src="https://i.ibb.co/rKRtZmBG/ring-of-queen-ant.png"><span>AQ</span></div>
+                <div class="boss-btn" onclick="logValidatedEvent('ORF', 1)"><img src="https://i.ibb.co/j9dDnXwH/earring-orfen.png"><span>ORF</span></div>
+                <div class="boss-btn" onclick="logValidatedEvent('COR', 1)"><img src="https://i.ibb.co/ksv37fNZ/ring-of-.png"><span>CORE</span></div>
             </div>
 
             <div id="edit-section" style="display:none; border-top:2px solid var(--gold); padding-top:20px; margin-top:20px;">
-                <h2 id="edit-title" style="text-align:left; color:var(--gold); margin:0 0 15px 0;"></h2>
-                
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:30px;">
+                <h2 id="edit-title"></h2>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:25px;">
                     <div>
-                        <label>Roster Management (One name per line)</label>
-                        <textarea id="edit-members" rows="12"></textarea>
-                        
-                        <h3 style="color:var(--gold); margin-top:20px;">PURCHASE HISTORY</h3>
-                        <div style="max-height: 200px; overflow-y: auto; background: #000; border: 1px solid #333; border-radius: 5px;">
+                        <label>Roster</label>
+                        <textarea id="edit-members" rows="10"></textarea>
+                        <h3 style="color:var(--gold);">LOOT HISTORY</h3>
+                        <div style="max-height: 150px; overflow-y: auto; background: #000; border: 1px solid #333;">
                             <table class="loot-table" id="loot-history-table">
-                                <thead><tr><th>Item</th><th>Cost</th><th>Date</th><th>Revoke</th></tr></thead>
                                 <tbody id="loot-history-body"></tbody>
                             </table>
                         </div>
                     </div>
-
                     <div>
-                        <h3 style="color:var(--red); margin-top:0;">LOOT MARKETPLACE</h3>
+                        <h3 style="color:var(--red); margin:0;">MARKETPLACE</h3>
                         <select id="loot-market">
                             <option value="3100|Valakas Necklace">Valakas Necklace (3100)</option>
                             <option value="1100|Antharas Earring">Antharas Earring (1100)</option>
@@ -114,18 +93,14 @@
                             <option value="75|Orfen Earring">Orfen Earring (75)</option>
                             <option value="25|Core Ring">Core Ring (25)</option>
                         </select>
-                        <button class="btn btn-red" onclick="addMarketLoot()">DEDUCT POINTS & LOG LOOT</button>
-
-                        <label style="display:block; margin-top:25px;">Manual Point Adjustment</label>
-                        <input type="number" id="edit-points" style="font-size:1.3rem; color:var(--gold); text-align: center;">
-                        
-                        <label style="display:block; margin-top:15px;">Participation Stats (Total Person-Events)</label>
+                        <button class="btn btn-red" onclick="addMarketLoot()">BUY ITEM</button>
+                        <label style="display:block; margin-top:20px;">Total Points</label>
+                        <input type="number" id="edit-points" style="font-size:1.2rem; color:var(--gold);">
                         <div class="stat-edit-grid" id="stat-inputs"></div>
-
-                        <div style="display:flex; gap:10px; margin-top:25px;">
-                            <button class="btn btn-gold" style="flex:2;" onclick="updateCP()">SAVE ALL CHANGES</button>
-                            <button class="btn btn-blue" style="flex:1;" onclick="moveToHistory()">HISTORY</button>
-                            <button class="btn btn-red" style="flex:1; background:#600;" onclick="deleteCP()">DELETE</button>
+                        <div style="display:flex; gap:10px; margin-top:20px;">
+                            <button class="btn btn-gold" style="flex:2;" onclick="updateCP()">SAVE ALL</button>
+                            <button class="btn btn-blue" onclick="moveToHistory()">HIST</button>
+                            <button class="btn btn-red" onclick="deleteCP()">DEL</button>
                         </div>
                     </div>
                 </div>
@@ -134,20 +109,12 @@
     </div>
 
 <script>
-    // FIREBASE CONFIGURATION
-    const firebaseConfig = { 
-        apiKey: "AIzaSyDRL8EehxdcgVYJ0LJ1khVYkSJcaCMKRes", 
-        databaseURL: "https://brokenmirrordb-default-rtdb.europe-west1.firebasedatabase.app" 
-    };
+    const firebaseConfig = { apiKey: "AIzaSyDRL8EehxdcgVYJ0LJ1khVYkSJcaCMKRes", databaseURL: "https://brokenmirrordb-default-rtdb.europe-west1.firebasedatabase.app" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
-
-    let allCPs = {};
-    let matchedData = {}; 
-    let currentEditID = null;
+    let allCPs = {}, matchedData = {}, currentEditID = null;
     const bossKeys = ['VAL', 'ANT', 'BAI', 'SIE', 'ZAK', 'FRI', 'AQ', 'ORF', 'COR'];
 
-    // REALTIME SYNC
     db.ref('cps/').on('value', snap => {
         allCPs = snap.val() || {};
         renderSimpleList();
@@ -155,178 +122,111 @@
     });
 
     function renderSimpleList() {
-        const container = document.getElementById('cp-list-simple');
-        container.innerHTML = Object.keys(allCPs).filter(id => allCPs[id].clan !== 'history').map(id => 
-            `<div onclick="loadEdit('${id}')" style="cursor:pointer; padding:10px; border-bottom:1px solid #222; transition: 0.2s;">
-                <b>${allCPs[id].name}</b> <span style="float:right; color:var(--gold)">${allCPs[id].totalPoints} Pts</span>
-            </div>`).join('');
+        document.getElementById('cp-list-simple').innerHTML = Object.keys(allCPs).filter(id => allCPs[id].clan !== 'history').map(id => 
+            `<div onclick="loadEdit('${id}')" style="cursor:pointer; padding:8px; border-bottom:1px solid #222;">${allCPs[id].name} <span style="float:right; color:var(--gold)">${allCPs[id].totalPoints}</span></div>`).join('');
     }
 
-    // 1. UNIQUE NAMES & ANALYSIS
     function analyzeAttendance() {
         const input = document.getElementById('mass-input').value.toLowerCase();
-        
-        // UNIQUE NAMES RULE: Remove duplicates from input immediately
-        let names = input.match(/[a-z0-9_]+/g) || [];
-        names = [...new Set(names)]; 
-
+        let names = [...new Set(input.match(/[a-z0-9_]+/g) || [])];
         const listDiv = document.getElementById('detected-list');
-        listDiv.innerHTML = ""; 
-        matchedData = {};
-
+        listDiv.innerHTML = ""; matchedData = {};
         Object.keys(allCPs).forEach(id => {
             if(allCPs[id].clan === 'history') return;
             const roster = (allCPs[id].members || "").toLowerCase();
             const leader = (allCPs[id].leader || "").toLowerCase();
-            
             let count = 0;
-            names.forEach(n => { 
-                if(n.length > 2 && (roster.includes(n) || leader === n)) count++; 
-            });
-
+            names.forEach(n => { if(n.length > 2 && (roster.includes(n) || leader === n)) count++; });
             if(count > 0) {
                 matchedData[id] = count;
-                const isOverCap = count > 9;
-                
-                listDiv.innerHTML += `
-                    <div class="detected-cp-row">
-                        <input type="checkbox" class="cp-checkbox" id="check-${id}" checked>
-                        <span>
-                            <b>${allCPs[id].name}</b>: 
-                            <span style="color:${isOverCap ? 'var(--red)' : 'var(--green)'}">${count} members found</span>
-                            ${isOverCap ? '<span class="cap-notice">(Will be capped at 9)</span>' : ''}
-                        </span>
-                    </div>`;
+                listDiv.innerHTML += `<div class="detected-cp-row"><input type="checkbox" class="cp-checkbox" id="check-${id}" checked><span><b>${allCPs[id].name}</b> (${count > 9 ? '9 Capped' : count})</span></div>`;
             }
         });
     }
 
-    // 2. LOG EVENT WITH 9-MEMBER CAP
     async function logValidatedEvent(bossId, multiplier) {
         const checkboxes = document.querySelectorAll('.cp-checkbox');
-        let logged = false;
+        let loggedCount = 0, skippedCount = 0;
+        const today = new Date().toLocaleDateString('el-GR');
 
         for (const cb of checkboxes) {
             if (cb.checked) {
                 const id = cb.id.replace('check-', '');
-                const rawCount = matchedData[id];
-                
-                // 9-MEMBER CAP RULE
-                const finalCount = Math.min(rawCount, 9); 
-                const pointsToAdd = finalCount * multiplier;
-
+                if (allCPs[id].lastLogs && allCPs[id].lastLogs[bossId] === today) { skippedCount++; continue; }
+                const finalCount = Math.min(matchedData[id], 9);
                 await db.ref('cps/' + id).transaction(cp => {
                     if(cp) {
                         if(!cp.bossStats) cp.bossStats = {};
+                        if(!cp.lastLogs) cp.lastLogs = {};
                         cp.bossStats[bossId] = (cp.bossStats[bossId] || 0) + finalCount;
-                        cp.totalPoints = (cp.totalPoints || 0) + pointsToAdd;
+                        cp.totalPoints = (cp.totalPoints || 0) + (finalCount * multiplier);
+                        cp.lastLogs[bossId] = today;
                     }
                     return cp;
                 });
-                logged = true;
+                loggedCount++;
             }
         }
-        
-        if(logged) {
-            alert("Points & Stats Updated! Duplicate names were ignored and 9-member cap was applied.");
-            document.getElementById('mass-input').value = "";
-            document.getElementById('detected-list').innerHTML = "";
-        }
+        if(loggedCount > 0) alert(`Success: ${loggedCount} CPs updated.`);
+        if(skippedCount > 0) alert(`Blocked: ${skippedCount} CPs already logged for ${bossId} today.`);
+        document.getElementById('mass-input').value = ""; document.getElementById('detected-list').innerHTML = "";
     }
 
     function loadEdit(id) {
-        currentEditID = id; 
-        const cp = allCPs[id];
+        currentEditID = id; const cp = allCPs[id];
         document.getElementById('edit-section').style.display = 'block';
-        document.getElementById('edit-title').innerText = "CP PROFILE: " + cp.name.toUpperCase();
+        document.getElementById('edit-title').innerText = cp.name;
         document.getElementById('edit-members').value = cp.members || "";
         document.getElementById('edit-points').value = cp.totalPoints || 0;
-        
         let statsHtml = "";
         bossKeys.forEach(k => {
             const val = (cp.bossStats && cp.bossStats[k]) ? cp.bossStats[k] : 0;
             statsHtml += `<div class="stat-field">${k}<br><input type="number" id="inp-${k}" value="${val}"></div>`;
         });
         document.getElementById('stat-inputs').innerHTML = statsHtml;
-
         let lootHtml = "";
         if(cp.lootHistory) {
             cp.lootHistory.forEach((item, index) => {
-                lootHtml += `<tr><td>${item.item}</td><td>-${item.cost}</td><td>${item.date}</td>
-                <td class="del-loot" onclick="deleteLoot(${index})">✖</td></tr>`;
+                lootHtml += `<tr><td>${item.item}</td><td>-${item.cost}</td><td onclick="deleteLoot(${index})" style="color:red; cursor:pointer;">✖</td></tr>`;
             });
         }
         document.getElementById('loot-history-body').innerHTML = lootHtml;
     }
 
-    function deleteLoot(index) {
-        if(!confirm("Revoke this item? Points will be refunded to the CP.")) return;
+    function deleteLoot(idx) {
+        if(!confirm("Refund points?")) return;
         const cp = allCPs[currentEditID];
-        const itemCost = parseInt(cp.lootHistory[index].cost);
-        
-        cp.totalPoints += itemCost;
-        cp.lootHistory.splice(index, 1);
-        
-        db.ref('cps/' + currentEditID).update({
-            totalPoints: cp.totalPoints,
-            lootHistory: cp.lootHistory
-        });
+        cp.totalPoints += parseInt(cp.lootHistory[idx].cost);
+        cp.lootHistory.splice(idx, 1);
+        db.ref('cps/' + currentEditID).update({ totalPoints: cp.totalPoints, lootHistory: cp.lootHistory });
     }
 
     function addMarketLoot() {
         const loot = document.getElementById('loot-market').value.split('|');
-        if(!currentEditID) return alert("Select a CP first!");
-        
         db.ref('cps/' + currentEditID).transaction(cp => {
             if(cp) {
                 cp.totalPoints -= parseInt(loot[0]);
                 if(!cp.lootHistory) cp.lootHistory = [];
-                cp.lootHistory.push({ 
-                    item: loot[1], 
-                    cost: loot[0], 
-                    date: new Date().toLocaleDateString('el-GR') 
-                });
+                cp.lootHistory.push({ item: loot[1], cost: loot[0], date: new Date().toLocaleDateString('el-GR') });
             }
             return cp;
         });
     }
 
     function updateCP() {
-        const newStats = {};
-        bossKeys.forEach(k => newStats[k] = parseInt(document.getElementById('inp-' + k).value) || 0);
-        
-        db.ref('cps/' + currentEditID).update({
-            members: document.getElementById('edit-members').value,
-            totalPoints: parseInt(document.getElementById('edit-points').value),
-            bossStats: newStats
-        });
-        alert("CP Data Saved Successfully!");
+        const stats = {}; bossKeys.forEach(k => stats[k] = parseInt(document.getElementById('inp-' + k).value) || 0);
+        db.ref('cps/' + currentEditID).update({ members: document.getElementById('edit-members').value, totalPoints: parseInt(document.getElementById('edit-points').value), bossStats: stats });
+        alert("Saved!");
     }
 
     function createNewCP() {
-        const n = document.getElementById('new-name').value;
-        const l = document.getElementById('new-leader').value;
-        const c = document.getElementById('new-clan').value;
-        if(!n) return alert("Name is required!");
-        
+        const n = document.getElementById('new-name').value; if(!n) return;
         const id = n.replace(/\s+/g, '-').toLowerCase();
-        db.ref('cps/' + id).set({ 
-            name: n, leader: l, clan: c, totalPoints: 0, members: "", 
-            bossStats: { VAL:0, ANT:0, BAI:0, SIE:0, ZAK:0, FRI:0, AQ:0, ORF:0, COR:0 } 
-        });
-        alert("Entity Registered.");
-        document.getElementById('new-name').value = "";
+        db.ref('cps/' + id).set({ name: n, leader: document.getElementById('new-leader').value, clan: document.getElementById('new-clan').value, totalPoints: 0, members: "", bossStats: { VAL:0, ANT:0, BAI:0, SIE:0, ZAK:0, FRI:0, AQ:0, ORF:0, COR:0 } });
     }
 
-    function moveToHistory() { 
-        if(confirm("Move this CP to History? It will be hidden from the main site list.")) 
-            db.ref('cps/' + currentEditID).update({ clan: 'history' }); 
-    }
-    
-    function deleteCP() { 
-        if(confirm("DANGER: Permanently delete this CP and all its data?")) 
-            db.ref('cps/' + currentEditID).remove(); 
-    }
+    function moveToHistory() { if(confirm("Move to History?")) db.ref('cps/' + currentEditID).update({ clan: 'history' }); }
+    function deleteCP() { if(confirm("Delete Forever?")) db.ref('cps/' + currentEditID).remove(); }
 </script>
 </body>
 </html>
