@@ -3,67 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BMA | Professional Admin Panel</title>
+    <title>BMA | System Admin</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root { --gold: #d4af37; --bg: #0a0c0f; --card: #15181c; --blue: #00d9ff; --red: #ff3333; }
         body { font-family: 'Open Sans', sans-serif; background: var(--bg); color: #eee; margin: 0; padding: 20px; }
         h1, h2 { font-family: 'Cinzel'; color: var(--gold); text-align: center; }
-        .container { max-width: 1200px; margin: 0 auto; }
-        .admin-card { background: var(--card); border: 1px solid #333; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
-        input, select, textarea { background: #000; border: 1px solid #444; color: #fff; padding: 10px; margin: 5px 0; width: 100%; box-sizing: border-box; border-radius: 6px; }
-        .btn { background: var(--gold); color: #000; border: none; padding: 12px; font-weight: bold; cursor: pointer; border-radius: 6px; width: 100%; font-family: 'Cinzel'; }
+        .container { max-width: 1100px; margin: 0 auto; }
+        .card { background: var(--card); border: 1px solid #333; padding: 20px; border-radius: 12px; margin-bottom: 25px; }
+        input, select, textarea { background: #000; border: 1px solid #444; color: #fff; padding: 12px; margin: 8px 0; width: 100%; border-radius: 6px; box-sizing: border-box; }
+        .btn { background: var(--gold); color: #000; border: none; padding: 14px; font-weight: bold; cursor: pointer; border-radius: 6px; width: 100%; font-family: 'Cinzel'; font-size: 1rem; }
         .btn:hover { background: #fff; }
-        #drop-zone { border: 2px dashed var(--gold); padding: 30px; text-align: center; background: rgba(212, 175, 55, 0.05); cursor: pointer; margin: 10px 0; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #333; padding: 10px; text-align: left; font-size: 0.85rem; }
+        th, td { border: 1px solid #333; padding: 12px; text-align: left; }
         th { background: #000; color: var(--gold); }
-        .clan-tag { padding: 2px 6px; border-radius: 4px; font-weight: bold; text-transform: uppercase; font-size: 0.7rem; }
+        .status-msg { text-align: center; font-weight: bold; margin: 10px 0; color: var(--gold); }
+        #drop-zone { border: 2px dashed var(--gold); padding: 30px; text-align: center; background: rgba(212,175,55,0.05); cursor: pointer; border-radius: 8px; }
+        .detected-tag { display: inline-block; background: rgba(0,217,255,0.1); border: 1px solid var(--blue); color: var(--blue); padding: 5px 10px; border-radius: 4px; margin: 5px; font-size: 0.8rem; }
+        .clan-tag { padding: 3px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; }
         .noldor { border: 1px solid var(--blue); color: var(--blue); }
         .kriminalides { border: 1px solid var(--red); color: var(--red); }
-        .history { border: 1px solid #888; color: #888; }
-        .detected-tag { display: inline-block; background: rgba(0,217,255,0.1); border: 1px solid var(--blue); color: var(--blue); padding: 4px 8px; border-radius: 4px; margin: 4px; }
+        .history { border: 1px solid #777; color: #777; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>ALLIANCE MANAGEMENT PANEL</h1>
+    <h1>BMA CONTROL PANEL</h1>
 
-    <div class="admin-card">
-        <h2>1. ATTENDANCE SCANNER</h2>
+    <div class="card">
+        <h2>DAILY ATTENDANCE</h2>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-            <select id="event-type">
+            <select id="event-mult">
                 <option value="1">MID EPICS (x1)</option>
                 <option value="2">BAIUM (x2)</option>
                 <option value="3">HIGH EPICS (x3)</option>
             </select>
-            <input type="text" id="event-name" placeholder="Event Name">
+            <input type="text" id="event-name" placeholder="Όνομα Boss/Event">
+        </div>
+        <div id="drop-zone" onclick="document.getElementById('file-input').click()">
+            Κάντε κλικ εδώ για <b>Επιλογή Φωτογραφίας</b> ή <b>CTRL+V</b> (Paste)
         </div>
         <input type="file" id="file-input" accept="image/*" style="display:none">
-        <div id="drop-zone" onclick="document.getElementById('file-input').click()">
-            Κάντε κλικ για Επιλογή ή CTRL+V (Paste)
-        </div>
-        <div id="ocr-status" style="text-align:center; margin:10px 0; color:var(--gold);"></div>
-        <div id="detected-players" style="text-align:center;"></div>
-        <button id="submit-attendance" class="btn" style="background:#28a745; color:white; display:none;" onclick="window.submitAttendance()">ΚΑΤΑΧΩΡΗΣΗ ΠΟΝΤΩΝ</button>
+        <div id="ocr-status" class="status-msg">Αναμονή...</div>
+        <div id="detected-players" style="text-align: center; margin-bottom: 10px;"></div>
+        <button id="submit-points" class="btn" style="background:#28a745; color:white; display:none;">ΚΑΤΑΧΩΡΗΣΗ ΠΟΝΤΩΝ</button>
     </div>
 
-    <div class="admin-card">
-        <h2>2. BULK CP IMPORT</h2>
+    <div class="card">
+        <h2>ΠΡΟΣΘΗΚΗ CP / BULK IMPORT</h2>
         <select id="bulk-clan">
-            <option value="noldor">NOLDOR CLAN</option>
-            <option value="kriminalides">KRIMINALIDES CLAN</option>
-            <option value="history">LEAVERS / HISTORY</option>
+            <option value="noldor">NOLDOR</option>
+            <option value="kriminalides">KRIMINALIDES</option>
+            <option value="history">LEAVERS (HISTORY)</option>
         </select>
-        <input type="number" id="bulk-points" placeholder="Starting Points">
-        <textarea id="bulk-input" rows="4" placeholder="Paste Excel column..."></textarea>
-        <button class="btn" onclick="window.processBulk()">SAVE TO DATABASE</button>
+        <textarea id="bulk-data" rows="4" placeholder="Paste στήλη Excel (1η: CP Name, 2η: Leader, επόμενες: Members)"></textarea>
+        <button id="save-bulk" class="btn">ΑΠΟΘΗΚΕΥΣΗ ΣΤΗ ΒΑΣΗ</button>
     </div>
 
-    <div class="admin-card">
-        <h2>3. DATABASE (CP LIST)</h2>
-        <table>
+    <div class="card">
+        <h2>CP DATABASE</h2>
+        <table id="db-table">
             <thead>
                 <tr>
                     <th>CP NAME</th>
@@ -72,7 +72,9 @@
                     <th>ACTIONS</th>
                 </tr>
             </thead>
-            <tbody id="cp-list-body"></tbody>
+            <tbody id="cp-table-body">
+                <tr><td colspan="4" style="text-align:center;">Σύνδεση με Firebase...</td></tr>
+            </tbody>
         </table>
     </div>
 </div>
@@ -94,100 +96,132 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
-    let allCPs = {};
+    let currentData = {};
     let detectedList = [];
 
-    // --- ΣΥΝΔΕΣΗ ΜΕ ΤΟΝ ΠΙΝΑΚΑ (Real-time) ---
-    onValue(ref(db, 'cps/'), (snap) => {
-        allCPs = snap.val() || {};
-        const tbody = document.getElementById('cp-list-body');
-        tbody.innerHTML = "";
+    // --- 1. ΔΙΑΒΑΣΜΑ ΒΑΣΗΣ (REAL-TIME) ---
+    const tableBody = document.getElementById('cp-table-body');
+    onValue(ref(db, 'cps/'), (snapshot) => {
+        currentData = snapshot.val() || {};
+        tableBody.innerHTML = "";
         
-        Object.keys(allCPs).forEach(key => {
-            const cp = allCPs[key];
-            tbody.innerHTML += `
-                <tr>
-                    <td><b>${cp.name}</b></td>
-                    <td><span class="clan-tag ${cp.clan}">${cp.clan}</span></td>
-                    <td style="color:var(--gold)">${cp.totalPoints}</td>
-                    <td>
-                        <button onclick="window.moveToLeavers('${cp.name}')" style="background:#555; color:white; border:none; padding:4px; cursor:pointer; font-size:0.7rem;">LEAVER</button>
-                        <button onclick="window.deleteCP('${cp.name}')" style="background:red; color:white; border:none; padding:4px; cursor:pointer; font-size:0.7rem;">DEL</button>
-                    </td>
-                </tr>`;
+        Object.keys(currentData).forEach(id => {
+            const cp = currentData[id];
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><b>${cp.name}</b></td>
+                <td><span class="clan-tag ${cp.clan}">${cp.clan}</span></td>
+                <td style="color:var(--gold); font-weight:bold;">${cp.totalPoints}</td>
+                <td>
+                    <button class="action-btn" data-id="${id}" data-action="leave" style="background:#555; color:white; border:none; padding:5px; cursor:pointer; margin-right:5px;">LEAVE</button>
+                    <button class="action-btn" data-id="${id}" data-action="delete" style="background:red; color:white; border:none; padding:5px; cursor:pointer;">DEL</button>
+                </td>
+            `;
+            tableBody.appendChild(row);
         });
+
+        // Event listeners για τα κουμπιά του πίνακα
+        document.querySelectorAll('.action-btn').forEach(btn => {
+            btn.onclick = (e) => {
+                const id = e.target.getAttribute('data-id');
+                const action = e.target.getAttribute('data-action');
+                if(action === 'delete' && confirm('Οριστική διαγραφή;')) remove(ref(db, 'cps/' + id));
+                if(action === 'leave' && confirm('Μετακίνηση στους Leavers;')) update(ref(db, 'cps/' + id), { clan: 'history' });
+            };
+        });
+    }, (error) => {
+        tableBody.innerHTML = `<tr><td colspan="4" style="color:red">Σφάλμα Firebase: ${error.message}</td></tr>`;
     });
 
-    // --- ΣΥΝΑΡΤΗΣΕΙΣ (WINDOW EXPORT) ---
-    window.processBulk = function() {
-        const raw = document.getElementById('bulk-input').value.trim();
+    // --- 2. BULK IMPORT ---
+    document.getElementById('save-bulk').onclick = () => {
+        const raw = document.getElementById('bulk-data').value.trim();
         const clan = document.getElementById('bulk-clan').value;
-        const pts = parseInt(document.getElementById('bulk-points').value) || 0;
+        if(!raw) return alert("Βάλε δεδομένα!");
+
         const lines = raw.split('\n').map(l => l.trim()).filter(l => l !== "");
-        if(lines.length < 2) return alert("Paste more data!");
-        
         const cpName = lines[0];
+        
         set(ref(db, 'cps/' + cpName), {
-            name: cpName, clan, leader: lines[1], totalPoints: pts, members: lines.slice(1).join(', '), updatedAt: Date.now()
-        }).then(() => alert("Saved!"));
+            name: cpName,
+            clan: clan,
+            leader: lines[1] || "N/A",
+            totalPoints: parseInt(document.getElementById('bulk-points').value) || 0,
+            members: lines.slice(1).join(', '),
+            updatedAt: Date.now()
+        }).then(() => {
+            alert("CP Saved!");
+            document.getElementById('bulk-data').value = "";
+        });
     };
 
-    window.moveToLeavers = function(name) {
-        if(confirm(`Μετακίνηση του ${name} στους Leavers;`)) {
-            update(ref(db, 'cps/' + name), { clan: 'history' });
-        }
-    };
+    // --- 3. OCR ATTENDANCE ---
+    const status = document.getElementById('ocr-status');
+    const playerContainer = document.getElementById('detected-players');
+    const submitBtn = document.getElementById('submit-points');
 
-    window.deleteCP = function(name) {
-        if(confirm(`Οριστική διαγραφή του ${name};`)) remove(ref(db, 'cps/' + name));
-    };
-
-    // --- OCR LOGIC ---
-    document.getElementById('file-input').onchange = e => e.target.files[0] && startOCR(e.target.files[0]);
-    document.onpaste = e => {
+    document.getElementById('file-input').onchange = (e) => e.target.files[0] && processOCR(e.target.files[0]);
+    document.onpaste = (e) => {
         const item = Array.from(e.clipboardData.items).find(x => x.type.includes('image'));
-        if(item) startOCR(item.getAsFile());
+        if(item) processOCR(item.getAsFile());
     };
 
-    async function startOCR(blob) {
-        const status = document.getElementById('ocr-status');
-        status.innerText = "⏳ Scanning image...";
+    async function processOCR(blob) {
+        status.innerText = "⏳ Scanning... (Παρακαλώ περιμένετε)";
+        playerContainer.innerHTML = "";
+        submitBtn.style.display = "none";
+        detectedList = [];
+
         try {
             const worker = await Tesseract.createWorker('eng');
             const { data: { text } } = await worker.recognize(blob);
             await worker.terminate();
-            
-            const words = text.toLowerCase().split(/[\s,]+/).map(w => w.replace(/[^a-z0-9]/g, ''));
-            detectedList = [];
-            const container = document.getElementById('detected-players');
-            container.innerHTML = "";
 
-            Object.values(allCPs).forEach(cp => {
+            const words = text.toLowerCase().split(/[\s,]+/).map(w => w.replace(/[^a-z0-9]/g, ''));
+            
+            Object.values(currentData).forEach(cp => {
                 const roster = cp.members.toLowerCase();
                 words.forEach(word => {
                     if(word.length > 2 && roster.includes(word)) {
                         if(!detectedList.find(p => p.name === word)) {
-                            detectedList.push({name: word, cp: cp.name});
-                            container.innerHTML += `<span class="detected-tag">${word} (${cp.name})</span>`;
+                            detectedList.push({ name: word, cp: cp.name });
+                            const tag = document.createElement('span');
+                            tag.className = 'detected-tag';
+                            tag.innerText = `${word} (${cp.name})`;
+                            playerContainer.appendChild(tag);
                         }
                     }
                 });
             });
-            status.innerText = `Detected ${detectedList.length} players!`;
-            document.getElementById('submit-attendance').style.display = detectedList.length ? 'block' : 'none';
-        } catch(e) { status.innerText = "Error: " + e.message; }
+
+            status.innerText = detectedList.length > 0 ? `✅ Βρέθηκαν ${detectedList.length} παίκτες!` : "❌ Κανένα μέλος δεν αναγνωρίστηκε.";
+            if(detectedList.length > 0) submitBtn.style.display = "block";
+
+        } catch (err) {
+            status.innerText = "Σφάλμα OCR: " + err.message;
+        }
     }
 
-    window.submitAttendance = function() {
-        const mult = parseInt(document.getElementById('event-type').value);
+    submitBtn.onclick = () => {
+        const mult = parseInt(document.getElementById('event-mult').value);
         const updates = {};
         const sums = {};
+        
         detectedList.forEach(p => sums[p.cp] = (sums[p.cp] || 0) + mult);
-        for(let cp in sums) {
-            updates[`cps/${cp}/totalPoints`] = (allCPs[cp].totalPoints || 0) + sums[cp];
+        
+        for(let cpKey in sums) {
+            const newPts = (currentData[cpKey].totalPoints || 0) + sums[cpKey];
+            updates[`cps/${cpKey}/totalPoints`] = newPts;
         }
-        update(ref(db), updates).then(() => alert("Points Updated!"));
+
+        update(ref(db), updates).then(() => {
+            alert("Οι πόντοι προστέθηκαν!");
+            playerContainer.innerHTML = "";
+            submitBtn.style.display = "none";
+            status.innerText = "Αναμονή...";
+        });
     };
+
 </script>
 </body>
 </html>
