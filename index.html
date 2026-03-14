@@ -233,18 +233,24 @@
         function closeModal() { document.getElementById('caller-modal').style.display='none'; document.getElementById('overlay').style.display='none'; }
         function toggleLeaderLoot() { const p = document.getElementById('leader-loot-panel'); p.style.display = p.style.display==='none'?'block':'none'; }
 
-        // MUSIC LOGIC - FIXED AUTOSTART & MEMORY
-        const tracks = [{name:"DION THEME", url:"https://www.dropbox.com/scl/fi/ypzqrr336iewt62gncy6u/Lineage-2-Dion-Theme-Song.mp3?rlkey=nl1quliuqleuljgkt5jhqq6hh&st=sb8ij16g&raw=1"},{name:"GIRAN THEME", url:"https://www.dropbox.com/scl/fi/iu8j9wn9wky8fav176ayf/Lineage-2-Giran-Theme.mp3?rlkey=xp1j0upa076sy21tgcta6t9c3&st=0a4ihyhg&raw=1"}];
-        let currentIdx = 0; const audio = document.getElementById('bg-music'); const musicIcon = document.getElementById('music-icon');
+        // --- MUSIC LOGIC (PERSISTENT & FIXED) ---
+        const tracks = [
+            {name:"DION THEME", url:"https://www.dropbox.com/scl/fi/ypzqrr336iewt62gncy6u/Lineage-2-Dion-Theme-Song.mp3?rlkey=nl1quliuqleuljgkt5jhqq6hh&st=sb8ij16g&raw=1"},
+            {name:"GIRAN THEME", url:"https://www.dropbox.com/scl/fi/iu8j9wn9wky8fav176ayf/Lineage-2-Giran-Theme.mp3?rlkey=xp1j0upa076sy21tgcta6t9c3&st=0a4ihyhg&raw=1"}
+        ];
+        let currentIdx = 0; 
+        const audio = document.getElementById('bg-music'); 
+        const musicIcon = document.getElementById('music-icon');
 
         window.addEventListener('DOMContentLoaded', () => {
             const savedMusic = localStorage.getItem('bmaMusicState');
             if (savedMusic === null || savedMusic === 'playing') {
                 localStorage.setItem('bmaMusicState', 'playing');
                 musicIcon.innerText = "🔊";
-                audio.play().catch(() => { console.log("Waiting for interaction..."); });
+                audio.play().catch(() => { console.log("Waiting for user interaction..."); });
             } else {
-                audio.pause(); musicIcon.innerText = "🔇";
+                audio.pause();
+                musicIcon.innerText = "🔇";
             }
         });
 
@@ -258,14 +264,21 @@
         }
 
         function nextTrack(e) { 
-            if(e) e.stopPropagation(); currentIdx = (currentIdx + 1) % tracks.length; 
-            audio.src = tracks[currentIdx].url; document.getElementById('track-name').innerText = tracks[currentIdx].name; 
-            audio.play(); musicIcon.innerText="🔊"; localStorage.setItem('bmaMusicState', 'playing');
+            if(e) e.stopPropagation(); 
+            currentIdx = (currentIdx + 1) % tracks.length; 
+            audio.src = tracks[currentIdx].url; 
+            document.getElementById('track-name').innerText = tracks[currentIdx].name; 
+            audio.play(); 
+            musicIcon.innerText="🔊"; 
+            localStorage.setItem('bmaMusicState', 'playing');
         }
 
         function tryAutoPlay() { 
             const state = localStorage.getItem('bmaMusicState');
-            if(state === 'playing' && audio.paused) { audio.play().then(() => musicIcon.innerText = "🔊").catch(() => {}); }
+            // ΜΟΝΟ ΑΝ το state είναι 'playing' προσπαθούμε να ξεκινήσουμε
+            if(state === 'playing' && audio.paused) { 
+                audio.play().then(() => { musicIcon.innerText = "🔊"; }).catch(() => {}); 
+            }
         }
 
         setInterval(() => { document.getElementById('clock').innerText = "SERVER TIME: " + new Date().toLocaleTimeString('el-GR', {timeZone:'UTC', hour12:false}) + " UTC"; }, 1000);
