@@ -2,175 +2,171 @@
 <html lang="el">
 <head>
     <meta charset="UTF-8">
-    <title>BMA | Admin Control</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <title>BMA | Advanced Command Center</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <style>
-        :root { --gold: #d4af37; --bg: #0f1113; --card: #1a1d21; --blue: #00d9ff; --red: #ff4444; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: #e0e0e0; margin: 0; }
-        nav { background: #000; padding: 15px; display: flex; justify-content: center; gap: 15px; border-bottom: 2px solid var(--gold); }
-        nav button { background: none; border: 1px solid #333; color: #888; padding: 10px 20px; cursor: pointer; font-family: 'Cinzel'; }
-        nav button.active { color: var(--gold); border-color: var(--gold); }
-        .container { padding: 20px; max-width: 1000px; margin: 0 auto; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        .card { background: var(--card); border-radius: 8px; padding: 20px; margin-bottom: 20px; border: 1px solid #333; }
-        h2 { font-family: 'Cinzel'; color: var(--gold); margin-top: 0; }
-        .btn { background: var(--gold); color: #000; border: none; padding: 12px; font-weight: bold; cursor: pointer; border-radius: 4px; font-family: 'Cinzel'; width: 100%; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #222; }
-        .cp-box { display: flex; align-items: center; gap: 10px; padding: 10px; border: 1px solid #333; border-radius: 5px; cursor: pointer; margin-bottom: 5px; }
-        .cp-box.selected { border-color: var(--gold); background: rgba(212,175,55,0.1); }
-        input[type="text"], select, textarea { width: 100%; padding: 10px; background: #000; border: 1px solid #444; color: #fff; margin: 5px 0; }
+        body { background: #0a0c0f; color: #eee; font-family: sans-serif; padding: 20px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .card { background: #15181c; border: 1px solid var(--gold); padding: 20px; border-radius: 8px; border-top: 3px solid #d4af37; }
+        h2 { font-family: 'Cinzel'; color: #d4af37; margin-top: 0; }
+        input, select, textarea { width: 100%; padding: 10px; margin: 10px 0; background: #000; color: #fff; border: 1px solid #444; }
+        .btn { background: #d4af37; color: #000; font-weight: bold; padding: 10px; border: none; cursor: pointer; width: 100%; font-family: 'Cinzel'; }
+        .event-grid { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+        .cp-select-item { background: #222; padding: 10px; margin: 5px; border-radius: 4px; display: inline-block; cursor: pointer; }
+        .cp-select-item.selected { background: #d4af37; color: #000; }
     </style>
 </head>
 <body>
 
-<nav>
-    <button onclick="showTab('tab-points')" id="btn-points" class="active">PONTOS</button>
-    <button onclick="showTab('tab-roster')" id="btn-roster">ROSTER</button>
-    <button onclick="showTab('tab-new')" id="btn-new">NEW CP</button>
-</nav>
-
-<div class="container">
-    <div id="tab-points" class="tab-content active">
+    <div class="grid">
         <div class="card">
-            <h2>1. SELECT EVENT</h2>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <select id="event-boss">
-                    <option>Valakas</option><option>Antharas</option><option>Baium</option>
-                    <option>Frintezza</option><option>Zaken</option><option>Orfen</option>
-                    <option>Ant Queen</option><option>Core</option><option>Siege</option>
-                </select>
-                <select id="event-mult">
-                    <option value="1">Points x1</option>
-                    <option value="2">Points x2</option>
-                    <option value="3">Points x3</option>
-                </select>
-            </div>
-        </div>
-        <div class="card">
-            <h2>2. SELECT PARTICIPATING CPs</h2>
-            <div id="attendance-list"></div>
-            <button class="btn" style="margin-top:20px; background: #28a745; color: #fff;" onclick="submitPoints()">SUBMIT POINTS</button>
-        </div>
-    </div>
-
-    <div id="tab-roster" class="tab-content">
-        <div class="card">
-            <h2>CURRENT ROSTER</h2>
-            <table>
-                <thead><tr><th>Name</th><th>Clan</th><th>Points</th><th>Actions</th></tr></thead>
-                <tbody id="roster-body"></tbody>
-            </table>
-        </div>
-    </div>
-
-    <div id="tab-new" class="tab-content">
-        <div class="card">
-            <h2>REGISTER NEW CP / CALLER</h2>
-            <input type="text" id="cp-name" placeholder="CP/Caller Name">
+            <h2>1. CP SETUP & ROSTERS</h2>
+            <input type="text" id="cp-name" placeholder="CP Name (π.χ. Noldor Archer)">
+            <input type="text" id="cp-leader" placeholder="CP Leader Name">
             <select id="cp-clan">
-                <option value="noldor">NOLDOR</option>
-                <option value="kriminalides">KRIMINALIDES</option>
-                <option value="caller">CALLER</option>
-                <option value="history">HISTORY</option>
+                <option value="noldor">Noldor</option>
+                <option value="kriminalides">Kriminalides</option>
+                <option value="caller">Callers</option>
             </select>
-            <textarea id="cp-members" placeholder="Members (comma separated)"></textarea>
-            <button class="btn" onclick="saveCP()">SAVE CP</button>
+            <textarea id="cp-roster" rows="4" placeholder="Members (Member1, Member2...)"></textarea>
+            <input type="number" id="cp-start-points" placeholder="Starting Points (για παλιά CP)">
+            <button class="btn" onclick="saveCP()">SAVE / UPDATE CP</button>
+        </div>
+
+        <div class="card">
+            <h2>2. LOG DAILY EVENT</h2>
+            <select id="event-type">
+                <option value="1">Mid Epic (QA/Zaken/Orfen/Core/Frin) - x1</option>
+                <option value="2">Baium - x2</option>
+                <option value="3">Siege / Valakas / Antharas - x3</option>
+            </select>
+            <div id="cp-check-list" class="event-grid">
+                </div>
+            <button class="btn" style="background:#28a745; color:white;" onclick="submitEvent()">LOG EVENT & ADD POINTS</button>
+        </div>
+
+        <div class="card">
+            <h2>3. LOOT & MARKETPLACE</h2>
+            <select id="loot-cp-id"></select>
+            <input type="text" id="loot-item" placeholder="Item Name (π.χ. Baium Ring)">
+            <input type="number" id="loot-cost" placeholder="Points Cost (π.χ. 950)">
+            <input type="date" id="loot-date">
+            <button class="btn" style="background:#dc3545; color:white;" onclick="addLoot()">REGISTER LOOT</button>
+        </div>
+
+        <div class="card">
+            <h2>4. ARCHIVE CP (LEAVERS)</h2>
+            <select id="archive-cp-id"></select>
+            <button class="btn" style="background:#555; color:white;" onclick="archiveCP()">MOVE TO HISTORY.HTML</button>
         </div>
     </div>
-</div>
 
 <script>
-    const firebaseConfig = {
-        apiKey: "AIzaSyDRL8EehxdcgVYJ0LJ1khVYkSJcaCMKRes",
-        authDomain: "brokenmirrordb.firebaseapp.com",
-        databaseURL: "https://brokenmirrordb-default-rtdb.europe-west1.firebasedatabase.app",
-        projectId: "brokenmirrordb",
-        storageBucket: "brokenmirrordb.firebasestorage.app",
+    // Firebase Config (Το ίδιο που είχαμε)
+    const firebaseConfig = { 
+        apiKey: "AIzaSyDRL8EehxdcgVYJ0LJ1khVYkSJcaCMKRes", 
+        databaseURL: "https://brokenmirrordb-default-rtdb.europe-west1.firebasedatabase.app" 
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
-    let allCPs = {};
-    let selectedForPoints = new Set();
 
-    db.ref('cps/').on('value', s => {
-        allCPs = s.val() || {};
-        renderAll();
-    });
-
-    function showTab(id) {
-        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        document.getElementById('btn-' + id.replace('tab-', '')).classList.add('active');
-    }
-
-    function renderAll() {
-        // Render Roster
-        const rBody = document.getElementById('roster-body');
-        rBody.innerHTML = "";
-        // Render Attendance Selection
-        const aList = document.getElementById('attendance-list');
-        aList.innerHTML = "";
-
-        Object.keys(allCPs).forEach(id => {
-            const cp = allCPs[id];
-            // Table
-            rBody.innerHTML += `<tr>
-                <td><b>${id}</b></td>
-                <td>${cp.clan}</td>
-                <td>${cp.totalPoints || 0}</td>
-                <td><button onclick="deleteCP('${id}')" style="background:red; color:white; border:none; padding:5px;">X</button></td>
-            </tr>`;
-
-            // Selection Boxes
-            if(cp.clan !== 'history') {
-                const div = document.createElement('div');
-                div.className = `cp-box ${selectedForPoints.has(id) ? 'selected' : ''}`;
-                div.innerHTML = `<span>${id} (${cp.clan})</span>`;
-                div.onclick = () => {
-                    if(selectedForPoints.has(id)) selectedForPoints.delete(id);
-                    else selectedForPoints.add(id);
-                    renderAll();
-                };
-                aList.appendChild(div);
-            }
-        });
-    }
-
-    function submitPoints() {
-        const boss = document.getElementById('event-boss').value;
-        const mult = parseInt(document.getElementById('event-mult').value);
-        if(selectedForPoints.size === 0) return alert("Select at least one CP!");
-        
-        const updates = {};
-        const winners = [];
-        selectedForPoints.forEach(id => {
-            const cp = allCPs[id];
-            const memberCount = cp.clan === 'caller' ? 1 : cp.members.split(',').length;
-            const ptsToAdd = memberCount * mult;
-            updates[`cps/${id}/totalPoints`] = (cp.totalPoints || 0) + ptsToAdd;
-            winners.push(`${id} (+${ptsToAdd})`);
-        });
-
-        db.ref().update(updates);
-        db.ref('logs/').push({ boss, winners, date: new Date().toLocaleString() });
-        selectedForPoints.clear();
-        alert("Points Submitted!");
-    }
-
+    // 1. ΣΥΝΑΡΤΗΣΗ SAVE CP
     function saveCP() {
         const name = document.getElementById('cp-name').value;
-        const clan = document.getElementById('cp-clan').value;
-        const members = document.getElementById('cp-members').value;
-        if(!name) return;
-        db.ref('cps/' + name).set({ name, clan, members, totalPoints: 0 });
+        const startPoints = parseInt(document.getElementById('cp-start-points').value) || 0;
+        const id = name.replace(/\s+/g, '-').toLowerCase();
+
+        db.ref('cps/' + id).update({
+            name: name,
+            leader: document.getElementById('cp-leader').value,
+            clan: document.getElementById('cp-clan').value,
+            members: document.getElementById('cp-roster').value,
+            startingPoints: startPoints,
+            // Αν είναι καινούργιο, βάλε τα starting points ως σύνολο
+            totalPoints: startPoints 
+        });
+        alert("CP Saved!");
     }
 
-    function deleteCP(id) { if(confirm("Delete?")) db.ref('cps/' + id).remove(); }
+    // 2. ΦΟΡΤΩΣΗ CP ΓΙΑ ΤΑ DROPDOWNS
+    db.ref('cps/').on('value', snap => {
+        const data = snap.val();
+        const checkList = document.getElementById('cp-check-list');
+        const lootSelect = document.getElementById('loot-cp-id');
+        const archiveSelect = document.getElementById('archive-cp-id');
+        
+        checkList.innerHTML = "";
+        lootSelect.innerHTML = "";
+        archiveSelect.innerHTML = "";
+
+        Object.keys(data).forEach(id => {
+            if(data[id].clan === 'history') return;
+            
+            // Για το Event Logging
+            checkList.innerHTML += `<div class="cp-select-item" onclick="this.classList.toggle('selected')" data-id="${id}">${data[id].name}</div>`;
+            
+            // Για τα Dropdowns
+            const opt = `<option value="${id}">${data[id].name}</option>`;
+            lootSelect.innerHTML += opt;
+            archiveSelect.innerHTML += opt;
+        });
+    });
+
+    // 3. LOG EVENT & CALCULATE POINTS
+    function submitEvent() {
+        const multiplier = parseInt(document.getElementById('event-type').value);
+        const selectedCPs = document.querySelectorAll('.cp-select-item.selected');
+        
+        selectedCPs.forEach(item => {
+            const cpId = item.getAttribute('data-id');
+            const ref = db.ref('cps/' + cpId + '/totalPoints');
+            
+            ref.transaction(currentPoints => {
+                return (currentPoints || 0) + (1 * multiplier);
+            });
+
+            // Log event for Hall of Fame
+            db.ref('events/').push({
+                cpId: cpId,
+                type: multiplier, // 1, 2, or 3
+                date: Date.now()
+            });
+        });
+        alert("Event Logged!");
+    }
+
+    // 4. ARCHIVE CP (Μεταφορά στο History)
+    function archiveCP() {
+        const id = document.getElementById('archive-cp-id').value;
+        db.ref('cps/' + id).once('value', snap => {
+            const data = snap.val();
+            data.clan = 'history'; // Αλλάζουμε το clan σε history
+            db.ref('history_archive/' + id).set(data); // Το στέλνουμε στο αρχείο
+            db.ref('cps/' + id).remove(); // Το σβήνουμε από τα ενεργά
+            alert("Moved to History!");
+        });
+    }
+
+    // 5. REGISTER LOOT
+    function addLoot() {
+        const cpId = document.getElementById('loot-cp-id').value;
+        const cost = parseInt(document.getElementById('loot-cost').value);
+        const item = document.getElementById('loot-item').value;
+        const date = document.getElementById('loot-date').value;
+
+        // Αφαίρεση πόντων
+        db.ref('cps/' + cpId + '/totalPoints').transaction(p => p - cost);
+        
+        // Καταγραφή στο ιστορικό του CP
+        db.ref('cps/' + cpId + '/lootHistory').push({
+            item: item,
+            cost: cost,
+            date: date
+        });
+        alert("Loot Registered!");
+    }
 </script>
 </body>
 </html>
