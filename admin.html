@@ -9,13 +9,14 @@
     <style>
         :root { --gold: #d4af37; --dark: #0a0c0f; }
         body { font-family: 'Open Sans', sans-serif; background: var(--dark); color: #eee; margin: 0; padding: 20px; }
-        .admin-wrapper { max-width: 1200px; margin: 0 auto; background: rgba(255,255,255,0.02); border: 1px solid #333; border-radius: 15px; padding: 30px; }
+        .admin-wrapper { max-width: 1300px; margin: 0 auto; background: rgba(255,255,255,0.02); border: 1px solid #333; border-radius: 15px; padding: 30px; }
         h2 { font-family: 'Cinzel'; color: var(--gold); text-align: center; border-bottom: 2px solid var(--gold); padding-bottom: 10px; }
         
-        .admin-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid #444; padding-bottom: 10px; }
-        .admin-tab-btn { background: #222; border: 1px solid #444; color: #888; padding: 10px 20px; cursor: pointer; font-family: 'Cinzel'; }
-        .admin-tab-btn.active { border-color: var(--gold); color: var(--gold); background: rgba(212,175,55,0.1); }
+        /* LOOT SYSTEM UI */
+        .loot-dist-box { background: rgba(212,175,55,0.1); border: 1px solid var(--gold); padding: 20px; border-radius: 10px; margin-bottom: 30px; display: grid; grid-template-columns: 2fr 2fr 1fr 1fr; gap: 15px; align-items: end; }
+        .loot-dist-box h3 { grid-column: 1 / -1; margin: 0 0 10px 0; font-family: 'Cinzel'; color: var(--gold); font-size: 1rem; }
 
+        /* CP LISTING */
         .cp-card { background: #15181c; border: 1px solid #333; border-left: 5px solid var(--gold); padding: 20px; margin-bottom: 15px; border-radius: 8px; }
         .cp-card.history-mode { border-left-color: #555; opacity: 0.7; }
         .grid-row { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 15px; margin-bottom: 15px; }
@@ -24,11 +25,13 @@
         .stat-input-group { text-align: center; }
         .stat-input-group label { font-size: 10px; color: var(--gold); display: block; margin-bottom: 3px; }
         
-        input, select, textarea { background: #000; border: 1px solid #444; color: #fff; padding: 8px; border-radius: 4px; width: 100%; box-sizing: border-box; }
-        .btn-save { background: var(--gold); color: #000; border: none; padding: 10px 20px; cursor: pointer; font-weight: bold; font-family: 'Cinzel'; border-radius: 4px; }
+        input, select { background: #000; border: 1px solid #444; color: #fff; padding: 10px; border-radius: 4px; width: 100%; box-sizing: border-box; }
+        .btn-gold { background: var(--gold); color: #000; border: none; padding: 12px; cursor: pointer; font-weight: bold; font-family: 'Cinzel'; border-radius: 4px; }
         .btn-delete { background: #722; color: #fff; border: none; padding: 5px 10px; cursor: pointer; font-size: 11px; margin-top: 10px; border-radius: 4px; }
         
-        .add-new-section { background: rgba(212,175,55,0.05); border: 1px dashed var(--gold); padding: 20px; border-radius: 10px; margin-top: 40px; }
+        .tab-nav { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab-btn { background: #222; border: 1px solid #444; color: #888; padding: 8px 15px; cursor: pointer; border-radius: 4px; }
+        .tab-btn.active { border-color: var(--gold); color: var(--gold); }
     </style>
 </head>
 <body>
@@ -36,143 +39,152 @@
 <div class="admin-wrapper">
     <h2>ALLIANCE COMMAND CENTER</h2>
 
-    <div class="admin-tabs">
-        <button class="admin-tab-btn active" onclick="filterClan('all', this)">ALL CPs</button>
-        <button class="admin-tab-btn" onclick="filterClan('noldor', this)">NOLDOR</button>
-        <button class="admin-tab-btn" onclick="filterClan('krim', this)">KRIMINALIDES</button>
-        <button class="admin-tab-btn" onclick="filterClan('history', this)">HISTORY (LEAVERS)</button>
+    <div class="loot-dist-box">
+        <h3>快速 DISTRIBUTE LOOT (AUTOMATIC PTS DEDUCTION)</h3>
+        <div>
+            <label style="font-size:11px;">SELECT CP</label>
+            <select id="dist-cp-id"></select>
+        </div>
+        <div>
+            <label style="font-size:11px;">ITEM NAME (Matches Marketplace)</label>
+            <input type="text" id="dist-item-name" placeholder="e.g. Baium Ring" list="item-list">
+            <datalist id="item-list">
+                <option value="Valakas Necklace">
+                <option value="Antharas Earring">
+                <option value="Baium Ring">
+                <option value="Zaken Earring">
+                <option value="Frintezza Necklace">
+                <option value="Queen Ant Ring">
+                <option value="Orfen Earring">
+                <option value="Core Ring">
+            </datalist>
+        </div>
+        <div>
+            <label style="font-size:11px;">DATE</label>
+            <input type="text" id="dist-date" placeholder="DD/MM/YYYY">
+        </div>
+        <button class="btn-gold" onclick="distributeLoot()">ASSIGN LOOT</button>
     </div>
 
-    <div id="cp-list">
-        </div>
+    <div class="tab-nav">
+        <button class="tab-btn active" onclick="setFilter('all', this)">ALL CPs</button>
+        <button class="tab-btn" onclick="setFilter('noldor', this)">NOLDOR</button>
+        <button class="tab-btn" onclick="setFilter('krim', this)">KRIM</button>
+        <button class="tab-btn" onclick="setFilter('history', this)">HISTORY</button>
+    </div>
 
-    <div class="add-new-section">
-        <h3 style="font-family:'Cinzel'; color:var(--gold); margin-top:0;">ADD NEW COMBAT PARTY</h3>
-        <div class="grid-row">
-            <input type="text" id="new-name" placeholder="CP Name">
-            <select id="new-clan">
-                <option value="noldor">Noldor Clan</option>
-                <option value="krim">Kriminalides Clan</option>
-                <option value="caller">Shot Caller</option>
-                <option value="history">History (Archive)</option>
-            </select>
-            <input type="text" id="new-leader" placeholder="CP Leader Name">
-            <button class="btn-save" onclick="addNewCP()">CREATE CP</button>
-        </div>
+    <div id="cp-list"></div>
+
+    <div class="loot-dist-box" style="margin-top:40px; border-style: dashed;">
+        <h3>ADD NEW CP TO DATABASE</h3>
+        <input type="text" id="new-name" placeholder="CP Name">
+        <select id="new-clan">
+            <option value="noldor">Noldor</option>
+            <option value="krim">Kriminalides</option>
+            <option value="caller">Shot Caller</option>
+            <option value="history">History</option>
+        </select>
+        <button class="btn-gold" onclick="addNewCP()">CREATE NEW</button>
     </div>
 </div>
 
 <script>
-    const firebaseConfig = { 
-        apiKey: "AIzaSyDRL8EehxdcgVYJ0LJ1khVYkSJcaCMKRes", 
-        authDomain: "brokenmirrordb.firebaseapp.com", 
-        databaseURL: "https://brokenmirrordb-default-rtdb.europe-west1.firebasedatabase.app", 
-        projectId: "brokenmirrordb" 
-    };
+    const firebaseConfig = { apiKey: "AIzaSyDRL8EehxdcgVYJ0LJ1khVYkSJcaCMKRes", authDomain: "brokenmirrordb.firebaseapp.com", databaseURL: "https://brokenmirrordb-default-rtdb.europe-west1.firebasedatabase.app", projectId: "brokenmirrordb" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
+
+    const prices = { "Valakas Necklace": 3100, "Antharas Earring": 1100, "Baium Ring": 950, "Zaken Earring": 175, "Frintezza Necklace": 225, "Queen Ant Ring": 150, "Orfen Earring": 75, "Core Ring": 25 };
     let currentFilter = 'all';
 
-    function filterClan(clan, btn) {
-        currentFilter = clan;
-        document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.remove('active'));
+    function setFilter(f, btn) {
+        currentFilter = f;
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        loadCPs();
+        render();
     }
 
-    function loadCPs() {
-        db.ref('cps/').on('value', (snapshot) => {
-            const data = snapshot.val() || {};
-            const container = document.getElementById('cp-list');
-            container.innerHTML = "";
+    function render() {
+        db.ref('cps/').on('value', (snap) => {
+            const data = snap.val() || {};
+            const list = document.getElementById('cp-list');
+            const select = document.getElementById('dist-cp-id');
+            list.innerHTML = "";
+            select.innerHTML = '<option value="">-- Select CP --</option>';
 
             Object.keys(data).forEach(id => {
                 const cp = data[id];
+                // Fill Select Dropdown
+                if(cp.clan !== 'history') select.innerHTML += `<option value="${id}">${cp.name}</option>`;
+
+                // Fill List with Filter
                 if (currentFilter !== 'all' && cp.clan !== currentFilter) return;
 
                 const card = document.createElement('div');
                 card.className = `cp-card ${cp.clan === 'history' ? 'history-mode' : ''}`;
-                
                 card.innerHTML = `
                     <div class="grid-row">
-                        <div>
-                            <label style="font-size:11px; color:#888;">CP NAME</label>
-                            <input type="text" value="${cp.name}" onchange="updateValue('${id}', 'name', this.value)">
-                        </div>
-                        <div>
-                            <label style="font-size:11px; color:#888;">CLAN / STATUS</label>
-                            <select onchange="updateValue('${id}', 'clan', this.value)">
-                                <option value="noldor" ${cp.clan==='noldor'?'selected':''}>Noldor</option>
-                                <option value="krim" ${cp.clan==='krim'?'selected':''}>Kriminalides</option>
-                                <option value="caller" ${cp.clan==='caller'?'selected':''}>Shot Caller</option>
-                                <option value="history" ${cp.clan==='history'?'selected':''}>History</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label style="font-size:11px; color:#888;">TOTAL POINTS</label>
-                            <input type="number" value="${cp.totalPoints || 0}" onchange="updateValue('${id}', 'totalPoints', parseInt(this.value))">
-                        </div>
-                        <div>
-                            <label style="font-size:11px; color:#888;">LEADER</label>
-                            <input type="text" value="${cp.leader || ''}" onchange="updateValue('${id}', 'leader', this.value)">
-                        </div>
+                        <input type="text" value="${cp.name}" onchange="update('${id}', 'name', this.value)">
+                        <select onchange="update('${id}', 'clan', this.value)">
+                            <option value="noldor" ${cp.clan==='noldor'?'selected':''}>Noldor</option>
+                            <option value="krim" ${cp.clan==='krim'?'selected':''}>Krim</option>
+                            <option value="caller" ${cp.clan==='caller'?'selected':''}>Shot Caller</option>
+                            <option value="history" ${cp.clan==='history'?'selected':''}>History</option>
+                        </select>
+                        <input type="number" value="${cp.totalPoints || 0}" onchange="update('${id}', 'totalPoints', parseInt(this.value))">
+                        <input type="text" value="${cp.leader || ''}" placeholder="Leader" onchange="update('${id}', 'leader', this.value)">
                     </div>
-
-                    <div style="margin-bottom:15px;">
-                        <label style="font-size:11px; color:#888;">ROSTER MEMBERS</label>
-                        <input type="text" value="${cp.members || ''}" placeholder="Member1, Member2, Member3..." onchange="updateValue('${id}', 'members', this.value)">
-                    </div>
-
+                    <input type="text" value="${cp.members || ''}" placeholder="Roster members..." style="margin-bottom:10px;" onchange="update('${id}', 'members', this.value)">
                     <div class="stats-grid">
-                        ${['VAL','ANT','BAI','FRI','ZAK','AQ','ORF','COR','SIE'].map(boss => `
+                        ${['VAL','ANT','BAI','FRI','ZAK','AQ','ORF','COR','SIE'].map(b => `
                             <div class="stat-input-group">
-                                <label>${boss}</label>
-                                <input type="number" value="${(cp.bossStats && cp.bossStats[boss]) ? cp.bossStats[boss] : 0}" 
-                                       onchange="updateBossStat('${id}', '${boss}', this.value)">
+                                <label>${b}</label>
+                                <input type="number" value="${(cp.bossStats && cp.bossStats[b]) ? cp.bossStats[b] : 0}" onchange="updateStat('${id}', '${b}', this.value)">
                             </div>
                         `).join('')}
                     </div>
-
-                    <button class="btn-delete" onclick="deleteCP('${id}')">DELETE CP PERMANENTLY</button>
+                    <button class="btn-delete" onclick="removeCP('${id}')">DELETE CP</button>
                 `;
-                container.appendChild(card);
+                list.appendChild(card);
             });
         });
     }
 
-    function updateValue(id, field, val) {
-        db.ref('cps/' + id).update({ [field]: val });
-    }
+    function update(id, field, val) { db.ref('cps/' + id).update({ [field]: val }); }
+    function updateStat(id, b, val) { db.ref(`cps/${id}/bossStats`).update({ [b]: parseInt(val) }); }
 
-    function updateBossStat(id, boss, val) {
-        db.ref(`cps/${id}/bossStats`).update({ [boss]: parseInt(val) });
+    function distributeLoot() {
+        const id = document.getElementById('dist-cp-id').value;
+        const item = document.getElementById('dist-item-name').value;
+        const date = document.getElementById('dist-date').value || new Date().toLocaleDateString('el-GR');
+        const cost = prices[item] || 0;
+
+        if(!id || !item) return alert("Select CP and Item!");
+
+        db.ref('cps/' + id).once('value', snap => {
+            const cp = snap.val();
+            const newPts = (cp.totalPoints || 0) - cost;
+            const history = cp.lootHistory || [];
+            history.push({ item: item, cost: cost, date: date });
+            
+            db.ref('cps/' + id).update({
+                totalPoints: newPts,
+                lootHistory: history
+            });
+            alert(`Loot Assigned! ${item} (-${cost} pts)`);
+        });
     }
 
     function addNewCP() {
         const name = document.getElementById('new-name').value;
         const clan = document.getElementById('new-clan').value;
-        const leader = document.getElementById('new-leader').value;
-        if(!name) return alert("Enter CP Name");
-
-        db.ref('cps/').push({
-            name: name,
-            clan: clan,
-            leader: leader,
-            totalPoints: 0,
-            members: "",
-            bossStats: { VAL:0, ANT:0, BAI:0, FRI:0, ZAK:0, AQ:0, ORF:0, COR:0, SIE:0 }
-        });
-        document.getElementById('new-name').value = "";
+        if(!name) return;
+        db.ref('cps/').push({ name: name, clan: clan, totalPoints: 0, bossStats: { VAL:0, ANT:0, BAI:0, FRI:0, ZAK:0, AQ:0, ORF:0, COR:0, SIE:0 } });
     }
 
-    function deleteCP(id) {
-        if(confirm("Are you sure? This cannot be undone.")) {
-            db.ref('cps/' + id).remove();
-        }
-    }
-
-    loadCPs();
+    function removeCP(id) { if(confirm("Delete?")) db.ref('cps/' + id).remove(); }
+    
+    document.getElementById('dist-date').value = new Date().toLocaleDateString('el-GR');
+    render();
 </script>
-
 </body>
 </html>
