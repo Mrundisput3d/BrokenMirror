@@ -2,98 +2,105 @@
 <html lang="el">
 <head>
     <meta charset="UTF-8">
-    <title>BMA | Intelligence Command Center</title>
+    <title>BMA | Supreme Intelligence Admin</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <style>
-        :root { --gold: #d4af37; --bg: #0a0c0f; --card: #15181c; --red: #ff4444; --green: #28a745; }
-        body { background: var(--bg); color: #eee; font-family: 'Open Sans', sans-serif; margin: 0; padding: 20px; }
-        h1, h2 { font-family: 'Cinzel'; color: var(--gold); text-align: center; }
-        
-        .layout { display: grid; grid-template-columns: 400px 1fr; gap: 20px; }
+        :root { --gold: #d4af37; --bg: #0a0c0f; --card: #15181c; --red: #ff4444; --green: #28a745; --blue: #3498db; }
+        body { background: var(--bg); color: #eee; font-family: 'Open Sans', sans-serif; margin: 0; padding: 20px; font-size: 14px; }
+        h1, h2 { font-family: 'Cinzel'; color: var(--gold); text-align: center; margin: 10px 0; }
+        .layout { display: grid; grid-template-columns: 380px 1fr; gap: 20px; }
         .panel { background: var(--card); border: 1px solid #333; padding: 15px; border-radius: 10px; border-top: 3px solid var(--gold); }
         
-        /* SEARCH AREA */
-        #mass-input { width: 100%; height: 150px; background: #000; color: var(--green); border: 1px solid #444; padding: 10px; font-family: monospace; }
-        .match-result { background: #222; padding: 10px; margin-top: 10px; border-radius: 5px; border-left: 4px solid var(--green); }
+        /* SEARCH & MATCHING */
+        #mass-input { width: 100%; height: 120px; background: #000; color: var(--green); border: 1px solid #444; padding: 10px; font-family: monospace; border-radius: 5px; }
+        .match-card { background: #000; border: 1px solid #444; padding: 10px; margin-top: 10px; border-radius: 5px; border-left: 4px solid var(--green); }
         
-        /* CP LIST & SELECTION */
-        .cp-item { background: #000; padding: 10px; margin-bottom: 5px; border-radius: 5px; border: 1px solid #222; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-        .cp-item.active-event { border-color: var(--green); background: rgba(40, 167, 69, 0.1); }
+        /* CP LIST */
+        .cp-item { background: #000; padding: 10px; margin-bottom: 5px; border-radius: 5px; border: 1px solid #222; display: flex; justify-content: space-between; cursor: pointer; }
+        .cp-item:hover { border-color: var(--gold); }
+        .cp-item.matched { border-color: var(--green); background: rgba(40, 167, 69, 0.1); }
         .cp-item.selected { border: 2px solid var(--gold); }
 
         /* BOSS GRID */
-        .boss-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 20px 0; }
-        .boss-btn { background: #000; border: 1px solid #444; padding: 10px; text-align: center; cursor: pointer; border-radius: 5px; }
-        .boss-btn:hover { border-color: var(--gold); }
-        .boss-btn img { width: 30px; }
+        .boss-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 15px 0; }
+        .boss-btn { background: #222; border: 1px solid #444; padding: 8px; text-align: center; cursor: pointer; border-radius: 5px; transition: 0.2s; }
+        .boss-btn:hover { border-color: var(--gold); background: #333; }
+        .boss-btn img { width: 30px; display: block; margin: 0 auto 5px; }
+        .boss-btn span { font-size: 0.65rem; color: var(--gold); font-weight: bold; }
 
+        input, select, textarea { width: 100%; padding: 8px; margin: 5px 0; background: #000; color: #fff; border: 1px solid #444; border-radius: 4px; box-sizing: border-box; }
         .btn { width: 100%; padding: 10px; border: none; border-radius: 4px; cursor: pointer; font-family: 'Cinzel'; font-weight: bold; margin-top: 5px; }
         .btn-gold { background: var(--gold); color: #000; }
         .btn-red { background: var(--red); color: #fff; }
-        
+        .btn-blue { background: var(--blue); color: #fff; }
+
         .stat-edit { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-top: 10px; }
-        .stat-input { background: #000; color: #fff; border: 1px solid #444; padding: 3px; text-align: center; width: 50px; }
+        .stat-input-group { background: #222; padding: 5px; border-radius: 3px; text-align: center; font-size: 0.7rem; }
     </style>
 </head>
 <body>
 
-    <h1>BMA INTELLIGENCE ADMIN</h1>
+    <h1>BMA SUPREME ADMIN V5</h1>
 
     <div class="layout">
-        
         <div class="panel">
-            <h2>1. CP LIST</h2>
-            <div id="cp-list-container"></div>
+            <h2>CP LIST & NEW</h2>
+            <div id="cp-list-container" style="max-height: 400px; overflow-y: auto;"></div>
             
-            <hr style="border-color:#333; margin:20px 0;">
-            
-            <h3>CREATE NEW</h3>
-            <input type="text" id="new-name" placeholder="Name">
+            <hr style="border-color:#333; margin:15px 0;">
+            <h3>CREATE CP / CALLER</h3>
+            <input type="text" id="new-name" placeholder="CP Name (e.g. Noldor Archer)">
+            <input type="text" id="new-leader" placeholder="Leader Name">
             <select id="new-clan">
-                <option value="noldor">Noldor</option>
-                <option value="kriminalides">Kriminalides</option>
-                <option value="caller">Caller</option>
+                <option value="noldor">Noldor Clan</option>
+                <option value="kriminalides">Kriminalides Clan</option>
+                <option value="caller">Leader / Caller</option>
             </select>
-            <button class="btn btn-gold" onclick="createNewCP()">CREATE CP</button>
+            <button class="btn btn-gold" onclick="createNewCP()">+ CREATE NEW</button>
         </div>
 
         <div class="panel">
-            <h2>2. SMART EVENT LOGGER</h2>
-            <label>Paste Names from Game/Discord:</label>
-            <textarea id="mass-input" placeholder="Mitsos&#10;Kostas&#10;Giorgos..." oninput="findCPsFromNames()"></textarea>
+            <h2>INTELLIGENT EVENT LOGGER</h2>
+            <label style="font-size:0.8rem; color:#888;">Paste Names from Game/Discord:</label>
+            <textarea id="mass-input" placeholder="Mitsos&#10;Kostas..." oninput="analyzeAttendance()"></textarea>
             
-            <div id="search-results" class="match-result">
-                Detected CPs: <span id="detected-count" style="color:var(--gold); font-weight:bold;">0</span>
-                <div id="detected-list" style="margin-top:10px; font-size:0.8rem;"></div>
+            <div id="attendance-report" class="match-card" style="display:none;">
+                <b>Detected Attendance:</b>
+                <div id="detected-details" style="font-size: 0.85rem; margin-top:5px;"></div>
             </div>
 
             <div class="boss-grid">
-                <div class="boss-btn" onclick="logEvent('VAL', 3)"><img src="https://i.ibb.co/84gZPVRP/necklace-valakas.png"><span>x3</span></div>
-                <div class="boss-btn" onclick="logEvent('ANT', 3)"><img src="https://i.ibb.co/rfqvc6mv/earring-antharas.png"><span>x3</span></div>
-                <div class="boss-btn" onclick="logEvent('BAI', 2)"><img src="https://i.ibb.co/XrZkv67h/ring-of-baium.png"><span>x2</span></div>
-                <div class="boss-btn" onclick="logEvent('SIE', 3)"><img src="https://i.ibb.co/Txfby6wD/images.png"><span>x3</span></div>
-                <div class="boss-btn" onclick="logEvent('ZAK', 1)"><img src="https://i.ibb.co/spkC6Gzz/zaken-earring.png"><span>x1</span></div>
-                </div>
+                <div class="boss-btn" onclick="logEvent('VAL', 3)"><img src="https://i.ibb.co/84gZPVRP/necklace-valakas.png"><span>VALAKAS x3</span></div>
+                <div class="boss-btn" onclick="logEvent('ANT', 3)"><img src="https://i.ibb.co/rfqvc6mv/earring-antharas.png"><span>ANTHARAS x3</span></div>
+                <div class="boss-btn" onclick="logEvent('BAI', 2)"><img src="https://i.ibb.co/XrZkv67h/ring-of-baium.png"><span>BAIUM x2</span></div>
+                <div class="boss-btn" onclick="logEvent('SIE', 3)"><img src="https://i.ibb.co/Txfby6wD/images.png"><span>SIEGE x3</span></div>
+                <div class="boss-btn" onclick="logEvent('ZAK', 1)"><img src="https://i.ibb.co/spkC6Gzz/zaken-earring.png"><span>ZAKEN x1</span></div>
+                <div class="boss-btn" onclick="logEvent('AQ', 1)"><img src="https://i.ibb.co/rKRtZmBG/ring-of-queen-ant.png"><span>A.QUEEN x1</span></div>
+                <div class="boss-btn" onclick="logEvent('ORF', 1)"><img src="https://i.ibb.co/j9dDnXwH/earring-orfen.png"><span>ORFEN x1</span></div>
+                <div class="boss-btn" onclick="logEvent('COR', 1)"><img src="https://i.ibb.co/ksv37fNZ/ring-of-.png"><span>CORE x1</span></div>
+                <div class="boss-btn" onclick="logEvent('FRI', 1)"><img src="https://i.ibb.co/gF4YKGTM/frintezza-necklace.png"><span>FRIN x1</span></div>
+            </div>
 
-            <hr style="border-color:#333;">
-
-            <div id="edit-section" style="display:none;">
-                <h2 id="edit-title">EDIT CP</h2>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+            <div id="edit-section" style="display:none; border-top: 1px solid #333; padding-top:15px;">
+                <h2 id="edit-title" style="text-align:left;">EDIT CP</h2>
+                <div style="display:grid; grid-template-columns: 1.5fr 1fr; gap:15px;">
                     <div>
-                        <label>Roster</label>
-                        <textarea id="edit-members" rows="6" style="width:100%; background:#000; color:#fff;"></textarea>
+                        <label>Roster (One name per line or comma)</label>
+                        <textarea id="edit-members" rows="8"></textarea>
+                        <button class="btn btn-gold" onclick="updateCP()">SAVE CHANGES</button>
                     </div>
                     <div>
+                        <label>Leader</label>
+                        <input type="text" id="edit-leader">
                         <label>Total Points</label>
-                        <input type="number" id="edit-points" style="width:100%; padding:10px; background:#000; color:#fff;">
+                        <input type="number" id="edit-points">
                         <div class="stat-edit" id="stat-grid"></div>
+                        <button class="btn btn-blue" onclick="moveToHistory()">MOVE TO HISTORY</button>
+                        <button class="btn btn-red" onclick="deleteCP()">DELETE CP</button>
                     </div>
                 </div>
-                <button class="btn btn-gold" onclick="updateCP()">SAVE CHANGES</button>
-                <button class="btn btn-red" onclick="deleteCP()">DELETE CP PERMANENTLY</button>
             </div>
         </div>
     </div>
@@ -104,11 +111,10 @@
     const db = firebase.database();
 
     let allCPs = {};
-    let matchedIDs = [];
+    let attendanceMap = {}; // { cpId: count }
     let currentEditID = null;
     const bossKeys = ['VAL', 'ANT', 'BAI', 'SIE', 'ZAK', 'AQ', 'ORF', 'COR', 'FRI'];
 
-    // 1. FETCH DATA
     db.ref('cps/').on('value', snap => {
         allCPs = snap.val() || {};
         renderCPList();
@@ -121,69 +127,78 @@
             const cp = allCPs[id];
             if(cp.clan === 'history') return;
             const div = document.createElement('div');
-            div.className = `cp-item ${matchedIDs.includes(id) ? 'active-event' : ''} ${currentEditID === id ? 'selected' : ''}`;
-            div.innerHTML = `<span>${cp.name}</span> <b>${cp.totalPoints}</b>`;
+            div.className = `cp-item ${attendanceMap[id] ? 'matched' : ''} ${currentEditID === id ? 'selected' : ''}`;
+            div.innerHTML = `<span>${cp.name} (${attendanceMap[id] || 0})</span> <b>${cp.totalPoints}</b>`;
             div.onclick = () => loadEdit(id);
             container.appendChild(div);
         });
     }
 
-    // 2. SMART SEARCH LOGIC
-    function findCPsFromNames() {
+    // SMART ATTENDANCE LOGIC
+    function analyzeAttendance() {
         const input = document.getElementById('mass-input').value.toLowerCase();
-        const names = input.split('\n').map(n => n.trim()).filter(n => n.length > 0);
-        matchedIDs = [];
+        const rawNames = input.split(/[\n,]+/).map(n => n.trim()).filter(n => n.length > 1);
+        attendanceMap = {};
         
-        if(names.length === 0) { renderCPList(); return; }
-
-        Object.keys(allCPs).forEach(id => {
-            const roster = (allCPs[id].members || "").toLowerCase();
-            const leader = (allCPs[id].leader || "").toLowerCase();
-            
-            // Ψάξε αν κάποιο από τα ονόματα που κάναμε paste υπάρχει στο roster ή στον leader
-            const isMatch = names.some(name => roster.includes(name) || leader.includes(name));
-            if(isMatch) matchedIDs.push(id);
-        });
-
-        document.getElementById('detected-count').innerText = matchedIDs.length;
-        document.getElementById('detected-list').innerText = matchedIDs.map(id => allCPs[id].name).join(', ');
+        if(rawNames.length > 0) {
+            Object.keys(allCPs).forEach(id => {
+                const roster = (allCPs[id].members || "").toLowerCase();
+                const leader = (allCPs[id].leader || "").toLowerCase();
+                let count = 0;
+                rawNames.forEach(name => {
+                    if(roster.includes(name) || leader.includes(name)) count++;
+                });
+                if(count > 0) attendanceMap[id] = count;
+            });
+            document.getElementById('attendance-report').style.display = 'block';
+            document.getElementById('detected-details').innerHTML = Object.keys(attendanceMap)
+                .map(id => `${allCPs[id].name}: <span style="color:var(--gold)">${attendanceMap[id]} members</span>`).join('<br>');
+        } else {
+            document.getElementById('attendance-report').style.display = 'none';
+        }
         renderCPList();
     }
 
-    // 3. LOG EVENT
+    // LOG EVENT WITH MULTIPLIER (Points = Count * Multiplier)
     function logEvent(bossId, multiplier) {
-        if(matchedIDs.length === 0) return alert("No CPs detected!");
-        if(!confirm(`Add ${bossId} (+${multiplier} pts) to ${matchedIDs.length} CPs?`)) return;
+        const ids = Object.keys(attendanceMap);
+        if(ids.length === 0) return alert("No members detected from the pasted list!");
+        
+        if(!confirm(`Apply ${bossId} to ${ids.length} CPs?`)) return;
 
-        matchedIDs.forEach(id => {
+        ids.forEach(id => {
+            const count = attendanceMap[id];
+            const pointsToAdd = count * multiplier;
+            
             db.ref('cps/' + id).transaction(cp => {
                 if(cp) {
                     if(!cp.bossStats) cp.bossStats = {};
-                    cp.bossStats[bossId] = (cp.bossStats[bossId] || 0) + 1;
-                    cp.totalPoints = (cp.totalPoints || 0) + multiplier;
+                    cp.bossStats[bossId] = (cp.bossStats[bossId] || 0) + 1; // +1 participation for CP
+                    cp.totalPoints = (cp.totalPoints || 0) + pointsToAdd; // members * multiplier
                 }
                 return cp;
             });
         });
-        alert("Success!");
+        
+        alert("Success! Points distributed.");
         document.getElementById('mass-input').value = "";
-        matchedIDs = [];
-        renderCPList();
+        attendanceMap = {};
+        analyzeAttendance();
     }
 
-    // 4. EDIT & DELETE
     function loadEdit(id) {
         currentEditID = id;
         const cp = allCPs[id];
         document.getElementById('edit-section').style.display = 'block';
-        document.getElementById('edit-title').innerText = "EDITING: " + cp.name;
+        document.getElementById('edit-title').innerText = "EDIT: " + cp.name;
         document.getElementById('edit-members').value = cp.members || "";
+        document.getElementById('edit-leader').value = cp.leader || "";
         document.getElementById('edit-points').value = cp.totalPoints || 0;
         
         let gridHtml = "";
         bossKeys.forEach(k => {
             const val = (cp.bossStats && cp.bossStats[k]) ? cp.bossStats[k] : 0;
-            gridHtml += `<div>${k}:<br><input type="number" class="stat-input" id="inp-${k}" value="${val}"></div>`;
+            gridHtml += `<div class="stat-input-group">${k}<br><input type="number" class="stat-input" style="width:40px; text-align:center;" id="inp-${k}" value="${val}"></div>`;
         });
         document.getElementById('stat-grid').innerHTML = gridHtml;
         renderCPList();
@@ -192,32 +207,40 @@
     function updateCP() {
         const stats = {};
         bossKeys.forEach(k => stats[k] = parseInt(document.getElementById('inp-' + k).value) || 0);
-        
         db.ref('cps/' + currentEditID).update({
             members: document.getElementById('edit-members').value,
+            leader: document.getElementById('edit-leader').value,
             totalPoints: parseInt(document.getElementById('edit-points').value),
             bossStats: stats
         });
         alert("Updated!");
     }
 
-    function deleteCP() {
-        if(confirm("DANGER: Are you sure you want to PERMANENTLY DELETE this CP?")) {
-            db.ref('cps/' + currentEditID).remove();
-            document.getElementById('edit-section').style.display = 'none';
-            currentEditID = null;
-        }
-    }
-
     function createNewCP() {
         const name = document.getElementById('new-name').value;
+        const leader = document.getElementById('new-leader').value;
         const clan = document.getElementById('new-clan').value;
         if(!name) return;
         const id = name.replace(/\s+/g, '-').toLowerCase();
         db.ref('cps/' + id).set({
-            name, clan, totalPoints: 0, members: "",
+            name, leader, clan, totalPoints: 0, members: "",
             bossStats: { VAL:0, ANT:0, BAI:0, SIE:0, ZAK:0, AQ:0, ORF:0, COR:0, FRI:0 }
         });
+        alert("Created!");
+    }
+
+    function moveToHistory() {
+        if(confirm("Move this CP to History page?")) {
+            db.ref('cps/' + currentEditID).update({ clan: 'history' });
+            document.getElementById('edit-section').style.display = 'none';
+        }
+    }
+
+    function deleteCP() {
+        if(confirm("DANGER: This will delete the CP and all its data FOREVER!")) {
+            db.ref('cps/' + currentEditID).remove();
+            document.getElementById('edit-section').style.display = 'none';
+        }
     }
 </script>
 </body>
