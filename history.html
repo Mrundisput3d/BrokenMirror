@@ -2,123 +2,138 @@
 <html lang="el">
 <head>
     <meta charset="UTF-8">
-    <title>BMA | Hall of Records</title>
+    <title>BMA | Hall of Fame</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <style>
-        :root { --gold: #d4af37; --bg: #0a0c0f; --card: #15181c; }
+        :root { --gold: #d4af37; --silver: #c0c0c0; --bronze: #cd7f32; --bg: #0a0c0f; --card: #15181c; }
         body { background: var(--bg); color: #eee; font-family: 'Open Sans', sans-serif; margin: 0; padding: 0; }
         
-        /* NAVIGATION BAR */
-        .nav-bar { background: rgba(0,0,0,0.8); border-bottom: 1px solid var(--gold); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px); }
-        .nav-logo { font-family: 'Cinzel'; color: var(--gold); font-size: 1.2rem; text-decoration: none; font-weight: bold; }
-        .nav-links a { color: #888; text-decoration: none; font-family: 'Cinzel'; font-size: 0.9rem; margin-left: 20px; transition: 0.3s; }
-        .nav-links a:hover { color: var(--gold); }
+        nav { background: rgba(0,0,0,0.9); padding: 20px 40px; border-bottom: 1px solid var(--gold); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-family: 'Cinzel'; color: var(--gold); text-decoration: none; font-size: 1.5rem; }
 
-        .header-section { padding: 60px 20px 20px; text-align: center; }
-        h1 { font-family: 'Cinzel'; color: var(--gold); font-size: 2.5rem; margin: 0; text-shadow: 0 0 15px rgba(212,175,55,0.3); }
-        .subtitle { color: #888; font-family: 'Cinzel'; margin-top: 10px; letter-spacing: 2px; font-size: 0.9rem; }
+        .container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
+        .section-title { font-family: 'Cinzel'; color: var(--gold); text-align: center; font-size: 2.2rem; margin-bottom: 50px; text-shadow: 0 0 15px rgba(212,175,55,0.4); }
+
+        /* Podium Style */
+        .podium { display: grid; grid-template-columns: 1fr 1.2fr 1fr; gap: 20px; align-items: end; margin-bottom: 80px; }
+        .podium-card { background: var(--card); border: 1px solid #333; padding: 40px 20px; text-align: center; border-radius: 15px; position: relative; transition: 0.3s; }
+        .podium-card:hover { transform: translateY(-10px); border-color: var(--gold); }
         
-        .history-container { max-width: 1100px; margin: 40px auto; padding: 0 20px; display: grid; grid-template-columns: 1fr; gap: 20px; }
-        .history-card { 
-            background: var(--card); border: 1px solid #333; border-left: 5px solid #444; padding: 25px; border-radius: 12px;
-            display: grid; grid-template-columns: 2fr 3fr; align-items: center; gap: 20px;
-        }
+        .rank-1 { border-top: 5px solid var(--gold); box-shadow: 0 0 30px rgba(212,175,55,0.15); transform: scale(1.05); }
+        .rank-2 { border-top: 5px solid var(--silver); }
+        .rank-3 { border-top: 5px solid var(--bronze); }
         
-        .cp-info { border-right: 1px solid #333; padding-right: 20px; }
-        .cp-name { font-family: 'Cinzel'; font-size: 1.6rem; color: var(--gold); margin: 0; }
-        .cp-pts-badge { display: inline-block; background: #222; padding: 4px 12px; border-radius: 20px; color: var(--gold); font-weight: bold; margin-top: 10px; border: 1px solid #444; }
-        
-        .loot-section { display: flex; flex-wrap: wrap; gap: 10px; }
-        .loot-tag { 
-            background: rgba(0,0,0,0.4); border: 1px solid #444; padding: 6px 12px; border-radius: 6px; 
-            font-size: 0.8rem; display: flex; align-items: center; gap: 8px;
-        }
-        .loot-tag img { width: 22px; height: 22px; border-radius: 3px; }
-        
-        .no-records { text-align: center; padding: 100px; color: #444; font-family: 'Cinzel'; font-size: 1.2rem; }
+        .podium-label { font-family: 'Cinzel'; font-size: 0.8rem; letter-spacing: 2px; color: #666; margin-bottom: 10px; }
+        .podium-name { font-family: 'Cinzel'; font-size: 1.8rem; color: #fff; margin: 10px 0; }
+        .podium-stat { font-size: 2.2rem; font-weight: bold; color: var(--gold); }
+        .stat-desc { font-size: 0.7rem; color: #555; text-transform: uppercase; margin-top: 5px; }
+
+        .divider { border-bottom: 1px solid #333; margin: 60px 0; position: relative; }
+        .divider::after { content: '◈'; position: absolute; left: 50%; top: -10px; background: var(--bg); padding: 0 15px; color: var(--gold); transform: translateX(-50%); }
     </style>
 </head>
 <body>
 
-    <nav class="nav-bar">
-        <a href="index.html" class="nav-logo">BMA ALLIANCE</a>
-        <div class="nav-links">
-            <a href="index.html">DASHBOARD</a>
-            <a href="History.html" style="color: var(--gold);">HISTORY</a>
-          </div>
-    </nav>
+    <nav><a href="index.html" class="logo">BMA ALLIANCE</a></nav>
 
-    <div class="header-section">
-        <h1>HALL OF RECORDS</h1>
-        <div class="subtitle">Legacy of the Fallen & The Retired</div>
-    </div>
+    <div class="container">
+        <div class="section-title">TOP BOSS KILLERS (EVER)</div>
+        <div id="ever-podium" class="podium">
+            </div>
 
-    <div class="history-container" id="history-list">
-        <div style="text-align: center; color: var(--gold);">Consulting the archives...</div>
+        <div class="divider"></div>
+
+        <div class="section-title">WEEKLY CHAMPIONS (7 DAYS)</div>
+        <div id="weekly-podium" class="podium">
+            </div>
+
+        <div class="divider"></div>
+
+        <div class="section-title">LOW-MID BOSS MASTERS (WEEKLY)</div>
+        <div id="mid-podium" class="podium">
+            </div>
     </div>
 
     <script>
-        const firebaseConfig = { 
-            apiKey: "AIzaSyDRL8EehxdcgVYJ0LJ1khVYkSJcaCMKRes", 
-            databaseURL: "https://brokenmirrordb-default-rtdb.europe-west1.firebasedatabase.app" 
-        };
+        const firebaseConfig = { apiKey: "AIzaSyDRL8EehxdcgVYJ0LJ1khVYkSJcaCMKRes", databaseURL: "https://brokenmirrordb-default-rtdb.europe-west1.firebasedatabase.app" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        const itemIcons = {
-            "Valakas Necklace": "https://i.ibb.co/84gZPVRP/necklace-valakas.png",
-            "Antharas Earring": "https://i.ibb.co/rfqvc6mv/earring-antharas.png",
-            "Baium Ring": "https://i.ibb.co/XrZkv67h/ring-of-baium.png",
-            "Zaken Earring": "https://i.ibb.co/spkC6Gzz/zaken-earring.png",
-            "Frintezza Necklace": "https://i.ibb.co/gF4YKGTM/frintezza-necklace.png",
-            "Queen Ant Ring": "https://i.ibb.co/rKRtZmBG/ring-of-queen-ant.png",
-            "Orfen Earring": "https://i.ibb.co/j9dDnXwH/earring-orfen.png",
-            "Core Ring": "https://i.ibb.co/ksv37fNZ/ring-of-.png"
-        };
+        const lowMidKeys = ['ZAK', 'FRI', 'AQ', 'ORF', 'COR'];
 
-        db.ref('cps/').on('value', snap => {
-            const data = snap.val() || {};
-            const container = document.getElementById('history-list');
-            container.innerHTML = "";
+        Promise.all([
+            db.ref('cps/').once('value'),
+            db.ref('dailyLogs/').once('value')
+        ]).then(snapshots => {
+            const allCPs = snapshots[0].val() || {};
+            const logs = snapshots[1].val() || {};
+            
+            // 1. Process Ever
+            const everSorted = Object.values(allCPs)
+                .map(cp => ({ name: cp.name, val: Object.values(cp.bossStats || {}).reduce((a,b)=>a+b, 0) }))
+                .sort((a,b) => b.val - a.val);
+            renderPodium('ever-podium', everSorted.slice(0, 3), 'Total Kills');
 
-            const historyList = Object.keys(data)
-                .map(id => ({ id, ...data[id] }))
-                .filter(cp => cp && cp.clan === 'history');
-
-            if (historyList.length === 0) {
-                container.innerHTML = "<div class='no-records'>THE ARCHIVES ARE CURRENTLY EMPTY</div>";
-                return;
+            // 2. Process Weekly
+            const last7Days = [];
+            for(let i=0; i<7; i++) {
+                const d = new Date(); d.setDate(d.getDate() - i);
+                last7Days.push(d.toLocaleDateString('el-GR').replace(/\//g, '-'));
             }
 
-            historyList.sort((a, b) => (b.totalPoints || 0) - (a.totalPoints || 0));
-
-            historyList.forEach(cp => {
-                const card = document.createElement('div');
-                card.className = 'history-card';
-                
-                let lootHtml = "";
-                if (cp.lootHistory && Array.isArray(cp.lootHistory)) {
-                    lootHtml = cp.lootHistory.map(l => {
-                        const icon = itemIcons[l.item] || "https://i.ibb.co/Txfby6wD/images.png";
-                        return `<div class="loot-tag"><img src="${icon}"> <span>${l.item}</span></div>`;
-                    }).join('');
-                } else {
-                    lootHtml = "<span style='color:#444; font-style:italic;'>No legacy loot recorded.</span>";
+            let weeklyMap = {}, midMap = {};
+            last7Days.forEach(date => {
+                if(logs[date]) {
+                    Object.values(logs[date]).forEach(bossData => {
+                        Object.keys(bossData).forEach(bossId => {
+                            const cpId = bossData[bossId].cp;
+                            if(!weeklyMap[cpId]) weeklyMap[cpId] = 0;
+                            if(!midMap[cpId]) midMap[cpId] = 0;
+                            weeklyMap[cpId]++;
+                            if(lowMidKeys.includes(bossId)) midMap[cpId]++;
+                        });
+                    });
                 }
-
-                card.innerHTML = `
-                    <div class="cp-info">
-                        <h2 class="cp-name">${cp.name}</h2>
-                        <div style="font-size:0.8rem; color:#666;">Leader: ${cp.leader || 'Unknown'}</div>
-                        <div class="cp-pts-badge">${cp.totalPoints || 0} PTS</div>
-                    </div>
-                    <div class="loot-section">${lootHtml}</div>
-                `;
-                container.appendChild(card);
             });
+
+            const weeklySorted = Object.keys(weeklyMap).map(id => ({ name: allCPs[id]?.name || id, val: weeklyMap[id] })).sort((a,b)=>b.val-a.val);
+            const midSorted = Object.keys(midMap).map(id => ({ name: allCPs[id]?.name || id, val: midMap[id] })).sort((a,b)=>b.val-a.val);
+
+            renderPodium('weekly-podium', weeklySorted.slice(0, 3), 'Weekly Kills');
+            renderPodium('mid-podium', midSorted.slice(0, 3), 'Low-Mid Kills');
         });
+
+        function renderPodium(targetId, top3, desc) {
+            const area = document.getElementById(targetId);
+            if(!top3[0]) { area.innerHTML = "<p style='text-align:center; width:100%; color:#444;'>No Data Found</p>"; return; }
+            
+            const p1 = top3[0] || { name: '-', val: 0 };
+            const p2 = top3[1] || { name: '-', val: 0 };
+            const p3 = top3[2] || { name: '-', val: 0 };
+
+            area.innerHTML = `
+                <div class="podium-card rank-2">
+                    <div class="podium-label">RUNNER UP</div>
+                    <div class="podium-name">${p2.name}</div>
+                    <div class="podium-stat">${p2.val}</div>
+                    <div class="stat-desc">${desc}</div>
+                </div>
+                <div class="podium-card rank-1">
+                    <div class="podium-label">LEGENDARY</div>
+                    <div class="podium-name">${p1.name}</div>
+                    <div class="podium-stat">${p1.val}</div>
+                    <div class="stat-desc">${desc}</div>
+                </div>
+                <div class="podium-card rank-3">
+                    <div class="podium-label">CONTENDER</div>
+                    <div class="podium-name">${p3.name}</div>
+                    <div class="podium-stat">${p3.val}</div>
+                    <div class="stat-desc">${desc}</div>
+                </div>
+            `;
+        }
     </script>
 </body>
 </html>
