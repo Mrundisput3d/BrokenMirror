@@ -7,37 +7,71 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <style>
-        :root { --gold: #d4af37; --bg: #0a0c0f; --card: #15181c; }
-        body { background: var(--bg); color: #eee; font-family: 'Open Sans', sans-serif; margin: 0; padding: 0; }
+        :root { --gold: #d4af37; --bg: #0a0c0f; --card: rgba(21, 24, 28, 0.9); }
+        
+        body { 
+            background: var(--bg); 
+            /* Το background image που ζήτησες */
+            background-image: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)), url('https://i.ibb.co/FbHYLMCD/BACKGROUND.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #eee; 
+            font-family: 'Open Sans', sans-serif; 
+            margin: 0; 
+            padding: 0; 
+        }
         
         /* NAVIGATION BAR */
-        .nav-bar { background: rgba(0,0,0,0.8); border-bottom: 1px solid var(--gold); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px); }
+        .nav-bar { 
+            background: rgba(0,0,0,0.9); 
+            border-bottom: 1px solid var(--gold); 
+            padding: 15px 40px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            position: sticky; 
+            top: 0; 
+            z-index: 100; 
+            backdrop-filter: blur(10px); 
+        }
         .nav-logo { font-family: 'Cinzel'; color: var(--gold); font-size: 1.2rem; text-decoration: none; font-weight: bold; }
         .nav-links a { color: #888; text-decoration: none; font-family: 'Cinzel'; font-size: 0.9rem; margin-left: 20px; transition: 0.3s; }
         .nav-links a:hover { color: var(--gold); }
 
         .header-section { padding: 60px 20px 20px; text-align: center; }
-        h1 { font-family: 'Cinzel'; color: var(--gold); font-size: 2.5rem; margin: 0; text-shadow: 0 0 15px rgba(212,175,55,0.3); }
-        .subtitle { color: #888; font-family: 'Cinzel'; margin-top: 10px; letter-spacing: 2px; font-size: 0.9rem; }
+        h1 { font-family: 'Cinzel'; color: var(--gold); font-size: 2.8rem; margin: 0; text-shadow: 0 0 20px rgba(0,0,0,1); }
+        .subtitle { color: #aaa; font-family: 'Cinzel'; margin-top: 10px; letter-spacing: 2px; font-size: 0.9rem; font-weight: bold; }
         
         .history-container { max-width: 1100px; margin: 40px auto; padding: 0 20px; display: grid; grid-template-columns: 1fr; gap: 20px; }
-        .history-card { 
-            background: var(--card); border: 1px solid #333; border-left: 5px solid #444; padding: 25px; border-radius: 12px;
-            display: grid; grid-template-columns: 2fr 3fr; align-items: center; gap: 20px;
-        }
         
-        .cp-info { border-right: 1px solid #333; padding-right: 20px; }
+        .history-card { 
+            background: var(--card); 
+            border: 1px solid #333; 
+            border-left: 5px solid #555; 
+            padding: 25px; 
+            border-radius: 12px;
+            display: grid; 
+            grid-template-columns: 2fr 3fr; 
+            align-items: center; 
+            gap: 20px;
+            backdrop-filter: blur(5px);
+            transition: 0.3s;
+        }
+        .history-card:hover { border-left-color: var(--gold); transform: scale(1.01); }
+        
+        .cp-info { border-right: 1px solid #444; padding-right: 20px; }
         .cp-name { font-family: 'Cinzel'; font-size: 1.6rem; color: var(--gold); margin: 0; }
-        .cp-pts-badge { display: inline-block; background: #222; padding: 4px 12px; border-radius: 20px; color: var(--gold); font-weight: bold; margin-top: 10px; border: 1px solid #444; }
+        .cp-pts-badge { display: inline-block; background: rgba(0,0,0,0.6); padding: 4px 12px; border-radius: 20px; color: var(--gold); font-weight: bold; margin-top: 10px; border: 1px solid #555; }
         
         .loot-section { display: flex; flex-wrap: wrap; gap: 10px; }
         .loot-tag { 
-            background: rgba(0,0,0,0.4); border: 1px solid #444; padding: 6px 12px; border-radius: 6px; 
+            background: rgba(0,0,0,0.5); border: 1px solid #444; padding: 6px 12px; border-radius: 6px; 
             font-size: 0.8rem; display: flex; align-items: center; gap: 8px;
         }
         .loot-tag img { width: 22px; height: 22px; border-radius: 3px; }
         
-        .no-records { text-align: center; padding: 100px; color: #444; font-family: 'Cinzel'; font-size: 1.2rem; }
+        .no-records { text-align: center; padding: 100px; color: #888; font-family: 'Cinzel'; font-size: 1.2rem; }
     </style>
 </head>
 <body>
@@ -47,12 +81,14 @@
         <div class="nav-links">
             <a href="index.html">DASHBOARD</a>
             <a href="History.html" style="color: var(--gold);">HISTORY</a>
-          </div>
+            <a href="HallofFame.html">HALL OF FAME</a>
+            <a href="admin.html">ADMIN</a>
+        </div>
     </nav>
 
     <div class="header-section">
         <h1>HALL OF RECORDS</h1>
-        <div class="subtitle">Legacy of the Fallen & The Retired</div>
+        <div class="subtitle">Eternal Legacy of the Fallen</div>
     </div>
 
     <div class="history-container" id="history-list">
@@ -105,13 +141,13 @@
                         return `<div class="loot-tag"><img src="${icon}"> <span>${l.item}</span></div>`;
                     }).join('');
                 } else {
-                    lootHtml = "<span style='color:#444; font-style:italic;'>No legacy loot recorded.</span>";
+                    lootHtml = "<span style='color:#666; font-style:italic;'>No legacy loot recorded.</span>";
                 }
 
                 card.innerHTML = `
                     <div class="cp-info">
                         <h2 class="cp-name">${cp.name}</h2>
-                        <div style="font-size:0.8rem; color:#666;">Leader: ${cp.leader || 'Unknown'}</div>
+                        <div style="font-size:0.85rem; color:#aaa; margin-top:5px;">Leader: ${cp.leader || 'Unknown'}</div>
                         <div class="cp-pts-badge">${cp.totalPoints || 0} PTS</div>
                     </div>
                     <div class="loot-section">${lootHtml}</div>
@@ -121,5 +157,4 @@
         });
     </script>
 </body>
-</html>
 </html>
