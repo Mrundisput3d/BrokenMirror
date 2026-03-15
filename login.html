@@ -2,57 +2,117 @@
 <html lang="el">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BMA | Secure Login</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
+    
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
     <style>
-        body { background: #0a0c0f; color: #eee; font-family: 'Open Sans', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .login-box { background: #15181c; padding: 40px; border-radius: 10px; border: 1px solid #d4af37; text-align: center; box-shadow: 0 0 20px rgba(212, 175, 55, 0.2); }
-        h2 { font-family: 'Cinzel'; color: #d4af37; margin-bottom: 25px; }
-        input { width: 100%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid #444; color: #fff; border-radius: 5px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background: #d4af37; border: none; color: #000; font-family: 'Cinzel'; font-weight: bold; cursor: pointer; border-radius: 5px; margin-top: 10px; }
+        :root { --gold: #d4af37; --bg: #0a0c0f; --card: #15181c; }
+        body { 
+            background: var(--bg); 
+            color: #eee; 
+            font-family: 'Open Sans', sans-serif; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+        }
+        .login-box { 
+            background: var(--card); 
+            padding: 40px; 
+            border-radius: 10px; 
+            border: 1px solid var(--gold); 
+            text-align: center; 
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+            width: 300px;
+        }
+        h2 { font-family: 'Cinzel'; color: var(--gold); margin-bottom: 25px; font-size: 1.2rem; }
+        input { 
+            width: 100%; 
+            padding: 12px; 
+            margin: 10px 0; 
+            background: #000; 
+            border: 1px solid #444; 
+            color: #fff; 
+            border-radius: 5px; 
+            box-sizing: border-box; 
+            outline: none;
+        }
+        input:focus { border-color: var(--gold); }
+        button { 
+            width: 100%; 
+            padding: 12px; 
+            background: var(--gold); 
+            border: none; 
+            color: #000; 
+            font-family: 'Cinzel'; 
+            font-weight: bold; 
+            cursor: pointer; 
+            border-radius: 5px; 
+            margin-top: 10px; 
+            transition: 0.3s;
+        }
+        button:hover { background: #b8972f; }
+        #error { color: #ff4444; font-size: 0.8rem; margin-top: 15px; min-height: 1rem; }
     </style>
 </head>
 <body>
+
     <div class="login-box">
         <h2>BMA COMMAND CENTER</h2>
         <input type="email" id="email" placeholder="Email">
         <input type="password" id="pass" placeholder="Password">
         <button onclick="login()">ENTER</button>
-        <p id="error" style="color: red; font-size: 0.8rem; margin-top: 15px;"></p>
+        <p id="error"></p>
     </div>
 
     <script>
-        // 1. Έλεγχος αν ο χρήστης είναι συνδεδεμένος
-firebase.auth().onAuthStateChanged((user) => {
-    if (!user) {
-        // Αν δεν είναι συνδεδεμένος, τον στέλνει στο login
-        window.location.href = "login.html";
-    }
-});
-
-// 2. Λειτουργία Logout (προαιρετικά, για να βγαίνεις εσύ)
-function logout() {
-    firebase.auth().signOut().then(() => {
-        window.location.href = "login.html";
-    });
-}
+        // 1. Ρυθμίσεις Firebase
         const firebaseConfig = { 
             apiKey: "AIzaSyDRL8EehxdcgVYJ0LJ1khVYkSJcaCMKRes", 
             authDomain: "brokenmirrordb.firebaseapp.com",
             databaseURL: "https://brokenmirrordb-default-rtdb.europe-west1.firebasedatabase.app" 
         };
+
+        // 2. Initialize Firebase
         firebase.initializeApp(firebaseConfig);
 
+        // 3. Λειτουργία Login
         function login() {
             const email = document.getElementById('email').value;
             const pass = document.getElementById('pass').value;
+            const errorDiv = document.getElementById('error');
             
+            errorDiv.innerText = "Connecting...";
+
             firebase.auth().signInWithEmailAndPassword(email, pass)
-                .then(() => { window.location.href = "admin.html"; })
-                .catch(err => { document.getElementById('error').innerText = "Access Denied: Invalid Credentials"; });
+                .then((userCredential) => {
+                    // Επιτυχία! Μεταφορά στο Admin
+                    window.location.href = "admin.html";
+                })
+                .catch((error) => {
+                    // Σφάλμα
+                    console.error("Login Error:", error.code);
+                    if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+                        errorDiv.innerText = "Λάθος στοιχεία πρόσβασης.";
+                    } else if (error.code === 'auth/unauthorized-domain') {
+                        errorDiv.innerText = "Το domain δεν είναι εγκεκριμένο στο Firebase.";
+                    } else {
+                        errorDiv.innerText = "Σφάλμα: " + error.message;
+                    }
+                });
         }
+
+        // Επιτρέπει το Login με το πάτημα του Enter
+        document.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                login();
+            }
+        });
     </script>
 </body>
 </html>
