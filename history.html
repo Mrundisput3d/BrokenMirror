@@ -8,51 +8,56 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <style>
         :root { --gold: #d4af37; --bg: #0a0c0f; --card: #15181c; }
-        body { background: var(--bg); color: #eee; font-family: 'Open Sans', sans-serif; margin: 0; padding: 40px; line-height: 1.6; }
-        h1 { font-family: 'Cinzel'; color: var(--gold); text-align: center; font-size: 2.5rem; margin-bottom: 10px; text-shadow: 0 0 15px rgba(212,175,55,0.3); }
-        .subtitle { text-align: center; color: #888; font-family: 'Cinzel'; margin-bottom: 50px; letter-spacing: 2px; }
+        body { background: var(--bg); color: #eee; font-family: 'Open Sans', sans-serif; margin: 0; padding: 0; }
         
-        .history-container { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr; gap: 20px; }
+        /* NAVIGATION BAR */
+        .nav-bar { background: rgba(0,0,0,0.8); border-bottom: 1px solid var(--gold); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px); }
+        .nav-logo { font-family: 'Cinzel'; color: var(--gold); font-size: 1.2rem; text-decoration: none; font-weight: bold; }
+        .nav-links a { color: #888; text-decoration: none; font-family: 'Cinzel'; font-size: 0.9rem; margin-left: 20px; transition: 0.3s; }
+        .nav-links a:hover { color: var(--gold); }
+
+        .header-section { padding: 60px 20px 20px; text-align: center; }
+        h1 { font-family: 'Cinzel'; color: var(--gold); font-size: 2.5rem; margin: 0; text-shadow: 0 0 15px rgba(212,175,55,0.3); }
+        .subtitle { color: #888; font-family: 'Cinzel'; margin-top: 10px; letter-spacing: 2px; font-size: 0.9rem; }
+        
+        .history-container { max-width: 1100px; margin: 40px auto; padding: 0 20px; display: grid; grid-template-columns: 1fr; gap: 20px; }
         .history-card { 
-            background: var(--card); 
-            border: 1px solid #333; 
-            border-left: 5px solid #444; 
-            padding: 25px; 
-            border-radius: 12px;
-            display: grid;
-            grid-template-columns: 2fr 3fr;
-            align-items: center;
-            gap: 20px;
+            background: var(--card); border: 1px solid #333; border-left: 5px solid #444; padding: 25px; border-radius: 12px;
+            display: grid; grid-template-columns: 2fr 3fr; align-items: center; gap: 20px;
         }
         
         .cp-info { border-right: 1px solid #333; padding-right: 20px; }
         .cp-name { font-family: 'Cinzel'; font-size: 1.6rem; color: var(--gold); margin: 0; }
-        .cp-meta { font-size: 0.85rem; color: #666; margin-top: 5px; }
         .cp-pts-badge { display: inline-block; background: #222; padding: 4px 12px; border-radius: 20px; color: var(--gold); font-weight: bold; margin-top: 10px; border: 1px solid #444; }
         
         .loot-section { display: flex; flex-wrap: wrap; gap: 10px; }
         .loot-tag { 
-            background: rgba(0,0,0,0.4); 
-            border: 1px solid #444; 
-            padding: 6px 12px; 
-            border-radius: 6px; 
-            font-size: 0.8rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            background: rgba(0,0,0,0.4); border: 1px solid #444; padding: 6px 12px; border-radius: 6px; 
+            font-size: 0.8rem; display: flex; align-items: center; gap: 8px;
         }
         .loot-tag img { width: 22px; height: 22px; border-radius: 3px; }
         
-        .no-records { text-align: center; padding: 50px; color: #555; font-family: 'Cinzel'; }
+        .no-records { text-align: center; padding: 100px; color: #444; font-family: 'Cinzel'; font-size: 1.2rem; }
     </style>
 </head>
 <body>
 
-    <h1>HALL OF RECORDS</h1>
-    <div class="subtitle">Legacy of the Fallen & The Retired</div>
+    <nav class="nav-bar">
+        <a href="index.html" class="nav-logo">BMA ALLIANCE</a>
+        <div class="nav-links">
+            <a href="index.html">DASHBOARD</a>
+            <a href="History.html" style="color: var(--gold);">HISTORY</a>
+            <a href="admin.html">ADMIN</a>
+        </div>
+    </nav>
+
+    <div class="header-section">
+        <h1>HALL OF RECORDS</h1>
+        <div class="subtitle">Legacy of the Fallen & The Retired</div>
+    </div>
 
     <div class="history-container" id="history-list">
-        <div style="text-align: center; color: var(--gold);">Loading Archives...</div>
+        <div style="text-align: center; color: var(--gold);">Consulting the archives...</div>
     </div>
 
     <script>
@@ -63,7 +68,6 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // Σωστά Icons (Διόρθωσα το Core Ring)
         const itemIcons = {
             "Valakas Necklace": "https://i.ibb.co/84gZPVRP/necklace-valakas.png",
             "Antharas Earring": "https://i.ibb.co/rfqvc6mv/earring-antharas.png",
@@ -72,8 +76,7 @@
             "Frintezza Necklace": "https://i.ibb.co/gF4YKGTM/frintezza-necklace.png",
             "Queen Ant Ring": "https://i.ibb.co/rKRtZmBG/ring-of-queen-ant.png",
             "Orfen Earring": "https://i.ibb.co/j9dDnXwH/earring-orfen.png",
-            "Core Ring": "https://i.ibb.co/ksv37fNZ/ring-of-.png", // Εδώ ήταν το λάθος!
-            "Siege": "https://i.ibb.co/Txfby6wD/images.png"
+            "Core Ring": "https://i.ibb.co/ksv37fNZ/ring-of-.png"
         };
 
         db.ref('cps/').on('value', snap => {
@@ -81,7 +84,6 @@
             const container = document.getElementById('history-list');
             container.innerHTML = "";
 
-            // Φιλτράρισμα και έλεγχος για crash (null checks)
             const historyList = Object.keys(data)
                 .map(id => ({ id, ...data[id] }))
                 .filter(cp => cp && cp.clan === 'history');
@@ -91,7 +93,6 @@
                 return;
             }
 
-            // Ταξινόμηση ανά πόντους
             historyList.sort((a, b) => (b.totalPoints || 0) - (a.totalPoints || 0));
 
             historyList.forEach(cp => {
@@ -105,24 +106,19 @@
                         return `<div class="loot-tag"><img src="${icon}"> <span>${l.item}</span></div>`;
                     }).join('');
                 } else {
-                    lootHtml = "<span style='color:#444; font-style:italic;'>No legacy loot items found.</span>";
+                    lootHtml = "<span style='color:#444; font-style:italic;'>No legacy loot recorded.</span>";
                 }
 
                 card.innerHTML = `
                     <div class="cp-info">
-                        <h2 class="cp-name">${cp.name || 'Unknown CP'}</h2>
-                        <div class="cp-meta">Leader: ${cp.leader || 'Unknown'}</div>
+                        <h2 class="cp-name">${cp.name}</h2>
+                        <div style="font-size:0.8rem; color:#666;">Leader: ${cp.leader || 'Unknown'}</div>
                         <div class="cp-pts-badge">${cp.totalPoints || 0} PTS</div>
                     </div>
-                    <div class="loot-section">
-                        ${lootHtml}
-                    </div>
+                    <div class="loot-section">${lootHtml}</div>
                 `;
                 container.appendChild(card);
             });
-        }, error => {
-            console.error(error);
-            document.getElementById('history-list').innerHTML = "<div class='no-records'>DATABASE ERROR - CONTACT ADMIN</div>";
         });
     </script>
 </body>
