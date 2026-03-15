@@ -24,6 +24,20 @@
     </div>
 
     <script>
+        // 1. Έλεγχος αν ο χρήστης είναι συνδεδεμένος
+firebase.auth().onAuthStateChanged((user) => {
+    if (!user) {
+        // Αν δεν είναι συνδεδεμένος, τον στέλνει στο login
+        window.location.href = "login.html";
+    }
+});
+
+// 2. Λειτουργία Logout (προαιρετικά, για να βγαίνεις εσύ)
+function logout() {
+    firebase.auth().signOut().then(() => {
+        window.location.href = "login.html";
+    });
+}
         const firebaseConfig = { 
             apiKey: "AIzaSyDRL8EehxdcgVYJ0LJ1khVYkSJcaCMKRes", 
             authDomain: "brokenmirrordb.firebaseapp.com",
