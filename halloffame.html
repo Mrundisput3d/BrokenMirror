@@ -2,55 +2,88 @@
 <html lang="el">
 <head>
     <meta charset="UTF-8">
-    <title>BMA | Hall of Fame</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <title>BMA | Hall of Fame Elite</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Open+Sans:wght@300;600&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <style>
-        :root { --gold: #d4af37; --bg: #0a0c0f; --card: #1c1f24; --blue: #3498db; }
-        body { background: var(--bg); color: #eee; font-family: 'Open Sans', sans-serif; margin: 0; padding: 0; }
-        nav { background: rgba(0,0,0,0.9); padding: 20px 40px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-family: 'Cinzel'; color: var(--gold); text-decoration: none; font-size: 1.5rem; }
-        .container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
-        .section-title { font-family: 'Cinzel'; color: var(--gold); text-align: center; font-size: 1.8rem; margin-bottom: 30px; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        :root { --gold: #d4af37; --silver: #e0e0e0; --bronze: #cd7f32; --bg: #050608; }
+        body { 
+            background: var(--bg); 
+            background-image: radial-gradient(circle at 50% -20%, #1a1d24 0%, #050608 80%);
+            color: #eee; font-family: 'Open Sans', sans-serif; margin: 0; padding-bottom: 100px;
+        }
         
-        .fame-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 50px; }
-        .fame-card { background: var(--card); border: 1px solid #333; border-top: 3px solid var(--gold); border-radius: 10px; padding: 25px; text-align: center; }
-        .fame-card.weekly { border-top-color: var(--blue); }
+        nav { padding: 30px; text-align: center; border-bottom: 1px solid rgba(212,175,55,0.1); }
+        .logo { font-family: 'Cinzel'; color: var(--gold); text-decoration: none; font-size: 2rem; letter-spacing: 5px; text-shadow: 0 0 20px rgba(212,175,55,0.5); }
+
+        .container { max-width: 1300px; margin: 60px auto; padding: 0 20px; }
         
-        .fame-label { font-family: 'Cinzel'; font-size: 0.75rem; color: #888; letter-spacing: 1px; }
-        .fame-name { font-family: 'Cinzel'; font-size: 1.5rem; color: #fff; margin: 10px 0; }
-        .fame-stat { font-size: 1.8rem; font-weight: bold; color: var(--gold); }
-        .weekly .fame-stat { color: var(--blue); }
+        .section-header { text-align: center; margin-bottom: 60px; }
+        .section-header h2 { font-family: 'Cinzel'; font-size: 2.5rem; color: #fff; margin: 0; text-transform: uppercase; letter-spacing: 3px; }
+        .section-header .line { width: 100px; height: 3px; background: var(--gold); margin: 15px auto; box-shadow: 0 0 15px var(--gold); }
+
+        /* THE ELITE PODIUM */
+        .elite-podium { 
+            display: flex; justify-content: center; align-items: flex-end; gap: 30px; margin-bottom: 120px; height: 450px;
+        }
+
+        .champion-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 20px 20px 10px 10px;
+            width: 320px; position: relative;
+            display: flex; flex-direction: column; align-items: center;
+            padding-bottom: 30px; transition: 0.4s ease;
+        }
+
+        .champion-card:hover { transform: translateY(-10px); background: rgba(255, 255, 255, 0.06); border-color: rgba(255,255,255,0.2); }
+
+        /* Ranks heights */
+        .rank-1 { height: 420px; z-index: 3; border-top: 4px solid var(--gold); box-shadow: 0 20px 50px rgba(212,175,55,0.1); }
+        .rank-2 { height: 350px; z-index: 2; border-top: 4px solid var(--silver); }
+        .rank-3 { height: 300px; z-index: 1; border-top: 4px solid var(--bronze); }
+
+        .crown { font-size: 2.5rem; margin-top: -30px; margin-bottom: 20px; filter: drop-shadow(0 0 10px currentColor); }
+        .c-1 { color: var(--gold); } .c-2 { color: var(--silver); } .c-3 { color: var(--bronze); }
+
+        .cp-name { font-family: 'Cinzel'; font-size: 1.8rem; margin: 10px 0; text-align: center; padding: 0 10px; }
+        .cp-val { font-size: 3.5rem; font-weight: 900; margin: 10px 0; font-family: 'Cinzel'; opacity: 0.9; }
+        .cp-label { font-size: 0.7rem; letter-spacing: 3px; color: #888; text-transform: uppercase; }
+
+        .glow-bar { width: 100%; height: 5px; position: absolute; bottom: 0; left: 0; border-radius: 0 0 10px 10px; }
+        .gb-1 { background: var(--gold); box-shadow: 0 0 20px var(--gold); }
+        .gb-2 { background: var(--silver); box-shadow: 0 0 20px var(--silver); }
+        .gb-3 { background: var(--bronze); box-shadow: 0 0 20px var(--bronze); }
+
     </style>
 </head>
 <body>
 
-    <nav><a href="index.html" class="logo">BMA ALLIANCE</a></nav>
+    <nav><a href="index.html" class="logo">BMA ELITE</a></nav>
 
     <div class="container">
-        <div class="section-title">ALL-TIME LEGENDS</div>
-        <div class="fame-grid" id="ever-grid">
-            <div class="fame-card">
-                <div class="fame-label">TOP BOSS KILLER (EVER)</div>
-                <div id="ever-name" class="fame-name">...</div>
-                <div id="ever-stat" class="fame-stat">0</div>
-            </div>
+        <div class="section-header">
+            <h2>The Immortals</h2>
+            <div class="cp-label" style="margin-top:5px;">Top Boss Killers (All Time)</div>
+            <div class="line"></div>
         </div>
+        <div id="ever-podium" class="elite-podium"></div>
 
-        <div class="section-title">WEEKLY DOMINANCE (LAST 7 DAYS)</div>
-        <div class="fame-grid">
-            <div class="fame-card weekly">
-                <div class="fame-label">TOP OVERALL KILLER</div>
-                <div id="weekly-name" class="fame-name">...</div>
-                <div id="weekly-stat" class="fame-stat">0</div>
-            </div>
-            <div class="fame-card weekly">
-                <div class="fame-label">LOW-MID BOSS MASTER</div>
-                <div id="mid-name" class="fame-name">...</div>
-                <div id="mid-stat" class="fame-stat">0</div>
-            </div>
+        <div class="section-header">
+            <h2>Weekly Warlords</h2>
+            <div class="cp-label" style="margin-top:5px;">Overall Kills (Last 7 Days)</div>
+            <div class="line"></div>
         </div>
+        <div id="weekly-podium" class="elite-podium"></div>
+
+        <div class="section-header">
+            <h2>The Specialists</h2>
+            <div class="cp-label" style="margin-top:5px;">Low-Mid Bosses (Weekly)</div>
+            <div class="line"></div>
+        </div>
+        <div id="mid-podium" class="elite-podium"></div>
     </div>
 
     <script>
@@ -60,7 +93,6 @@
 
         const lowMidKeys = ['ZAK', 'FRI', 'AQ', 'ORF', 'COR'];
 
-        // Sync Data
         Promise.all([
             db.ref('cps/').once('value'),
             db.ref('dailyLogs/').once('value')
@@ -68,64 +100,60 @@
             const allCPs = snapshots[0].val() || {};
             const logs = snapshots[1].val() || {};
             
-            processEver(allCPs);
-            processWeekly(allCPs, logs);
-        });
+            // EVER
+            const everSorted = Object.values(allCPs)
+                .map(cp => ({ name: cp.name, val: Object.values(cp.bossStats || {}).reduce((a,b)=>a+b, 0) }))
+                .sort((a,b) => b.val - a.val);
+            renderElitePodium('ever-podium', everSorted.slice(0, 3));
 
-        function processEver(allCPs) {
-            let bestCP = { name: '-', kills: -1 };
-            Object.values(allCPs).forEach(cp => {
-                let total = 0;
-                if(cp.bossStats) Object.values(cp.bossStats).forEach(v => total += v);
-                if(total > bestCP.kills) { bestCP = { name: cp.name, kills: total }; }
-            });
-            document.getElementById('ever-name').innerText = bestCP.name;
-            document.getElementById('ever-stat').innerText = bestCP.kills;
-        }
-
-        function processWeekly(allCPs, logs) {
-            const last7Days = [];
-            for(let i=0; i<7; i++) {
+            // WEEKLY (7 Days)
+            const last7Days = Array.from({length: 7}, (_, i) => {
                 const d = new Date(); d.setDate(d.getDate() - i);
-                last7Days.push(d.toLocaleDateString('el-GR').replace(/\//g, '-'));
-            }
+                return d.toLocaleDateString('el-GR').replace(/\//g, '-');
+            });
 
-            let weeklyCounts = {}; // { cpId: kills }
-            let midCounts = {};    // { cpId: kills }
-
+            let wMap = {}, mMap = {};
             last7Days.forEach(date => {
                 if(logs[date]) {
-                    Object.keys(logs[date]).forEach(memberName => {
-                        const bossData = logs[date][memberName]; // { BOSS_ID: { cp: id } }
+                    Object.values(logs[date]).forEach(bossData => {
                         Object.keys(bossData).forEach(bossId => {
-                            const cpId = bossData[bossId].cp;
-                            if(!weeklyCounts[cpId]) weeklyCounts[cpId] = 0;
-                            if(!midCounts[cpId]) midCounts[cpId] = 0;
-                            
-                            weeklyCounts[cpId]++;
-                            if(lowMidKeys.includes(bossId)) midCounts[cpId]++;
+                            const cid = bossData[bossId].cp;
+                            wMap[cid] = (wMap[cid] || 0) + 1;
+                            if(lowMidKeys.includes(bossId)) mMap[cid] = (mMap[cid] || 0) + 1;
                         });
                     });
                 }
             });
 
-            const topWeekly = getBestFromMap(weeklyCounts, allCPs);
-            const topMid = getBestFromMap(midCounts, allCPs);
+            const wSorted = Object.keys(wMap).map(id => ({ name: allCPs[id]?.name || id, val: wMap[id] })).sort((a,b)=>b.val-a.val);
+            const mSorted = Object.keys(mMap).map(id => ({ name: allCPs[id]?.name || id, val: mMap[id] })).sort((a,b)=>b.val-a.val);
 
-            document.getElementById('weekly-name').innerText = topWeekly.name;
-            document.getElementById('weekly-stat').innerText = topWeekly.val;
-            document.getElementById('mid-name').innerText = topMid.name;
-            document.getElementById('mid-stat').innerText = topMid.val;
-        }
+            renderElitePodium('weekly-podium', wSorted.slice(0, 3));
+            renderElitePodium('mid-podium', mSorted.slice(0, 3));
+        });
 
-        function getBestFromMap(map, allCPs) {
-            let best = { name: '-', val: 0 };
-            Object.keys(map).forEach(id => {
-                if(map[id] > best.val) {
-                    best = { name: allCPs[id] ? allCPs[id].name : id, val: map[id] };
-                }
-            });
-            return best;
+        function renderElitePodium(targetId, top3) {
+            const area = document.getElementById(targetId);
+            if(!top3[0]) { area.innerHTML = "<p>No Archives Found</p>"; return; }
+            
+            // Reorder for visual: 2, 1, 3
+            const p = [top3[1], top3[0], top3[2]];
+            const ranks = [2, 1, 3];
+            const icons = ['🥈', '🥇', '🥉'];
+
+            area.innerHTML = p.map((cp, i) => {
+                if(!cp) return `<div style="width:320px"></div>`;
+                return `
+                    <div class="champion-card rank-${ranks[i]}">
+                        <div class="crown c-${ranks[i]}">${icons[i]}</div>
+                        <div class="cp-label">Rank ${ranks[i]}</div>
+                        <div class="cp-name">${cp.name}</div>
+                        <div class="cp-val">${cp.val}</div>
+                        <div class="cp-label">Total Kills</div>
+                        <div class="glow-bar gb-${ranks[i]}"></div>
+                    </div>
+                `;
+            }).join('');
         }
     </script>
 </body>
