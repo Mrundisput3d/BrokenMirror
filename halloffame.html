@@ -2,7 +2,7 @@
 <html lang="el">
 <head>
     <meta charset="UTF-8">
-    <title>BMA | Hall of Fame</title>
+    <title>BMA | Elite Hall of Fame</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -11,59 +11,79 @@
         
         body { 
             background: var(--bg); 
-            /* Εδώ μπαίνει το background που έχεις και στο Dashboard */
             background-image: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('https://i.ibb.co/FbHYLMCD/BACKGROUND.png');
-            background-size: cover;
-            background-attachment: fixed;
-            color: #eee; font-family: 'Open Sans', sans-serif; margin: 0; padding-bottom: 100px;
+            background-size: cover; background-attachment: fixed; background-position: center;
+            color: #eee; font-family: 'Open Sans', sans-serif; margin: 0; overflow-x: hidden;
         }
-        
-        nav { background: rgba(0,0,0,0.9); padding: 20px 40px; border-bottom: 2px solid var(--gold); text-align: center; }
-        .logo { font-family: 'Cinzel'; color: var(--gold); text-decoration: none; font-size: 1.8rem; letter-spacing: 4px; }
 
-        .container { max-width: 1200px; margin: 50px auto; padding: 0 20px; }
-        
-        .section-header { text-align: center; margin-bottom: 40px; }
-        .section-header h2 { font-family: 'Cinzel'; font-size: 2.2rem; color: var(--gold); margin: 0; text-shadow: 0 0 20px rgba(212,175,55,0.4); }
-        .line { width: 150px; height: 2px; background: var(--gold); margin: 15px auto; box-shadow: 0 0 10px var(--gold); }
+        nav { background: rgba(0,0,0,0.9); padding: 20px; border-bottom: 2px solid var(--gold); text-align: center; backdrop-filter: blur(10px); }
+        .logo { font-family: 'Cinzel'; color: var(--gold); text-decoration: none; font-size: 1.8rem; letter-spacing: 5px; }
 
-        /* PODIUM SYSTEM */
+        .container { max-width: 1400px; margin: 60px auto; padding: 0 20px; }
+
+        .section-header { text-align: center; margin-bottom: 80px; }
+        .section-header h2 { font-family: 'Cinzel'; font-size: 3rem; color: #fff; margin: 0; letter-spacing: 8px; text-transform: uppercase; }
+        .line { width: 200px; height: 3px; background: var(--gold); margin: 20px auto; box-shadow: 0 0 20px var(--gold); }
+
+        /* FANCY PODIUM SYSTEM */
         .podium-wrapper { 
-            display: flex; justify-content: center; align-items: flex-end; gap: 15px; margin-bottom: 100px; min-height: 380px;
+            display: flex; justify-content: center; align-items: flex-end; gap: 40px; margin-bottom: 150px; perspective: 1000px;
         }
 
-        .p-card {
-            background: rgba(21, 24, 28, 0.95);
-            border: 1px solid #333;
-            border-radius: 10px 10px 5px 5px;
-            width: 300px; position: relative;
-            display: flex; flex-direction: column; align-items: center;
-            padding-bottom: 25px; transition: 0.3s;
+        .fancy-card {
+            position: relative; width: 320px; background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px; display: flex; flex-direction: column; align-items: center;
+            padding-bottom: 40px; transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
         }
 
-        /* Heights & Special Borders */
-        .r-1 { height: 360px; border-top: 5px solid var(--gold); z-index: 3; box-shadow: 0 0 30px rgba(212,175,55,0.1); }
-        .r-2 { height: 300px; border-top: 5px solid var(--silver); z-index: 2; }
-        .r-3 { height: 260px; border-top: 5px solid var(--bronze); z-index: 1; }
+        .fancy-card:hover { transform: translateY(-20px) rotateX(5deg); border-color: rgba(212,175,55,0.5); }
 
-        .medal { font-size: 2.5rem; margin-top: -25px; margin-bottom: 15px; filter: drop-shadow(0 0 8px rgba(0,0,0,0.8)); }
+        /* Glowing Aura behind cards */
+        .fancy-card::after {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            border-radius: 20px; z-index: -1; filter: blur(40px); opacity: 0.15; transition: 0.5s;
+        }
+        .r-1:hover::after { background: var(--gold); opacity: 0.4; }
+        .r-2:hover::after { background: var(--silver); opacity: 0.3; }
+        .r-3:hover::after { background: var(--bronze); opacity: 0.3; }
+
+        /* Heights */
+        .r-1 { height: 480px; z-index: 3; border: 2px solid var(--gold); }
+        .r-2 { height: 400px; z-index: 2; }
+        .r-3 { height: 340px; z-index: 1; }
+
+        /* Animated Border for Rank 1 */
+        .r-1::before {
+            content: ''; position: absolute; top: -5px; left: -5px; right: -5px; bottom: -5px;
+            background: linear-gradient(45deg, var(--gold), transparent, var(--gold));
+            z-index: -1; border-radius: 25px; animation: borderRotate 3s linear infinite; opacity: 0.6;
+        }
+
+        @keyframes borderRotate {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(20deg); }
+        }
+
+        .rank-icon { font-size: 4rem; margin-top: -40px; margin-bottom: 20px; filter: drop-shadow(0 0 15px rgba(0,0,0,0.5)); }
         
-        .p-name { font-family: 'Cinzel'; font-size: 1.5rem; text-align: center; color: #fff; padding: 0 10px; margin: 5px 0; }
-        .p-stat { font-family: 'Cinzel'; font-size: 3rem; font-weight: 900; color: var(--gold); margin: 5px 0; }
-        .p-label { font-size: 0.7rem; color: #666; letter-spacing: 2px; text-transform: uppercase; font-weight: bold; }
+        .p-name { font-family: 'Cinzel'; font-size: 2rem; color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+        .p-stat { font-family: 'Cinzel'; font-size: 4.5rem; font-weight: 900; margin: 15px 0; color: var(--gold); }
+        .p-label { font-size: 0.8rem; letter-spacing: 4px; color: #aaa; text-transform: uppercase; }
 
-        .divider { height: 1px; background: linear-gradient(90deg, transparent, var(--gold), transparent); margin: 80px 0; opacity: 0.3; }
+        .divider { height: 2px; background: radial-gradient(circle, var(--gold) 0%, transparent 70%); margin: 100px 0; opacity: 0.4; }
     </style>
 </head>
 <body>
 
-    <nav><a href="index.html" class="logo">BMA ALLIANCE</a></nav>
+    <nav><a href="index.html" class="logo">BMA ELITE ARCHIVES</a></nav>
 
     <div class="container">
         
         <div class="section-header">
             <h2>THE IMMORTALS</h2>
-            <div class="p-label">Top Killers of All Time</div>
+            <div class="p-label">All-Time Boss Annihilators</div>
             <div class="line"></div>
         </div>
         <div id="ever-podium" class="podium-wrapper"></div>
@@ -71,85 +91,72 @@
         <div class="divider"></div>
 
         <div class="section-header">
-            <h2>WEEKLY WARLORDS</h2>
-            <div class="p-label">Last 7 Days (All Bosses)</div>
+            <h2>WEEKLY KINGS</h2>
+            <div class="p-label">Seven Days of Carnage</div>
             <div class="line"></div>
         </div>
         <div id="weekly-podium" class="podium-wrapper"></div>
 
-        <div class="divider"></div>
-
-        <div class="section-header">
-            <h2>MID-LOW SPECIALISTS</h2>
-            <div class="p-label">Zaken / Frintezza / Core / Orfen / AQ</div>
-            <div class="line"></div>
-        </div>
-        <div id="mid-podium" class="podium-wrapper"></div>
-
     </div>
 
     <script>
-        const firebaseConfig = { apiKey: "AIzaSyDRL8EehxdcgVYJ0LJ1khVYkSJcaCMKRes", databaseURL: "https://brokenmirrordb-default-rtdb.europe-west1.firebasedatabase.app" };
+        const firebaseConfig = { 
+            apiKey: "AIzaSyDRL8EehxdcgVYJ0LJ1khVYkSJcaCMKRes", 
+            databaseURL: "https://brokenmirrordb-default-rtdb.europe-west1.firebasedatabase.app" 
+        };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-
-        const lowMidKeys = ['ZAK', 'FRI', 'AQ', 'ORF', 'COR'];
 
         db.ref().on('value', snap => {
             const data = snap.val();
             const allCPs = data.cps || {};
             const logs = data.dailyLogs || {};
             
-            // 1. EVER Calculation
+            // Logic for Ever
             const everSorted = Object.values(allCPs)
                 .map(cp => ({ name: cp.name, val: Object.values(cp.bossStats || {}).reduce((a,b)=>a+b, 0) }))
                 .sort((a,b) => b.val - a.val);
 
-            // 2. WEEKLY Calculation (Last 7 Days)
+            // Logic for Weekly
             const last7Days = Array.from({length: 7}, (_, i) => {
                 const d = new Date(); d.setDate(d.getDate() - i);
                 return d.toLocaleDateString('el-GR').replace(/\//g, '-');
             });
 
-            let wMap = {}, mMap = {};
+            let wMap = {};
             last7Days.forEach(date => {
                 if(logs[date]) {
                     Object.values(logs[date]).forEach(bossData => {
                         Object.keys(bossData).forEach(bossId => {
                             const cid = bossData[bossId].cp;
                             wMap[cid] = (wMap[cid] || 0) + 1;
-                            if(lowMidKeys.includes(bossId)) mMap[cid] = (mMap[cid] || 0) + 1;
                         });
                     });
                 }
             });
-
             const wSorted = Object.keys(wMap).map(id => ({ name: allCPs[id]?.name || id, val: wMap[id] })).sort((a,b)=>b.val-a.val);
-            const mSorted = Object.keys(mMap).map(id => ({ name: allCPs[id]?.name || id, val: mMap[id] })).sort((a,b)=>b.val-a.val);
 
-            renderFullPodium('ever-podium', everSorted.slice(0, 3));
-            renderFullPodium('weekly-podium', wSorted.slice(0, 3));
-            renderFullPodium('mid-podium', mSorted.slice(0, 3));
+            renderFancyPodium('ever-podium', everSorted.slice(0, 3));
+            renderFancyPodium('weekly-podium', wSorted.slice(0, 3));
         });
 
-        function renderFullPodium(targetId, top3) {
+        function renderFancyPodium(targetId, top3) {
             const area = document.getElementById(targetId);
-            if(!top3 || top3.length === 0) { area.innerHTML = "<p>ARCHIVES EMPTY</p>"; return; }
+            if(!top3 || top3.length === 0) return;
             
-            // Reorder for visual podium: [Rank 2, Rank 1, Rank 3]
-            const p = [top3[1], top3[0], top3[2]];
+            const p = [top3[1], top3[0], top3[2]]; // Order: 2, 1, 3
             const r = [2, 1, 3];
-            const m = ['🥈', '🥇', '🥉'];
+            const icons = ['🥈', '🥇', '🥉'];
 
             area.innerHTML = p.map((cp, i) => {
-                if(!cp) return `<div style="width:300px"></div>`; // Empty slot if less than 3 CPs
+                if(!cp) return `<div style="width:320px"></div>`;
                 return `
-                    <div class="p-card r-${r[i]}">
-                        <div class="medal">${m[i]}</div>
+                    <div class="fancy-card r-${r[i]}">
+                        <div class="rank-icon">${icons[i]}</div>
                         <div class="p-label">RANK ${r[i]}</div>
                         <div class="p-name">${cp.name}</div>
                         <div class="p-stat">${cp.val}</div>
-                        <div class="p-label">KILLS</div>
+                        <div class="p-label">TOTAL KILLS</div>
                     </div>
                 `;
             }).join('');
