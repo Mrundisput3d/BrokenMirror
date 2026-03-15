@@ -144,15 +144,15 @@
                 <h3>ALLIANCE POLICIES</h3>
                 <div style="color:#ccc; font-size: 0.85rem; line-height:1.7;">
                     <b style="color:var(--gold); font-family:'Cinzel';">ATTENDANCE POINTS:</b><br>
-                    • Mid Epics (Orfen, Queen Ant, Zaken) = 1 pt<br>
-                    • Baium = 2 pts<br>
-                    • Valakas / Antharas = 3 pts<br><br>
+                    • Mid Epics (Orfen, Queen Ant, Zaken) = 1 pt per member<br>
+                    • Baium = 2 pts per member<br>
+                    • Valakas / Antharas = 3 pts Per member <br><br>
                     <b style="color:var(--gold); font-family:'Cinzel';">JEWEL PRIORITY:</b><br>
                     • Archer CPs: Baium Ring<br>
                     • Mage CPs: Valakas Necklace<br>
                     • Stopper Party: Antharas Earring<br><br>
                     <b style="color:var(--gold); font-family:'Cinzel';">COOLDOWN PROTOCOL:</b><br>
-                    3-week restriction for major jewels.<br><br>
+                    3-week restriction for mid level jewels.<br><br>
                     <b style="color:var(--gold); font-family:'Cinzel';">DEDUCTIONS:</b><br>
                     Points are deducted automatically based on Marketplace price.
                 </div>
@@ -234,6 +234,7 @@
         function toggleLeaderLoot() { const p = document.getElementById('leader-loot-panel'); p.style.display = p.style.display==='none'?'block':'none'; }
 
         // --- MUSIC LOGIC (PERSISTENT & FIXED) ---
+       // --- MUSIC LOGIC (FIXED) ---
         const tracks = [
             {name:"DION THEME", url:"https://www.dropbox.com/scl/fi/ypzqrr336iewt62gncy6u/Lineage-2-Dion-Theme-Song.mp3?rlkey=nl1quliuqleuljgkt5jhqq6hh&st=sb8ij16g&raw=1"},
             {name:"GIRAN THEME", url:"https://www.dropbox.com/scl/fi/iu8j9wn9wky8fav176ayf/Lineage-2-Giran-Theme.mp3?rlkey=xp1j0upa076sy21tgcta6t9c3&st=0a4ihyhg&raw=1"}
@@ -241,25 +242,20 @@
         let currentIdx = 0; 
         const audio = document.getElementById('bg-music'); 
         const musicIcon = document.getElementById('music-icon');
-
-        window.addEventListener('DOMContentLoaded', () => {
-            const savedMusic = localStorage.getItem('bmaMusicState');
-            if (savedMusic === null || savedMusic === 'playing') {
-                localStorage.setItem('bmaMusicState', 'playing');
-                musicIcon.innerText = "🔊";
-                audio.play().catch(() => { console.log("Waiting for user interaction..."); });
-            } else {
-                audio.pause();
-                musicIcon.innerText = "🔇";
-            }
-        });
+        
+        // Αυτή η μεταβλητή ελέγχει αν ο χρήστης έκλεισε ΧΕΙΡΟΚΙΝΗΤΑ τη μουσική
+        let userMuted = false;
 
         function toggleMusic(e) { 
             if(e) e.stopPropagation(); 
             if (audio.paused) { 
-                audio.play(); musicIcon.innerText="🔊"; localStorage.setItem('bmaMusicState', 'playing');
+                audio.play(); 
+                musicIcon.innerText="🔊"; 
+                userMuted = false; // Ο χρήστης την άνοιξε
             } else { 
-                audio.pause(); musicIcon.innerText="🔇"; localStorage.setItem('bmaMusicState', 'paused');
+                audio.pause(); 
+                musicIcon.innerText="🔇"; 
+                userMuted = true; // Ο χρήστης την έκλεισε - δεν θα ξαναξεκινήσει με κλικ
             } 
         }
 
@@ -270,14 +266,18 @@
             document.getElementById('track-name').innerText = tracks[currentIdx].name; 
             audio.play(); 
             musicIcon.innerText="🔊"; 
-            localStorage.setItem('bmaMusicState', 'playing');
+            userMuted = false;
         }
 
+        // Αυτή η συνάρτηση τρέχει σε κάθε κλικ στο body
         function tryAutoPlay() { 
-            const state = localStorage.getItem('bmaMusicState');
-            // ΜΟΝΟ ΑΝ το state είναι 'playing' προσπαθούμε να ξεκινήσουμε
-            if(state === 'playing' && audio.paused) { 
-                audio.play().then(() => { musicIcon.innerText = "🔊"; }).catch(() => {}); 
+            // Αν δεν παίζει ήδη ΚΑΙ ο χρήστης δεν την έχει κάνει mute χειροκίνητα
+            if(audio.paused && !userMuted) { 
+                audio.play().then(() => { 
+                    musicIcon.innerText = "🔊"; 
+                }).catch(() => {
+                    // Αγνοούμε το error αν ο browser μπλοκάρει ακόμα το autoplay
+                }); 
             }
         }
 
