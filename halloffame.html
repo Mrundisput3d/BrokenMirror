@@ -13,52 +13,41 @@
             background: var(--bg); 
             background-image: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('https://i.ibb.co/FbHYLMCD/BACKGROUND.png');
             background-size: cover; background-attachment: fixed; background-position: center;
-            color: #eee; font-family: 'Open Sans', sans-serif; margin: 0; overflow-x: hidden;
+            color: #eee; font-family: 'Open Sans', sans-serif; margin: 0; 
         }
 
-        nav { background: rgba(0,0,0,0.9); padding: 20px; border-bottom: 2px solid var(--gold); text-align: center; backdrop-filter: blur(10px); }
-        .logo { font-family: 'Cinzel'; color: var(--gold); text-decoration: none; font-size: 1.8rem; letter-spacing: 5px; }
+        nav { background: rgba(0,0,0,0.9); padding: 15px; border-bottom: 2px solid var(--gold); text-align: center; position: sticky; top:0; z-index:1000; }
+        .logo { font-family: 'Cinzel'; color: var(--gold); text-decoration: none; font-size: 1.5rem; letter-spacing: 3px; }
 
-        .container { max-width: 1400px; margin: 60px auto; padding: 0 20px; }
+        .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
 
-        .section-header { text-align: center; margin-bottom: 80px; }
-        .section-header h2 { font-family: 'Cinzel'; font-size: 3rem; color: #fff; margin: 0; letter-spacing: 8px; text-transform: uppercase; }
-        .line { width: 200px; height: 3px; background: var(--gold); margin: 20px auto; box-shadow: 0 0 20px var(--gold); }
+        .section-header { text-align: center; margin-bottom: 40px; }
+        .section-header h2 { font-family: 'Cinzel'; font-size: 2.2rem; color: #fff; margin: 0; letter-spacing: 4px; text-transform: uppercase; }
+        .line { width: 120px; height: 2px; background: var(--gold); margin: 10px auto; box-shadow: 0 0 15px var(--gold); }
 
         /* FANCY PODIUM SYSTEM */
         .podium-wrapper { 
-            display: flex; justify-content: center; align-items: flex-end; gap: 40px; margin-bottom: 150px; perspective: 1000px;
+            display: flex; justify-content: center; align-items: flex-end; gap: 20px; margin-bottom: 80px; 
         }
 
         .fancy-card {
-            position: relative; width: 320px; background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 20px; display: flex; flex-direction: column; align-items: center;
-            padding-bottom: 40px; transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            position: relative; width: 280px; background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 15px; display: flex; flex-direction: column; align-items: center;
+            padding-bottom: 25px; transition: 0.3s ease-in-out;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
         }
 
-        .fancy-card:hover { transform: translateY(-20px) rotateX(5deg); border-color: rgba(212,175,55,0.5); }
+        /* Heights - Πιο μαζεμένα για να χωράνε */
+        .r-1 { height: 380px; z-index: 3; border: 2px solid var(--gold); }
+        .r-2 { height: 320px; z-index: 2; }
+        .r-3 { height: 280px; z-index: 1; }
 
-        /* Glowing Aura behind cards */
-        .fancy-card::after {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            border-radius: 20px; z-index: -1; filter: blur(40px); opacity: 0.15; transition: 0.5s;
-        }
-        .r-1:hover::after { background: var(--gold); opacity: 0.4; }
-        .r-2:hover::after { background: var(--silver); opacity: 0.3; }
-        .r-3:hover::after { background: var(--bronze); opacity: 0.3; }
-
-        /* Heights */
-        .r-1 { height: 480px; z-index: 3; border: 2px solid var(--gold); }
-        .r-2 { height: 400px; z-index: 2; }
-        .r-3 { height: 340px; z-index: 1; }
-
-        /* Animated Border for Rank 1 */
+        /* Το border style που σου άρεσε */
         .r-1::before {
-            content: ''; position: absolute; top: -5px; left: -5px; right: -5px; bottom: -5px;
+            content: ''; position: absolute; top: -4px; left: -4px; right: -4px; bottom: -4px;
             background: linear-gradient(45deg, var(--gold), transparent, var(--gold));
-            z-index: -1; border-radius: 25px; animation: borderRotate 3s linear infinite; opacity: 0.6;
+            z-index: -1; border-radius: 18px; animation: borderRotate 4s linear infinite; opacity: 0.7;
         }
 
         @keyframes borderRotate {
@@ -66,13 +55,13 @@
             100% { filter: hue-rotate(20deg); }
         }
 
-        .rank-icon { font-size: 4rem; margin-top: -40px; margin-bottom: 20px; filter: drop-shadow(0 0 15px rgba(0,0,0,0.5)); }
+        .rank-icon { font-size: 3rem; margin-top: -30px; margin-bottom: 10px; }
         
-        .p-name { font-family: 'Cinzel'; font-size: 2rem; color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
-        .p-stat { font-family: 'Cinzel'; font-size: 4.5rem; font-weight: 900; margin: 15px 0; color: var(--gold); }
-        .p-label { font-size: 0.8rem; letter-spacing: 4px; color: #aaa; text-transform: uppercase; }
+        .p-name { font-family: 'Cinzel'; font-size: 1.4rem; color: #fff; text-align: center; padding: 0 5px; }
+        .p-stat { font-family: 'Cinzel'; font-size: 3.5rem; font-weight: 900; margin: 10px 0; color: var(--gold); line-height: 1; }
+        .p-label { font-size: 0.65rem; letter-spacing: 3px; color: #888; text-transform: uppercase; font-weight: bold; }
 
-        .divider { height: 2px; background: radial-gradient(circle, var(--gold) 0%, transparent 70%); margin: 100px 0; opacity: 0.4; }
+        .divider { height: 1px; background: linear-gradient(90deg, transparent, var(--gold), transparent); margin: 60px 0; opacity: 0.2; }
     </style>
 </head>
 <body>
@@ -97,6 +86,15 @@
         </div>
         <div id="weekly-podium" class="podium-wrapper"></div>
 
+        <div class="divider"></div>
+
+        <div class="section-header">
+            <h2>LOW-MID SPECIALISTS</h2>
+            <div class="p-label">Weekly: Zak / Fri / Queen / Orfen / Core</div>
+            <div class="line"></div>
+        </div>
+        <div id="mid-podium" class="podium-wrapper"></div>
+
     </div>
 
     <script>
@@ -107,56 +105,63 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
+        const lowMidKeys = ['ZAK', 'FRI', 'AQ', 'ORF', 'COR'];
+
         db.ref().on('value', snap => {
             const data = snap.val();
             const allCPs = data.cps || {};
             const logs = data.dailyLogs || {};
             
-            // Logic for Ever
+            // EVER
             const everSorted = Object.values(allCPs)
                 .map(cp => ({ name: cp.name, val: Object.values(cp.bossStats || {}).reduce((a,b)=>a+b, 0) }))
                 .sort((a,b) => b.val - a.val);
 
-            // Logic for Weekly
+            // WEEKLY (7 Days)
             const last7Days = Array.from({length: 7}, (_, i) => {
                 const d = new Date(); d.setDate(d.getDate() - i);
                 return d.toLocaleDateString('el-GR').replace(/\//g, '-');
             });
 
-            let wMap = {};
+            let wMap = {}, mMap = {};
             last7Days.forEach(date => {
                 if(logs[date]) {
                     Object.values(logs[date]).forEach(bossData => {
                         Object.keys(bossData).forEach(bossId => {
                             const cid = bossData[bossId].cp;
                             wMap[cid] = (wMap[cid] || 0) + 1;
+                            if(lowMidKeys.includes(bossId)) mMap[cid] = (mMap[cid] || 0) + 1;
                         });
                     });
                 }
             });
+
             const wSorted = Object.keys(wMap).map(id => ({ name: allCPs[id]?.name || id, val: wMap[id] })).sort((a,b)=>b.val-a.val);
+            const mSorted = Object.keys(mMap).map(id => ({ name: allCPs[id]?.name || id, val: mMap[id] })).sort((a,b)=>b.val-a.val);
 
             renderFancyPodium('ever-podium', everSorted.slice(0, 3));
             renderFancyPodium('weekly-podium', wSorted.slice(0, 3));
+            renderFancyPodium('mid-podium', mSorted.slice(0, 3));
         });
 
         function renderFancyPodium(targetId, top3) {
             const area = document.getElementById(targetId);
-            if(!top3 || top3.length === 0) return;
+            if(!top3 || top3.length === 0) { area.innerHTML = "<p>NO DATA</p>"; return; }
             
-            const p = [top3[1], top3[0], top3[2]]; // Order: 2, 1, 3
+            // Order: 2, 1, 3
+            const p = [top3[1], top3[0], top3[2]];
             const r = [2, 1, 3];
             const icons = ['🥈', '🥇', '🥉'];
 
             area.innerHTML = p.map((cp, i) => {
-                if(!cp) return `<div style="width:320px"></div>`;
+                if(!cp) return `<div style="width:280px"></div>`;
                 return `
                     <div class="fancy-card r-${r[i]}">
                         <div class="rank-icon">${icons[i]}</div>
                         <div class="p-label">RANK ${r[i]}</div>
                         <div class="p-name">${cp.name}</div>
                         <div class="p-stat">${cp.val}</div>
-                        <div class="p-label">TOTAL KILLS</div>
+                        <div class="p-label">KILLS</div>
                     </div>
                 `;
             }).join('');
