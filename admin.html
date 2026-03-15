@@ -239,12 +239,34 @@
     function toggleHistoryStatus() {
         const cp = allCPs[currentEditID];
         if(cp.clan === 'history') {
-            if(confirm("Restore to Active?")) db.ref('cps/' + currentEditID).update({ clan: 'noldor' });
+            // ΕΡΩΤΗΣΗ ΓΙΑ ΕΠΑΝΑΦΟΡΑ
+            const newClan = prompt("Σε ποια Clan να γίνει η επαναφορά; (noldor ή kriminalides)", "noldor");
+            
+            if (newClan === null) return; // Αν πατήσεις Cancel
+
+            const formattedClan = newClan.trim().toLowerCase();
+            if (formattedClan !== "noldor" && formattedClan !== "kriminalides") {
+                alert("Λάθος όνομα! Γράψε ακριβώς: noldor ή kriminalides");
+                return;
+            }
+
+            db.ref('cps/' + currentEditID).update({ 
+                clan: formattedClan 
+            }).then(() => {
+                alert("Το CP επαναφέρθηκε στη συμμαχία: " + formattedClan.toUpperCase());
+            });
+
         } else {
-            if(confirm("Move to History?")) db.ref('cps/' + currentEditID).update({ clan: 'history' });
+            // ΜΕΤΑΦΟΡΑ ΣΤΟ HISTORY
+            if(confirm("Θέλεις να μεταφέρεις το CP '" + cp.name + "' στο History;")) {
+                db.ref('cps/' + currentEditID).update({ 
+                    clan: 'history' 
+                }).then(() => {
+                    alert("Το CP μεταφέρθηκε στο History.");
+                });
+            }
         }
     }
-
     function deleteLoot(idx) {
         if(!confirm("Refund points?")) return;
         const cp = allCPs[currentEditID];
