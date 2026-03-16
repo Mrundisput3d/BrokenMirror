@@ -25,7 +25,7 @@
         .ally-logo { width: 110px; filter: drop-shadow(0 0 15px var(--gold)); }
         .ally-title { font-family: 'Cinzel Decorative', cursive; font-size: 1.8rem; color: var(--gold); display: block; letter-spacing: 2px; margin-bottom: 20px;}
         .main-nav { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-        .nav-btn { background: rgba(212, 175, 55, 0.1); border: 1px solid var(--gold); color: var(--gold); padding: 8px 15px; font-family: 'Cinzel'; cursor: pointer; font-size: 0.75rem; border-radius: 4px; text-decoration: none; }
+        .nav-btn { background: rgba(212, 175, 55, 0.1); border: 1px solid var(--gold); color: var(--gold); padding: 8px 15px; font-family: 'Cinzel'; cursor: pointer; font-size: 0.75rem; border-radius: 4px; }
         .nav-btn.active { background: var(--gold); color: #000; }
         .leaders-row { display: flex; justify-content: center; gap: 40px; margin-bottom: 20px; }
         .leader-card { text-align: center; cursor: pointer; width: 110px; }
@@ -64,9 +64,8 @@
         .info-card { background: rgba(15, 18, 22, 0.9); border: 1px solid #333; border-radius: 12px; padding: 25px; }
         .info-card h3 { font-family: 'Cinzel'; color: var(--gold); border-bottom: 1px solid rgba(212,175,55,0.3); padding-bottom: 10px; margin-top: 0; }
         
-        /* NEW BUTTON STYLE */
-        .market-enter-container { text-align: center; padding: 40px 10px; }
-        .enter-btn { display: inline-block; background: rgba(212, 175, 55, 0.1); border: 2px solid var(--gold); color: var(--gold); padding: 15px 30px; font-family: 'Cinzel'; text-decoration: none; font-weight: bold; letter-spacing: 2px; transition: 0.3s; cursor: pointer; }
+        /* MARKETPLACE BUTTON STYLE (ADDED) */
+        .enter-btn { display: inline-block; background: rgba(212, 175, 55, 0.1); border: 2px solid var(--gold); color: var(--gold); padding: 15px 30px; font-family: 'Cinzel'; text-decoration: none; font-weight: bold; letter-spacing: 2px; transition: 0.3s; cursor: pointer; margin-top: 30px; }
         .enter-btn:hover { background: var(--gold); color: #000; box-shadow: 0 0 15px var(--gold); }
 
         #caller-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 420px; background: #0f1216; border: 2px solid var(--gold); border-radius: 15px; padding: 25px; z-index: 9999; text-align: center; }
@@ -100,9 +99,9 @@
         <span class="ally-title">BROKEN MIRROR ALLIANCE</span>
         <div class="main-nav">
             <button class="nav-btn active">DASHBOARD</button>
-            <a href="history.html" class="nav-btn">LEAVERS HISTORY</a>
-            <a href="pvpzone.html" class="nav-btn">PVP ZONE</a>
-            <a href="halloffame.html" class="nav-btn">HALL OF FAME</a>
+            <a href="history.html"><button class="nav-btn">LEAVERS HISTORY</button></a>
+            <a href="pvpzone.html"><button class="nav-btn">PVP ZONE</button></a>
+            <a href="halloffame.html"><button class="nav-btn">HALL OF FAME</button></a>
         </div>
         <div class="leaders-row">
             <div class="leader-card" onclick="openCaller('NIKLAUS', 'ALLY LEADER', 'https://i.ibb.co/5X3NDQFR/niklaus.png')">
@@ -143,13 +142,12 @@
 
     <div id="info" class="page">
         <div class="info-wrapper">
-            <div class="info-card">
+            <div class="info-card" style="text-align: center;">
                 <h3>MARKETPLACE</h3>
-                <div class="market-enter-container">
-                    <p style="color:#888; margin-bottom: 25px;">Click below to view prices and detailed market policy.</p>
-                    <a href="market.html" class="enter-btn">ENTER MARKETPLACE</a>
-                </div>
+                <p style="color:#888; font-size: 0.9rem; margin-top: 20px;">Access Jewel Market, Attendance Rules and Clan Agreements.</p>
+                <a href="market.html" class="enter-btn">ENTER MARKETPLACE</a>
             </div>
+            
             <div class="info-card">
                 <h3>ALLIANCE POLICIES</h3>
                 <div style="color:#ccc; font-size: 0.85rem; line-height:1.7;">
@@ -243,6 +241,7 @@
         function closeModal() { document.getElementById('caller-modal').style.display='none'; document.getElementById('overlay').style.display='none'; }
         function toggleLeaderLoot() { const p = document.getElementById('leader-loot-panel'); p.style.display = p.style.display==='none'?'block':'none'; }
 
+        // --- MUSIC LOGIC (FIXED) ---
         const tracks = [
             {name:"DION THEME", url:"https://www.dropbox.com/scl/fi/ypzqrr336iewt62gncy6u/Lineage-2-Dion-Theme-Song.mp3?rlkey=nl1quliuqleuljgkt5jhqq6hh&st=sb8ij16g&raw=1"},
             {name:"GIRAN THEME", url:"https://www.dropbox.com/scl/fi/iu8j9wn9wky8fav176ayf/Lineage-2-Giran-Theme.mp3?rlkey=xp1j0upa076sy21tgcta6t9c3&st=0a4ihyhg&raw=1"}
@@ -284,6 +283,8 @@
         }
 
         setInterval(() => { document.getElementById('clock').innerText = "SERVER TIME: " + new Date().toLocaleTimeString('el-GR', {timeZone:'UTC', hour12:false}) + " UTC"; }, 1000);
+        
+        // ΣΗΜΕΙΩΣΗ: Αφαιρέθηκε το JS που φόρτωνε τις τιμές του Market, αφού πλέον υπάρχει το κουμπί!
     </script>
 </body>
 </html>
