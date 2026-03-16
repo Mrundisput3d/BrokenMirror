@@ -7,201 +7,190 @@
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     
     <style>
-        :root { 
-            --gold: #d4af37; 
-            --gold-bright: #f1d592;
-            --bg: #0a0c0f; 
-        }
+        :root { --gold: #d4af37; --bg: #0a0c0f; }
 
         body { 
             background: var(--bg); 
-            /* ΑΝΤΙΓΡΑΦΗ ΑΠΟ INDEX */
-            background-image: linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.85)), url('https://i.ibb.co/hR0867S/bma-bg.jpg'); 
+            /* ΠΡΟΣΟΧΗ: Αν το αρχείο εικόνας στο GitHub λέγεται bg.jpg, άλλαξε το παρακάτω link */
+            background-image: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), url('https://i.ibb.co/hR0867S/bma-bg.jpg'); 
             background-attachment: fixed;
             background-size: cover;
             background-position: center;
             color: #eee; 
             font-family: 'Open Sans', sans-serif; 
             margin: 0; padding: 0;
-            overflow-x: hidden;
         }
 
-        /* Fancy Overlay */
-        .overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle, transparent 0%, rgba(0,0,0,0.4) 100%);
-            pointer-events: none; z-index: 1;
+        .music-box {
+            position: fixed; top: 20px; left: 20px;
+            background: rgba(0, 0, 0, 0.9); border: 2px solid var(--gold);
+            padding: 10px; z-index: 1000; border-radius: 5px;
+            box-shadow: 0 0 15px var(--gold);
         }
 
-        .content-wrapper {
-            position: relative; z-index: 2;
-            max-width: 1000px; margin: 0 auto; padding: 60px 20px;
+        .music-box select {
+            background: #000; color: var(--gold); border: 1px solid var(--gold);
+            padding: 5px; font-family: 'Cinzel'; cursor: pointer;
         }
+
+        .top-nav { position: fixed; top: 20px; right: 20px; z-index: 1000; }
+        .nav-btn {
+            background: rgba(0,0,0,0.8); border: 2px solid var(--gold); color: var(--gold);
+            padding: 10px 25px; font-family: 'Cinzel'; text-decoration: none; font-weight: bold;
+            transition: 0.3s;
+        }
+        .nav-btn:hover { background: var(--gold); color: #000; }
+
+        .container { max-width: 1000px; margin: 0 auto; padding: 120px 20px; }
 
         h1 { 
             font-family: 'Cinzel'; color: var(--gold); text-align: center; 
-            font-size: 3rem; letter-spacing: 5px; text-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
-            margin-bottom: 60px; text-transform: uppercase;
+            font-size: 3.5rem; letter-spacing: 5px; text-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
+            margin-bottom: 50px;
         }
 
-        /* Navigation Buttons */
-        .top-nav { position: fixed; top: 20px; right: 20px; z-index: 100; display: flex; gap: 15px; }
-        .nav-btn {
-            background: rgba(0,0,0,0.7); border: 2px solid var(--gold); color: var(--gold);
-            padding: 10px 25px; font-family: 'Cinzel'; cursor: pointer; text-decoration: none;
-            font-weight: bold; transition: 0.4s; text-shadow: 0 0 5px black;
-        }
-        .nav-btn:hover { background: var(--gold); color: black; box-shadow: 0 0 20px var(--gold); }
-
-        /* Market Cards */
         .market-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px; margin-bottom: 80px;
         }
         .jewel-card {
-            background: rgba(20, 20, 20, 0.9); border: 1px solid #444;
-            padding: 15px; display: flex; align-items: center; gap: 15px;
-            box-shadow: inset 0 0 15px rgba(212, 175, 55, 0.05);
-            border-left: 4px solid var(--gold);
+            background: rgba(20, 20, 20, 0.9); border: 1px solid #333;
+            padding: 15px; display: flex; align-items: center; gap: 12px;
+            border-bottom: 2px solid var(--gold);
         }
-        .jewel-icon { width: 45px; height: 45px; border: 1px solid var(--gold); background: #000; }
-        .jewel-name { font-family: 'Cinzel'; font-size: 0.8rem; color: #fff; display: block; }
-        .jewel-price { font-family: 'Cinzel'; font-size: 1.3rem; color: var(--gold); font-weight: bold; }
+        .jewel-icon { width: 40px; height: 40px; border: 1px solid var(--gold); background: #000; }
+        .jewel-name { font-family: 'Cinzel'; font-size: 0.75rem; color: #fff; }
+        .jewel-price { font-family: 'Cinzel'; font-size: 1.2rem; color: var(--gold); font-weight: bold; }
 
-        /* Grand Scroll / Policy Box */
-        .grand-scroll {
-            background: rgba(15, 15, 15, 0.95); 
-            border: 2px solid var(--gold);
-            outline: 1px solid var(--gold);
-            outline-offset: 4px;
-            padding: 60px; position: relative; line-height: 1.8;
-            box-shadow: 0 0 40px rgba(0,0,0,1);
+        .policy-section {
+            background: rgba(15, 15, 15, 0.95); border: 1px solid #333;
+            border-left: 5px solid var(--gold); margin-bottom: 40px;
+            padding: 40px; position: relative; overflow: hidden;
         }
 
-        .policy-text { white-space: pre-line; font-size: 1.05rem; }
-        
-        .section-header {
-            font-family: 'Cinzel'; color: var(--gold); font-size: 1.6rem;
-            margin: 40px 0 20px 0; border-bottom: 1px solid var(--gold);
-            padding-bottom: 10px; text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+        /* Υδατογράφημα στο βάθος κάθε ενότητας */
+        .policy-section::before {
+            content: ""; position: absolute; top: -10%; right: -5%;
+            width: 250px; height: 250px; opacity: 0.05; pointer-events: none;
+            background-size: contain; background-repeat: no-repeat;
+        }
+        .sec-points::before { background-image: url('https://i.ibb.co/gF4YKGTM/frintezza-necklace.png'); }
+        .sec-limit::before { background-image: url('https://i.ibb.co/rfqvc6mv/antharas-earring.png'); }
+        .sec-sunday::before { background-image: url('https://i.ibb.co/84gZPVRP/necklace-valakas.png'); }
+
+        .policy-header {
+            font-family: 'Cinzel'; color: var(--gold); font-size: 1.8rem;
+            margin-bottom: 25px; border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+            padding-bottom: 10px;
         }
 
-        .points-box {
-            background: rgba(212, 175, 55, 0.1); border: 1px dashed var(--gold);
-            padding: 20px; margin: 20px 0; border-radius: 5px;
-        }
+        .policy-content { font-family: 'Open Sans'; font-size: 1.1rem; line-height: 1.8; color: #ddd; white-space: pre-line; }
 
-        .penalty { color: #ff4d4d; font-weight: bold; text-transform: uppercase; }
-        .highlight-gold { color: var(--gold-bright); font-weight: 600; }
-
-        .footer-note {
-            text-align: center; font-family: 'Cinzel'; color: var(--gold);
-            margin-top: 50px; font-style: italic; opacity: 0.8;
+        /* CLAN BOXES */
+        .clan-box {
+            display: flex; align-items: center; gap: 20px;
+            background: rgba(0, 0, 0, 0.6); padding: 25px;
+            border: 1px solid #444; margin-top: 25px;
+            border-right: 3px solid var(--gold);
         }
+        .clan-logo { width: 80px; height: 80px; object-fit: contain; border: 1px solid #555; background: #000; padding: 5px; }
+
+        .important { color: #ff4444; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div class="overlay"></div>
-
-    <div style="position: absolute; left: -9999px;">
-        <iframe id="bg-music" width="100" height="100" 
-            src="https://www.youtube.com/embed/YOUR_VIDEO_ID_HERE?autoplay=1&loop=1&playlist=YOUR_VIDEO_ID_HERE" 
-            frameborder="0" allow="autoplay">
-        </iframe>
+    <div class="music-box">
+        <select id="musicSelect" onchange="changeMusic()">
+            <option value="none">Silence</option>
+            <option value="https://www.youtube.com/embed/S2C_P7-Yn8o">Dion</option>
+            <option value="https://www.youtube.com/embed/pSj7S8N6Ksc">Giran</option>
+            <option value="https://www.youtube.com/embed/vO6WpS8p4n0">Hunters Village</option>
+        </select>
     </div>
+    <iframe id="bgMusic" width="0" height="0" src="" frameborder="0" allow="autoplay"></iframe>
 
     <div class="top-nav">
         <a href="index.html" class="nav-btn">← DASHBOARD</a>
     </div>
 
-    <div class="content-wrapper">
+    <div class="container">
         <h1>MARKET & POLICIES</h1>
 
-        <div class="section-header" style="text-align: center; border-bottom: none;">ALLIANCE MARKETPLACE</div>
-        
         <div class="market-grid">
-            <div class="jewel-card"><img src="https://i.ibb.co/84gZPVRP/necklace-valakas.png" class="jewel-icon"><div><span class="jewel-name">Valakas Necklace</span><span class="jewel-price">3100</span></div></div>
-            <div class="jewel-card"><img src="https://i.ibb.co/rfqvc6mv/earring-antharas.png" class="jewel-icon"><div><span class="jewel-name">Antharas Earring</span><span class="jewel-price">1100</span></div></div>
-            <div class="jewel-card"><img src="https://i.ibb.co/XrZkv67h/ring-of-baium.png" class="jewel-icon"><div><span class="jewel-name">Baium Ring</span><span class="jewel-price">950</span></div></div>
-            <div class="jewel-card"><img src="https://i.ibb.co/gF4YKGTM/frintezza-necklace.png" class="jewel-icon"><div><span class="jewel-name">Frintezza Necklace</span><span class="jewel-price">225</span></div></div>
-            <div class="jewel-card"><img src="https://i.ibb.co/spkC6Gzz/zaken-earring.png" class="jewel-icon"><div><span class="jewel-name">Zaken Earring</span><span class="jewel-price">175</span></div></div>
-            <div class="jewel-card"><img src="https://i.ibb.co/rKRtZmBG/ring-of-queen-ant.png" class="jewel-icon"><div><span class="jewel-name">Queen Ant Ring</span><span class="jewel-price">150</span></div></div>
-            <div class="jewel-card"><img src="https://i.ibb.co/j9dDnXwH/earring-orfen.png" class="jewel-icon"><div><span class="jewel-name">Orfen Earring</span><span class="jewel-price">75</span></div></div>
-            <div class="jewel-card"><img src="https://i.ibb.co/ksv37fNZ/ring-of-.png" class="jewel-icon"><div><span class="jewel-name">Core Ring</span><span class="jewel-price">25</span></div></div>
+            <div class="jewel-card"><img src="https://i.ibb.co/84gZPVRP/necklace-valakas.png" class="jewel-icon"><div><span class="jewel-name">Valakas Necklace</span><br><span class="jewel-price">3100</span></div></div>
+            <div class="jewel-card"><img src="https://i.ibb.co/rfqvc6mv/earring-antharas.png" class="jewel-icon"><div><span class="jewel-name">Antharas Earring</span><br><span class="jewel-price">1100</span></div></div>
+            <div class="jewel-card"><img src="https://i.ibb.co/XrZkv67h/ring-of-baium.png" class="jewel-icon"><div><span class="jewel-name">Baium Ring</span><br><span class="jewel-price">950</span></div></div>
+            <div class="jewel-card"><img src="https://i.ibb.co/gF4YKGTM/frintezza-necklace.png" class="jewel-icon"><div><span class="jewel-name">Frintezza Necklace</span><br><span class="jewel-price">225</span></div></div>
+            <div class="jewel-card"><img src="https://i.ibb.co/spkC6Gzz/zaken-earring.png" class="jewel-icon"><div><span class="jewel-name">Zaken Earring</span><br><span class="jewel-price">175</span></div></div>
+            <div class="jewel-card"><img src="https://i.ibb.co/rKRtZmBG/ring-of-queen-ant.png" class="jewel-icon"><div><span class="jewel-name">Queen Ant Ring</span><br><span class="jewel-price">150</span></div></div>
+            <div class="jewel-card"><img src="https://i.ibb.co/j9dDnXwH/earring-orfen.png" class="jewel-icon"><div><span class="jewel-name">Orfen Earring</span><br><span class="jewel-price">75</span></div></div>
+            <div class="jewel-card"><img src="https://i.ibb.co/ksv37fNZ/ring-of-.png" class="jewel-icon"><div><span class="jewel-name">Core Ring</span><br><span class="jewel-price">25</span></div></div>
         </div>
 
-        <div class="grand-scroll">
-            <div class="policy-text">
-                As Alliance Leader, the following policies are established to maintain fairness, discipline, and effective organization. These rules are strict and apply to all CP Leaders, and members. Respecting them ensures equal opportunity for every CP and keeps the alliance competitive and active.
+        <div class="policy-section sec-points">
+            <div class="policy-header">ATTENDANCE POINTS</div>
+            <div class="policy-content">
+As Alliance Leader, the following policies are established to maintain fairness, discipline, and effective organization. These rules are strict and apply to all CP Leaders, and members. Respecting them ensures equal opportunity for every CP and keeps the alliance competitive and active.
 
-                <div class="section-header">ATTENDANCE POINTS</div>
-                <div class="points-box">
-                    • Mid Epics (Orfen, Queen Ant, Zaken) = 1 pt per member
-                    • Baium = 2 pts per member
-                    • Valakas / Antharas = 3 pts Per member
-                    <span class="highlight-gold">Caller : 9 pts for high epic participation / 6 pts for Baium participation / 3 pts for low epics participation . (Caller points are applied only for himself, and not for his CP)</span>
-                </div>
-
-                <div class="section-header">1. Cooldown Protocol</div>
-                - Low Epics: 1-week restriction before participating again.  
-                - Mid-Level Epics: 3-week restriction before participating again.  
-                - High Epics: 3-week restriction before participating again.
-
-                <div class="section-header">CP Member Limit</div>
-                Each CP is allowed to have a maximum of 10 members in clan
-                This rule exists so that other CPs also have the opportunity to maintain their 10 active members.
-                Do not occupy extra spaces without permission.
-                If a CP exceeds this limit without prior notice, penalty points will be applied.
-
-                <div class="section-header">Weekend Attendance</div>
-                Major events take place during the weekend.
-                If your CP has absent members for Saturday or Sunday, you must inform the Alliance Leader
-
-                <div class="section-header">Sunday Activity Requirement</div>
-                Sunday is the most important active day for the clan.
-                If a member cannot attend on Sunday, there is no problem, but the following must happen:
-                - The member must notify their CP Leader in advance.
-                - The member must temporarily leave the clan on Sunday.
-                This allows the alliance to invite temporary drivers to fill the available spots.
-                Members who leave for this reason will be invited back the next day.
-
-                <div class="section-header">Clan Picture & Activity Monitoring on Sundays</div>
-                Clan activity is regularly monitored through clan pictures taken by the Alliance Leader.
-                If during these checks:
-                A CP is not 9/9 active (for example 6/9 or 7/9), and their members are still in the clan but offline on Sunday, then the following penalties will apply:
-                <span class="penalty">- The CP will receive penalty points.
-                - If this situation happens more than once, the entire CP score will be reset to 0 points.</span>
-                This ensures the alliance can replace inactive spots and remain competitive during key events.
-
-                <div class="footer-note">Final Note</div>
-                These policies are designed to maintain discipline, fairness, and strong performance across the alliance. Respecting these rules ensures every CP has equal opportunity and the alliance remains organized and competitive.
-
-                <div class="section-header"># External Clan Agreements</div>
-                <span class="highlight-gold">ExitGaming Clan</span>
-                Night Epics:  
-                - All night epics between 00:00 and 08:00 Greek time are assigned to ExitGaming.
-
-                High Epics (Baium, Antharas, Valakas):  
-                - Distribution: 1 for ExitGaming, 3 for our alliance.  
-                - The order is determined by rolling a dice each time:  
-                  - Example: 4 people roll → if ExitGaming wins, they take the first, next 3 are ours.  
-                  - After each “raw” finishes, a new roll determines the next sequence.  
-                  - Rolling continues until all parts of the epic are distributed fairly, alternating according to dice results.
-
-                <hr style="border: 0; border-top: 1px solid #333; margin: 30px 0;">
-
-                <span class="highlight-gold">Last Kingdom (LK) Clan</span>
-                Epic Distribution:  
-                - 1 mid epic and 2 low epics if they bring:  
-                  - At least 5 parties of 9/9 for the weekend  
-                  - And at least 3 parties of 9/9 on weekdays.  
-                - If they bring fewer parties, the deal is adjusted accordingly (e.g., 1 mid + 1 low, or only 1 low).  
-
-                Baium Access:  
-                - LK Clan has access to every 5th or 6th Baium.
+• Mid Epics (Orfen, Queen Ant, Zaken) = 1 pt per member
+• Baium = 2 pts per member
+• Valakas / Antharas = 3 pts Per member
+<span style="color:var(--gold)">Caller : 9 pts for high epic participation / 6 pts for Baium participation / 3 pts for low epics participation . (Caller points are applied only for himself, and not for his CP)</span>
             </div>
         </div>
+
+        <div class="policy-section">
+            <div class="policy-header">EXTERNAL CLAN AGREEMENTS</div>
+            
+            <div class="clan-box">
+                <img src="https://i.ibb.co/4gnvW96/exitgaming.png" class="clan-logo" alt="ExitGaming">
+                <div class="policy-content">
+                    <span style="font-family:'Cinzel'; color:var(--gold); font-size:1.2rem;"># ExitGaming Clan</span>
+                    Night Epics:  
+                    - All night epics between 00:00 and 08:00 Greek time are assigned to ExitGaming.
+
+                    High Epics (Baium, Antharas, Valakas):  
+                    - Distribution: 1 for ExitGaming, 3 for our alliance.  
+                    - The order is determined by rolling a dice each time.
+                </div>
+            </div>
+
+            <div class="clan-box">
+                <img src="https://i.ibb.co/Y7D9v3x/lastkingdom.png" class="clan-logo" alt="Last Kingdom">
+                <div class="policy-content">
+                    <span style="font-family:'Cinzel'; color:var(--gold); font-size:1.2rem;"># Last Kingdom (LK) Clan</span>
+                    Epic Distribution:  
+                    - 1 mid epic and 2 low epics if they bring: At least 5 parties of 9/9 for the weekend and at least 3 parties of 9/9 on weekdays.
+                    - Baium Access: LK Clan has access to every 5th or 6th Baium.
+                </div>
+            </div>
+        </div>
+
+        <div class="policy-section sec-sunday">
+            <div class="policy-header">SUNDAY & PENALTIES</div>
+            <div class="policy-content">
+Sunday is the most important active day. If a member cannot attend, they must notify their CP Leader and temporarily leave the clan on Sunday.
+
+<span class="important">Activity Monitoring:</span>
+If a CP is not 9/9 active and members are offline on Sunday:
+- The CP will receive penalty points.
+- <span class="important">If this happens more than once, the entire CP score will be reset to 0 points.</span>
+            </div>
+        </div>
+
     </div>
+
+    <script>
+        function changeMusic() {
+            const select = document.getElementById('musicSelect');
+            const player = document.getElementById('bgMusic');
+            if(select.value === "none") {
+                player.src = "";
+            } else {
+                player.src = select.value + "?autoplay=1";
+            }
+        }
+    </script>
 </body>
 </html>
