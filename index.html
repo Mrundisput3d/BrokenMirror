@@ -70,7 +70,24 @@
         .member-click:hover { color: var(--gold); border-bottom: 1px dashed var(--gold); text-shadow: 0 0 5px rgba(212,175,55,0.5); }
         
         .loot-btn { width: 100%; background: rgba(212,175,55,0.1); border: 1px solid #444; color: var(--gold); padding: 8px; font-family: 'Cinzel'; font-size: 0.65rem; cursor: pointer; border-radius: 4px; margin-bottom: 10px; }
-        .loot-panel { display: none; padding: 12px; background: rgba(0,0,0,0.5); margin-bottom: 10px; border-radius: 4px; font-size: 0.75rem; border: 1px solid #222; color: #aaa; }
+        
+        /* -- SCROLLABLE LOOT PANEL -- */
+        .loot-panel { 
+            display: none; 
+            padding: 12px; 
+            background: rgba(0,0,0,0.5); 
+            margin-bottom: 10px; 
+            border-radius: 4px; 
+            font-size: 0.75rem; 
+            border: 1px solid #222; 
+            color: #aaa; 
+            max-height: 200px; /* Μέγιστο ύψος πριν εμφανιστεί η μπάρα */
+            overflow-y: auto;  /* Ενεργοποίηση κάθετου scroll */
+        }
+        /* Custom Scrollbar για το Loot Panel */
+        .loot-panel::-webkit-scrollbar { width: 6px; }
+        .loot-panel::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 4px; }
+        .loot-panel::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 4px; }
         
         .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
         .stat-box { background: #15181c; padding: 6px; border: 1px solid #333; text-align: center; border-radius: 4px; }
@@ -295,7 +312,6 @@
             const cp = globalCPData[cpId];
             if(!cp) return;
             
-            // Κρύβουμε το Caller Modal (αν είχε ανοίξει από εκεί) για να φανεί το CP Stats Modal ολόκληρο
             document.getElementById('caller-modal').style.display = 'none';
 
             document.getElementById('cp-stats-name').innerText = cp.name.toUpperCase() + " ATTENDANCES";
@@ -347,7 +363,6 @@
             });
         }
 
-        // ΝΕΑ ΛΕΙΤΟΥΡΓΙΑ ΓΙΑ ΤΟ CALLER MODAL (ΚΡΥΒΕΙ ATTENDANCE ΑΝ ΕΙΝΑΙ ALLY LEADER)
         function openCaller(callerId, role, img) {
             const cp = globalCPData[callerId];
             if(!cp) return;
@@ -369,14 +384,13 @@
             }
             document.getElementById('leader-loot-panel').innerHTML = lootHtml;
             
-            // Έλεγχος: Αν είναι Ally Leader, κρύβουμε το κουμπί
             const attBtn = document.getElementById('caller-attendance-btn');
             if (role.toUpperCase() === 'ALLY LEADER') {
                 attBtn.style.display = 'none';
             } else {
                 attBtn.style.display = 'block';
                 attBtn.onclick = function() {
-                    openCpStats(callerId); // Χρησιμοποιεί την ίδια συνάρτηση με τα CPs!
+                    openCpStats(callerId); 
                 };
             }
             
