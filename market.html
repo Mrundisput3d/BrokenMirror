@@ -19,7 +19,7 @@
             margin: 0; padding: 0;
         }
 
-        /* MUSIC BOX - EXACT INDEX STYLE */
+        /* MUSIC BOX - ΣΤΑΘΕΡΟ ΣΤΥΛ INDEX */
         .audio-player {
             position: fixed; top: 20px; left: 20px;
             background: rgba(0, 0, 0, 0.9); border: 1px solid var(--gold);
@@ -37,61 +37,55 @@
             padding: 10px 25px; font-family: 'Cinzel'; text-decoration: none; font-weight: bold;
         }
 
-        .container { max-width: 1100px; margin: 0 auto; padding: 120px 20px; }
-        
-        h1 { 
-            font-family: 'Cinzel'; color: var(--gold); text-align: center; 
-            font-size: 3.5rem; letter-spacing: 8px; text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
-        }
+        .container { max-width: 1000px; margin: 0 auto; padding: 120px 20px; }
+        h1 { font-family: 'Cinzel'; color: var(--gold); text-align: center; font-size: 3rem; letter-spacing: 5px; margin-bottom: 50px; }
 
-        /* MARKET SECTION */
-        .market-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 50px 0 80px; }
+        /* MARKET ITEMS */
+        .market-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 50px; }
         .jewel-card {
-            background: rgba(10, 10, 10, 0.9); border: 1px solid #333;
-            padding: 15px; display: flex; align-items: center; gap: 15px;
-            border-bottom: 3px solid var(--gold);
+            background: rgba(15, 15, 15, 0.9); border: 1px solid #333; padding: 15px; 
+            display: flex; align-items: center; gap: 15px; border-bottom: 3px solid var(--gold);
         }
         .jewel-icon { width: 45px; height: 45px; border: 1px solid var(--gold); }
 
         /* POLICIES BOX */
         .policies-box {
             background: rgba(5, 5, 5, 0.95); border: 2px solid var(--gold);
-            padding: 60px; line-height: 1.8; box-shadow: 0 0 50px rgba(0,0,0,1);
+            padding: 40px; line-height: 1.6; box-shadow: 0 0 50px rgba(0,0,0,1);
         }
         
         .section-header {
-            font-family: 'Cinzel'; color: var(--gold); font-size: 1.7rem;
-            margin-top: 40px; margin-bottom: 20px; border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+            font-family: 'Cinzel'; color: var(--gold); font-size: 1.5rem;
+            margin-top: 30px; margin-bottom: 15px; border-bottom: 1px solid rgba(212, 175, 55, 0.3);
             display: flex; align-items: center; gap: 15px; padding-bottom: 10px;
         }
-
-        /* Custom Icons Style */
-        .policy-icon { width: 40px; height: 40px; object-fit: contain; }
-
-        .policy-text { white-space: pre-line; font-size: 1.1rem; color: #ccc; }
-        .highlight { color: var(--gold); font-weight: bold; display: block; margin-top: 10px; }
+        
+        .policy-icon { width: 35px; height: 35px; }
+        .policy-text { white-space: pre-line; font-size: 1rem; color: #ccc; }
+        .highlight { color: var(--gold); font-weight: bold; display: block; margin-top: 5px; }
         .important { color: #ff4444; font-weight: bold; }
 
+        /* CLAN AGREEMENTS */
         .clan-agreement {
             background: rgba(212, 175, 55, 0.05); border: 1px solid #444;
-            padding: 25px; margin-top: 30px; display: flex; align-items: center; gap: 20px;
+            padding: 20px; margin-top: 20px; display: flex; align-items: center; gap: 20px;
             border-left: 5px solid var(--gold);
         }
-        .clan-logo { width: 80px; height: 80px; border: 1px solid var(--gold); background: #000; }
+        .clan-logo { width: 80px; height: 80px; border: 1px solid var(--gold); background: #000; padding: 5px; }
     </style>
 </head>
 <body>
 
     <div class="audio-player">
         <label>Ambient Audio</label>
-        <select id="audioSelect">
+        <select id="audioSelect" onchange="changeMusic()">
             <option value="none">Silence</option>
-            <option value="S2C_P7-Yn8o">Dion Theme</option>
-            <option value="pSj7S8N6Ksc">Giran Theme</option>
-            <option value="vO6WpS8p4n0">Hunters Village</option>
+            <option value="https://www.youtube.com/embed/S2C_P7-Yn8o">Dion Theme</option>
+            <option value="https://www.youtube.com/embed/pSj7S8N6Ksc">Giran Theme</option>
+            <option value="https://www.youtube.com/embed/vO6WpS8p4n0">Hunters Village</option>
         </select>
     </div>
-    <div id="player"></div>
+    <iframe id="bgMusic" width="0" height="0" src="" frameborder="0" allow="autoplay"></iframe>
 
     <div class="top-nav">
         <a href="index.html" class="nav-btn">← DASHBOARD</a>
@@ -101,4 +95,81 @@
         <h1>MARKET & POLICIES</h1>
 
         <div class="market-grid">
-            <div class="jewel-card"><img src="https://i.ibb.co/84gZPVRP/necklace-valakas.png" class="jewel-icon"><div><span style="font-family:'Cinzel';font-size:0.8rem;">Valakas</span><br><span style="color:var(--gold);font-weight:bold;">3100</span></div></div>
+            <div class="jewel-card"><img src="https://i.ibb.co/84gZPVRP/necklace-valakas.png" class="jewel-icon"><div><span style="font-family:'Cinzel';">Valakas</span><br><span style="color:var(--gold); font-weight:bold;">3100</span></div></div>
+            <div class="jewel-card"><img src="https://i.ibb.co/rfqvc6mv/earring-antharas.png" class="jewel-icon"><div><span style="font-family:'Cinzel';">Antharas</span><br><span style="color:var(--gold); font-weight:bold;">1100</span></div></div>
+            <div class="jewel-card"><img src="https://i.ibb.co/XrZkv67h/ring-of-baium.png" class="jewel-icon"><div><span style="font-family:'Cinzel';">Baium</span><br><span style="color:var(--gold); font-weight:bold;">950</span></div></div>
+            <div class="jewel-card"><img src="https://i.ibb.co/gF4YKGTM/frintezza-necklace.png" class="jewel-icon"><div><span style="font-family:'Cinzel';">Frintezza</span><br><span style="color:var(--gold); font-weight:bold;">225</span></div></div>
+        </div>
+
+        <div class="policies-box">
+            <div class="policy-text">
+            As Alliance Leader, the following policies are established to maintain fairness, discipline, and effective organization.
+
+            <div class="section-header">
+                 01. ATTENDANCE POINTS
+            </div>
+            • Mid Epics (Orfen, Queen Ant, Zaken) = 1 pt per member
+            • Baium = 2 pts per member
+            • Valakas / Antharas = 3 pts Per member
+
+            <span class="highlight">Caller : 9 pts for high epic participation / 6 pts for Baium participation / 3 pts for low epics participation. (Caller points are applied only for himself, and not for his CP)</span>
+            <span class="highlight">Ally leader : For every high epic earned, he cannot earn again for at least 6 months. For mid-low epics, and full drops, he can earn at any time, as long as the alliance approves during the weekly meeting.</span>
+
+            <div class="section-header">
+                 02. Cooldown Protocol
+            </div>
+            - Low Epics: 1-week restriction before participating again.  
+            - Mid-Level Epics: 3-week restriction before participating again.  
+            - High Epics: 3-week restriction before participating again.
+
+            <div class="section-header">
+                 03. CP Member Limit
+            </div>
+            Each CP is allowed to have a maximum of 10 members in clan.
+            Do not occupy extra spaces without permission.
+
+            <div class="section-header">
+                 04. Sunday Activity
+            </div>
+            Sunday is the most important active day. αν ένας member δεν μπορεί:
+            - Notify CP Leader.
+            - Temporarily leave the clan on Sunday for drivers.
+            <span class="important">Penalties: If a CP is not 9/9 active on Sunday checks, penalty points apply. Repeat offense leads to score reset to 0.</span>
+
+            <div style="text-align:center; margin-top:40px; font-family:'Cinzel'; color:var(--gold); border-top:1px solid #333; padding-top:20px;"># Clan Agreements</div>
+
+            <div class="clan-agreement">
+                <img src="https://i.ibb.co/Y4spJqVy/exitgaming.png" class="clan-logo">
+                <div>
+                    <strong style="color:var(--gold); font-family:'Cinzel';">ExitGaming Clan</strong><br>
+                    Night Epics (00:00 - 08:00) assigned to ExitGaming.
+                    High Epics: 1 for ExitGaming, 3 for us (Dice Roll).
+                </div>
+            </div>
+
+            <div class="clan-agreement">
+                <img src="https://i.ibb.co/xqg1qNFw/lastkingdom.png" class="clan-logo">
+                <div>
+                    <strong style="color:var(--gold); font-family:'Cinzel';">Last Kingdom (LK) Clan</strong><br>
+                    Epic Distribution based on participation (5 parties weekend / 3 parties weekdays).
+                    Access to every 5th or 6th Baium.
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function changeMusic() {
+            const select = document.getElementById('audioSelect');
+            const player = document.getElementById('bgMusic');
+            const track = select.value;
+            if(track === "none") {
+                player.src = "";
+            } else {
+                player.src = track + "?autoplay=1";
+            }
+        }
+    </script>
+</body>
+</html>
