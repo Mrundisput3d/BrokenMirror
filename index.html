@@ -143,18 +143,8 @@
             <a href="pvpzone.html" class="nav-btn">PVP ZONE</a>
             <a href="halloffame.html" class="nav-btn">HALL OF FAME</a>
         </div>
-        <div class="leaders-row">
-            <div class="leader-card" onclick="openCaller('NIKLAUS', 'ALLY LEADER', 'https://i.ibb.co/5X3NDQFR/niklaus.png')">
-                <div class="img-frame"><img src="https://i.ibb.co/5X3NDQFR/niklaus.png" class="leader-img"></div>
-                <span class="leader-name">NIKLAUS</span>
-                <span class="leader-role">ALLY LEADER</span>
+        <div class="leaders-row" id="dynamic-leaders">
             </div>
-            <div class="leader-card" onclick="openCaller('TSAKNORRIS', 'SHOT CALLER', 'https://i.ibb.co/xSVgzBPB/tsaknorris.png')">
-                <div class="img-frame"><img src="https://i.ibb.co/xSVgzBPB/tsaknorris.png" class="leader-img"></div>
-                <span class="leader-name">TSAKNORRIS</span>
-                <span class="leader-role">SHOT CALLER</span>
-            </div>
-        </div>
     </div>
 
     <div id="dashboard" class="page">
@@ -227,12 +217,28 @@
             const nList = document.getElementById('noldor-list');
             const kList = document.getElementById('krim-list');
             nList.innerHTML = ""; kList.innerHTML = "";
+            let dynamicLeadersHtml = ""; // Μεταβλητή για τα δυναμικά Caller εικονίδια
+
             const sortedIDs = Object.keys(data).sort((a,b) => (data[b].totalPoints || 0) - (data[a].totalPoints || 0));
             
             sortedIDs.forEach(id => {
                 const cp = data[id];
                 if(cp.clan === 'history') return;
-                const style = (cp.clan === 'noldor' || cp.clan === 'caller') ? 'cp-noldor' : 'cp-krim';
+
+                // ΑΝ ΕΙΝΑΙ CALLER, ΦΤΙΑΞΕ ΣΤΡΟΓΓΥΛΟ ΕΙΚΟΝΙΔΙΟ ΣΤΗΝ ΚΟΡΥΦΗ
+                if(cp.clan === 'caller') {
+                    const role = cp.leader || "CALLER";
+                    const img = cp.imgUrl || "https://i.ibb.co/SXM1FZx8/attedance-points.png";
+                    dynamicLeadersHtml += `
+                        <div class="leader-card" onclick="openCaller('${id}', '${role}', '${img}')">
+                            <div class="img-frame"><img src="${img}" class="leader-img"></div>
+                            <span class="leader-name">${cp.name.toUpperCase()}</span>
+                            <span class="leader-role">${role}</span>
+                        </div>`;
+                    return; // Το return εδώ εμποδίζει το Caller να μπει ΚΑΙ στις κάτω λίστες.
+                }
+
+                const style = cp.clan === 'noldor' ? 'cp-noldor' : 'cp-krim';
                 
                 let lootHtml = "No history found.";
                 if(cp.lootHistory && cp.lootHistory.length > 0) {
@@ -278,9 +284,12 @@
                             <button class="loot-btn" onclick="openCpStats('${id}')">VIEW CP ATTENDANCES</button>
                         </div>
                     </div>`;
-                if(cp.clan === 'noldor' || cp.clan === 'caller') nList.innerHTML += html;
+                if(cp.clan === 'noldor') nList.innerHTML += html;
                 else kList.innerHTML += html;
             });
+
+            // Εισαγωγή των δυναμικών Callers στο πάνω μέρος της σελίδας
+            document.getElementById('dynamic-leaders').innerHTML = dynamicLeadersHtml;
         });
 
         function openCpStats(cpId) {
@@ -335,33 +344,32 @@
             });
         }
 
-        function openCaller(name, role, img) {
-            document.getElementById('modal-name').innerText = name;
+        function openCaller(callerId, role, img) {
+            const cp = globalCPData[callerId];
+            if(!cp) return;
+
+            document.getElementById('modal-name').innerText = cp.name.toUpperCase() + ` (${cp.totalPoints || 0} PTS)`;
             document.getElementById('modal-title').innerText = role;
             document.getElementById('modal-img').src = img;
-            db.ref('cps').once('value', snap => {
-                const data = snap.val() || {};
-                let callerID = Object.keys(data).find(k => data[k].name.toUpperCase() === name.toUpperCase());
-                const cp = callerID ? data[callerID] : null;
-                document.getElementById('modal-stats').innerHTML = Object.keys(bossIcons).map(b => {
-                    const val = (cp && cp.bossStats && cp.bossStats[b]) ? cp.bossStats[b] : 0;
-                    return `<div class="stat-box"><img src="${bossIcons[b]}" class="boss-icon"><span class="stat-val">${val}</span></div>`;
-                }).join('');
-                
-                let lootHtml = "No history found.";
-                if(cp && cp.lootHistory) {
-                    lootHtml = cp.lootHistory.map(l => `
-                        <div style="display:flex; align-items:center; gap:8px; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
-                            <img src="${getIconForLoot(l.item)}" style="width:18px; height:18px; object-fit:contain;">
-                            <span style="color:#888; font-size:0.7rem;">${l.date}</span>
-                            <span style="color:#ddd; flex-grow:1; text-align:left;">${l.item}</span>
-                            <span style="color:#ff4444; font-family:'Cinzel'; font-weight:bold;">-${l.cost}</span>
-                        </div>
-                    `).join('');
-                }
-                document.getElementById('leader-loot-panel').innerHTML = lootHtml;
-                if(cp) document.getElementById('modal-name').innerText = `${name} (${cp.totalPoints || 0} PTS)`;
-            });
+            
+            document.getElementById('modal-stats').innerHTML = Object.keys(bossIcons).map(b => {
+                const val = (cp.bossStats && cp.bossStats[b]) ? cp.bossStats[b] : 0;
+                return `<div class="stat-box"><img src="${bossIcons[b]}" class="boss-icon"><span class="stat-val">${val}</span></div>`;
+            }).join('');
+            
+            let lootHtml = "No history found.";
+            if(cp.lootHistory && cp.lootHistory.length > 0) {
+                lootHtml = cp.lootHistory.map(l => `
+                    <div style="display:flex; align-items:center; gap:8px; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
+                        <img src="${getIconForLoot(l.item)}" style="width:18px; height:18px; object-fit:contain;">
+                        <span style="color:#888; font-size:0.7rem;">${l.date}</span>
+                        <span style="color:#ddd; flex-grow:1; text-align:left;">${l.item}</span>
+                        <span style="color:#ff4444; font-family:'Cinzel'; font-weight:bold;">-${l.cost}</span>
+                    </div>
+                `).join('');
+            }
+            document.getElementById('leader-loot-panel').innerHTML = lootHtml;
+            
             document.getElementById('caller-modal').style.display = 'block';
             document.getElementById('overlay').style.display = 'block';
         }
