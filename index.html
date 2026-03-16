@@ -25,7 +25,7 @@
         .ally-logo { width: 110px; filter: drop-shadow(0 0 15px var(--gold)); }
         .ally-title { font-family: 'Cinzel Decorative', cursive; font-size: 1.8rem; color: var(--gold); display: block; letter-spacing: 2px; margin-bottom: 20px;}
         .main-nav { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-        .nav-btn { background: rgba(212, 175, 55, 0.1); border: 1px solid var(--gold); color: var(--gold); padding: 8px 15px; font-family: 'Cinzel'; cursor: pointer; font-size: 0.75rem; border-radius: 4px; }
+        .nav-btn { background: rgba(212, 175, 55, 0.1); border: 1px solid var(--gold); color: var(--gold); padding: 8px 15px; font-family: 'Cinzel'; cursor: pointer; font-size: 0.75rem; border-radius: 4px; text-decoration: none; }
         .nav-btn.active { background: var(--gold); color: #000; }
         .leaders-row { display: flex; justify-content: center; gap: 40px; margin-bottom: 20px; }
         .leader-card { text-align: center; cursor: pointer; width: 110px; }
@@ -33,11 +33,17 @@
         .leader-img { width: 100%; height: 100%; object-fit: contain; }
         .leader-name { color: var(--gold); font-size: 0.8rem; font-family: 'Cinzel'; display: block; margin-top: 8px; font-weight: bold; }
         .leader-role { color: #888; font-size: 0.6rem; text-transform: uppercase; display: block; }
-        .tabs-nav { display: flex; justify-content: center; gap: 15px; margin: 25px 0; }
-        .tab-btn { background: rgba(0,0,0,0.6); border: 1px solid var(--gold); color: var(--gold); padding: 10px 25px; font-family: 'Cinzel'; cursor: pointer; font-size: 0.8rem; }
-        .tab-btn.active { background: var(--gold); color: #000; font-weight: bold; }
-        .page { display: none; max-width: 1500px; margin: 0 auto; padding: 0 20px; }
-        .page.active { display: block; }
+        
+        /* THE BIG MARKETPLACE BUTTON IN THE MAIN DASHBOARD */
+        .market-action-row { text-align: center; margin: 30px 0; }
+        .enter-market-btn { display: inline-block; background: rgba(212, 175, 55, 0.1); border: 2px solid var(--gold); color: var(--gold); padding: 15px 40px; font-family: 'Cinzel'; font-size: 1.1rem; text-decoration: none; font-weight: bold; letter-spacing: 2px; border-radius: 5px; transition: 0.3s; cursor: pointer; }
+        .enter-market-btn:hover { background: var(--gold); color: #000; box-shadow: 0 0 20px rgba(212, 175, 55, 0.5); }
+        
+        /* STYLING FOR THE SINGLE TITLE (SINCE TABS ARE GONE) */
+        .section-title { text-align: center; color: var(--gold); font-family: 'Cinzel'; font-size: 1.3rem; margin: 20px 0 10px 0; border-bottom: 1px solid rgba(212, 175, 55, 0.3); padding-bottom: 10px; display: inline-block; }
+        .section-title-wrapper { text-align: center; margin-bottom: 20px; }
+
+        .page { display: block; max-width: 1500px; margin: 0 auto; padding: 0 20px; }
         .main-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px; }
         .clan-column { background: rgba(15, 18, 22, 0.95); height: 750px; display: flex; flex-direction: column; border: 1px solid #333; border-radius: 10px; border-top: 4px solid var(--gold); }
         .column-header { padding: 15px; text-align: center; font-family: 'Cinzel'; font-size: 1.1rem; border-bottom: 1px solid #222; display: flex; align-items: center; justify-content: center; gap: 12px; }
@@ -60,14 +66,6 @@
         .new-clan-card { background: rgba(15, 18, 22, 0.95); border: 1px solid #333; border-top: 3px solid var(--gold); border-radius: 10px; padding: 20px; text-align: center; }
         .new-clan-icon { width: 55px; height: 55px; margin-bottom: 12px; }
         .new-clan-name { display: block; font-family: 'Cinzel'; color: #fff; font-size: 0.95rem; }
-        .info-wrapper { display: grid; grid-template-columns: 1fr 1.5fr; gap: 30px; }
-        .info-card { background: rgba(15, 18, 22, 0.9); border: 1px solid #333; border-radius: 12px; padding: 25px; }
-        .info-card h3 { font-family: 'Cinzel'; color: var(--gold); border-bottom: 1px solid rgba(212,175,55,0.3); padding-bottom: 10px; margin-top: 0; }
-        
-        /* MARKETPLACE BUTTON STYLE (ADDED) */
-        .enter-btn { display: inline-block; background: rgba(212, 175, 55, 0.1); border: 2px solid var(--gold); color: var(--gold); padding: 15px 30px; font-family: 'Cinzel'; text-decoration: none; font-weight: bold; letter-spacing: 2px; transition: 0.3s; cursor: pointer; margin-top: 30px; }
-        .enter-btn:hover { background: var(--gold); color: #000; box-shadow: 0 0 15px var(--gold); }
-
         #caller-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 420px; background: #0f1216; border: 2px solid var(--gold); border-radius: 15px; padding: 25px; z-index: 9999; text-align: center; }
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9998; backdrop-filter: blur(5px); }
     </style>
@@ -99,9 +97,9 @@
         <span class="ally-title">BROKEN MIRROR ALLIANCE</span>
         <div class="main-nav">
             <button class="nav-btn active">DASHBOARD</button>
-            <a href="history.html"><button class="nav-btn">LEAVERS HISTORY</button></a>
-            <a href="pvpzone.html"><button class="nav-btn">PVP ZONE</button></a>
-            <a href="halloffame.html"><button class="nav-btn">HALL OF FAME</button></a>
+            <a href="history.html" class="nav-btn">LEAVERS HISTORY</a>
+            <a href="pvpzone.html" class="nav-btn">PVP ZONE</a>
+            <a href="halloffame.html" class="nav-btn">HALL OF FAME</a>
         </div>
         <div class="leaders-row">
             <div class="leader-card" onclick="openCaller('NIKLAUS', 'ALLY LEADER', 'https://i.ibb.co/5X3NDQFR/niklaus.png')">
@@ -117,12 +115,16 @@
         </div>
     </div>
 
-    <div class="tabs-nav">
-        <button class="tab-btn active" onclick="showPage('dashboard', this)">ALLIANCE CP LIST</button>
-        <button class="tab-btn" onclick="showPage('info', this)">MARKET & POLICIES</button>
-    </div>
+    <div id="dashboard" class="page">
+        
+        <div class="market-action-row">
+            <a href="market.html" class="enter-market-btn">⚖️ ENTER MARKETPLACE & POLICIES ⚖️</a>
+        </div>
 
-    <div id="dashboard" class="page active">
+        <div class="section-title-wrapper">
+            <span class="section-title">ALLIANCE CP LIST</span>
+        </div>
+
         <div class="main-wrapper">
             <div class="clan-column">
                 <div class="column-header" style="color:var(--noldor-sky)"><img src="https://i.ibb.co/8LvFNQkC/noldor.png" style="width:25px;"> NOLDOR CLAN</div>
@@ -137,34 +139,6 @@
             <div class="new-clan-card"><img src="https://i.ibb.co/6cgvyHHW/orzelbialy.png" class="new-clan-icon"><span class="new-clan-name">OrzelBialy Clan</span></div>
             <div class="new-clan-card"><img src="https://i.ibb.co/Y4spJqVy/exitgaming.png" class="new-clan-icon"><span class="new-clan-name">ExitGaming Clan</span></div>
             <div class="new-clan-card"><img src="https://i.ibb.co/xqg1qNFw/lastkingdom.png" class="new-clan-icon"><span class="new-clan-name">LastKingdom Clan</span></div>
-        </div>
-    </div>
-
-    <div id="info" class="page">
-        <div class="info-wrapper">
-            <div class="info-card" style="text-align: center;">
-                <h3>MARKETPLACE</h3>
-                <p style="color:#888; font-size: 0.9rem; margin-top: 20px;">Access Jewel Market, Attendance Rules and Clan Agreements.</p>
-                <a href="market.html" class="enter-btn">ENTER MARKETPLACE</a>
-            </div>
-            
-            <div class="info-card">
-                <h3>ALLIANCE POLICIES</h3>
-                <div style="color:#ccc; font-size: 0.85rem; line-height:1.7;">
-                    <b style="color:var(--gold); font-family:'Cinzel';">ATTENDANCE POINTS:</b><br>
-                    • Mid Epics (Orfen, Queen Ant, Zaken) = 1 pt per member<br>
-                    • Baium = 2 pts per member<br>
-                    • Valakas / Antharas = 3 pts Per member <br><br>
-                    <b style="color:var(--gold); font-family:'Cinzel';">JEWEL PRIORITY:</b><br>
-                    • Archer CPs: Baium Ring<br>
-                    • Mage CPs: Valakas Necklace<br>
-                    • Stopper Party: Antharas Earring<br><br>
-                    <b style="color:var(--gold); font-family:'Cinzel';">COOLDOWN PROTOCOL:</b><br>
-                    3-week restriction for mid level jewels.<br><br>
-                    <b style="color:var(--gold); font-family:'Cinzel';">DEDUCTIONS:</b><br>
-                    Points are deducted automatically based on Marketplace price.
-                </div>
-            </div>
         </div>
     </div>
 
@@ -210,12 +184,6 @@
                 else kList.innerHTML += html;
             });
         });
-
-        function showPage(id, btn) { 
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); 
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); 
-            document.getElementById(id).classList.add('active'); btn.classList.add('active'); 
-        }
 
         function openCaller(name, role, img) {
             document.getElementById('modal-name').innerText = name;
@@ -283,8 +251,6 @@
         }
 
         setInterval(() => { document.getElementById('clock').innerText = "SERVER TIME: " + new Date().toLocaleTimeString('el-GR', {timeZone:'UTC', hour12:false}) + " UTC"; }, 1000);
-        
-        // ΣΗΜΕΙΩΣΗ: Αφαιρέθηκε το JS που φόρτωνε τις τιμές του Market, αφού πλέον υπάρχει το κουμπί!
     </script>
 </body>
 </html>
