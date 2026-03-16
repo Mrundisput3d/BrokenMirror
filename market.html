@@ -10,7 +10,8 @@
 
         body { 
             background: var(--bg); 
-            background-image: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), url('https://i.ibb.co/hR0867S/bma-bg.jpg'); 
+            /* ΤΟ ΔΙΚΟ ΣΟΥ BACKGROUND LINK */
+            background-image: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), url('https://i.ibb.co/FbHYLMCD/BACKGROUND.png'); 
             background-attachment: fixed;
             background-size: cover;
             background-position: center;
@@ -39,7 +40,7 @@
         }
         .nav-btn:hover { background: var(--gold); color: #000; box-shadow: 0 0 15px var(--gold); }
 
-        .container { max-width: 1000px; margin: 0 auto; padding: 100px 20px; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 100px 20px; }
 
         h1 { 
             font-family: 'Cinzel'; color: var(--gold); text-align: center; 
@@ -53,19 +54,19 @@
             gap: 15px; margin-bottom: 80px;
         }
         .jewel-card {
-            background: rgba(15, 15, 15, 0.9); border: 1px solid #333;
+            background: rgba(10, 10, 10, 0.85); border: 1px solid #333;
             padding: 15px; display: flex; align-items: center; gap: 15px;
             border-bottom: 3px solid var(--gold);
             transition: 0.3s;
         }
-        .jewel-card:hover { transform: translateY(-5px); background: rgba(30, 30, 30, 0.9); }
+        .jewel-card:hover { transform: translateY(-5px); background: rgba(20, 20, 20, 0.95); }
         .jewel-icon { width: 45px; height: 45px; border: 1px solid var(--gold); background: #000; }
         .jewel-name { font-family: 'Cinzel'; font-size: 0.85rem; color: #fff; letter-spacing: 1px; }
         .jewel-price { font-family: 'Cinzel'; font-size: 1.3rem; color: var(--gold); font-weight: bold; }
 
         /* POLICIES BOX */
         .policies-box {
-            background: rgba(10, 10, 10, 0.95);
+            background: rgba(5, 5, 5, 0.92);
             border: 2px solid var(--gold);
             padding: 60px;
             line-height: 1.8;
@@ -73,7 +74,7 @@
         }
 
         .section-title {
-            font-family: 'Cinzel'; color: var(--gold); font-size: 1.6rem;
+            font-family: 'Cinzel'; color: var(--gold); font-size: 1.7rem;
             margin-top: 50px; margin-bottom: 25px; border-bottom: 1px solid rgba(212, 175, 55, 0.3);
             display: flex; align-items: center; gap: 15px; padding-bottom: 10px;
             letter-spacing: 2px; text-shadow: 1px 1px 3px black;
@@ -81,23 +82,23 @@
 
         .section-title img { width: 35px; height: 35px; border: 1px solid var(--gold); }
 
-        .policy-text { white-space: pre-line; font-size: 1.1rem; color: #ccc; }
+        .policy-text { white-space: pre-line; font-size: 1.15rem; color: #ddd; text-align: justify; }
 
         /* CLAN AGREEMENTS */
         .clan-agreement {
-            background: rgba(212, 175, 55, 0.03);
-            border: 1px solid #333;
+            background: rgba(212, 175, 55, 0.05);
+            border: 1px solid #444;
             padding: 30px;
             margin-top: 30px;
             display: flex;
             align-items: center;
             gap: 25px;
-            border-left: 4px solid var(--gold);
+            border-left: 5px solid var(--gold);
         }
-        .clan-logo { width: 90px; height: 90px; object-fit: contain; background: rgba(0,0,0,0.5); border: 1px solid #444; padding: 5px; }
+        .clan-logo { width: 100px; height: 100px; object-fit: contain; background: rgba(0,0,0,0.6); border: 1px solid #444; padding: 5px; }
 
-        .important { color: #ff4444; font-weight: bold; border-bottom: 1px solid #ff4444; }
-        .highlight { color: var(--gold); font-weight: bold; }
+        .important { color: #ff4444; font-weight: bold; text-decoration: underline; }
+        .highlight { color: var(--gold); font-weight: bold; font-family: 'Cinzel'; }
     </style>
 </head>
 <body>
@@ -105,9 +106,9 @@
     <div class="music-box">
         <select id="musicSelect" onchange="changeMusic()">
             <option value="none">Silence</option>
-            <option value="https://www.youtube.com/embed/S2C_P7-Yn8o">Dion</option>
-            <option value="https://www.youtube.com/embed/pSj7S8N6Ksc">Giran</option>
-            <option value="https://www.youtube.com/embed/vO6WpS8p4n0">Hunters</option>
+            <option value="https://www.youtube.com/embed/S2C_P7-Yn8o">Dion Theme</option>
+            <option value="https://www.youtube.com/embed/pSj7S8N6Ksc">Giran Theme</option>
+            <option value="https://www.youtube.com/embed/vO6WpS8p4n0">Hunters Village</option>
         </select>
     </div>
     <iframe id="bgMusic" width="0" height="0" src="" frameborder="0" allow="autoplay"></iframe>
@@ -158,8 +159,8 @@ If your CP has absent members for Saturday or Sunday, you must inform the Allian
 <div class="section-title">Sunday Activity Requirement</div>
 Sunday is the most important active day for the clan.
 If a member cannot attend on Sunday, there is no problem, but the following must happen:
-The member must notify their CP Leader in advance.,
-The member must temporarily leave the clan on Sunday.,
+- The member must notify their CP Leader in advance.
+- The member must temporarily leave the clan on Sunday.
 This allows the alliance to invite temporary drivers to fill the available spots.
 Members who leave for this reason will be invited back the next day.
 
@@ -173,7 +174,7 @@ If this situation happens more than once, the entire CP score will be reset to 0
 
 This ensures the alliance can replace inactive spots and remain competitive during key events.
 
-<div style="text-align:center; margin-top:50px; font-family:'Cinzel'; color:var(--gold); font-size: 1.3rem;">Final Note</div>
+<div style="text-align:center; margin-top:50px; font-family:'Cinzel'; color:var(--gold); font-size: 1.5rem;">Final Note</div>
 These policies are designed to maintain discipline, fairness, and strong performance across the alliance. Respecting these rules ensures every CP has equal opportunity and the alliance remains organized and competitive.
 
 <div class="section-title"># External Clan Agreements</div>
@@ -181,7 +182,7 @@ These policies are designed to maintain discipline, fairness, and strong perform
 <div class="clan-agreement">
     <img src="https://i.ibb.co/Y4spJqVy/exitgaming.png" class="clan-logo">
     <div>
-        <strong style="color:var(--gold); font-family:'Cinzel'; font-size: 1.2rem;">ExitGaming Clan</strong>
+        <strong style="color:var(--gold); font-family:'Cinzel'; font-size: 1.3rem;">ExitGaming Clan</strong>
         Night Epics:  
         - All night epics between 00:00 and 08:00 Greek time are assigned to ExitGaming.
 
@@ -197,7 +198,7 @@ These policies are designed to maintain discipline, fairness, and strong perform
 <div class="clan-agreement">
     <img src="https://i.ibb.co/xqg1qNFw/lastkingdom.png" class="clan-logo">
     <div>
-        <strong style="color:var(--gold); font-family:'Cinzel'; font-size: 1.2rem;">Last Kingdom (LK) Clan</strong>
+        <strong style="color:var(--gold); font-family:'Cinzel'; font-size: 1.3rem;">Last Kingdom (LK) Clan</strong>
         Epic Distribution:  
         - 1 mid epic and 2 low epics if they bring:  
           - At least 5 parties of 9/9 for the weekend  
