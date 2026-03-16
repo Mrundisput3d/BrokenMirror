@@ -2,7 +2,7 @@
 <html lang="el">
 <head>
     <meta charset="UTF-8">
-    <title>BMA | Command Center V18.1</title>
+    <title>BMA | Command Center V18.2</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -46,7 +46,7 @@
 <body>
 
     <div class="header-container">
-        <div style="width:80px"></div> <h1>BMA COMMAND CENTER V18.1</h1>
+        <div style="width:80px"></div> <h1>BMA COMMAND CENTER V18.2</h1>
         <button class="logout-btn" onclick="logout()">LOGOUT</button>
     </div>
 
@@ -322,6 +322,7 @@
         });
     }
 
+    // --- ΑΛΛΑΓΗ ΣΤΗ ΛΟΓΙΚΗ ΓΙΑ ΝΑ ΜΕΤΡΑΕΙ ΟΛΑ ΤΑ ΑΤΟΜΑ ΣΤΑ PERSONAL LOGS (ΚΑΙ ΤΟΥ 10ου/11ου) ---
     async function logValidatedEvent(bossId, multiplier) {
         const checkboxes = document.querySelectorAll('.cp-checkbox');
         const today = new Date().toLocaleDateString('el-GR').replace(/\//g, '-');
@@ -336,22 +337,29 @@
                     if (alreadyDone) { skippedTotal++; return false; }
                     return true;
                 });
+                
                 if (eligible.length === 0) continue;
-                const finalNames = eligible.slice(0, 9);
-                const finalCount = finalNames.length;
+                
+                // Κρατάμε ΟΛΑ τα ονόματα για τα προσωπικά logs
+                const allNames = eligible;
+                
+                // Το CP θα πάρει πόντους για αυστηρά MAX 9 άτομα.
+                const pointsCount = Math.min(allNames.length, 9);
 
                 await db.ref('cps/' + id).transaction(cp => {
                     if(cp) {
                         if(!cp.bossStats) cp.bossStats = {};
-                        cp.bossStats[bossId] = (cp.bossStats[bossId] || 0) + finalCount;
-                        cp.totalPoints = (cp.totalPoints || 0) + (finalCount * multiplier);
+                        cp.bossStats[bossId] = (cp.bossStats[bossId] || 0) + pointsCount;
+                        cp.totalPoints = (cp.totalPoints || 0) + (pointsCount * multiplier);
                     }
                     return cp;
                 });
 
-                for(let name of finalNames) {
+                // Όλοι (ακόμα και ο 10ος ή 11ος) παίρνουν το δικό τους personal attendance!
+                for(let name of allNames) {
                     await db.ref(`dailyLogs/${today}/${name}/${bossId}`).set({ cp: id, time: new Date().toLocaleTimeString() });
                 }
+                
                 totalUpdated++;
             }
         }
