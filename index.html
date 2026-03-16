@@ -78,12 +78,15 @@
         .stat-val { font-size: 0.75rem; color: #fff; font-family: 'Cinzel'; display: block; }
         
         .other-clans-section { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 20px; }
-        .new-clan-card { background: rgba(15, 18, 22, 0.95); border: 1px solid #333; border-top: 3px solid var(--gold); border-radius: 10px; padding: 20px; text-align: center; }
+        
+        .new-clan-card { background: rgba(15, 18, 22, 0.95); border: 1px solid #333; border-top: 3px solid var(--gold); border-radius: 10px; padding: 20px; text-align: center; cursor: pointer; transition: 0.3s; }
+        .new-clan-card:hover { transform: translateY(-3px); box-shadow: 0 0 15px rgba(212, 175, 55, 0.2); }
+        
         .new-clan-icon { width: 55px; height: 55px; margin-bottom: 12px; }
         .new-clan-name { display: block; font-family: 'Cinzel'; color: #fff; font-size: 0.95rem; }
         
         /* MODALS */
-        #caller-modal, #cp-stats-modal, #member-stats-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 420px; background: #0f1216; border: 2px solid var(--gold); border-radius: 15px; padding: 25px; z-index: 9999; text-align: center; }
+        #caller-modal, #cp-stats-modal, #member-stats-modal, #clan-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 420px; background: #0f1216; border: 2px solid var(--gold); border-radius: 15px; padding: 25px; z-index: 9999; text-align: center; }
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9998; backdrop-filter: blur(5px); }
     </style>
 </head>
@@ -106,7 +109,7 @@
         <p id="modal-title" style="color:#888; font-size:0.7rem; margin-bottom:20px;"></p>
         <div class="stat-grid" id="modal-stats"></div>
         <button class="loot-btn" onclick="toggleLeaderLoot()">VIEW LOOT HISTORY</button>
-        <div id="leader-loot-panel" class="loot-panel" style="display:none;">No history found.</div>
+        <div id="leader-loot-panel" class="loot-panel" style="display:none; text-align:left;">No history found.</div>
         <button onclick="closeModal()" style="margin-top:20px; background:var(--gold); color:#000; border:none; padding:10px 25px; cursor:pointer; font-weight:bold; border-radius:4px; width: 100%;">CLOSE</button>
     </div>
 
@@ -121,6 +124,14 @@
         <p style="color:#888; font-size:0.7rem; margin-bottom:20px;">PERSONAL ATTENDANCES</p>
         <div class="stat-grid" id="member-stats-grid"></div>
         <button onclick="closeModal()" style="margin-top:20px; background:var(--gold); color:#000; border:none; padding:10px 25px; cursor:pointer; font-weight:bold; border-radius:4px; width: 100%;">CLOSE</button>
+    </div>
+
+    <div id="clan-modal">
+        <img id="clan-modal-img" src="" style="width:90px; height:90px; border-radius:10px; border:2px solid var(--gold); background:rgba(0,0,0,0.6); margin-bottom:15px; object-fit:contain; padding:5px;">
+        <h2 id="clan-modal-name" style="font-family:'Cinzel'; color:var(--gold); margin:0 0 15px 0; font-size:1.3rem;"></h2>
+        <div id="clan-modal-content">
+            </div>
+        <button onclick="closeModal()" style="margin-top:10px; background:var(--gold); color:#000; border:none; padding:10px 25px; cursor:pointer; font-weight:bold; border-radius:4px; width: 100%;">CLOSE</button>
     </div>
 
     <div class="top-header">
@@ -166,10 +177,20 @@
                 <div class="scroll-area" id="krim-list"></div>
             </div>
         </div>
+        
         <div class="other-clans-section">
-            <div class="new-clan-card"><img src="https://i.ibb.co/6cgvyHHW/orzelbialy.png" class="new-clan-icon"><span class="new-clan-name">OrzelBialy Clan</span></div>
-            <div class="new-clan-card"><img src="https://i.ibb.co/Y4spJqVy/exitgaming.png" class="new-clan-icon"><span class="new-clan-name">ExitGaming Clan</span></div>
-            <div class="new-clan-card"><img src="https://i.ibb.co/xqg1qNFw/lastkingdom.png" class="new-clan-icon"><span class="new-clan-name">LastKingdom Clan</span></div>
+            <div class="new-clan-card" onclick="openClanModal('OrzelBialy', 'OrzelBialy Clan', 'https://i.ibb.co/6cgvyHHW/orzelbialy.png')">
+                <img src="https://i.ibb.co/6cgvyHHW/orzelbialy.png" class="new-clan-icon">
+                <span class="new-clan-name">OrzelBialy Clan</span>
+            </div>
+            <div class="new-clan-card" onclick="openClanModal('ExitGaming', 'ExitGaming Clan', 'https://i.ibb.co/Y4spJqVy/exitgaming.png')">
+                <img src="https://i.ibb.co/Y4spJqVy/exitgaming.png" class="new-clan-icon">
+                <span class="new-clan-name">ExitGaming Clan</span>
+            </div>
+            <div class="new-clan-card" onclick="openClanModal('LastKingdom', 'LastKingdom Clan', 'https://i.ibb.co/xqg1qNFw/lastkingdom.png')">
+                <img src="https://i.ibb.co/xqg1qNFw/lastkingdom.png" class="new-clan-icon">
+                <span class="new-clan-name">LastKingdom Clan</span>
+            </div>
         </div>
     </div>
 
@@ -180,6 +201,12 @@
         const bossIcons = { "VAL": "https://i.ibb.co/84gZPVRP/necklace-valakas.png", "ANT": "https://i.ibb.co/rfqvc6mv/earring-antharas.png", "BAI": "https://i.ibb.co/XrZkv67h/ring-of-baium.png", "FRI": "https://i.ibb.co/gF4YKGTM/frintezza-necklace.png", "ZAK": "https://i.ibb.co/spkC6Gzz/zaken-earring.png", "AQ":  "https://i.ibb.co/rKRtZmBG/ring-of-queen-ant.png", "ORF": "https://i.ibb.co/j9dDnXwH/earring-orfen.png", "COR": "https://i.ibb.co/ksv37fNZ/ring-of-.png", "SIE": "https://i.ibb.co/Txfby6wD/images.png" };
 
         let globalCPData = {}; 
+        let globalExternalClans = {}; // Για τα 3 κάτω clans
+
+        // Fetch External Clans Data
+        db.ref('externalClans/').on('value', (snapshot) => {
+            globalExternalClans = snapshot.val() || {};
+        });
 
         function getIconForLoot(itemName) {
             if(!itemName) return "https://i.ibb.co/SXM1FZx8/attedance-points.png";
@@ -247,7 +274,7 @@
                             </div>
 
                             <button class="loot-btn" onclick="const p=this.nextElementSibling; p.style.display=p.style.display==='block'?'none':'block';">VIEW LOOT HISTORY</button>
-                            <div class="loot-panel" style="display:none;">${lootHtml}</div>
+                            <div class="loot-panel" style="display:none; text-align:left;">${lootHtml}</div>
 
                             <button class="loot-btn" onclick="openCpStats('${id}')">VIEW CP ATTENDANCES</button>
                         </div>
@@ -270,7 +297,6 @@
             document.getElementById('overlay').style.display = 'block';
         }
 
-        // Η ΣΥΝΑΡΤΗΣΗ ΠΟΥ ΔΙΑΒΑΖΕΙ ΑΠΟ ΤΟ DAILY LOGS ΓΙΑ ΤΟ ΣΥΓΚΕΚΡΙΜΕΝΟ ΜΕΛΟΣ
         function openMemberStats(memberName) {
             document.getElementById('member-stats-name').innerText = memberName.toUpperCase() + " (LOADING...)";
             document.getElementById('member-stats-grid').innerHTML = "<div style='grid-column:1/-1; color:var(--gold); padding:20px; font-family:Cinzel;'>Scanning logs...</div>";
@@ -282,14 +308,11 @@
                 const dailyLogs = snapshot.val() || {};
                 const searchName = memberName.trim().toUpperCase();
 
-                // Διαβάζει μέρα-μέρα τα logs
                 Object.values(dailyLogs).forEach(dayData => {
-                    // Ψάχνει αν ο παίκτης πήγε κάπου τη συγκεκριμένη μέρα
                     Object.keys(dayData).forEach(pName => {
                         if (pName.trim().toUpperCase() === searchName) {
                             const playerBosses = dayData[pName];
                             
-                            // Αν πήγε, μετράει το Boss
                             Object.keys(playerBosses).forEach(bossId => {
                                 const b = bossId.toUpperCase();
                                 if(b.includes('VAL')) mStats.VAL++;
@@ -344,10 +367,59 @@
             document.getElementById('overlay').style.display = 'block';
         }
 
+        function openClanModal(clanId, clanName, iconUrl) {
+            document.getElementById('clan-modal-name').innerText = clanName.toUpperCase();
+            document.getElementById('clan-modal-img').src = iconUrl;
+            
+            // Παίρνουμε τα δεδομένα από τη Firebase (αν υπάρχουν)
+            const extData = globalExternalClans[clanId] || {};
+            const leaderName = extData.leader || "Pending...";
+            const lootHistory = extData.lootHistory || [];
+
+            // 1. Το κείμενο συμφωνιών (όπως ήταν)
+            let content = "Alliance agreements and information regarding this clan are currently pending.";
+            if (clanId === "ExitGaming") {
+                content = "<b style='color:var(--gold)'>NIGHT EPICS:</b><br>All night epics between 00:00 and 08:00 Greek time are assigned to ExitGaming.<br><br><b style='color:var(--gold)'>HIGH EPICS (Baium, Antharas, Valakas):</b><br>Distribution: 1 for ExitGaming, 3 for our alliance.<br>The order is determined by rolling a dice each time (Rolling continues until all parts are distributed fairly).";
+            } else if (clanId === "LastKingdom") {
+                content = "<b style='color:var(--gold)'>EPIC DISTRIBUTION:</b><br>1 mid epic and 2 low epics if they bring at least 5 parties (9/9) for the weekend and at least 3 parties (9/9) on weekdays.<br>If they bring fewer parties, the deal is adjusted accordingly.<br><br><b style='color:var(--gold)'>BAIUM ACCESS:</b><br>LK Clan has access to every 5th or 6th Baium.";
+            }
+
+            // 2. Η λίστα του Loot
+            let lootHtml = "No history found.";
+            if(lootHistory.length > 0) {
+                lootHtml = lootHistory.map(l => `
+                    <div style="display:flex; align-items:center; gap:8px; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
+                        <img src="${getIconForLoot(l.item)}" style="width:18px; height:18px; object-fit:contain;">
+                        <span style="color:#888; font-size:0.7rem;">${l.date}</span>
+                        <span style="color:#ddd; flex-grow:1; text-align:left;">${l.item}</span>
+                        <span style="color:#ff4444; font-family:'Cinzel'; font-weight:bold;">-${l.cost}</span>
+                    </div>
+                `).join('');
+            }
+
+            // 3. Ενώνουμε τα πάντα σε ένα ωραίο HTML
+            const finalHtml = `
+                <div style="margin-bottom: 15px; font-size:0.95rem;">
+                    <span style="color:var(--gold); font-weight:bold; font-family:'Cinzel';">👑 LEADER:</span> 
+                    <span style="color:#fff;">${leaderName}</span>
+                </div>
+                <div style="color:#ddd; font-size:0.85rem; line-height:1.6; text-align:justify; margin-bottom:20px; padding: 10px; background:rgba(0,0,0,0.3); border:1px solid #333; border-radius:5px;">
+                    ${content}
+                </div>
+                <button class="loot-btn" onclick="const p=this.nextElementSibling; p.style.display=p.style.display==='block'?'none':'block';">VIEW LOOT HISTORY</button>
+                <div class="loot-panel" style="display:none; text-align:left;">${lootHtml}</div>
+            `;
+
+            document.getElementById('clan-modal-content').innerHTML = finalHtml;
+            document.getElementById('clan-modal').style.display = 'block';
+            document.getElementById('overlay').style.display = 'block';
+        }
+
         function closeModal() { 
             document.getElementById('caller-modal').style.display='none'; 
             document.getElementById('cp-stats-modal').style.display='none'; 
             document.getElementById('member-stats-modal').style.display='none'; 
+            document.getElementById('clan-modal').style.display='none'; 
             document.getElementById('overlay').style.display='none'; 
         }
         function toggleLeaderLoot() { const p = document.getElementById('leader-loot-panel'); p.style.display = p.style.display==='none'?'block':'none'; }
@@ -355,6 +427,7 @@
         // --- MUSIC LOGIC ---
         const tracks = [
             {name:"DION THEME", url:"https://www.dropbox.com/scl/fi/ypzqrr336iewt62gncy6u/Lineage-2-Dion-Theme-Song.mp3?rlkey=nl1quliuqleuljgkt5jhqq6hh&st=sb8ij16g&raw=1"},
+            {name:"HUNTERS THEME", url:"https://www.dropbox.com/scl/fi/75hck498enzot93zt0lg9/Lineage-2-Hunters-Village-Theme.mp3?rlkey=6mu9ic0gavmofkdvduj72270y&st=j6zupb0a&dl=0"},
             {name:"GIRAN THEME", url:"https://www.dropbox.com/scl/fi/iu8j9wn9wky8fav176ayf/Lineage-2-Giran-Theme.mp3?rlkey=xp1j0upa076sy21tgcta6t9c3&st=0a4ihyhg&raw=1"}
         ];
         let currentIdx = 0; 
