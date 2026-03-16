@@ -41,7 +41,6 @@
         .filter-btn { flex: 1; padding: 5px; font-size: 10px; cursor: pointer; background: #222; border: 1px solid #444; color: #888; font-family: 'Cinzel'; }
         .filter-btn.active { border-color: var(--gold); color: var(--gold); background: rgba(212,175,55,0.1); }
         
-        /* Νέα κλάση για το grid του External panel */
         .external-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px; }
     </style>
 </head>
@@ -59,7 +58,8 @@
                 <button class="filter-btn active" id="btn-active" onclick="setViewMode('active')">ACTIVE</button>
                 <button class="filter-btn" id="btn-history" onclick="setViewMode('history')">HISTORY</button>
             </div>
-            <div id="cp-list-simple" style="max-height: 400px; overflow-y: auto;"></div>
+            <div id="cp-list-simple" style="max-height: 350px; overflow-y: auto;"></div>
+            
             <hr style="border-color:#333; margin: 20px 0;">
             <h3>NEW CP</h3>
             <input type="text" id="new-name" placeholder="Name">
@@ -70,6 +70,13 @@
                 <option value="caller">Caller</option>
             </select>
             <button class="btn btn-gold" onclick="createNewCP()">REGISTER</button>
+
+            <hr style="border-color:#333; margin: 20px 0;">
+            <h3 style="color:var(--blue);">MIGRATE / RENAME PLAYER</h3>
+            <p style="font-size:10px; color:#888; margin-top:-10px;">Αλλάζει το όνομα παντού και μεταφέρει τα Boss Logs στο νέο όνομα χωρίς να χαθούν.</p>
+            <input type="text" id="old-player-name" placeholder="Παλιό Όνομα (Ακριβώς)">
+            <input type="text" id="new-player-name" placeholder="Νέο Όνομα">
+            <button class="btn btn-blue" onclick="migratePlayerLogs()">MIGRATE & RENAME</button>
         </div>
 
         <div class="panel">
@@ -90,11 +97,22 @@
             </div>
 
             <div id="edit-section" style="display:none; border-top:2px solid var(--gold); padding-top:20px; margin-top:20px;">
-                <h2 id="edit-title"></h2>
+                <div style="display:flex; gap:10px; margin-bottom:15px;">
+                    <div style="flex:1;">
+                        <label style="color:#aaa; font-size:11px;">CP Name</label>
+                        <input type="text" id="edit-cp-name" style="font-family:'Cinzel'; color:var(--gold); font-size:1.1rem;">
+                    </div>
+                    <div style="flex:1;">
+                        <label style="color:#aaa; font-size:11px;">CP Leader</label>
+                        <input type="text" id="edit-cp-leader" style="font-family:'Cinzel';">
+                    </div>
+                </div>
+
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:25px;">
                     <div>
-                        <label>Roster</label>
+                        <label style="color:#aaa; font-size:11px;">Roster (Χωρισμένο με κόμμα)</label>
                         <textarea id="edit-members" rows="10"></textarea>
+                        
                         <h3 style="color:var(--gold);">LOOT HISTORY</h3>
                         <div style="max-height: 150px; overflow-y: auto; background: #000; border: 1px solid #333;">
                             <table class="loot-table" id="loot-history-table">
@@ -115,11 +133,14 @@
                             <option value="25|Core Ring">Core Ring (25)</option>
                         </select>
                         <button class="btn btn-red" onclick="addMarketLoot()">BUY ITEM</button>
-                        <label style="display:block; margin-top:20px;">Total Points</label>
+                        
+                        <label style="display:block; margin-top:20px; color:#aaa; font-size:11px;">Total Points</label>
                         <input type="number" id="edit-points" style="font-size:1.2rem; color:var(--gold);">
+                        
                         <div class="stat-edit-grid" id="stat-inputs"></div>
+                        
                         <div style="display:flex; gap:10px; margin-top:20px;">
-                            <button class="btn btn-gold" style="flex:2;" onclick="updateCP()">SAVE ALL</button>
+                            <button class="btn btn-gold" style="flex:2;" onclick="updateCP()">SAVE CP DATA</button>
                             <button class="btn" id="hist-toggle-btn" onclick="toggleHistoryStatus()">HIST</button>
                             <button class="btn btn-red" onclick="deleteCP()">DEL</button>
                         </div>
@@ -185,19 +206,14 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // --- Ο ΦΥΛΑΚΑΣ (AUTH CHECK) ---
+    // AUTH CHECK
     firebase.auth().onAuthStateChanged((user) => {
-        if (!user) {
-            window.location.href = "login.html";
-        }
+        if (!user) window.location.href = "login.html";
     });
 
     function logout() {
-        firebase.auth().signOut().then(() => {
-            window.location.href = "login.html";
-        });
+        firebase.auth().signOut().then(() => window.location.href = "login.html");
     }
-    // ------------------------------
 
     let allCPs = {}, matchedData = {}, currentEditID = null, globalDailyLogs = {};
     let allExtClans = {}, currentExtID = null;
@@ -209,11 +225,9 @@
         allCPs = snap.val() || {}; 
         renderSimpleList(); 
         if(currentEditID) loadEdit(currentEditID); 
-        if(currentExtID && currentExtID.startsWith('cp_')) loadExtEdit(); // Ανανέωση αν είναι caller
+        if(currentExtID && currentExtID.startsWith('cp_')) loadExtEdit(); 
     });
     db.ref('dailyLogs/').on('value', snap => { globalDailyLogs = snap.val() || {}; });
-    
-    // Νέο Realtime Sync για τα External Clans
     db.ref('externalClans/').on('value', snap => {
         allExtClans = snap.val() || {};
         if(currentExtID && currentExtID.startsWith('ext_')) loadExtEdit();
@@ -290,10 +304,16 @@
         document.getElementById('mass-input').value = ""; document.getElementById('detected-list').innerHTML = "";
     }
 
+    // --- CP EDIT & RENAME LOGIC ---
+
     function loadEdit(id) {
         currentEditID = id; const cp = allCPs[id];
         document.getElementById('edit-section').style.display = 'block';
-        document.getElementById('edit-title').innerText = cp.name + (cp.clan === 'history' ? " (ARCHIVED)" : "");
+        
+        // Νέα Πεδία
+        document.getElementById('edit-cp-name').value = cp.name || "";
+        document.getElementById('edit-cp-leader').value = cp.leader || "";
+        
         document.getElementById('edit-members').value = cp.members || "";
         document.getElementById('edit-points').value = cp.totalPoints || 0;
         
@@ -312,7 +332,6 @@
         }
         document.getElementById('loot-history-body').innerHTML = lootHtml;
 
-        // Update Toggle Button UI
         const toggleBtn = document.getElementById('hist-toggle-btn');
         if(cp.clan === 'history') {
             toggleBtn.innerText = "RESTORE";
@@ -322,6 +341,101 @@
             toggleBtn.className = "btn btn-blue";
         }
     }
+
+    function updateCP() {
+        const stats = {}; bossKeys.forEach(k => stats[k] = parseInt(document.getElementById('inp-' + k).value) || 0);
+        
+        // Σώζει και το νέο όνομα/leader
+        db.ref('cps/' + currentEditID).update({ 
+            name: document.getElementById('edit-cp-name').value,
+            leader: document.getElementById('edit-cp-leader').value,
+            members: document.getElementById('edit-members').value, 
+            totalPoints: parseInt(document.getElementById('edit-points').value), 
+            bossStats: stats 
+        });
+        alert("CP Data Saved Successfully!");
+    }
+
+    // --- PLAYER RENAME / MIGRATION LOGIC ---
+    
+    async function migratePlayerLogs() {
+        const oldName = document.getElementById('old-player-name').value.trim();
+        const newName = document.getElementById('new-player-name').value.trim();
+        
+        if(!oldName || !newName) {
+            alert("Παρακαλώ συμπλήρωσε και το παλιό και το νέο όνομα.");
+            return;
+        }
+        if(!confirm(`ΕΙΣΑΙ ΣΙΓΟΥΡΟΣ;\nΤο όνομα ${oldName} θα αλλάξει σε ${newName} σε όλα τα Roster και όλα τα Boss Logs του θα μεταφερθούν αυτόματα!`)) return;
+
+        let logsMoved = 0;
+        let cpsUpdated = 0;
+
+        // 1. Μεταφορά των Logs (Attendances)
+        const logsRef = db.ref('dailyLogs');
+        const snap = await logsRef.once('value');
+        const logs = snap.val() || {};
+        
+        for (const date in logs) {
+            // Βρίσκουμε αν το oldName υπάρχει σε αυτή τη μέρα (case-insensitive)
+            let foundKey = Object.keys(logs[date]).find(k => k.toLowerCase() === oldName.toLowerCase());
+            
+            if (foundKey) {
+                // Αντιγραφή δεδομένων στο newName
+                const dataToMove = logs[date][foundKey];
+                await db.ref(`dailyLogs/${date}/${newName}`).set(dataToMove);
+                // Διαγραφή του παλιού
+                await db.ref(`dailyLogs/${date}/${foundKey}`).remove();
+                logsMoved++;
+            }
+        }
+
+        // 2. Αλλαγή ονόματος στα Roster των CPs
+        const cpsRef = db.ref('cps');
+        const cpSnap = await cpsRef.once('value');
+        const cps = cpSnap.val() || {};
+
+        for (const cpId in cps) {
+            let updated = false;
+            let cp = cps[cpId];
+            
+            if (cp.leader && cp.leader.toLowerCase() === oldName.toLowerCase()) {
+                cp.leader = newName;
+                updated = true;
+            }
+            
+            if (cp.members) {
+                let membersArr = cp.members.split(',').map(m => m.trim());
+                let idx = membersArr.findIndex(m => m.toLowerCase() === oldName.toLowerCase());
+                if (idx !== -1) {
+                    membersArr[idx] = newName;
+                    cp.members = membersArr.join(', ');
+                    updated = true;
+                }
+            }
+            
+            if (updated) {
+                await db.ref(`cps/${cpId}`).update({ leader: cp.leader, members: cp.members });
+                cpsUpdated++;
+            }
+        }
+
+        // 3. (Προαιρετικό) Αλλαγή ονόματος και στα External Clans αν είναι leader εκεί
+        const extRef = db.ref('externalClans');
+        const extSnap = await extRef.once('value');
+        const exts = extSnap.val() || {};
+        for (const extId in exts) {
+            if (exts[extId].leader && exts[extId].leader.toLowerCase() === oldName.toLowerCase()) {
+                await db.ref(`externalClans/${extId}`).update({ leader: newName });
+            }
+        }
+
+        alert(`ΕΠΙΤΥΧΙΑ!\nΜεταφέρθηκαν Logs από ${logsMoved} μέρες.\nΕνημερώθηκαν τα Roster σε ${cpsUpdated} CPs.`);
+        document.getElementById('old-player-name').value = "";
+        document.getElementById('new-player-name').value = "";
+    }
+
+    // ----------------------------------------
 
     function toggleHistoryStatus() {
         const cp = allCPs[currentEditID];
@@ -365,12 +479,6 @@
         });
     }
 
-    function updateCP() {
-        const stats = {}; bossKeys.forEach(k => stats[k] = parseInt(document.getElementById('inp-' + k).value) || 0);
-        db.ref('cps/' + currentEditID).update({ members: document.getElementById('edit-members').value, totalPoints: parseInt(document.getElementById('edit-points').value), bossStats: stats });
-        alert("Saved!");
-    }
-
     function createNewCP() {
         const n = document.getElementById('new-name').value; if(!n) return;
         const id = n.replace(/\s+/g, '-').toLowerCase();
@@ -381,7 +489,7 @@
 
 
     /* =========================================
-       NΕΟΣ ΚΩΔΙΚΑΣ ΓΙΑ ΤΑ EXTERNAL CLANS & CALLERS
+       EXTERNAL CLANS & CALLERS LOGIC
        ========================================= */
 
     function loadExtEdit() {
@@ -398,15 +506,13 @@
         let lootHtml = "";
 
         if (selVal.startsWith('ext_')) {
-            // Είναι External Clan (Orzel, Exit, LK)
             const pureId = selVal.replace('ext_', '');
             targetData = allExtClans[pureId] || { leader: '', lootHistory: [] };
             document.getElementById('ext-leader').value = targetData.leader || "";
-            document.getElementById('ext-points').value = 0; // Τα Clans δεν μετράνε πόντους
+            document.getElementById('ext-points').value = 0; 
             document.getElementById('ext-points').disabled = true; 
         } 
         else if (selVal.startsWith('cp_')) {
-            // Είναι Caller από τα CPs
             const pureId = selVal.replace('cp_', '');
             targetData = allCPs[pureId] || {};
             document.getElementById('ext-leader').value = targetData.leader || targetData.members || "";
@@ -414,7 +520,6 @@
             document.getElementById('ext-points').disabled = false;
         }
 
-        // Render Loot History
         if(targetData.lootHistory) {
             targetData.lootHistory.forEach((item, index) => {
                 lootHtml += `<tr><td>${item.item}</td><td>-${item.cost}</td><td onclick="deleteExtLoot(${index})" style="color:red; cursor:pointer;">✖</td></tr>`;
@@ -457,7 +562,7 @@
             const pureId = currentExtID.replace('cp_', '');
             db.ref('cps/' + pureId).transaction(cp => {
                 if(cp) {
-                    cp.totalPoints -= parseInt(loot[0]); // Αφαιρούμε πόντους στους Callers
+                    cp.totalPoints -= parseInt(loot[0]); 
                     if(!cp.lootHistory) cp.lootHistory = [];
                     cp.lootHistory.push(newItem);
                 }
@@ -478,7 +583,7 @@
         else if (currentExtID.startsWith('cp_')) {
             const pureId = currentExtID.replace('cp_', '');
             const cp = allCPs[pureId];
-            cp.totalPoints += parseInt(cp.lootHistory[idx].cost); // Refund στους Callers
+            cp.totalPoints += parseInt(cp.lootHistory[idx].cost); 
             cp.lootHistory.splice(idx, 1);
             db.ref('cps/' + pureId).update({ totalPoints: cp.totalPoints, lootHistory: cp.lootHistory });
         }
