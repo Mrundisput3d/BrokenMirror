@@ -78,7 +78,9 @@
         .new-clan-card { background: rgba(15, 18, 22, 0.95); border: 1px solid #333; border-top: 3px solid var(--gold); border-radius: 10px; padding: 20px; text-align: center; }
         .new-clan-icon { width: 55px; height: 55px; margin-bottom: 12px; }
         .new-clan-name { display: block; font-family: 'Cinzel'; color: #fff; font-size: 0.95rem; }
-        #caller-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 420px; background: #0f1216; border: 2px solid var(--gold); border-radius: 15px; padding: 25px; z-index: 9999; text-align: center; }
+        
+        /* MODALS */
+        #caller-modal, #cp-stats-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 420px; background: #0f1216; border: 2px solid var(--gold); border-radius: 15px; padding: 25px; z-index: 9999; text-align: center; }
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9998; backdrop-filter: blur(5px); }
     </style>
 </head>
@@ -94,6 +96,7 @@
     <audio id="bg-music" loop><source id="music-source" src="https://www.dropbox.com/scl/fi/ypzqrr336iewt62gncy6u/Lineage-2-Dion-Theme-Song.mp3?rlkey=nl1quliuqleuljgkt5jhqq6hh&st=sb8ij16g&raw=1" type="audio/mpeg"></audio>
 
     <div class="modal-overlay" id="overlay" onclick="closeModal()"></div>
+    
     <div id="caller-modal">
         <img id="modal-img" src="" style="width:90px; height:90px; border-radius:50%; border:2px solid var(--gold); background:#000; margin-bottom:15px;">
         <h2 id="modal-name" style="font-family:'Cinzel'; color:var(--gold); margin:0;"></h2>
@@ -101,6 +104,12 @@
         <div class="stat-grid" id="modal-stats"></div>
         <button class="loot-btn" onclick="toggleLeaderLoot()">VIEW LOOT HISTORY</button>
         <div id="leader-loot-panel" class="loot-panel" style="display:none;">No history found.</div>
+        <button onclick="closeModal()" style="margin-top:20px; background:var(--gold); color:#000; border:none; padding:10px 25px; cursor:pointer; font-weight:bold; border-radius:4px; width: 100%;">CLOSE</button>
+    </div>
+
+    <div id="cp-stats-modal">
+        <h2 id="cp-stats-name" style="font-family:'Cinzel'; color:var(--gold); margin:0 0 20px 0; font-size:1.3rem;"></h2>
+        <div class="stat-grid" id="cp-stats-grid"></div>
         <button onclick="closeModal()" style="margin-top:20px; background:var(--gold); color:#000; border:none; padding:10px 25px; cursor:pointer; font-weight:bold; border-radius:4px; width: 100%;">CLOSE</button>
     </div>
 
@@ -160,6 +169,8 @@
         const db = firebase.database();
         const bossIcons = { "VAL": "https://i.ibb.co/84gZPVRP/necklace-valakas.png", "ANT": "https://i.ibb.co/rfqvc6mv/earring-antharas.png", "BAI": "https://i.ibb.co/XrZkv67h/ring-of-baium.png", "FRI": "https://i.ibb.co/gF4YKGTM/frintezza-necklace.png", "ZAK": "https://i.ibb.co/spkC6Gzz/zaken-earring.png", "AQ":  "https://i.ibb.co/rKRtZmBG/ring-of-queen-ant.png", "ORF": "https://i.ibb.co/j9dDnXwH/earring-orfen.png", "COR": "https://i.ibb.co/ksv37fNZ/ring-of-.png", "SIE": "https://i.ibb.co/Txfby6wD/images.png" };
 
+        let globalCPData = {}; // Αποθηκεύει τα δεδομένα για να τα διαβάσει το Modal
+
         function getIconForLoot(itemName) {
             if(!itemName) return "https://i.ibb.co/SXM1FZx8/attedance-points.png";
             const upName = itemName.toUpperCase();
@@ -171,11 +182,12 @@
             if(upName.includes("QUEEN") || upName.includes("AQ")) return bossIcons.AQ;
             if(upName.includes("ORF")) return bossIcons.ORF;
             if(upName.includes("COR")) return bossIcons.COR;
-            return "https://i.ibb.co/SXM1FZx8/attedance-points.png"; // Default
+            return "https://i.ibb.co/SXM1FZx8/attedance-points.png"; 
         }
 
         db.ref('cps/').on('value', (snapshot) => {
             const data = snapshot.val() || {};
+            globalCPData = data; 
             const nList = document.getElementById('noldor-list');
             const kList = document.getElementById('krim-list');
             nList.innerHTML = ""; kList.innerHTML = "";
@@ -185,7 +197,6 @@
                 if(cp.clan === 'history') return;
                 const style = (cp.clan === 'noldor' || cp.clan === 'caller') ? 'cp-noldor' : 'cp-krim';
                 
-                // Δημιουργία του Loot HTML με τα εικονίδια
                 let lootHtml = "No history found.";
                 if(cp.lootHistory && cp.lootHistory.length > 0) {
                     lootHtml = cp.lootHistory.map(l => `
@@ -198,6 +209,7 @@
                     `).join('');
                 }
                 
+                // Αντικαταστάθηκε το Grid με το Κουμπί VIEW ATTENDANCES
                 const html = `
                     <div class="cp-box ${style}">
                         <button class="cp-btn" onclick="this.parentElement.classList.toggle('active')">
@@ -212,16 +224,27 @@
                             <button class="loot-btn" onclick="const p=this.nextElementSibling; p.style.display=p.style.display==='block'?'none':'block';">VIEW LOOT HISTORY</button>
                             <div class="loot-panel" style="display:none;">${lootHtml}</div>
 
-                            <div class="stat-grid">${Object.keys(bossIcons).map(b => {
-                                const val = (cp.bossStats && cp.bossStats[b]) ? cp.bossStats[b] : 0;
-                                return `<div class="stat-box"><img src="${bossIcons[b]}" class="boss-icon"><span class="stat-val">${val}</span></div>`;
-                            }).join('')}</div>
+                            <button class="loot-btn" onclick="openCpStats('${id}')">VIEW ATTENDANCES</button>
                         </div>
                     </div>`;
                 if(cp.clan === 'noldor' || cp.clan === 'caller') nList.innerHTML += html;
                 else kList.innerHTML += html;
             });
         });
+
+        // ΝΕΑ ΣΥΝΑΡΤΗΣΗ ΠΟΥ ΑΝΟΙΓΕΙ ΤΟ MODAL ΜΕ ΤΑ ATTENDANCES ΤΟΥ CP
+        function openCpStats(cpId) {
+            const cp = globalCPData[cpId];
+            if(!cp) return;
+            document.getElementById('cp-stats-name').innerText = cp.name + " ATTENDANCES";
+            document.getElementById('cp-stats-grid').innerHTML = Object.keys(bossIcons).map(b => {
+                const val = (cp.bossStats && cp.bossStats[b]) ? cp.bossStats[b] : 0;
+                return `<div class="stat-box"><img src="${bossIcons[b]}" class="boss-icon"><span class="stat-val">${val}</span></div>`;
+            }).join('');
+            
+            document.getElementById('cp-stats-modal').style.display = 'block';
+            document.getElementById('overlay').style.display = 'block';
+        }
 
         function openCaller(name, role, img) {
             document.getElementById('modal-name').innerText = name;
@@ -236,7 +259,6 @@
                     return `<div class="stat-box"><img src="${bossIcons[b]}" class="boss-icon"><span class="stat-val">${val}</span></div>`;
                 }).join('');
                 
-                // Looting History Modal με Icons
                 let lootHtml = "No history found.";
                 if(cp && cp.lootHistory) {
                     lootHtml = cp.lootHistory.map(l => `
@@ -255,7 +277,11 @@
             document.getElementById('overlay').style.display = 'block';
         }
 
-        function closeModal() { document.getElementById('caller-modal').style.display='none'; document.getElementById('overlay').style.display='none'; }
+        function closeModal() { 
+            document.getElementById('caller-modal').style.display='none'; 
+            document.getElementById('cp-stats-modal').style.display='none'; 
+            document.getElementById('overlay').style.display='none'; 
+        }
         function toggleLeaderLoot() { const p = document.getElementById('leader-loot-panel'); p.style.display = p.style.display==='none'?'block':'none'; }
 
         // --- MUSIC LOGIC ---
