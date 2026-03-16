@@ -107,9 +107,12 @@
         <img id="modal-img" src="" style="width:90px; height:90px; border-radius:50%; border:2px solid var(--gold); background:#000; margin-bottom:15px;">
         <h2 id="modal-name" style="font-family:'Cinzel'; color:var(--gold); margin:0;"></h2>
         <p id="modal-title" style="color:#888; font-size:0.7rem; margin-bottom:20px;"></p>
-        <div class="stat-grid" id="modal-stats"></div>
+        
         <button class="loot-btn" onclick="toggleLeaderLoot()">VIEW LOOT HISTORY</button>
         <div id="leader-loot-panel" class="loot-panel" style="display:none; text-align:left;">No history found.</div>
+        
+        <button class="loot-btn" id="caller-attendance-btn" style="display:none;">VIEW ATTENDANCES</button>
+
         <button onclick="closeModal()" style="margin-top:20px; background:var(--gold); color:#000; border:none; padding:10px 25px; cursor:pointer; font-weight:bold; border-radius:4px; width: 100%;">CLOSE</button>
     </div>
 
@@ -129,8 +132,7 @@
     <div id="clan-modal">
         <img id="clan-modal-img" src="" style="width:90px; height:90px; border-radius:10px; border:2px solid var(--gold); background:rgba(0,0,0,0.6); margin-bottom:15px; object-fit:contain; padding:5px;">
         <h2 id="clan-modal-name" style="font-family:'Cinzel'; color:var(--gold); margin:0 0 15px 0; font-size:1.3rem;"></h2>
-        <div id="clan-modal-content">
-            </div>
+        <div id="clan-modal-content"></div>
         <button onclick="closeModal()" style="margin-top:10px; background:var(--gold); color:#000; border:none; padding:10px 25px; cursor:pointer; font-weight:bold; border-radius:4px; width: 100%;">CLOSE</button>
     </div>
 
@@ -148,7 +150,6 @@
     </div>
 
     <div id="dashboard" class="page">
-        
         <div class="market-action-row">
             <a href="market.html" class="enter-market-btn">⚖️ ENTER MARKETPLACE & POLICIES ⚖️</a>
         </div>
@@ -217,7 +218,7 @@
             const nList = document.getElementById('noldor-list');
             const kList = document.getElementById('krim-list');
             nList.innerHTML = ""; kList.innerHTML = "";
-            let dynamicLeadersHtml = ""; // Μεταβλητή για τα δυναμικά Caller εικονίδια
+            let dynamicLeadersHtml = ""; 
 
             const sortedIDs = Object.keys(data).sort((a,b) => (data[b].totalPoints || 0) - (data[a].totalPoints || 0));
             
@@ -225,7 +226,6 @@
                 const cp = data[id];
                 if(cp.clan === 'history') return;
 
-                // ΑΝ ΕΙΝΑΙ CALLER, ΦΤΙΑΞΕ ΣΤΡΟΓΓΥΛΟ ΕΙΚΟΝΙΔΙΟ ΣΤΗΝ ΚΟΡΥΦΗ
                 if(cp.clan === 'caller') {
                     const role = cp.leader || "CALLER";
                     const img = cp.imgUrl || "https://i.ibb.co/SXM1FZx8/attedance-points.png";
@@ -235,7 +235,7 @@
                             <span class="leader-name">${cp.name.toUpperCase()}</span>
                             <span class="leader-role">${role}</span>
                         </div>`;
-                    return; // Το return εδώ εμποδίζει το Caller να μπει ΚΑΙ στις κάτω λίστες.
+                    return; 
                 }
 
                 const style = cp.clan === 'noldor' ? 'cp-noldor' : 'cp-krim';
@@ -288,14 +288,17 @@
                 else kList.innerHTML += html;
             });
 
-            // Εισαγωγή των δυναμικών Callers στο πάνω μέρος της σελίδας
             document.getElementById('dynamic-leaders').innerHTML = dynamicLeadersHtml;
         });
 
         function openCpStats(cpId) {
             const cp = globalCPData[cpId];
             if(!cp) return;
-            document.getElementById('cp-stats-name').innerText = cp.name + " ATTENDANCES";
+            
+            // Κρύβουμε το Caller Modal (αν είχε ανοίξει από εκεί) για να φανεί το CP Stats Modal ολόκληρο
+            document.getElementById('caller-modal').style.display = 'none';
+
+            document.getElementById('cp-stats-name').innerText = cp.name.toUpperCase() + " ATTENDANCES";
             document.getElementById('cp-stats-grid').innerHTML = Object.keys(bossIcons).map(b => {
                 const val = (cp.bossStats && cp.bossStats[b]) ? cp.bossStats[b] : 0;
                 return `<div class="stat-box"><img src="${bossIcons[b]}" class="boss-icon"><span class="stat-val">${val}</span></div>`;
@@ -344,18 +347,14 @@
             });
         }
 
+        // ΝΕΑ ΛΕΙΤΟΥΡΓΙΑ ΓΙΑ ΤΟ CALLER MODAL (ΚΡΥΒΕΙ ATTENDANCE ΑΝ ΕΙΝΑΙ ALLY LEADER)
         function openCaller(callerId, role, img) {
             const cp = globalCPData[callerId];
             if(!cp) return;
 
             document.getElementById('modal-name').innerText = cp.name.toUpperCase() + ` (${cp.totalPoints || 0} PTS)`;
-            document.getElementById('modal-title').innerText = role;
+            document.getElementById('modal-title').innerText = role.toUpperCase();
             document.getElementById('modal-img').src = img;
-            
-            document.getElementById('modal-stats').innerHTML = Object.keys(bossIcons).map(b => {
-                const val = (cp.bossStats && cp.bossStats[b]) ? cp.bossStats[b] : 0;
-                return `<div class="stat-box"><img src="${bossIcons[b]}" class="boss-icon"><span class="stat-val">${val}</span></div>`;
-            }).join('');
             
             let lootHtml = "No history found.";
             if(cp.lootHistory && cp.lootHistory.length > 0) {
@@ -369,6 +368,17 @@
                 `).join('');
             }
             document.getElementById('leader-loot-panel').innerHTML = lootHtml;
+            
+            // Έλεγχος: Αν είναι Ally Leader, κρύβουμε το κουμπί
+            const attBtn = document.getElementById('caller-attendance-btn');
+            if (role.toUpperCase() === 'ALLY LEADER') {
+                attBtn.style.display = 'none';
+            } else {
+                attBtn.style.display = 'block';
+                attBtn.onclick = function() {
+                    openCpStats(callerId); // Χρησιμοποιεί την ίδια συνάρτηση με τα CPs!
+                };
+            }
             
             document.getElementById('caller-modal').style.display = 'block';
             document.getElementById('overlay').style.display = 'block';
