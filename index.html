@@ -71,7 +71,6 @@
         
         .loot-btn { width: 100%; background: rgba(212,175,55,0.1); border: 1px solid #444; color: var(--gold); padding: 8px; font-family: 'Cinzel'; font-size: 0.65rem; cursor: pointer; border-radius: 4px; margin-bottom: 10px; }
         
-        /* -- SCROLLABLE LOOT PANEL -- */
         .loot-panel { 
             display: none; 
             padding: 12px; 
@@ -81,10 +80,9 @@
             font-size: 0.75rem; 
             border: 1px solid #222; 
             color: #aaa; 
-            max-height: 200px; /* Μέγιστο ύψος πριν εμφανιστεί η μπάρα */
-            overflow-y: auto;  /* Ενεργοποίηση κάθετου scroll */
+            max-height: 200px; 
+            overflow-y: auto;  
         }
-        /* Custom Scrollbar για το Loot Panel */
         .loot-panel::-webkit-scrollbar { width: 6px; }
         .loot-panel::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 4px; }
         .loot-panel::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 4px; }
@@ -162,8 +160,7 @@
             <a href="pvpzone.html" class="nav-btn">PVP ZONE</a>
             <a href="halloffame.html" class="nav-btn">HALL OF FAME</a>
         </div>
-        <div class="leaders-row" id="dynamic-leaders">
-            </div>
+        <div class="leaders-row" id="dynamic-leaders"></div>
     </div>
 
     <div id="dashboard" class="page">
@@ -219,11 +216,14 @@
             if(!itemName) return "https://i.ibb.co/SXM1FZx8/attedance-points.png";
             const upName = itemName.toUpperCase();
             if(upName.includes("VAL")) return bossIcons.VAL;
-            if(upName.includes("ANT")) return bossIcons.ANT;
+            
+            // ΔΙΟΡΘΩΣΗ: Ξεχωρίζουμε Antharas από Queen Ant
+            if(upName.includes("QUEEN") || upName.includes("AQ")) return bossIcons.AQ;
+            if(upName.includes("ANT")) return bossIcons.ANT; 
+            
             if(upName.includes("BAI")) return bossIcons.BAI;
             if(upName.includes("FRI")) return bossIcons.FRI;
             if(upName.includes("ZAK")) return bossIcons.ZAK;
-            if(upName.includes("QUEEN") || upName.includes("AQ")) return bossIcons.AQ;
             if(upName.includes("ORF")) return bossIcons.ORF;
             if(upName.includes("COR")) return bossIcons.COR;
             return "https://i.ibb.co/SXM1FZx8/attedance-points.png"; 
@@ -311,15 +311,12 @@
         function openCpStats(cpId) {
             const cp = globalCPData[cpId];
             if(!cp) return;
-            
             document.getElementById('caller-modal').style.display = 'none';
-
             document.getElementById('cp-stats-name').innerText = cp.name.toUpperCase() + " ATTENDANCES";
             document.getElementById('cp-stats-grid').innerHTML = Object.keys(bossIcons).map(b => {
                 const val = (cp.bossStats && cp.bossStats[b]) ? cp.bossStats[b] : 0;
                 return `<div class="stat-box"><img src="${bossIcons[b]}" class="boss-icon"><span class="stat-val">${val}</span></div>`;
             }).join('');
-            
             document.getElementById('cp-stats-modal').style.display = 'block';
             document.getElementById('overlay').style.display = 'block';
         }
@@ -339,7 +336,6 @@
                     Object.keys(dayData).forEach(pName => {
                         if (pName.trim().toUpperCase() === searchName) {
                             const playerBosses = dayData[pName];
-                            
                             Object.keys(playerBosses).forEach(bossId => {
                                 const b = bossId.toUpperCase();
                                 if(b.includes('VAL')) mStats.VAL++;
@@ -366,11 +362,9 @@
         function openCaller(callerId, role, img) {
             const cp = globalCPData[callerId];
             if(!cp) return;
-
             document.getElementById('modal-name').innerText = cp.name.toUpperCase() + ` (${cp.totalPoints || 0} PTS)`;
             document.getElementById('modal-title').innerText = role.toUpperCase();
             document.getElementById('modal-img').src = img;
-            
             let lootHtml = "No history found.";
             if(cp.lootHistory && cp.lootHistory.length > 0) {
                 lootHtml = cp.lootHistory.map(l => `
@@ -383,17 +377,9 @@
                 `).join('');
             }
             document.getElementById('leader-loot-panel').innerHTML = lootHtml;
-            
             const attBtn = document.getElementById('caller-attendance-btn');
-            if (role.toUpperCase() === 'ALLY LEADER') {
-                attBtn.style.display = 'none';
-            } else {
-                attBtn.style.display = 'block';
-                attBtn.onclick = function() {
-                    openCpStats(callerId); 
-                };
-            }
-            
+            if (role.toUpperCase() === 'ALLY LEADER') attBtn.style.display = 'none';
+            else { attBtn.style.display = 'block'; attBtn.onclick = function() { openCpStats(callerId); }; }
             document.getElementById('caller-modal').style.display = 'block';
             document.getElementById('overlay').style.display = 'block';
         }
@@ -401,18 +387,12 @@
         function openClanModal(clanId, clanName, iconUrl) {
             document.getElementById('clan-modal-name').innerText = clanName.toUpperCase();
             document.getElementById('clan-modal-img').src = iconUrl;
-            
             const extData = globalExternalClans[clanId] || {};
             const leaderName = extData.leader || "Pending...";
             const lootHistory = extData.lootHistory || [];
-
-            let content = "Alliance agreements and information regarding this clan are currently pending.";
-            if (clanId === "ExitGaming") {
-                content = "<b style='color:var(--gold)'>NIGHT EPICS:</b><br>All night epics between 00:00 and 08:00 Greek time are assigned to ExitGaming.<br><br><b style='color:var(--gold)'>HIGH EPICS (Baium, Antharas, Valakas):</b><br>Distribution: 1 for ExitGaming, 3 for our alliance.<br>The order is determined by rolling a dice each time (Rolling continues until all parts are distributed fairly).";
-            } else if (clanId === "LastKingdom") {
-                content = "<b style='color:var(--gold)'>EPIC DISTRIBUTION:</b><br>1 mid epic and 2 low epics if they bring at least 5 parties (9/9) for the weekend and at least 3 parties (9/9) on weekdays.<br>If they bring fewer parties, the deal is adjusted accordingly.<br><br><b style='color:var(--gold)'>BAIUM ACCESS:</b><br>LK Clan has access to every 5th or 6th Baium.";
-            }
-
+            let content = "Alliance agreements pending.";
+            if (clanId === "ExitGaming") content = "<b style='color:var(--gold)'>NIGHT EPICS:</b><br>assigned to ExitGaming.<br><br><b style='color:var(--gold)'>HIGH EPICS:</b><br>1 Exit, 3 Alliance.";
+            else if (clanId === "LastKingdom") content = "<b style='color:var(--gold)'>EPIC DISTRIBUTION:</b><br>Based on attendance.<br><br><b style='color:var(--gold)'>BAIUM ACCESS:</b><br>Every 5th or 6th.";
             let lootHtml = "No history found.";
             if(lootHistory.length > 0) {
                 lootHtml = lootHistory.map(l => `
@@ -421,22 +401,13 @@
                         <span style="color:#888; font-size:0.7rem;">${l.date}</span>
                         <span style="color:#ddd; flex-grow:1; text-align:left;">${l.item}</span>
                         <span style="color:#ff4444; font-family:'Cinzel'; font-weight:bold;">-${l.cost}</span>
-                    </div>
-                `).join('');
+                    </div>`).join('');
             }
-
             const finalHtml = `
-                <div style="margin-bottom: 15px; font-size:0.95rem;">
-                    <span style="color:var(--gold); font-weight:bold; font-family:'Cinzel';">👑 LEADER:</span> 
-                    <span style="color:#fff;">${leaderName}</span>
-                </div>
-                <div style="color:#ddd; font-size:0.85rem; line-height:1.6; text-align:justify; margin-bottom:20px; padding: 10px; background:rgba(0,0,0,0.3); border:1px solid #333; border-radius:5px;">
-                    ${content}
-                </div>
+                <div style="margin-bottom: 15px; font-size:0.95rem;"><span style="color:var(--gold); font-weight:bold; font-family:'Cinzel';">👑 LEADER:</span> <span style="color:#fff;">${leaderName}</span></div>
+                <div style="color:#ddd; font-size:0.85rem; line-height:1.6; text-align:justify; margin-bottom:20px; padding: 10px; background:rgba(0,0,0,0.3); border:1px solid #333; border-radius:5px;">${content}</div>
                 <button class="loot-btn" onclick="const p=this.nextElementSibling; p.style.display=p.style.display==='block'?'none':'block';">VIEW LOOT HISTORY</button>
-                <div class="loot-panel" style="display:none; text-align:left;">${lootHtml}</div>
-            `;
-
+                <div class="loot-panel" style="display:none; text-align:left;">${lootHtml}</div>`;
             document.getElementById('clan-modal-content').innerHTML = finalHtml;
             document.getElementById('clan-modal').style.display = 'block';
             document.getElementById('overlay').style.display = 'block';
@@ -451,48 +422,15 @@
         }
         function toggleLeaderLoot() { const p = document.getElementById('leader-loot-panel'); p.style.display = p.style.display==='none'?'block':'none'; }
 
-        // --- MUSIC LOGIC ---
         const tracks = [
             {name:"DION THEME", url:"https://www.dropbox.com/scl/fi/ypzqrr336iewt62gncy6u/Lineage-2-Dion-Theme-Song.mp3?rlkey=nl1quliuqleuljgkt5jhqq6hh&st=sb8ij16g&raw=1"},
             {name:"HUNTERS THEME", url:"https://www.dropbox.com/scl/fi/75hck498enzot93zt0lg9/Lineage-2-Hunters-Village-Theme.mp3?rlkey=6mu9ic0gavmofkdvduj72270y&st=qr4cvisl&raw=1"},
             {name:"GIRAN THEME", url:"https://www.dropbox.com/scl/fi/iu8j9wn9wky8fav176ayf/Lineage-2-Giran-Theme.mp3?rlkey=xp1j0upa076sy21tgcta6t9c3&st=0a4ihyhg&raw=1"}
         ];
-        let currentIdx = 0; 
-        const audio = document.getElementById('bg-music'); 
-        const musicIcon = document.getElementById('music-icon');
-        let userMuted = false;
-
-        function toggleMusic(e) { 
-            if(e) e.stopPropagation(); 
-            if (audio.paused) { 
-                audio.play(); 
-                musicIcon.innerText="🔊"; 
-                userMuted = false;
-            } else { 
-                audio.pause(); 
-                musicIcon.innerText="🔇"; 
-                userMuted = true;
-            } 
-        }
-
-        function nextTrack(e) { 
-            if(e) e.stopPropagation(); 
-            currentIdx = (currentIdx + 1) % tracks.length; 
-            audio.src = tracks[currentIdx].url; 
-            document.getElementById('track-name').innerText = tracks[currentIdx].name; 
-            audio.play(); 
-            musicIcon.innerText="🔊"; 
-            userMuted = false;
-        }
-
-        function tryAutoPlay() { 
-            if(audio.paused && !userMuted) { 
-                audio.play().then(() => { 
-                    musicIcon.innerText = "🔊"; 
-                }).catch(() => {}); 
-            }
-        }
-
+        let currentIdx = 0; const audio = document.getElementById('bg-music'); const musicIcon = document.getElementById('music-icon'); let userMuted = false;
+        function toggleMusic(e) { if(e) e.stopPropagation(); if (audio.paused) { audio.play(); musicIcon.innerText="🔊"; userMuted = false; } else { audio.pause(); musicIcon.innerText="🔇"; userMuted = true; } }
+        function nextTrack(e) { if(e) e.stopPropagation(); currentIdx = (currentIdx + 1) % tracks.length; audio.src = tracks[currentIdx].url; document.getElementById('track-name').innerText = tracks[currentIdx].name; audio.play(); musicIcon.innerText="🔊"; userMuted = false; }
+        function tryAutoPlay() { if(audio.paused && !userMuted) { audio.play().then(() => { musicIcon.innerText = "🔊"; }).catch(() => {}); } }
         setInterval(() => { document.getElementById('clock').innerText = "SERVER TIME: " + new Date().toLocaleTimeString('el-GR', {timeZone:'UTC', hour12:false}) + " UTC"; }, 1000);
     </script>
 </body>
