@@ -29,16 +29,16 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
             gap: 25px;
+            align-items: start;
         }
 
         .card {
-            background: rgba(15, 15, 15, 0.9);
+            background: rgba(15, 15, 15, 0.85);
             border: 1px solid #333;
             border-top: 3px solid var(--gold);
-            padding: 0;
-            transition: 0.3s;
-            position: relative;
-            overflow: hidden;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
         }
 
         .card-header {
@@ -46,40 +46,48 @@
             padding: 15px 20px;
             font-family: 'Cinzel';
             color: var(--gold);
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             border-bottom: 1px solid #333;
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
-        /* ENTER MARKET BUTTON STYLE */
+        /* ΤΟ ΚΟΥΜΠΙ ΠΟΥ ΘΕΛΟΥΜΕ */
+        .market-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
         .enter-btn {
             display: inline-block;
-            background: rgba(212, 175, 55, 0.1);
-            border: 2px solid var(--gold);
+            background: rgba(212, 175, 55, 0.05);
+            border: 1px solid var(--gold);
             color: var(--gold);
-            padding: 15px 40px;
-            font-family: 'Cinzel', serif;
-            font-weight: bold;
+            padding: 12px 30px;
+            font-family: 'Cinzel';
             text-decoration: none;
             letter-spacing: 2px;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.1);
+            transition: 0.3s;
+            margin-top: 20px;
         }
 
         .enter-btn:hover {
             background: var(--gold);
             color: #000;
-            box-shadow: 0 0 25px var(--gold);
-            transform: scale(1.05);
+            box-shadow: 0 0 15px var(--gold);
         }
 
-        /* ΥΠΟΛΟΙΠΑ STYLES ΠΟΥ ΥΠΗΡΧΑΝ (Event cards, κλπ) */
+        /* EVENT LIST STYLE */
         .event-list { list-style: none; padding: 20px; margin: 0; }
         .event-item {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 12px 0; border-bottom: 1px solid #222;
+            padding: 15px 0; border-bottom: 1px solid #222;
         }
         .event-name { font-family: 'Cinzel'; color: #fff; }
         .event-time { color: var(--gold); font-weight: bold; }
@@ -97,13 +105,11 @@
             
             <div class="card">
                 <div class="card-header">
-                    <img src="https://i.ibb.co/SXM1FZx8/attedance-points.png" style="width:30px; height:30px; object-fit:contain;"> 
+                    <img src="https://i.ibb.co/SXM1FZx8/attedance-points.png" style="width:25px; height:25px;"> 
                     MARKET & POLICIES
                 </div>
-                <div style="padding: 50px 20px; text-align: center;">
-                    <p style="color: #bbb; font-size: 0.95rem; margin-bottom: 30px; font-family: 'Open Sans';">
-                        Access Jewel Market, Attendance Rules and Clan Agreements.
-                    </p>
+                <div class="market-content">
+                    <p style="color: #888; font-size: 0.9rem; margin: 0;">Access Jewel Market, Attendance Rules<br>and Clan Agreements.</p>
                     <a href="market.html" class="enter-btn">ENTER MARKETPLACE</a>
                 </div>
             </div>
