@@ -2,7 +2,7 @@
 <html lang="el">
 <head>
     <meta charset="UTF-8">
-    <title>BMA | Command Center V17.2</title>
+    <title>BMA | Command Center V17.3</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -46,13 +46,13 @@
 <body>
 
     <div class="header-container">
-        <div style="width:80px"></div> <h1>BMA COMMAND CENTER V17.2</h1>
+        <div style="width:80px"></div> <h1>BMA COMMAND CENTER V17.3</h1>
         <button class="logout-btn" onclick="logout()">LOGOUT</button>
     </div>
 
     <div class="layout">
         <div class="panel">
-            <h2>CP LIST</h2>
+            <h2>CP / CALLERS LIST</h2>
             <div class="filter-tabs">
                 <button class="filter-btn active" id="btn-active" onclick="setViewMode('active')">ACTIVE</button>
                 <button class="filter-btn" id="btn-history" onclick="setViewMode('history')">HISTORY</button>
@@ -60,13 +60,15 @@
             <div id="cp-list-simple" style="max-height: 350px; overflow-y: auto;"></div>
             
             <hr style="border-color:#333; margin: 20px 0;">
-            <h3>NEW CP</h3>
-            <input type="text" id="new-name" placeholder="Name">
-            <input type="text" id="new-leader" placeholder="Leader">
+            <h3>NEW CP / CALLER</h3>
+            <input type="text" id="new-name" placeholder="Name (π.χ. ANIMALS ή NIKLAUS)">
+            <input type="text" id="new-leader" placeholder="Leader (ή Role, π.χ. ALLY LEADER)">
+            <input type="text" id="new-imgUrl" placeholder="Image URL (Μόνο για Callers)">
             <select id="new-clan">
                 <option value="noldor">Noldor</option>
                 <option value="kriminalides">Kriminalides</option>
-                </select>
+                <option value="caller">Caller (Στρογγυλό εικονίδιο)</option>
+            </select>
             <button class="btn btn-gold" onclick="createNewCP()">REGISTER</button>
 
             <hr style="border-color:#333; margin: 20px 0;">
@@ -79,7 +81,7 @@
 
         <div class="panel">
             <h2>1. LOG EVENT (MEMBER-BOSS LOCK)</h2>
-            <textarea id="mass-input" rows="3" placeholder="Paste names..." oninput="analyzeAttendance()"></textarea>
+            <textarea id="mass-input" rows="3" placeholder="Paste names... (Smart filtering enabled)" oninput="analyzeAttendance()"></textarea>
             <div id="detected-list"></div>
 
             <div class="boss-grid">
@@ -95,21 +97,25 @@
             </div>
 
             <div id="edit-section" style="display:none; border-top:2px solid var(--gold); padding-top:20px; margin-top:20px;">
-                <div style="display:flex; gap:10px; margin-bottom:15px;">
+                <div style="display:flex; gap:10px; margin-bottom:10px;">
                     <div style="flex:1;">
-                        <label style="color:#aaa; font-size:11px;">CP Name</label>
+                        <label style="color:#aaa; font-size:11px;">Name</label>
                         <input type="text" id="edit-cp-name" style="font-family:'Cinzel'; color:var(--gold); font-size:1.1rem;">
                     </div>
                     <div style="flex:1;">
-                        <label style="color:#aaa; font-size:11px;">CP Leader</label>
+                        <label style="color:#aaa; font-size:11px;">Leader / Role</label>
                         <input type="text" id="edit-cp-leader" style="font-family:'Cinzel';">
                     </div>
+                </div>
+                <div style="margin-bottom:15px;">
+                    <label style="color:#aaa; font-size:11px;">Image URL (Μόνο για Callers)</label>
+                    <input type="text" id="edit-cp-imgUrl" placeholder="https://...">
                 </div>
 
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:25px;">
                     <div>
                         <label style="color:#aaa; font-size:11px;">Roster</label>
-                        <textarea id="edit-members" rows="10"></textarea>
+                        <textarea id="edit-members" rows="8"></textarea>
                         
                         <h3 style="color:var(--gold);">LOOT HISTORY</h3>
                         <div style="max-height: 150px; overflow-y: auto; background: #000; border: 1px solid #333;">
@@ -138,7 +144,7 @@
                         <div class="stat-edit-grid" id="stat-inputs"></div>
                         
                         <div style="display:flex; gap:10px; margin-top:20px;">
-                            <button class="btn btn-gold" style="flex:2;" onclick="updateCP()">SAVE CP DATA</button>
+                            <button class="btn btn-gold" style="flex:2;" onclick="updateCP()">SAVE ALL DATA</button>
                             <button class="btn" id="hist-toggle-btn" onclick="toggleHistoryStatus()">HIST</button>
                             <button class="btn btn-red" onclick="deleteCP()">DEL</button>
                         </div>
@@ -150,31 +156,20 @@
     
     <div style="max-width: 1400px; margin: 20px auto;">
         <div class="panel">
-            <h2 style="color:var(--blue); border-bottom: 1px solid #333; padding-bottom: 10px;">EXTERNAL CLANS & CALLERS MANAGER</h2>
+            <h2 style="color:var(--blue); border-bottom: 1px solid #333; padding-bottom: 10px;">EXTERNAL CLANS MANAGER (Agreements)</h2>
             <div style="display:flex; gap:10px; margin-bottom: 15px;">
                 <select id="ext-select" style="flex:1;" onchange="loadExtEdit()">
-                    <option value="">-- Επιλογή Clan / Caller --</option>
-                    <optgroup label="External Clans">
-                        <option value="OrzelBialy">OrzelBialy Clan</option>
-                        <option value="ExitGaming">ExitGaming Clan</option>
-                        <option value="LastKingdom">LastKingdom Clan</option>
-                    </optgroup>
-                    <optgroup label="Main Callers (Ηγετικά Στελέχη)">
-                        <option value="NIKLAUS">Niklaus (Ally Leader)</option>
-                        <option value="TSAKNORRIS">Tsaknorris (Shot Caller)</option>
-                    </optgroup>
+                    <option value="">-- Επιλογή External Clan --</option>
+                    <option value="OrzelBialy">OrzelBialy Clan</option>
+                    <option value="ExitGaming">ExitGaming Clan</option>
+                    <option value="LastKingdom">LastKingdom Clan</option>
                 </select>
             </div>
             
             <div id="ext-edit-section" style="display:none;" class="external-grid">
                 <div>
-                    <label>Leader Name (Αν είναι Clan) / Roster (Αν είναι Caller)</label>
+                    <label>Clan Leader Name</label>
                     <input type="text" id="ext-leader" placeholder="Όνομα Leader...">
-                    <label style="display:block; margin-top:10px;">Total Points (Μόνο για Callers)</label>
-                    <input type="number" id="ext-points" style="font-size:1.2rem; color:var(--gold);">
-                    
-                    <div id="ext-stat-inputs" class="stat-edit-grid" style="margin-top: 15px;"></div>
-
                     <button class="btn btn-gold" onclick="updateExtData()" style="margin-top:20px;">SAVE DATA</button>
                 </div>
                 <div>
@@ -216,7 +211,6 @@
     let viewMode = 'active'; 
     const bossKeys = ['VAL', 'ANT', 'BAI', 'SIE', 'ZAK', 'FRI', 'AQ', 'ORF', 'COR'];
 
-    // Realtime Syncs
     db.ref('cps/').on('value', snap => { 
         allCPs = snap.val() || {}; 
         renderSimpleList(); 
@@ -239,9 +233,12 @@
         const listDiv = document.getElementById('cp-list-simple');
         listDiv.innerHTML = Object.keys(allCPs)
             .filter(id => viewMode === 'history' ? allCPs[id].clan === 'history' : allCPs[id].clan !== 'history')
-            .map(id => `<div onclick="loadEdit('${id}')" style="cursor:pointer; padding:8px; border-bottom:1px solid #222;">
-                ${allCPs[id].name} <span style="float:right; color:var(--gold)">${allCPs[id].totalPoints}</span>
-            </div>`).join('');
+            .map(id => {
+                const isCaller = allCPs[id].clan === 'caller' ? ' <span style="color:#aaa; font-size:10px;">[CALLER]</span>' : '';
+                return `<div onclick="loadEdit('${id}')" style="cursor:pointer; padding:8px; border-bottom:1px solid #222;">
+                    ${allCPs[id].name} ${isCaller} <span style="float:right; color:var(--gold)">${allCPs[id].totalPoints}</span>
+                </div>`;
+            }).join('');
     }
 
     function analyzeAttendance() {
@@ -305,6 +302,7 @@
         
         document.getElementById('edit-cp-name').value = cp.name || "";
         document.getElementById('edit-cp-leader').value = cp.leader || "";
+        document.getElementById('edit-cp-imgUrl').value = cp.imgUrl || "";
         document.getElementById('edit-members').value = cp.members || "";
         document.getElementById('edit-points').value = cp.totalPoints || 0;
         
@@ -338,11 +336,12 @@
         db.ref('cps/' + currentEditID).update({ 
             name: document.getElementById('edit-cp-name').value,
             leader: document.getElementById('edit-cp-leader').value,
+            imgUrl: document.getElementById('edit-cp-imgUrl').value,
             members: document.getElementById('edit-members').value, 
             totalPoints: parseInt(document.getElementById('edit-points').value), 
             bossStats: stats 
         });
-        alert("CP Data Saved Successfully!");
+        alert("Saved Successfully!");
     }
 
     async function migratePlayerLogs() {
@@ -391,10 +390,10 @@
     function toggleHistoryStatus() {
         const cp = allCPs[currentEditID];
         if(cp.clan === 'history') {
-            const newClan = prompt("Σε ποια Clan; (noldor ή kriminalides)", "noldor");
+            const newClan = prompt("Σε ποια ομάδα; (noldor, kriminalides, caller)", "noldor");
             if (newClan === null) return; 
             const formattedClan = newClan.trim().toLowerCase();
-            if (formattedClan !== "noldor" && formattedClan !== "kriminalides") return alert("Λάθος όνομα!");
+            if (formattedClan !== "noldor" && formattedClan !== "kriminalides" && formattedClan !== "caller") return alert("Λάθος όνομα!");
             db.ref('cps/' + currentEditID).update({ clan: formattedClan }).then(() => alert("Restored!"));
         } else {
             if(confirm("Move to History?")) db.ref('cps/' + currentEditID).update({ clan: 'history' }).then(() => alert("Moved!"));
@@ -424,14 +423,21 @@
     function createNewCP() {
         const n = document.getElementById('new-name').value; if(!n) return;
         const id = n.replace(/\s+/g, '-').toLowerCase();
-        db.ref('cps/' + id).set({ name: n, leader: document.getElementById('new-leader').value, clan: document.getElementById('new-clan').value, totalPoints: 0, members: "", bossStats: { VAL:0, ANT:0, BAI:0, SIE:0, ZAK:0, FRI:0, AQ:0, ORF:0, COR:0 } });
+        db.ref('cps/' + id).set({ 
+            name: n, 
+            leader: document.getElementById('new-leader').value, 
+            imgUrl: document.getElementById('new-imgUrl').value || 'https://i.ibb.co/SXM1FZx8/attedance-points.png',
+            clan: document.getElementById('new-clan').value, 
+            totalPoints: 0, members: "", 
+            bossStats: { VAL:0, ANT:0, BAI:0, SIE:0, ZAK:0, FRI:0, AQ:0, ORF:0, COR:0 } 
+        });
     }
 
     function deleteCP() { if(confirm("Delete Forever?")) db.ref('cps/' + currentEditID).remove(); }
 
 
     /* =========================================
-       EXTERNAL CLANS & CALLERS LOGIC (ΑΠΟΘΗΚΕΥΣΗ ΟΛΩΝ ΣΤΟ externalClans)
+       EXTERNAL CLANS LOGIC
        ========================================= */
 
     function loadExtEdit() {
@@ -444,28 +450,9 @@
 
         currentExtID = selVal;
         document.getElementById('ext-edit-section').style.display = 'grid';
-        let targetData = allExtClans[currentExtID] || {};
+        let targetData = allExtClans[currentExtID] || { leader: '', lootHistory: [] };
         
-        // Setup fields based on type
         document.getElementById('ext-leader').value = targetData.leader || "";
-        
-        if (currentExtID === 'NIKLAUS' || currentExtID === 'TSAKNORRIS') {
-            document.getElementById('ext-points').value = targetData.totalPoints || 0;
-            document.getElementById('ext-points').disabled = false;
-            
-            // Build Stat Inputs for Callers
-            let statsHtml = "";
-            bossKeys.forEach(k => {
-                const val = (targetData.bossStats && targetData.bossStats[k]) ? targetData.bossStats[k] : 0;
-                statsHtml += `<div class="stat-field">${k}<br><input type="number" id="ext-inp-${k}" value="${val}"></div>`;
-            });
-            document.getElementById('ext-stat-inputs').innerHTML = statsHtml;
-            document.getElementById('ext-stat-inputs').style.display = 'grid';
-        } else {
-            document.getElementById('ext-points').value = 0; 
-            document.getElementById('ext-points').disabled = true;
-            document.getElementById('ext-stat-inputs').style.display = 'none';
-        }
 
         let lootHtml = "";
         if(targetData.lootHistory) {
@@ -478,20 +465,9 @@
 
     function updateExtData() {
         if(!currentExtID) return;
-        
         const leaderVal = document.getElementById('ext-leader').value;
-        let updatePayload = { leader: leaderVal };
-        
-        if (currentExtID === 'NIKLAUS' || currentExtID === 'TSAKNORRIS') {
-            updatePayload.totalPoints = parseInt(document.getElementById('ext-points').value) || 0;
-            
-            const stats = {}; 
-            bossKeys.forEach(k => stats[k] = parseInt(document.getElementById('ext-inp-' + k).value) || 0);
-            updatePayload.bossStats = stats;
-        }
-
-        db.ref('externalClans/' + currentExtID).update(updatePayload);
-        alert("Data Saved!");
+        db.ref('externalClans/' + currentExtID).update({ leader: leaderVal });
+        alert("Leader updated for Clan!");
     }
 
     function addExtMarketLoot() {
@@ -501,9 +477,6 @@
 
         db.ref('externalClans/' + currentExtID).transaction(ext => {
             if(ext === null) ext = {};
-            if (currentExtID === 'NIKLAUS' || currentExtID === 'TSAKNORRIS') {
-                ext.totalPoints = (ext.totalPoints || 0) - parseInt(loot[0]); 
-            }
             if(!ext.lootHistory) ext.lootHistory = [];
             ext.lootHistory.push(newItem);
             return ext;
@@ -512,20 +485,11 @@
 
     function deleteExtLoot(idx) {
         if(!currentExtID) return;
-        if(!confirm("Are you sure you want to delete this loot? (Points will refund if it's a Caller)")) return;
+        if(!confirm("Are you sure you want to delete this loot?")) return;
 
         const ext = allExtClans[currentExtID];
-        if (currentExtID === 'NIKLAUS' || currentExtID === 'TSAKNORRIS') {
-            ext.totalPoints = (ext.totalPoints || 0) + parseInt(ext.lootHistory[idx].cost); 
-        }
         ext.lootHistory.splice(idx, 1);
-        
-        const updatePayload = { lootHistory: ext.lootHistory };
-        if (currentExtID === 'NIKLAUS' || currentExtID === 'TSAKNORRIS') {
-            updatePayload.totalPoints = ext.totalPoints;
-        }
-        
-        db.ref('externalClans/' + currentExtID).update(updatePayload);
+        db.ref('externalClans/' + currentExtID).update({ lootHistory: ext.lootHistory });
     }
 </script>
 </body>
