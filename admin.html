@@ -2,13 +2,13 @@
 <html lang="el">
 <head>
     <meta charset="UTF-8">
-    <title>BMA | Command Center V18.0</title>
+    <title>BMA | Command Center V18.1</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <style>
-        :root { --gold: #d4af37; --bg: #0a0c0f; --card: #15181c; --red: #ff4444; --green: #28a745; --blue: #3498db; }
+        :root { --gold: #d4af37; --bg: #0a0c0f; --card: #15181c; --red: #ff4444; --green: #28a745; --blue: #3498db; --sky: #00d9ff; }
         body { background: var(--bg); color: #eee; font-family: 'Open Sans', sans-serif; margin: 0; padding: 20px; font-size: 13px; }
         
         .header-container { display: flex; justify-content: space-between; align-items: center; max-width: 1400px; margin: 0 auto 20px; }
@@ -37,7 +37,7 @@
         .stat-field { background: #111; padding: 8px; border-radius: 4px; text-align: center; border: 1px solid #333; }
         .stat-field input { width: 50px; text-align: center; border-color: var(--gold); color: var(--gold); }
         .filter-tabs { display: flex; gap: 5px; margin-bottom: 10px; }
-        .filter-btn { flex: 1; padding: 5px; font-size: 10px; cursor: pointer; background: #222; border: 1px solid #444; color: #888; font-family: 'Cinzel'; }
+        .filter-btn { flex: 1; padding: 5px; font-size: 10px; cursor: pointer; background: #222; border: 1px solid #444; color: #888; font-family: 'Cinzel'; border-radius: 3px; }
         .filter-btn.active { border-color: var(--gold); color: var(--gold); background: rgba(212,175,55,0.1); }
         
         .external-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px; }
@@ -46,7 +46,7 @@
 <body>
 
     <div class="header-container">
-        <div style="width:80px"></div> <h1>BMA COMMAND CENTER V18.0</h1>
+        <div style="width:80px"></div> <h1>BMA COMMAND CENTER V18.1</h1>
         <button class="logout-btn" onclick="logout()">LOGOUT</button>
     </div>
 
@@ -167,7 +167,7 @@
             <div style="display:flex; gap:10px; margin-bottom: 15px;">
                 <select id="ext-select" style="flex:1; font-family:'Cinzel';" onchange="loadExtEdit()">
                     <option value="">-- Επιλογή Clan / Caller --</option>
-                    </select>
+                </select>
             </div>
             
             <div id="ext-edit-section" style="display:none;" class="external-grid">
@@ -175,9 +175,22 @@
                     <label style="color:#aaa; font-size:11px;">Leader Name (Αν είναι Clan) / Roster (Αν είναι Caller)</label>
                     <input type="text" id="ext-leader" style="font-family:'Cinzel';">
                     
+                    <div id="ext-icon-container">
+                        <label style="display:block; margin-top:10px; color:#aaa; font-size:11px;">Image URL (Εικονίδιο Clan)</label>
+                        <input type="text" id="ext-icon" placeholder="https://...">
+                    </div>
+
                     <div id="ext-desc-container">
-                        <label style="display:block; margin-top:10px; color:#aaa; font-size:11px;">Agreements / Description (Μόνο για Clans)</label>
-                        <textarea id="ext-description" rows="4"></textarea>
+                        <label style="display:block; margin-top:10px; color:#aaa; font-size:11px;">Agreements / Description (Υποστηρίζει μορφοποίηση)</label>
+                        <div style="display:flex; gap:5px; margin-bottom:5px; flex-wrap:wrap;">
+                            <button type="button" class="filter-btn" style="color:var(--gold); border-color:var(--gold);" onclick="formatText('gold')">GOLD BOLD</button>
+                            <button type="button" class="filter-btn" style="color:var(--red); border-color:var(--red);" onclick="formatText('red')">RED TEXT</button>
+                            <button type="button" class="filter-btn" style="color:var(--sky); border-color:var(--sky);" onclick="formatText('blue')">BLUE TEXT</button>
+                            <button type="button" class="filter-btn" onclick="formatText('icon1')">⚔️</button>
+                            <button type="button" class="filter-btn" onclick="formatText('icon2')">🛡️</button>
+                        </div>
+                        <textarea id="ext-description" rows="6" style="font-family: monospace; font-size:11px;"></textarea>
+                        <div style="font-size:9px; color:#666; margin-top:3px;">* Επίλεξε μια λέξη με το ποντίκι και πάτα ένα κουμπί. Τα 'Enter' γίνονται αυτόματα αλλαγή γραμμής.</div>
                     </div>
 
                     <label style="display:block; margin-top:10px; color:#aaa; font-size:11px;">Total Points (Μόνο για Callers)</label>
@@ -233,14 +246,14 @@
     db.ref('cps/').on('value', snap => { 
         allCPs = snap.val() || {}; 
         renderSimpleList(); 
-        renderExtSelect(); // Ανανεώνει και το κάτω select
+        renderExtSelect(); 
         if(currentEditID) loadEdit(currentEditID); 
         if(currentExtID && currentExtID.startsWith('cp_')) loadExtEdit(); 
     });
     db.ref('dailyLogs/').on('value', snap => { globalDailyLogs = snap.val() || {}; });
     db.ref('externalClans/').on('value', snap => {
         allExtClans = snap.val() || {};
-        renderExtSelect(); // Ανανεώνει το κάτω select
+        renderExtSelect(); 
         if(currentExtID && currentExtID.startsWith('ext_')) loadExtEdit();
     });
 
@@ -268,7 +281,6 @@
         const currentVal = sel.value;
         let html = '<option value="">-- Επιλογή Clan / Caller --</option>';
         
-        // Φόρτωση External Clans
         html += '<optgroup label="External Clans">';
         Object.keys(allExtClans).forEach(id => {
             const clan = allExtClans[id];
@@ -278,7 +290,6 @@
         });
         html += '</optgroup>';
 
-        // Φόρτωση Callers
         html += '<optgroup label="Callers (Από CP List)">';
         Object.keys(allCPs).forEach(id => {
             if (allCPs[id].clan === 'caller') {
@@ -348,6 +359,8 @@
         document.getElementById('mass-input').value = ""; document.getElementById('detected-list').innerHTML = "";
     }
 
+    // --- CP EDIT & RENAME LOGIC ---
+
     function loadEdit(id) {
         currentEditID = id; const cp = allCPs[id];
         document.getElementById('edit-section').style.display = 'block';
@@ -385,6 +398,7 @@
 
     function updateCP() {
         const stats = {}; bossKeys.forEach(k => stats[k] = parseInt(document.getElementById('inp-' + k).value) || 0);
+        
         db.ref('cps/' + currentEditID).update({ 
             name: document.getElementById('edit-cp-name').value,
             leader: document.getElementById('edit-cp-leader').value,
@@ -393,7 +407,7 @@
             totalPoints: parseInt(document.getElementById('edit-points').value), 
             bossStats: stats 
         });
-        alert("Saved Successfully!");
+        alert("CP Data Saved Successfully!");
     }
 
     async function migratePlayerLogs() {
@@ -432,6 +446,7 @@
             }
             if (updated) { await db.ref(`cps/${cpId}`).update({ leader: cp.leader, members: cp.members }); cpsUpdated++; }
         }
+
         alert(`ΕΠΙΤΥΧΙΑ!\nLogs moved: ${logsMoved} days.\nCPs updated: ${cpsUpdated}.`);
         document.getElementById('old-player-name').value = ""; document.getElementById('new-player-name').value = "";
     }
@@ -489,6 +504,24 @@
        EXTERNAL CLANS & CALLERS MANAGER LOGIC
        ========================================= */
        
+    // FORMATTING TOOLBAR FUNCTION
+    function formatText(type) {
+        const textarea = document.getElementById('ext-description');
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const selectedText = textarea.value.substring(start, end) || "Κείμενο";
+        let insertText = "";
+
+        if(type === 'gold') insertText = `<b style="color:var(--gold); font-family:'Cinzel';">${selectedText}</b>`;
+        if(type === 'red') insertText = `<span style="color:var(--red); font-weight:bold;">${selectedText}</span>`;
+        if(type === 'blue') insertText = `<span style="color:var(--noldor-sky); font-weight:bold;">${selectedText}</span>`;
+        if(type === 'icon1') insertText = `⚔️`;
+        if(type === 'icon2') insertText = `🛡️`;
+        
+        textarea.value = textarea.value.substring(0, start) + insertText + textarea.value.substring(end);
+        textarea.focus();
+    }
+
     function createExtClan() {
         const name = document.getElementById('new-ext-name').value.trim();
         const icon = document.getElementById('new-ext-icon').value.trim();
@@ -522,13 +555,16 @@
         let lootHtml = "";
 
         if (selVal.startsWith('ext_')) {
-            // Είναι Clan
+            // Είναι External Clan
             const pureId = selVal.replace('ext_', '');
-            targetData = allExtClans[pureId] || { leader: '', description: '', lootHistory: [] };
+            targetData = allExtClans[pureId] || { leader: '', description: '', iconUrl: '', lootHistory: [] };
             
             document.getElementById('ext-leader').value = targetData.leader || "";
             document.getElementById('ext-description').value = targetData.description || "";
+            document.getElementById('ext-icon').value = targetData.iconUrl || "";
+            
             document.getElementById('ext-desc-container').style.display = 'block';
+            document.getElementById('ext-icon-container').style.display = 'block';
             
             document.getElementById('ext-points').value = 0; 
             document.getElementById('ext-points').disabled = true;
@@ -550,8 +586,11 @@
             targetData = allCPs[pureId] || {};
             
             document.getElementById('ext-leader').value = targetData.leader || targetData.members || "";
-            document.getElementById('ext-desc-container').style.display = 'none'; // Δεν έχουν Agreements
-            document.getElementById('ext-hist-btn').style.display = 'none'; // Το History τους γίνεται από το πάνω panel
+            
+            // Κρύβουμε τα πεδία που δεν χρειάζεται ο Caller στο κάτω panel
+            document.getElementById('ext-desc-container').style.display = 'none'; 
+            document.getElementById('ext-icon-container').style.display = 'none'; 
+            document.getElementById('ext-hist-btn').style.display = 'none'; 
             
             document.getElementById('ext-points').value = targetData.totalPoints || 0;
             document.getElementById('ext-points').disabled = false;
@@ -582,6 +621,7 @@
             const pureId = currentExtID.replace('ext_', '');
             db.ref('externalClans/' + pureId).update({ 
                 leader: leaderVal,
+                iconUrl: document.getElementById('ext-icon').value,
                 description: document.getElementById('ext-description').value
             });
             alert("Clan Data Saved!");
@@ -608,6 +648,7 @@
         const newStatus = clan.status === 'history' ? 'active' : 'history';
         db.ref('externalClans/' + pureId).update({ status: newStatus }).then(() => {
             alert("Clan visibility updated!");
+            loadExtEdit(); // Ανανεώνει το κουμπί
         });
     }
 
