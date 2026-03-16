@@ -18,7 +18,6 @@
             --bg: #0a0c0f;
         }
         
-        /* ΙΔΙΟ BACKGROUND ΑΚΡΙΒΩΣ ΜΕ ΤΟ MARKET.HTML - ΧΩΡΙΣ ΤΗΝ ΕΞΤΡΑ ΜΑΣΚΑ */
         body { 
             background: var(--bg); 
             background-image: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), url('https://i.ibb.co/FbHYLMCD/BACKGROUND.png'); 
@@ -45,7 +44,6 @@
         .leader-name { color: var(--gold); font-size: 0.8rem; font-family: 'Cinzel'; display: block; margin-top: 8px; font-weight: bold; }
         .leader-role { color: #888; font-size: 0.6rem; text-transform: uppercase; display: block; }
         
-        /* MARKETPLACE BUTTON */
         .market-action-row { text-align: center; margin: 30px 0; }
         .enter-market-btn { display: inline-block; background: rgba(212, 175, 55, 0.1); border: 2px solid var(--gold); color: var(--gold); padding: 15px 40px; font-family: 'Cinzel'; font-size: 1.1rem; text-decoration: none; font-weight: bold; letter-spacing: 2px; border-radius: 5px; transition: 0.3s; cursor: pointer; }
         .enter-market-btn:hover { background: var(--gold); color: #000; box-shadow: 0 0 20px rgba(212, 175, 55, 0.5); }
@@ -64,14 +62,18 @@
         .cp-btn { width: 100%; background: none; border: none; padding: 12px 15px; color: #fff; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 0.85rem; }
         .cp-content { display: none; background: rgba(0,0,0,0.85); padding: 15px; border-top: 1px solid #333; }
         .cp-box.active .cp-content { display: block; }
-        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 15px; }
+        
+        .roster-section { background: rgba(255,255,255,0.03); border: 1px solid #333; padding: 10px; border-radius: 5px; margin-bottom: 10px; font-size: 0.75rem; }
+        .leader-item { color: var(--gold); font-weight: bold; font-size: 0.8rem; }
+        
+        .loot-btn { width: 100%; background: rgba(212,175,55,0.1); border: 1px solid #444; color: var(--gold); padding: 8px; font-family: 'Cinzel'; font-size: 0.65rem; cursor: pointer; border-radius: 4px; margin-bottom: 10px; }
+        .loot-panel { display: none; padding: 12px; background: rgba(0,0,0,0.5); margin-bottom: 10px; border-radius: 4px; font-size: 0.75rem; border: 1px solid #222; color: #aaa; }
+        
+        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
         .stat-box { background: #15181c; padding: 6px; border: 1px solid #333; text-align: center; border-radius: 4px; }
         .boss-icon { width: 22px; height: 22px; margin-bottom: 4px; }
         .stat-val { font-size: 0.75rem; color: #fff; font-family: 'Cinzel'; display: block; }
-        .roster-section { background: rgba(255,255,255,0.03); border: 1px solid #333; padding: 10px; border-radius: 5px; margin-top: 10px; font-size: 0.75rem; }
-        .leader-item { color: var(--gold); font-weight: bold; font-size: 0.8rem; }
-        .loot-btn { width: 100%; background: rgba(212,175,55,0.1); border: 1px solid #444; color: var(--gold); padding: 8px; font-family: 'Cinzel'; font-size: 0.65rem; cursor: pointer; border-radius: 4px; margin-top:10px; }
-        .loot-panel { display: none; padding: 12px; background: rgba(0,0,0,0.5); margin-top: 8px; border-radius: 4px; font-size: 0.75rem; border: 1px solid #222; color: #aaa; }
+        
         .other-clans-section { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 20px; }
         .new-clan-card { background: rgba(15, 18, 22, 0.95); border: 1px solid #333; border-top: 3px solid var(--gold); border-radius: 10px; padding: 20px; text-align: center; }
         .new-clan-icon { width: 55px; height: 55px; margin-bottom: 12px; }
@@ -172,22 +174,26 @@
                 if(cp.lootHistory && cp.lootHistory.length > 0) {
                     lootHtml = cp.lootHistory.map(l => `${l.date}: ${l.item} (-${l.cost})`).join('<br>');
                 }
+                
+                // ΕΔΩ ΑΛΛΑΞΕ Η ΣΕΙΡΑ ΜΕΣΑ ΣΤΟ cp-content
                 const html = `
                     <div class="cp-box ${style}">
                         <button class="cp-btn" onclick="this.parentElement.classList.toggle('active')">
                             <span>${cp.name}</span><span style="color:var(--gold); font-size:0.75rem;">${cp.totalPoints || 0} PTS</span>
                         </button>
                         <div class="cp-content">
-                            <div class="stat-grid">${Object.keys(bossIcons).map(b => {
-                                const val = (cp.bossStats && cp.bossStats[b]) ? cp.bossStats[b] : 0;
-                                return `<div class="stat-box"><img src="${bossIcons[b]}" class="boss-icon"><span class="stat-val">${val}</span></div>`;
-                            }).join('')}</div>
-                            <button class="loot-btn" onclick="const p=this.nextElementSibling; p.style.display=p.style.display==='block'?'none':'block';">VIEW LOOT HISTORY</button>
-                            <div class="loot-panel" style="display:none;">${lootHtml}</div>
                             <div class="roster-section">
                                 <span class="leader-item">👑 ${cp.leader || 'Pending...'}</span><br>
                                 <span style="color:#888;">Members: ${cp.members || 'Roster pending...'}</span>
                             </div>
+
+                            <button class="loot-btn" onclick="const p=this.nextElementSibling; p.style.display=p.style.display==='block'?'none':'block';">VIEW LOOT HISTORY</button>
+                            <div class="loot-panel" style="display:none;">${lootHtml}</div>
+
+                            <div class="stat-grid">${Object.keys(bossIcons).map(b => {
+                                const val = (cp.bossStats && cp.bossStats[b]) ? cp.bossStats[b] : 0;
+                                return `<div class="stat-box"><img src="${bossIcons[b]}" class="boss-icon"><span class="stat-val">${val}</span></div>`;
+                            }).join('')}</div>
                         </div>
                     </div>`;
                 if(cp.clan === 'noldor' || cp.clan === 'caller') nList.innerHTML += html;
