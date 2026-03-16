@@ -160,6 +160,20 @@
         const db = firebase.database();
         const bossIcons = { "VAL": "https://i.ibb.co/84gZPVRP/necklace-valakas.png", "ANT": "https://i.ibb.co/rfqvc6mv/earring-antharas.png", "BAI": "https://i.ibb.co/XrZkv67h/ring-of-baium.png", "FRI": "https://i.ibb.co/gF4YKGTM/frintezza-necklace.png", "ZAK": "https://i.ibb.co/spkC6Gzz/zaken-earring.png", "AQ":  "https://i.ibb.co/rKRtZmBG/ring-of-queen-ant.png", "ORF": "https://i.ibb.co/j9dDnXwH/earring-orfen.png", "COR": "https://i.ibb.co/ksv37fNZ/ring-of-.png", "SIE": "https://i.ibb.co/Txfby6wD/images.png" };
 
+        function getIconForLoot(itemName) {
+            if(!itemName) return "https://i.ibb.co/SXM1FZx8/attedance-points.png";
+            const upName = itemName.toUpperCase();
+            if(upName.includes("VAL")) return bossIcons.VAL;
+            if(upName.includes("ANT")) return bossIcons.ANT;
+            if(upName.includes("BAI")) return bossIcons.BAI;
+            if(upName.includes("FRI")) return bossIcons.FRI;
+            if(upName.includes("ZAK")) return bossIcons.ZAK;
+            if(upName.includes("QUEEN") || upName.includes("AQ")) return bossIcons.AQ;
+            if(upName.includes("ORF")) return bossIcons.ORF;
+            if(upName.includes("COR")) return bossIcons.COR;
+            return "https://i.ibb.co/SXM1FZx8/attedance-points.png"; // Default
+        }
+
         db.ref('cps/').on('value', (snapshot) => {
             const data = snapshot.val() || {};
             const nList = document.getElementById('noldor-list');
@@ -170,12 +184,20 @@
                 const cp = data[id];
                 if(cp.clan === 'history') return;
                 const style = (cp.clan === 'noldor' || cp.clan === 'caller') ? 'cp-noldor' : 'cp-krim';
+                
+                // Δημιουργία του Loot HTML με τα εικονίδια
                 let lootHtml = "No history found.";
                 if(cp.lootHistory && cp.lootHistory.length > 0) {
-                    lootHtml = cp.lootHistory.map(l => `${l.date}: ${l.item} (-${l.cost})`).join('<br>');
+                    lootHtml = cp.lootHistory.map(l => `
+                        <div style="display:flex; align-items:center; gap:8px; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
+                            <img src="${getIconForLoot(l.item)}" style="width:18px; height:18px; object-fit:contain;">
+                            <span style="color:#888; font-size:0.7rem;">${l.date}</span>
+                            <span style="color:#ddd; flex-grow:1; text-align:left;">${l.item}</span>
+                            <span style="color:#ff4444; font-family:'Cinzel'; font-weight:bold;">-${l.cost}</span>
+                        </div>
+                    `).join('');
                 }
                 
-                // ΕΔΩ ΑΛΛΑΞΕ Η ΣΕΙΡΑ ΜΕΣΑ ΣΤΟ cp-content
                 const html = `
                     <div class="cp-box ${style}">
                         <button class="cp-btn" onclick="this.parentElement.classList.toggle('active')">
@@ -213,8 +235,19 @@
                     const val = (cp && cp.bossStats && cp.bossStats[b]) ? cp.bossStats[b] : 0;
                     return `<div class="stat-box"><img src="${bossIcons[b]}" class="boss-icon"><span class="stat-val">${val}</span></div>`;
                 }).join('');
+                
+                // Looting History Modal με Icons
                 let lootHtml = "No history found.";
-                if(cp && cp.lootHistory) lootHtml = cp.lootHistory.map(l => `${l.date}: ${l.item} (-${l.cost})`).join('<br>');
+                if(cp && cp.lootHistory) {
+                    lootHtml = cp.lootHistory.map(l => `
+                        <div style="display:flex; align-items:center; gap:8px; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
+                            <img src="${getIconForLoot(l.item)}" style="width:18px; height:18px; object-fit:contain;">
+                            <span style="color:#888; font-size:0.7rem;">${l.date}</span>
+                            <span style="color:#ddd; flex-grow:1; text-align:left;">${l.item}</span>
+                            <span style="color:#ff4444; font-family:'Cinzel'; font-weight:bold;">-${l.cost}</span>
+                        </div>
+                    `).join('');
+                }
                 document.getElementById('leader-loot-panel').innerHTML = lootHtml;
                 if(cp) document.getElementById('modal-name').innerText = `${name} (${cp.totalPoints || 0} PTS)`;
             });
