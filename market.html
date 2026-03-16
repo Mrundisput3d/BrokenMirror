@@ -19,17 +19,6 @@
             margin: 0; padding: 0;
         }
 
-        .music-box {
-            position: fixed; top: 20px; left: 20px;
-            background: rgba(0, 0, 0, 0.85); border: 2px solid var(--gold);
-            padding: 10px; z-index: 1000; border-radius: 5px;
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
-        }
-        .music-box select {
-            background: #000; color: var(--gold); border: 1px solid var(--gold);
-            padding: 5px; font-family: 'Cinzel'; cursor: pointer; outline: none;
-        }
-
         .top-nav { position: fixed; top: 20px; right: 20px; z-index: 1000; }
         .nav-btn {
             background: rgba(0,0,0,0.8); border: 2px solid var(--gold); color: var(--gold);
@@ -69,7 +58,7 @@
             margin-top: 50px; margin-bottom: 25px; border-bottom: 1px solid rgba(212, 175, 55, 0.3);
             display: flex; align-items: center; gap: 15px; padding-bottom: 10px;
         }
-        .section-title img { width: 40px; height: 40px; border: 1px solid var(--gold); background: #000; }
+        .section-title img { width: 40px; height: 40px; border: 1px solid var(--gold); background: #000; object-fit: contain; }
 
         .policy-text { white-space: pre-line; font-size: 1.15rem; color: #ddd; text-align: justify; }
         .important { color: #ff4444; font-weight: bold; text-decoration: underline; }
@@ -83,17 +72,7 @@
         .clan-logo { width: 100px; height: 100px; object-fit: contain; background: rgba(0,0,0,0.6); border: 1px solid #444; padding: 5px; }
     </style>
 </head>
-<body onclick="playOnFirstClick()">
-
-    <div class="music-box">
-        <select id="musicSelect" onchange="changeMusic()">
-            <option value="none">Silence</option>
-            <option value="https://www.youtube.com/embed/S2C_P7-Yn8o">Dion Theme</option>
-            <option value="https://www.youtube.com/embed/pSj7S8N6Ksc">Giran Theme</option>
-            <option value="https://www.youtube.com/embed/vO6WpS8p4n0">Hunters Village</option>
-        </select>
-    </div>
-    <iframe id="bgMusic" width="0" height="0" src="" frameborder="0" allow="autoplay"></iframe>
+<body>
 
     <div class="top-nav">
         <a href="index.html" class="nav-btn">← DASHBOARD</a>
@@ -195,25 +174,5 @@ These policies are designed to maintain discipline, fairness, and strong perform
             </div>
         </div>
     </div>
-
-    <script>
-        function changeMusic() {
-            const select = document.getElementById('musicSelect');
-            const player = document.getElementById('bgMusic');
-            if(select.value === "none") {
-                player.src = "";
-            } else {
-                player.src = select.value + "?autoplay=1&enablejsapi=1";
-            }
-        }
-
-        function playOnFirstClick() {
-            const select = document.getElementById('musicSelect');
-            const player = document.getElementById('bgMusic');
-            if(select.value !== "none" && player.src === "") {
-                changeMusic();
-            }
-        }
-    </script>
 </body>
 </html>
