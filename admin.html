@@ -40,6 +40,9 @@
         .filter-tabs { display: flex; gap: 5px; margin-bottom: 10px; }
         .filter-btn { flex: 1; padding: 5px; font-size: 10px; cursor: pointer; background: #222; border: 1px solid #444; color: #888; font-family: 'Cinzel'; }
         .filter-btn.active { border-color: var(--gold); color: var(--gold); background: rgba(212,175,55,0.1); }
+        
+        /* Νέα κλάση για το grid του External panel */
+        .external-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px; }
     </style>
 </head>
 <body>
@@ -125,6 +128,57 @@
             </div>
         </div>
     </div>
+    
+    <div style="max-width: 1400px; margin: 20px auto;">
+        <div class="panel">
+            <h2 style="color:var(--blue); border-bottom: 1px solid #333; padding-bottom: 10px;">EXTERNAL CLANS & CALLERS MANAGER</h2>
+            <div style="display:flex; gap:10px; margin-bottom: 15px;">
+                <select id="ext-select" style="flex:1;" onchange="loadExtEdit()">
+                    <option value="">-- Επιλογή Clan / Caller --</option>
+                    <optgroup label="External Clans">
+                        <option value="ext_OrzelBialy">OrzelBialy Clan</option>
+                        <option value="ext_ExitGaming">ExitGaming Clan</option>
+                        <option value="ext_LastKingdom">LastKingdom Clan</option>
+                    </optgroup>
+                    <optgroup label="Callers (Από CP List)">
+                        <option value="cp_niklaus">Niklaus (Ally Leader)</option>
+                        <option value="cp_tsaknorris">Tsaknorris (Shot Caller)</option>
+                    </optgroup>
+                </select>
+            </div>
+            
+            <div id="ext-edit-section" style="display:none;" class="external-grid">
+                <div>
+                    <label>Leader Name / Caller Roster</label>
+                    <input type="text" id="ext-leader" placeholder="Όνομα Leader...">
+                    <label style="display:block; margin-top:10px;">Total Points (Μόνο για Callers)</label>
+                    <input type="number" id="ext-points" style="font-size:1.2rem; color:var(--gold);">
+                    <button class="btn btn-gold" onclick="updateExtData()" style="margin-top:20px;">SAVE DATA</button>
+                </div>
+                <div>
+                    <h3 style="color:var(--red); margin:0;">MARKETPLACE (BUY LOOT)</h3>
+                    <select id="ext-loot-market">
+                        <option value="3100|Valakas Necklace">Valakas Necklace (3100)</option>
+                        <option value="1100|Antharas Earring">Antharas Earring (1100)</option>
+                        <option value="950|Baium Ring">Baium Ring (950)</option>
+                        <option value="225|Frintezza Necklace">Frintezza Necklace (225)</option>
+                        <option value="175|Zaken Earring">Zaken Earring (175)</option>
+                        <option value="150|Queen Ant Ring">Queen Ant Ring (150)</option>
+                        <option value="75|Orfen Earring">Orfen Earring (75)</option>
+                        <option value="25|Core Ring">Core Ring (25)</option>
+                    </select>
+                    <button class="btn btn-red" onclick="addExtMarketLoot()">BUY ITEM</button>
+                    
+                    <h3 style="color:var(--gold); margin-top:20px;">LOOT HISTORY</h3>
+                    <div style="max-height: 150px; overflow-y: auto; background: #000; border: 1px solid #333;">
+                        <table class="loot-table">
+                            <tbody id="ext-loot-history-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 <script>
     const firebaseConfig = { apiKey: "AIzaSyDRL8EehxdcgVYJ0LJ1khVYkSJcaCMKRes", databaseURL: "https://brokenmirrordb-default-rtdb.europe-west1.firebasedatabase.app" };
@@ -146,6 +200,7 @@
     // ------------------------------
 
     let allCPs = {}, matchedData = {}, currentEditID = null, globalDailyLogs = {};
+    let allExtClans = {}, currentExtID = null;
     let viewMode = 'active'; 
     const bossKeys = ['VAL', 'ANT', 'BAI', 'SIE', 'ZAK', 'FRI', 'AQ', 'ORF', 'COR'];
 
@@ -154,8 +209,15 @@
         allCPs = snap.val() || {}; 
         renderSimpleList(); 
         if(currentEditID) loadEdit(currentEditID); 
+        if(currentExtID && currentExtID.startsWith('cp_')) loadExtEdit(); // Ανανέωση αν είναι caller
     });
     db.ref('dailyLogs/').on('value', snap => { globalDailyLogs = snap.val() || {}; });
+    
+    // Νέο Realtime Sync για τα External Clans
+    db.ref('externalClans/').on('value', snap => {
+        allExtClans = snap.val() || {};
+        if(currentExtID && currentExtID.startsWith('ext_')) loadExtEdit();
+    });
 
     function setViewMode(mode) {
         viewMode = mode;
@@ -282,6 +344,7 @@
             }
         }
     }
+    
     function deleteLoot(idx) {
         if(!confirm("Refund points?")) return;
         const cp = allCPs[currentEditID];
@@ -315,6 +378,111 @@
     }
 
     function deleteCP() { if(confirm("Delete Forever?")) db.ref('cps/' + currentEditID).remove(); }
+
+
+    /* =========================================
+       NΕΟΣ ΚΩΔΙΚΑΣ ΓΙΑ ΤΑ EXTERNAL CLANS & CALLERS
+       ========================================= */
+
+    function loadExtEdit() {
+        const selVal = document.getElementById('ext-select').value;
+        if(!selVal) {
+            document.getElementById('ext-edit-section').style.display = 'none';
+            currentExtID = null;
+            return;
+        }
+
+        currentExtID = selVal;
+        document.getElementById('ext-edit-section').style.display = 'grid';
+        let targetData = {};
+        let lootHtml = "";
+
+        if (selVal.startsWith('ext_')) {
+            // Είναι External Clan (Orzel, Exit, LK)
+            const pureId = selVal.replace('ext_', '');
+            targetData = allExtClans[pureId] || { leader: '', lootHistory: [] };
+            document.getElementById('ext-leader').value = targetData.leader || "";
+            document.getElementById('ext-points').value = 0; // Τα Clans δεν μετράνε πόντους
+            document.getElementById('ext-points').disabled = true; 
+        } 
+        else if (selVal.startsWith('cp_')) {
+            // Είναι Caller από τα CPs
+            const pureId = selVal.replace('cp_', '');
+            targetData = allCPs[pureId] || {};
+            document.getElementById('ext-leader').value = targetData.leader || targetData.members || "";
+            document.getElementById('ext-points').value = targetData.totalPoints || 0;
+            document.getElementById('ext-points').disabled = false;
+        }
+
+        // Render Loot History
+        if(targetData.lootHistory) {
+            targetData.lootHistory.forEach((item, index) => {
+                lootHtml += `<tr><td>${item.item}</td><td>-${item.cost}</td><td onclick="deleteExtLoot(${index})" style="color:red; cursor:pointer;">✖</td></tr>`;
+            });
+        }
+        document.getElementById('ext-loot-history-body').innerHTML = lootHtml;
+    }
+
+    function updateExtData() {
+        const leaderVal = document.getElementById('ext-leader').value;
+        
+        if (currentExtID.startsWith('ext_')) {
+            const pureId = currentExtID.replace('ext_', '');
+            db.ref('externalClans/' + pureId).update({ leader: leaderVal });
+            alert("Leader updated for Clan!");
+        } 
+        else if (currentExtID.startsWith('cp_')) {
+            const pureId = currentExtID.replace('cp_', '');
+            const pts = parseInt(document.getElementById('ext-points').value) || 0;
+            db.ref('cps/' + pureId).update({ leader: leaderVal, totalPoints: pts });
+            alert("Caller Data & Points Saved!");
+        }
+    }
+
+    function addExtMarketLoot() {
+        if(!currentExtID) return;
+        const loot = document.getElementById('ext-loot-market').value.split('|');
+        const newItem = { item: loot[1], cost: loot[0], date: new Date().toLocaleDateString('el-GR') };
+
+        if (currentExtID.startsWith('ext_')) {
+            const pureId = currentExtID.replace('ext_', '');
+            db.ref('externalClans/' + pureId).transaction(ext => {
+                if(ext === null) ext = {};
+                if(!ext.lootHistory) ext.lootHistory = [];
+                ext.lootHistory.push(newItem);
+                return ext;
+            });
+        } 
+        else if (currentExtID.startsWith('cp_')) {
+            const pureId = currentExtID.replace('cp_', '');
+            db.ref('cps/' + pureId).transaction(cp => {
+                if(cp) {
+                    cp.totalPoints -= parseInt(loot[0]); // Αφαιρούμε πόντους στους Callers
+                    if(!cp.lootHistory) cp.lootHistory = [];
+                    cp.lootHistory.push(newItem);
+                }
+                return cp;
+            });
+        }
+    }
+
+    function deleteExtLoot(idx) {
+        if(!confirm("Are you sure you want to delete this loot? (Points will refund if it's a Caller)")) return;
+
+        if (currentExtID.startsWith('ext_')) {
+            const pureId = currentExtID.replace('ext_', '');
+            const ext = allExtClans[pureId];
+            ext.lootHistory.splice(idx, 1);
+            db.ref('externalClans/' + pureId).update({ lootHistory: ext.lootHistory });
+        } 
+        else if (currentExtID.startsWith('cp_')) {
+            const pureId = currentExtID.replace('cp_', '');
+            const cp = allCPs[pureId];
+            cp.totalPoints += parseInt(cp.lootHistory[idx].cost); // Refund στους Callers
+            cp.lootHistory.splice(idx, 1);
+            db.ref('cps/' + pureId).update({ totalPoints: cp.totalPoints, lootHistory: cp.lootHistory });
+        }
+    }
 </script>
 </body>
 </html>
