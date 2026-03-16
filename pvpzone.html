@@ -10,10 +10,15 @@
             --gold: #d4af37; --bg-overlay: rgba(10, 12, 15, 0.96); 
         }
         body { 
-            font-family: 'Open Sans', sans-serif; 
-            background: #0a0c0f url('https://i.ibb.co/1GmpSyxZ/BACKGROUND.jpg') no-repeat center center fixed; 
-            background-size: cover; color: #eee; margin: 0; padding: 0;
-        }
+    background: #0a0c0f; 
+    background-image: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), url('https://i.ibb.co/xKJXgPdg/MOS.png'); 
+    background-attachment: fixed;
+    background-size: cover;
+    background-position: center;
+    color: #eee; 
+    font-family: 'Open Sans', sans-serif; 
+    margin: 0; padding: 0;
+}
         body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-overlay); z-index: -1; }
 
         .top-header { text-align: center; padding-top: 20px; }
