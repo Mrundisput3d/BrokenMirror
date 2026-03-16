@@ -63,8 +63,11 @@
         .cp-content { display: none; background: rgba(0,0,0,0.85); padding: 15px; border-top: 1px solid #333; }
         .cp-box.active .cp-content { display: block; }
         
-        .roster-section { background: rgba(255,255,255,0.03); border: 1px solid #333; padding: 10px; border-radius: 5px; margin-bottom: 10px; font-size: 0.75rem; }
+        .roster-section { background: rgba(255,255,255,0.03); border: 1px solid #333; padding: 10px; border-radius: 5px; margin-bottom: 10px; font-size: 0.75rem; line-height: 1.6; }
         .leader-item { color: var(--gold); font-weight: bold; font-size: 0.8rem; }
+        
+        .member-click { color: #aaa; cursor: pointer; transition: 0.2s; border-bottom: 1px dashed transparent; }
+        .member-click:hover { color: var(--gold); border-bottom: 1px dashed var(--gold); text-shadow: 0 0 5px rgba(212,175,55,0.5); }
         
         .loot-btn { width: 100%; background: rgba(212,175,55,0.1); border: 1px solid #444; color: var(--gold); padding: 8px; font-family: 'Cinzel'; font-size: 0.65rem; cursor: pointer; border-radius: 4px; margin-bottom: 10px; }
         .loot-panel { display: none; padding: 12px; background: rgba(0,0,0,0.5); margin-bottom: 10px; border-radius: 4px; font-size: 0.75rem; border: 1px solid #222; color: #aaa; }
@@ -79,8 +82,7 @@
         .new-clan-icon { width: 55px; height: 55px; margin-bottom: 12px; }
         .new-clan-name { display: block; font-family: 'Cinzel'; color: #fff; font-size: 0.95rem; }
         
-        /* MODALS */
-        #caller-modal, #cp-stats-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 420px; background: #0f1216; border: 2px solid var(--gold); border-radius: 15px; padding: 25px; z-index: 9999; text-align: center; }
+        #caller-modal, #cp-stats-modal, #member-stats-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 420px; background: #0f1216; border: 2px solid var(--gold); border-radius: 15px; padding: 25px; z-index: 9999; text-align: center; }
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9998; backdrop-filter: blur(5px); }
     </style>
 </head>
@@ -110,6 +112,13 @@
     <div id="cp-stats-modal">
         <h2 id="cp-stats-name" style="font-family:'Cinzel'; color:var(--gold); margin:0 0 20px 0; font-size:1.3rem;"></h2>
         <div class="stat-grid" id="cp-stats-grid"></div>
+        <button onclick="closeModal()" style="margin-top:20px; background:var(--gold); color:#000; border:none; padding:10px 25px; cursor:pointer; font-weight:bold; border-radius:4px; width: 100%;">CLOSE</button>
+    </div>
+
+    <div id="member-stats-modal">
+        <h2 id="member-stats-name" style="font-family:'Cinzel'; color:var(--gold); margin:0 0 5px 0; font-size:1.3rem;"></h2>
+        <p style="color:#888; font-size:0.7rem; margin-bottom:20px;">PERSONAL ATTENDANCES</p>
+        <div class="stat-grid" id="member-stats-grid"></div>
         <button onclick="closeModal()" style="margin-top:20px; background:var(--gold); color:#000; border:none; padding:10px 25px; cursor:pointer; font-weight:bold; border-radius:4px; width: 100%;">CLOSE</button>
     </div>
 
@@ -169,7 +178,7 @@
         const db = firebase.database();
         const bossIcons = { "VAL": "https://i.ibb.co/84gZPVRP/necklace-valakas.png", "ANT": "https://i.ibb.co/rfqvc6mv/earring-antharas.png", "BAI": "https://i.ibb.co/XrZkv67h/ring-of-baium.png", "FRI": "https://i.ibb.co/gF4YKGTM/frintezza-necklace.png", "ZAK": "https://i.ibb.co/spkC6Gzz/zaken-earring.png", "AQ":  "https://i.ibb.co/rKRtZmBG/ring-of-queen-ant.png", "ORF": "https://i.ibb.co/j9dDnXwH/earring-orfen.png", "COR": "https://i.ibb.co/ksv37fNZ/ring-of-.png", "SIE": "https://i.ibb.co/Txfby6wD/images.png" };
 
-        let globalCPData = {}; // Αποθηκεύει τα δεδομένα για να τα διαβάσει το Modal
+        let globalCPData = {}; 
 
         function getIconForLoot(itemName) {
             if(!itemName) return "https://i.ibb.co/SXM1FZx8/attedance-points.png";
@@ -192,6 +201,7 @@
             const kList = document.getElementById('krim-list');
             nList.innerHTML = ""; kList.innerHTML = "";
             const sortedIDs = Object.keys(data).sort((a,b) => (data[b].totalPoints || 0) - (data[a].totalPoints || 0));
+            
             sortedIDs.forEach(id => {
                 const cp = data[id];
                 if(cp.clan === 'history') return;
@@ -208,8 +218,22 @@
                         </div>
                     `).join('');
                 }
+
+                let membersHtml = 'Roster pending...';
+                if (cp.members) {
+                    membersHtml = cp.members.split(',').map(m => {
+                        let mName = m.trim();
+                        if(!mName) return '';
+                        return `<span class="member-click" onclick="openMemberStats('${id}', '${mName}')">${mName}</span>`;
+                    }).join(', ');
+                }
+
+                let leaderHtml = 'Pending...';
+                if (cp.leader) {
+                    let lName = cp.leader.trim();
+                    leaderHtml = `<span class="member-click" onclick="openMemberStats('${id}', '${lName}')">${lName}</span>`;
+                }
                 
-                // Αντικαταστάθηκε το Grid με το Κουμπί VIEW ATTENDANCES
                 const html = `
                     <div class="cp-box ${style}">
                         <button class="cp-btn" onclick="this.parentElement.classList.toggle('active')">
@@ -217,14 +241,14 @@
                         </button>
                         <div class="cp-content">
                             <div class="roster-section">
-                                <span class="leader-item">👑 ${cp.leader || 'Pending...'}</span><br>
-                                <span style="color:#888;">Members: ${cp.members || 'Roster pending...'}</span>
+                                <span class="leader-item">👑 ${leaderHtml}</span><br>
+                                <span style="color:#888;">Members: ${membersHtml}</span>
                             </div>
 
                             <button class="loot-btn" onclick="const p=this.nextElementSibling; p.style.display=p.style.display==='block'?'none':'block';">VIEW LOOT HISTORY</button>
                             <div class="loot-panel" style="display:none;">${lootHtml}</div>
 
-                            <button class="loot-btn" onclick="openCpStats('${id}')">VIEW ATTENDANCES</button>
+                            <button class="loot-btn" onclick="openCpStats('${id}')">VIEW CP ATTENDANCES</button>
                         </div>
                     </div>`;
                 if(cp.clan === 'noldor' || cp.clan === 'caller') nList.innerHTML += html;
@@ -232,7 +256,6 @@
             });
         });
 
-        // ΝΕΑ ΣΥΝΑΡΤΗΣΗ ΠΟΥ ΑΝΟΙΓΕΙ ΤΟ MODAL ΜΕ ΤΑ ATTENDANCES ΤΟΥ CP
         function openCpStats(cpId) {
             const cp = globalCPData[cpId];
             if(!cp) return;
@@ -244,6 +267,46 @@
             
             document.getElementById('cp-stats-modal').style.display = 'block';
             document.getElementById('overlay').style.display = 'block';
+        }
+
+        // ΣΥΝΑΡΤΗΣΗ ΠΟΥ ΔΙΑΒΑΖΕΙ ΑΠΟ ΤΑ LOGS ΓΙΑ ΤΟ ΣΥΓΚΕΚΡΙΜΕΝΟ ΜΕΛΟΣ
+        function openMemberStats(cpId, memberName) {
+            // Δείξε "Loading..." μέχρι να έρθουν τα δεδομένα από το Firebase
+            document.getElementById('member-stats-name').innerText = memberName.toUpperCase() + " (LOADING...)";
+            document.getElementById('member-stats-grid').innerHTML = "<div style='grid-column:1/-1; color:var(--gold); padding:20px; font-family:Cinzel;'>Scanning logs...</div>";
+            document.getElementById('member-stats-modal').style.display = 'block';
+            document.getElementById('overlay').style.display = 'block';
+
+            // Διαβάζει τον φάκελο 'logs' από τη βάση σου
+            db.ref('logs').once('value', snapshot => {
+                let mStats = { VAL:0, ANT:0, BAI:0, FRI:0, ZAK:0, AQ:0, ORF:0, COR:0, SIE:0 };
+                const logsData = snapshot.val() || {};
+                const upperName = memberName.toUpperCase();
+
+                // Ψάχνει σε ΟΛΑ τα logs
+                Object.values(logsData).forEach(log => {
+                    const logString = JSON.stringify(log).toUpperCase();
+                    
+                    // Αν το όνομα του παίκτη υπάρχει σε αυτό το log, ψάχνει να βρει ποιο Boss αφορά
+                    if (logString.includes(upperName)) {
+                        if(logString.includes("VALAKAS") || logString.includes('"VAL"')) mStats.VAL++;
+                        else if(logString.includes("ANTHARAS") || logString.includes('"ANT"')) mStats.ANT++;
+                        else if(logString.includes("BAIUM") || logString.includes('"BAI"')) mStats.BAI++;
+                        else if(logString.includes("FRINTEZZA") || logString.includes('"FRI"')) mStats.FRI++;
+                        else if(logString.includes("ZAKEN") || logString.includes('"ZAK"')) mStats.ZAK++;
+                        else if(logString.includes("QUEEN ANT") || logString.includes("QUEENANT") || logString.includes('"AQ"')) mStats.AQ++;
+                        else if(logString.includes("ORFEN") || logString.includes('"ORF"')) mStats.ORF++;
+                        else if(logString.includes("CORE") || logString.includes('"COR"')) mStats.COR++;
+                        else if(logString.includes("SIEGE") || logString.includes('"SIE"')) mStats.SIE++;
+                    }
+                });
+
+                // Ενημερώνει το Modal με τα έτοιμα νούμερα
+                document.getElementById('member-stats-name').innerText = memberName.toUpperCase();
+                document.getElementById('member-stats-grid').innerHTML = Object.keys(bossIcons).map(b => {
+                    return `<div class="stat-box"><img src="${bossIcons[b]}" class="boss-icon"><span class="stat-val">${mStats[b]}</span></div>`;
+                }).join('');
+            });
         }
 
         function openCaller(name, role, img) {
@@ -280,6 +343,7 @@
         function closeModal() { 
             document.getElementById('caller-modal').style.display='none'; 
             document.getElementById('cp-stats-modal').style.display='none'; 
+            document.getElementById('member-stats-modal').style.display='none'; 
             document.getElementById('overlay').style.display='none'; 
         }
         function toggleLeaderLoot() { const p = document.getElementById('leader-loot-panel'); p.style.display = p.style.display==='none'?'block':'none'; }
