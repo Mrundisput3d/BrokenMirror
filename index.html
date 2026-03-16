@@ -201,9 +201,8 @@
         const bossIcons = { "VAL": "https://i.ibb.co/84gZPVRP/necklace-valakas.png", "ANT": "https://i.ibb.co/rfqvc6mv/earring-antharas.png", "BAI": "https://i.ibb.co/XrZkv67h/ring-of-baium.png", "FRI": "https://i.ibb.co/gF4YKGTM/frintezza-necklace.png", "ZAK": "https://i.ibb.co/spkC6Gzz/zaken-earring.png", "AQ":  "https://i.ibb.co/rKRtZmBG/ring-of-queen-ant.png", "ORF": "https://i.ibb.co/j9dDnXwH/earring-orfen.png", "COR": "https://i.ibb.co/ksv37fNZ/ring-of-.png", "SIE": "https://i.ibb.co/Txfby6wD/images.png" };
 
         let globalCPData = {}; 
-        let globalExternalClans = {}; // Για τα 3 κάτω clans
+        let globalExternalClans = {}; 
 
-        // Fetch External Clans Data
         db.ref('externalClans/').on('value', (snapshot) => {
             globalExternalClans = snapshot.val() || {};
         });
@@ -371,12 +370,10 @@
             document.getElementById('clan-modal-name').innerText = clanName.toUpperCase();
             document.getElementById('clan-modal-img').src = iconUrl;
             
-            // Παίρνουμε τα δεδομένα από τη Firebase (αν υπάρχουν)
             const extData = globalExternalClans[clanId] || {};
             const leaderName = extData.leader || "Pending...";
             const lootHistory = extData.lootHistory || [];
 
-            // 1. Το κείμενο συμφωνιών (όπως ήταν)
             let content = "Alliance agreements and information regarding this clan are currently pending.";
             if (clanId === "ExitGaming") {
                 content = "<b style='color:var(--gold)'>NIGHT EPICS:</b><br>All night epics between 00:00 and 08:00 Greek time are assigned to ExitGaming.<br><br><b style='color:var(--gold)'>HIGH EPICS (Baium, Antharas, Valakas):</b><br>Distribution: 1 for ExitGaming, 3 for our alliance.<br>The order is determined by rolling a dice each time (Rolling continues until all parts are distributed fairly).";
@@ -384,7 +381,6 @@
                 content = "<b style='color:var(--gold)'>EPIC DISTRIBUTION:</b><br>1 mid epic and 2 low epics if they bring at least 5 parties (9/9) for the weekend and at least 3 parties (9/9) on weekdays.<br>If they bring fewer parties, the deal is adjusted accordingly.<br><br><b style='color:var(--gold)'>BAIUM ACCESS:</b><br>LK Clan has access to every 5th or 6th Baium.";
             }
 
-            // 2. Η λίστα του Loot
             let lootHtml = "No history found.";
             if(lootHistory.length > 0) {
                 lootHtml = lootHistory.map(l => `
@@ -397,7 +393,6 @@
                 `).join('');
             }
 
-            // 3. Ενώνουμε τα πάντα σε ένα ωραίο HTML
             const finalHtml = `
                 <div style="margin-bottom: 15px; font-size:0.95rem;">
                     <span style="color:var(--gold); font-weight:bold; font-family:'Cinzel';">👑 LEADER:</span> 
@@ -427,7 +422,7 @@
         // --- MUSIC LOGIC ---
         const tracks = [
             {name:"DION THEME", url:"https://www.dropbox.com/scl/fi/ypzqrr336iewt62gncy6u/Lineage-2-Dion-Theme-Song.mp3?rlkey=nl1quliuqleuljgkt5jhqq6hh&st=sb8ij16g&raw=1"},
-            {name:"HUNTERS THEME", url:"https://www.dropbox.com/scl/fi/75hck498enzot93zt0lg9/Lineage-2-Hunters-Village-Theme.mp3?rlkey=6mu9ic0gavmofkdvduj72270y&st=j6zupb0a&dl=0"},
+            {name:"HUNTERS THEME", url:"https://www.dropbox.com/scl/fi/75hck498enzot93zt0lg9/Lineage-2-Hunters-Village-Theme.mp3?rlkey=6mu9ic0gavmofkdvduj72270y&st=qr4cvisl&raw=1"},
             {name:"GIRAN THEME", url:"https://www.dropbox.com/scl/fi/iu8j9wn9wky8fav176ayf/Lineage-2-Giran-Theme.mp3?rlkey=xp1j0upa076sy21tgcta6t9c3&st=0a4ihyhg&raw=1"}
         ];
         let currentIdx = 0; 
