@@ -5,13 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BMA | Market & Policies</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
-    
     <style>
         :root { --gold: #d4af37; --bg: #0a0c0f; }
 
+        /* ΑΚΡΙΒΩΣ ΤΟ ΙΔΙΟ BACKGROUND ΜΕ ΤΟ INDEX */
         body { 
             background: var(--bg); 
-            /* ΠΡΟΣΟΧΗ: Αν το αρχείο εικόνας στο GitHub λέγεται bg.jpg, άλλαξε το παρακάτω link */
             background-image: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), url('https://i.ibb.co/hR0867S/bma-bg.jpg'); 
             background-attachment: fixed;
             background-size: cover;
@@ -21,13 +20,12 @@
             margin: 0; padding: 0;
         }
 
+        /* MUSIC BOX ΑΠΟ INDEX */
         .music-box {
             position: fixed; top: 20px; left: 20px;
-            background: rgba(0, 0, 0, 0.9); border: 2px solid var(--gold);
+            background: rgba(0, 0, 0, 0.8); border: 1px solid var(--gold);
             padding: 10px; z-index: 1000; border-radius: 5px;
-            box-shadow: 0 0 15px var(--gold);
         }
-
         .music-box select {
             background: #000; color: var(--gold); border: 1px solid var(--gold);
             padding: 5px; font-family: 'Cinzel'; cursor: pointer;
@@ -37,63 +35,60 @@
         .nav-btn {
             background: rgba(0,0,0,0.8); border: 2px solid var(--gold); color: var(--gold);
             padding: 10px 25px; font-family: 'Cinzel'; text-decoration: none; font-weight: bold;
-            transition: 0.3s;
         }
-        .nav-btn:hover { background: var(--gold); color: #000; }
 
-        .container { max-width: 1000px; margin: 0 auto; padding: 120px 20px; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 100px 20px; }
 
         h1 { 
             font-family: 'Cinzel'; color: var(--gold); text-align: center; 
-            font-size: 3.5rem; letter-spacing: 5px; text-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
-            margin-bottom: 50px;
+            font-size: 3rem; letter-spacing: 5px; text-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
+            margin-bottom: 60px;
         }
 
+        /* JEWELS GRID */
         .market-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px; margin-bottom: 80px;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px; margin-bottom: 60px;
         }
         .jewel-card {
             background: rgba(20, 20, 20, 0.9); border: 1px solid #333;
-            padding: 15px; display: flex; align-items: center; gap: 12px;
+            padding: 15px; display: flex; align-items: center; gap: 15px;
             border-bottom: 2px solid var(--gold);
         }
-        .jewel-icon { width: 40px; height: 40px; border: 1px solid var(--gold); background: #000; }
-        .jewel-name { font-family: 'Cinzel'; font-size: 0.75rem; color: #fff; }
+        .jewel-icon { width: 45px; height: 45px; border: 1px solid var(--gold); }
+        .jewel-name { font-family: 'Cinzel'; font-size: 0.85rem; color: #fff; }
         .jewel-price { font-family: 'Cinzel'; font-size: 1.2rem; color: var(--gold); font-weight: bold; }
 
-        .policy-section {
-            background: rgba(15, 15, 15, 0.95); border: 1px solid #333;
-            border-left: 5px solid var(--gold); margin-bottom: 40px;
-            padding: 40px; position: relative; overflow: hidden;
+        /* POLICIES BOX (ΜΕΓΑΛΟ ΚΑΙ SCROLLABLE) */
+        .policies-box {
+            background: rgba(10, 10, 10, 0.95);
+            border: 2px solid var(--gold);
+            padding: 50px;
+            line-height: 1.8;
+            box-shadow: 0 0 40px rgba(0,0,0,1);
+            position: relative;
         }
 
-        /* Υδατογράφημα στο βάθος κάθε ενότητας */
-        .policy-section::before {
-            content: ""; position: absolute; top: -10%; right: -5%;
-            width: 250px; height: 250px; opacity: 0.05; pointer-events: none;
-            background-size: contain; background-repeat: no-repeat;
-        }
-        .sec-points::before { background-image: url('https://i.ibb.co/gF4YKGTM/frintezza-necklace.png'); }
-        .sec-limit::before { background-image: url('https://i.ibb.co/rfqvc6mv/antharas-earring.png'); }
-        .sec-sunday::before { background-image: url('https://i.ibb.co/84gZPVRP/necklace-valakas.png'); }
-
-        .policy-header {
-            font-family: 'Cinzel'; color: var(--gold); font-size: 1.8rem;
-            margin-bottom: 25px; border-bottom: 1px solid rgba(212, 175, 55, 0.3);
-            padding-bottom: 10px;
+        .section-title {
+            font-family: 'Cinzel'; color: var(--gold); font-size: 1.5rem;
+            margin-top: 40px; margin-bottom: 20px; border-bottom: 1px solid #333;
+            display: flex; align-items: center; gap: 15px;
         }
 
-        .policy-content { font-family: 'Open Sans'; font-size: 1.1rem; line-height: 1.8; color: #ddd; white-space: pre-line; }
+        .section-title img { width: 30px; height: 30px; }
 
-        /* CLAN BOXES */
-        .clan-box {
-            display: flex; align-items: center; gap: 20px;
-            background: rgba(0, 0, 0, 0.6); padding: 25px;
-            border: 1px solid #444; margin-top: 25px;
-            border-right: 3px solid var(--gold);
+        .policy-text { white-space: pre-line; font-size: 1.05rem; color: #ddd; }
+
+        .clan-agreement {
+            background: rgba(212, 175, 55, 0.05);
+            border: 1px solid #444;
+            padding: 25px;
+            margin-top: 30px;
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
         }
-        .clan-logo { width: 80px; height: 80px; object-fit: contain; border: 1px solid #555; background: #000; padding: 5px; }
+        .clan-logo { width: 70px; height: 70px; border: 1px solid var(--gold); background: #000; }
 
         .important { color: #ff4444; font-weight: bold; }
     </style>
@@ -105,7 +100,7 @@
             <option value="none">Silence</option>
             <option value="https://www.youtube.com/embed/S2C_P7-Yn8o">Dion</option>
             <option value="https://www.youtube.com/embed/pSj7S8N6Ksc">Giran</option>
-            <option value="https://www.youtube.com/embed/vO6WpS8p4n0">Hunters Village</option>
+            <option value="https://www.youtube.com/embed/vO6WpS8p4n0">Hunters</option>
         </select>
     </div>
     <iframe id="bgMusic" width="0" height="0" src="" frameborder="0" allow="autoplay"></iframe>
@@ -128,57 +123,86 @@
             <div class="jewel-card"><img src="https://i.ibb.co/ksv37fNZ/ring-of-.png" class="jewel-icon"><div><span class="jewel-name">Core Ring</span><br><span class="jewel-price">25</span></div></div>
         </div>
 
-        <div class="policy-section sec-points">
-            <div class="policy-header">ATTENDANCE POINTS</div>
-            <div class="policy-content">
+        <div class="policies-box">
+            <div class="policy-text">
 As Alliance Leader, the following policies are established to maintain fairness, discipline, and effective organization. These rules are strict and apply to all CP Leaders, and members. Respecting them ensures equal opportunity for every CP and keeps the alliance competitive and active.
 
+<div class="section-title"><img src="https://i.ibb.co/84gZPVRP/necklace-valakas.png"> ATTENDANCE POINTS:</div>
 • Mid Epics (Orfen, Queen Ant, Zaken) = 1 pt per member
 • Baium = 2 pts per member
 • Valakas / Antharas = 3 pts Per member
 <span style="color:var(--gold)">Caller : 9 pts for high epic participation / 6 pts for Baium participation / 3 pts for low epics participation . (Caller points are applied only for himself, and not for his CP)</span>
+
+<div class="section-title"><img src="https://i.ibb.co/rfqvc6mv/antharas-earring.png"> 1. Cooldown Protocol</div>
+- Low Epics: 1-week restriction before participating again.  
+- Mid-Level Epics: 3-week restriction before participating again.  
+- High Epics: 3-week restriction before participating again.
+
+<div class="section-title">CP Member Limit</div>
+Each CP is allowed to have a maximum of 10 members in clan
+This rule exists so that other CPs also have the opportunity to maintain their 10 active members.
+Do not occupy extra spaces without permission.
+If a CP exceeds this limit without prior notice, penalty points will be applied.
+
+<div class="section-title">Weekend Attendance</div>
+Major events take place during the weekend.
+If your CP has absent members for Saturday or Sunday, you must inform the Alliance Leader
+
+<div class="section-title">Sunday Activity Requirement</div>
+Sunday is the most important active day for the clan.
+If a member cannot attend on Sunday, there is no problem, but the following must happen:
+The member must notify their CP Leader in advance.,
+The member must temporarily leave the clan on Sunday.,
+This allows the alliance to invite temporary drivers to fill the available spots.
+Members who leave for this reason will be invited back the next day.
+
+<div class="section-title">Clan Picture & Activity Monitoring on Sundays</div>
+Clan activity is regularly monitored through clan pictures taken by the Alliance Leader.
+If during these checks:
+A CP is not 9/9 active (for example 6/9 or 7/9), and their members are still in the clan but offline on Sunday, then the following penalties will apply:
+
+<span class="important">The CP will receive penalty points.,
+If this situation happens more than once, the entire CP score will be reset to 0 points.,</span>
+
+This ensures the alliance can replace inactive spots and remain competitive during key events.
+
+<div style="text-align:center; margin-top:30px; font-family:'Cinzel'; color:var(--gold);">Final Note</div>
+These policies are designed to maintain discipline, fairness, and strong performance across the alliance. Respecting these rules ensures every CP has equal opportunity and the alliance remains organized and competitive.
+
+<div class="section-title"># External Clan Agreements</div>
+
+<div class="clan-agreement">
+    <img src="https://i.ibb.co/4gnvW96/exitgaming.png" class="clan-logo">
+    <div>
+        <strong style="color:var(--gold); font-family:'Cinzel';">ExitGaming Clan</strong>
+        Night Epics:  
+        - All night epics between 00:00 and 08:00 Greek time are assigned to ExitGaming.
+
+        High Epics (Baium, Antharas, Valakas):  
+        - Distribution: 1 for ExitGaming, 3 for our alliance.  
+        - The order is determined by rolling a dice each time:  
+          - Example: 4 people roll → if ExitGaming wins, they take the first, next 3 are ours.  
+          - After each “raw” finishes, a new roll determines the next sequence.  
+          - Rolling continues until all parts of the epic are distributed fairly, alternating according to dice results.
+    </div>
+</div>
+
+<div class="clan-agreement">
+    <img src="https://i.ibb.co/Y7D9v3x/lastkingdom.png" class="clan-logo">
+    <div>
+        <strong style="color:var(--gold); font-family:'Cinzel';">Last Kingdom (LK) Clan</strong>
+        Epic Distribution:  
+        - 1 mid epic and 2 low epics if they bring:  
+          - At least 5 parties of 9/9 for the weekend  
+          - And at least 3 parties of 9/9 on weekdays.  
+        - If they bring fewer parties, the deal is adjusted accordingly (e.g., 1 mid + 1 low, or only 1 low).  
+
+        Baium Access:  
+        - LK Clan has access to every 5th or 6th Baium.
+    </div>
+</div>
             </div>
         </div>
-
-        <div class="policy-section">
-            <div class="policy-header">EXTERNAL CLAN AGREEMENTS</div>
-            
-            <div class="clan-box">
-                <img src="https://i.ibb.co/4gnvW96/exitgaming.png" class="clan-logo" alt="ExitGaming">
-                <div class="policy-content">
-                    <span style="font-family:'Cinzel'; color:var(--gold); font-size:1.2rem;"># ExitGaming Clan</span>
-                    Night Epics:  
-                    - All night epics between 00:00 and 08:00 Greek time are assigned to ExitGaming.
-
-                    High Epics (Baium, Antharas, Valakas):  
-                    - Distribution: 1 for ExitGaming, 3 for our alliance.  
-                    - The order is determined by rolling a dice each time.
-                </div>
-            </div>
-
-            <div class="clan-box">
-                <img src="https://i.ibb.co/Y7D9v3x/lastkingdom.png" class="clan-logo" alt="Last Kingdom">
-                <div class="policy-content">
-                    <span style="font-family:'Cinzel'; color:var(--gold); font-size:1.2rem;"># Last Kingdom (LK) Clan</span>
-                    Epic Distribution:  
-                    - 1 mid epic and 2 low epics if they bring: At least 5 parties of 9/9 for the weekend and at least 3 parties of 9/9 on weekdays.
-                    - Baium Access: LK Clan has access to every 5th or 6th Baium.
-                </div>
-            </div>
-        </div>
-
-        <div class="policy-section sec-sunday">
-            <div class="policy-header">SUNDAY & PENALTIES</div>
-            <div class="policy-content">
-Sunday is the most important active day. If a member cannot attend, they must notify their CP Leader and temporarily leave the clan on Sunday.
-
-<span class="important">Activity Monitoring:</span>
-If a CP is not 9/9 active and members are offline on Sunday:
-- The CP will receive penalty points.
-- <span class="important">If this happens more than once, the entire CP score will be reset to 0 points.</span>
-            </div>
-        </div>
-
     </div>
 
     <script>
