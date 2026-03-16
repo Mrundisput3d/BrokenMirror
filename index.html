@@ -37,7 +37,10 @@
         .main-nav { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
         .nav-btn { background: rgba(212, 175, 55, 0.1); border: 1px solid var(--gold); color: var(--gold); padding: 8px 15px; font-family: 'Cinzel'; cursor: pointer; font-size: 0.75rem; border-radius: 4px; text-decoration: none; }
         .nav-btn.active { background: var(--gold); color: #000; }
-        .leaders-row { display: flex; justify-content: center; gap: 40px; margin-bottom: 20px; }
+        
+        /* ΠΡΟΣΘΗΚΗ FLEX-WRAP ΓΙΑ ΝΑ ΜΗΝ ΣΠΑΕΙ ΑΝ ΕΙΝΑΙ ΠΟΛΛΟΙ CALLERS */
+        .leaders-row { display: flex; justify-content: center; gap: 40px; margin-bottom: 20px; flex-wrap: wrap; }
+        
         .leader-card { text-align: center; cursor: pointer; width: 110px; }
         .img-frame { width: 80px; height: 80px; margin: 0 auto; background: #000; border: 2px solid var(--gold); border-radius: 50%; overflow: hidden; }
         .leader-img { width: 100%; height: 100%; object-fit: contain; }
@@ -84,7 +87,8 @@
         .boss-icon { width: 22px; height: 22px; margin-bottom: 4px; }
         .stat-val { font-size: 0.75rem; color: #fff; font-family: 'Cinzel'; display: block; }
         
-        .other-clans-section { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 20px; }
+        /* ΠΡΟΣΘΗΚΗ AUTO-FIT ΓΙΑ ΤΙΣ EXTERNAL CLANS - ΟΣΕΣ ΚΑΙ ΝΑ ΜΠΟΥΝ ΧΩΡΑΝΕ! */
+        .other-clans-section { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 20px; }
         
         .new-clan-card { background: rgba(15, 18, 22, 0.95); border: 1px solid #333; border-top: 3px solid var(--gold); border-radius: 10px; padding: 20px; text-align: center; cursor: pointer; transition: 0.3s; }
         .new-clan-card:hover { transform: translateY(-3px); box-shadow: 0 0 15px rgba(212, 175, 55, 0.2); }
@@ -175,20 +179,7 @@
             </div>
         </div>
         
-        <div class="other-clans-section">
-            <div class="new-clan-card" onclick="openClanModal('OrzelBialy', 'OrzelBialy Clan', 'https://i.ibb.co/6cgvyHHW/orzelbialy.png')">
-                <img src="https://i.ibb.co/6cgvyHHW/orzelbialy.png" class="new-clan-icon">
-                <span class="new-clan-name">OrzelBialy Clan</span>
-            </div>
-            <div class="new-clan-card" onclick="openClanModal('ExitGaming', 'ExitGaming Clan', 'https://i.ibb.co/Y4spJqVy/exitgaming.png')">
-                <img src="https://i.ibb.co/Y4spJqVy/exitgaming.png" class="new-clan-icon">
-                <span class="new-clan-name">ExitGaming Clan</span>
-            </div>
-            <div class="new-clan-card" onclick="openClanModal('LastKingdom', 'LastKingdom Clan', 'https://i.ibb.co/xqg1qNFw/lastkingdom.png')">
-                <img src="https://i.ibb.co/xqg1qNFw/lastkingdom.png" class="new-clan-icon">
-                <span class="new-clan-name">LastKingdom Clan</span>
-            </div>
-        </div>
+        <div class="other-clans-section" id="dynamic-external-clans"></div>
     </div>
 
     <script>
@@ -200,8 +191,27 @@
         let globalCPData = {}; 
         let globalExternalClans = {}; 
 
+        // -- ΦΟΡΤΩΣΗ EXTERNAL CLANS (ΔΥΝΑΜΙΚΑ) --
         db.ref('externalClans/').on('value', (snapshot) => {
             globalExternalClans = snapshot.val() || {};
+            let extHtml = "";
+            
+            Object.keys(globalExternalClans).forEach(clanId => {
+                const clan = globalExternalClans[clanId];
+                if(clan.status === 'history') return; // Αν είναι στο History δεν την εμφανίζουμε!
+                
+                const cName = clan.name || clanId;
+                const icon = clan.iconUrl || 'https://i.ibb.co/SXM1FZx8/attedance-points.png';
+                
+                extHtml += `
+                    <div class="new-clan-card" onclick="openClanModal('${clanId}')">
+                        <img src="${icon}" class="new-clan-icon">
+                        <span class="new-clan-name">${cName}</span>
+                    </div>
+                `;
+            });
+            
+            document.getElementById('dynamic-external-clans').innerHTML = extHtml;
         });
 
         function getIconForLoot(itemName) {
@@ -285,7 +295,7 @@
                             </div>
 
                             <button class="loot-btn" onclick="const p=this.nextElementSibling; p.style.display=p.style.display==='block'?'none':'block';">VIEW LOOT HISTORY</button>
-                            <div class="loot-panel" style="display:none; text-align:left;">${lootHtml}</div>
+                            <div class="loot-panel">${lootHtml}</div>
 
                             <button class="loot-btn" onclick="openCpStats('${id}')">VIEW CP ATTENDANCES</button>
                         </div>
@@ -300,15 +310,12 @@
         function openCpStats(cpId) {
             const cp = globalCPData[cpId];
             if(!cp) return;
-            
             document.getElementById('caller-modal').style.display = 'none';
-
             document.getElementById('cp-stats-name').innerText = cp.name.toUpperCase() + " ATTENDANCES";
             document.getElementById('cp-stats-grid').innerHTML = Object.keys(bossIcons).map(b => {
                 const val = (cp.bossStats && cp.bossStats[b]) ? cp.bossStats[b] : 0;
                 return `<div class="stat-box"><img src="${bossIcons[b]}" class="boss-icon"><span class="stat-val">${val}</span></div>`;
             }).join('');
-            
             document.getElementById('cp-stats-modal').style.display = 'block';
             document.getElementById('overlay').style.display = 'block';
         }
@@ -328,7 +335,6 @@
                     Object.keys(dayData).forEach(pName => {
                         if (pName.trim().toUpperCase() === searchName) {
                             const playerBosses = dayData[pName];
-                            
                             Object.keys(playerBosses).forEach(bossId => {
                                 const b = bossId.toUpperCase();
                                 if(b.includes('VAL')) mStats.VAL++;
@@ -355,11 +361,9 @@
         function openCaller(callerId, role, img) {
             const cp = globalCPData[callerId];
             if(!cp) return;
-
             document.getElementById('modal-name').innerText = cp.name.toUpperCase() + ` (${cp.totalPoints || 0} PTS)`;
             document.getElementById('modal-title').innerText = role.toUpperCase();
             document.getElementById('modal-img').src = img;
-            
             let lootHtml = "No history found.";
             if(cp.lootHistory && cp.lootHistory.length > 0) {
                 lootHtml = cp.lootHistory.map(l => `
@@ -372,36 +376,28 @@
                 `).join('');
             }
             document.getElementById('leader-loot-panel').innerHTML = lootHtml;
-            
             const attBtn = document.getElementById('caller-attendance-btn');
-            if (role.toUpperCase() === 'ALLY LEADER') {
-                attBtn.style.display = 'none';
-            } else {
-                attBtn.style.display = 'block';
-                attBtn.onclick = function() {
-                    openCpStats(callerId); 
-                };
-            }
-            
+            if (role.toUpperCase() === 'ALLY LEADER') attBtn.style.display = 'none';
+            else { attBtn.style.display = 'block'; attBtn.onclick = function() { openCpStats(callerId); }; }
             document.getElementById('caller-modal').style.display = 'block';
             document.getElementById('overlay').style.display = 'block';
         }
 
-        function openClanModal(clanId, clanName, iconUrl) {
-            document.getElementById('clan-modal-name').innerText = clanName.toUpperCase();
-            document.getElementById('clan-modal-img').src = iconUrl;
+        // Η ΣΥΝΑΡΤΗΣΗ ΠΟΥ ΔΙΑΒΑΖΕΙ ΠΛΕΟΝ ΔΥΝΑΜΙΚΑ ΑΠΟ ΤΗ ΒΑΣΗ
+        function openClanModal(clanId) {
+            const extData = globalExternalClans[clanId];
+            if(!extData) return;
             
-            const extData = globalExternalClans[clanId] || {};
+            document.getElementById('clan-modal-name').innerText = (extData.name || clanId).toUpperCase();
+            document.getElementById('clan-modal-img').src = extData.iconUrl || 'https://i.ibb.co/SXM1FZx8/attedance-points.png';
+            
             const leaderName = extData.leader || "Pending...";
+            const content = extData.description || "Alliance agreements pending.";
+            
+            // Το Replace(/\\n/g, '<br>') είναι για να κρατάει τις παραγράφους που έγραψες στο textarea του Admin!
+            const formattedContent = content.replace(/\n/g, '<br>');
+
             const lootHistory = extData.lootHistory || [];
-
-            let content = "Alliance agreements and information regarding this clan are currently pending.";
-            if (clanId === "ExitGaming") {
-                content = "<b style='color:var(--gold)'>NIGHT EPICS:</b><br>All night epics between 00:00 and 08:00 Greek time are assigned to ExitGaming.<br><br><b style='color:var(--gold)'>HIGH EPICS (Baium, Antharas, Valakas):</b><br>Distribution: 1 for ExitGaming, 3 for our alliance.<br>The order is determined by rolling a dice each time (Rolling continues until all parts are distributed fairly).";
-            } else if (clanId === "LastKingdom") {
-                content = "<b style='color:var(--gold)'>EPIC DISTRIBUTION:</b><br>1 mid epic and 2 low epics if they bring at least 5 parties (9/9) for the weekend and at least 3 parties (9/9) on weekdays.<br>If they bring fewer parties, the deal is adjusted accordingly.<br><br><b style='color:var(--gold)'>BAIUM ACCESS:</b><br>LK Clan has access to every 5th or 6th Baium.";
-            }
-
             let lootHtml = "No history found.";
             if(lootHistory.length > 0) {
                 lootHtml = lootHistory.map(l => `
@@ -420,7 +416,7 @@
                     <span style="color:#fff;">${leaderName}</span>
                 </div>
                 <div style="color:#ddd; font-size:0.85rem; line-height:1.6; text-align:justify; margin-bottom:20px; padding: 10px; background:rgba(0,0,0,0.3); border:1px solid #333; border-radius:5px;">
-                    ${content}
+                    ${formattedContent}
                 </div>
                 <button class="loot-btn" onclick="const p=this.nextElementSibling; p.style.display=p.style.display==='block'?'none':'block';">VIEW LOOT HISTORY</button>
                 <div class="loot-panel" style="display:none; text-align:left;">${lootHtml}</div>
@@ -446,42 +442,10 @@
             {name:"HUNTERS THEME", url:"https://www.dropbox.com/scl/fi/75hck498enzot93zt0lg9/Lineage-2-Hunters-Village-Theme.mp3?rlkey=6mu9ic0gavmofkdvduj72270y&st=qr4cvisl&raw=1"},
             {name:"GIRAN THEME", url:"https://www.dropbox.com/scl/fi/iu8j9wn9wky8fav176ayf/Lineage-2-Giran-Theme.mp3?rlkey=xp1j0upa076sy21tgcta6t9c3&st=0a4ihyhg&raw=1"}
         ];
-        let currentIdx = 0; 
-        const audio = document.getElementById('bg-music'); 
-        const musicIcon = document.getElementById('music-icon');
-        let userMuted = false;
-
-        function toggleMusic(e) { 
-            if(e) e.stopPropagation(); 
-            if (audio.paused) { 
-                audio.play(); 
-                musicIcon.innerText="🔊"; 
-                userMuted = false;
-            } else { 
-                audio.pause(); 
-                musicIcon.innerText="🔇"; 
-                userMuted = true;
-            } 
-        }
-
-        function nextTrack(e) { 
-            if(e) e.stopPropagation(); 
-            currentIdx = (currentIdx + 1) % tracks.length; 
-            audio.src = tracks[currentIdx].url; 
-            document.getElementById('track-name').innerText = tracks[currentIdx].name; 
-            audio.play(); 
-            musicIcon.innerText="🔊"; 
-            userMuted = false;
-        }
-
-        function tryAutoPlay() { 
-            if(audio.paused && !userMuted) { 
-                audio.play().then(() => { 
-                    musicIcon.innerText = "🔊"; 
-                }).catch(() => {}); 
-            }
-        }
-
+        let currentIdx = 0; const audio = document.getElementById('bg-music'); const musicIcon = document.getElementById('music-icon'); let userMuted = false;
+        function toggleMusic(e) { if(e) e.stopPropagation(); if (audio.paused) { audio.play(); musicIcon.innerText="🔊"; userMuted = false; } else { audio.pause(); musicIcon.innerText="🔇"; userMuted = true; } }
+        function nextTrack(e) { if(e) e.stopPropagation(); currentIdx = (currentIdx + 1) % tracks.length; audio.src = tracks[currentIdx].url; document.getElementById('track-name').innerText = tracks[currentIdx].name; audio.play(); musicIcon.innerText="🔊"; userMuted = false; }
+        function tryAutoPlay() { if(audio.paused && !userMuted) { audio.play().then(() => { musicIcon.innerText = "🔊"; }).catch(() => {}); } }
         setInterval(() => { document.getElementById('clock').innerText = "SERVER TIME: " + new Date().toLocaleTimeString('el-GR', {timeZone:'UTC', hour12:false}) + " UTC"; }, 1000);
     </script>
 </body>
