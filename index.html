@@ -15,10 +15,21 @@
             --noldor-sky: #00d9ff; --krim-red: #ff3333;
             --noldor-grad: linear-gradient(90deg, rgba(0,217,255,0.15) 0%, rgba(0,0,0,0) 100%);
             --krim-grad: linear-gradient(90deg, rgba(255,51,51,0.15) 0%, rgba(0,0,0,0) 100%);
-            --bg-overlay: rgba(10, 12, 15, 0.96); 
+            --bg: #0a0c0f;
         }
-        body { font-family: 'Open Sans', sans-serif; background: #0a0c0f url('https://i.ibb.co/1GmpSyxZ/BACKGROUND.jpg') no-repeat center center fixed; background-size: cover; color: #eee; margin: 0; padding: 0; }
-        body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-overlay); z-index: -1; }
+        
+        /* ΙΔΙΟ BACKGROUND ΑΚΡΙΒΩΣ ΜΕ ΤΟ MARKET.HTML - ΧΩΡΙΣ ΤΗΝ ΕΞΤΡΑ ΜΑΣΚΑ */
+        body { 
+            background: var(--bg); 
+            background-image: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), url('https://i.ibb.co/FbHYLMCD/BACKGROUND.png'); 
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center;
+            color: #eee; 
+            font-family: 'Open Sans', sans-serif; 
+            margin: 0; padding: 0;
+        }
+
         .header-controls { position: absolute; top: 20px; right: 40px; display: flex; gap: 10px; z-index: 100; }
         .control-btn { color: var(--gold); font-family: 'Cinzel'; border: 1px solid var(--gold); padding: 5px 15px; border-radius: 5px; background: rgba(0,0,0,0.6); font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; gap: 8px; }
         .top-header { text-align: center; padding-top: 20px; }
@@ -34,12 +45,11 @@
         .leader-name { color: var(--gold); font-size: 0.8rem; font-family: 'Cinzel'; display: block; margin-top: 8px; font-weight: bold; }
         .leader-role { color: #888; font-size: 0.6rem; text-transform: uppercase; display: block; }
         
-        /* THE BIG MARKETPLACE BUTTON IN THE MAIN DASHBOARD */
+        /* MARKETPLACE BUTTON */
         .market-action-row { text-align: center; margin: 30px 0; }
         .enter-market-btn { display: inline-block; background: rgba(212, 175, 55, 0.1); border: 2px solid var(--gold); color: var(--gold); padding: 15px 40px; font-family: 'Cinzel'; font-size: 1.1rem; text-decoration: none; font-weight: bold; letter-spacing: 2px; border-radius: 5px; transition: 0.3s; cursor: pointer; }
         .enter-market-btn:hover { background: var(--gold); color: #000; box-shadow: 0 0 20px rgba(212, 175, 55, 0.5); }
         
-        /* STYLING FOR THE SINGLE TITLE (SINCE TABS ARE GONE) */
         .section-title { text-align: center; color: var(--gold); font-family: 'Cinzel'; font-size: 1.3rem; margin: 20px 0 10px 0; border-bottom: 1px solid rgba(212, 175, 55, 0.3); padding-bottom: 10px; display: inline-block; }
         .section-title-wrapper { text-align: center; margin-bottom: 20px; }
 
@@ -209,7 +219,7 @@
         function closeModal() { document.getElementById('caller-modal').style.display='none'; document.getElementById('overlay').style.display='none'; }
         function toggleLeaderLoot() { const p = document.getElementById('leader-loot-panel'); p.style.display = p.style.display==='none'?'block':'none'; }
 
-        // --- MUSIC LOGIC (FIXED) ---
+        // --- MUSIC LOGIC ---
         const tracks = [
             {name:"DION THEME", url:"https://www.dropbox.com/scl/fi/ypzqrr336iewt62gncy6u/Lineage-2-Dion-Theme-Song.mp3?rlkey=nl1quliuqleuljgkt5jhqq6hh&st=sb8ij16g&raw=1"},
             {name:"GIRAN THEME", url:"https://www.dropbox.com/scl/fi/iu8j9wn9wky8fav176ayf/Lineage-2-Giran-Theme.mp3?rlkey=xp1j0upa076sy21tgcta6t9c3&st=0a4ihyhg&raw=1"}
