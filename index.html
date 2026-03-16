@@ -82,6 +82,7 @@
         .new-clan-icon { width: 55px; height: 55px; margin-bottom: 12px; }
         .new-clan-name { display: block; font-family: 'Cinzel'; color: #fff; font-size: 0.95rem; }
         
+        /* MODALS */
         #caller-modal, #cp-stats-modal, #member-stats-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 420px; background: #0f1216; border: 2px solid var(--gold); border-radius: 15px; padding: 25px; z-index: 9999; text-align: center; }
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9998; backdrop-filter: blur(5px); }
     </style>
@@ -224,14 +225,14 @@
                     membersHtml = cp.members.split(',').map(m => {
                         let mName = m.trim();
                         if(!mName) return '';
-                        return `<span class="member-click" onclick="openMemberStats('${id}', '${mName}')">${mName}</span>`;
+                        return `<span class="member-click" onclick="openMemberStats('${mName}')">${mName}</span>`;
                     }).join(', ');
                 }
 
                 let leaderHtml = 'Pending...';
                 if (cp.leader) {
                     let lName = cp.leader.trim();
-                    leaderHtml = `<span class="member-click" onclick="openMemberStats('${id}', '${lName}')">${lName}</span>`;
+                    leaderHtml = `<span class="member-click" onclick="openMemberStats('${lName}')">${lName}</span>`;
                 }
                 
                 const html = `
@@ -269,39 +270,42 @@
             document.getElementById('overlay').style.display = 'block';
         }
 
-        // ΣΥΝΑΡΤΗΣΗ ΠΟΥ ΔΙΑΒΑΖΕΙ ΑΠΟ ΤΑ LOGS ΓΙΑ ΤΟ ΣΥΓΚΕΚΡΙΜΕΝΟ ΜΕΛΟΣ
-        function openMemberStats(cpId, memberName) {
-            // Δείξε "Loading..." μέχρι να έρθουν τα δεδομένα από το Firebase
+        // Η ΣΥΝΑΡΤΗΣΗ ΠΟΥ ΔΙΑΒΑΖΕΙ ΑΠΟ ΤΟ DAILY LOGS ΓΙΑ ΤΟ ΣΥΓΚΕΚΡΙΜΕΝΟ ΜΕΛΟΣ
+        function openMemberStats(memberName) {
             document.getElementById('member-stats-name').innerText = memberName.toUpperCase() + " (LOADING...)";
             document.getElementById('member-stats-grid').innerHTML = "<div style='grid-column:1/-1; color:var(--gold); padding:20px; font-family:Cinzel;'>Scanning logs...</div>";
             document.getElementById('member-stats-modal').style.display = 'block';
             document.getElementById('overlay').style.display = 'block';
 
-            // Διαβάζει τον φάκελο 'logs' από τη βάση σου
-            db.ref('logs').once('value', snapshot => {
+            db.ref('dailyLogs/').once('value', snapshot => {
                 let mStats = { VAL:0, ANT:0, BAI:0, FRI:0, ZAK:0, AQ:0, ORF:0, COR:0, SIE:0 };
-                const logsData = snapshot.val() || {};
-                const upperName = memberName.toUpperCase();
+                const dailyLogs = snapshot.val() || {};
+                const searchName = memberName.trim().toUpperCase();
 
-                // Ψάχνει σε ΟΛΑ τα logs
-                Object.values(logsData).forEach(log => {
-                    const logString = JSON.stringify(log).toUpperCase();
-                    
-                    // Αν το όνομα του παίκτη υπάρχει σε αυτό το log, ψάχνει να βρει ποιο Boss αφορά
-                    if (logString.includes(upperName)) {
-                        if(logString.includes("VALAKAS") || logString.includes('"VAL"')) mStats.VAL++;
-                        else if(logString.includes("ANTHARAS") || logString.includes('"ANT"')) mStats.ANT++;
-                        else if(logString.includes("BAIUM") || logString.includes('"BAI"')) mStats.BAI++;
-                        else if(logString.includes("FRINTEZZA") || logString.includes('"FRI"')) mStats.FRI++;
-                        else if(logString.includes("ZAKEN") || logString.includes('"ZAK"')) mStats.ZAK++;
-                        else if(logString.includes("QUEEN ANT") || logString.includes("QUEENANT") || logString.includes('"AQ"')) mStats.AQ++;
-                        else if(logString.includes("ORFEN") || logString.includes('"ORF"')) mStats.ORF++;
-                        else if(logString.includes("CORE") || logString.includes('"COR"')) mStats.COR++;
-                        else if(logString.includes("SIEGE") || logString.includes('"SIE"')) mStats.SIE++;
-                    }
+                // Διαβάζει μέρα-μέρα τα logs
+                Object.values(dailyLogs).forEach(dayData => {
+                    // Ψάχνει αν ο παίκτης πήγε κάπου τη συγκεκριμένη μέρα
+                    Object.keys(dayData).forEach(pName => {
+                        if (pName.trim().toUpperCase() === searchName) {
+                            const playerBosses = dayData[pName];
+                            
+                            // Αν πήγε, μετράει το Boss
+                            Object.keys(playerBosses).forEach(bossId => {
+                                const b = bossId.toUpperCase();
+                                if(b.includes('VAL')) mStats.VAL++;
+                                else if(b.includes('ANT')) mStats.ANT++;
+                                else if(b.includes('BAI')) mStats.BAI++;
+                                else if(b.includes('FRI')) mStats.FRI++;
+                                else if(b.includes('ZAK')) mStats.ZAK++;
+                                else if(b.includes('AQ') || b.includes('QUEEN')) mStats.AQ++;
+                                else if(b.includes('ORF')) mStats.ORF++;
+                                else if(b.includes('COR')) mStats.COR++;
+                                else if(b.includes('SIE')) mStats.SIE++;
+                            });
+                        }
+                    });
                 });
 
-                // Ενημερώνει το Modal με τα έτοιμα νούμερα
                 document.getElementById('member-stats-name').innerText = memberName.toUpperCase();
                 document.getElementById('member-stats-grid').innerHTML = Object.keys(bossIcons).map(b => {
                     return `<div class="stat-box"><img src="${bossIcons[b]}" class="boss-icon"><span class="stat-val">${mStats[b]}</span></div>`;
