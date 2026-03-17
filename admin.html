@@ -56,7 +56,6 @@
             <div class="filter-tabs">
                 <button class="filter-btn active" id="btn-active" onclick="setViewMode('active')">ACTIVE</button>
                 <button class="filter-btn" id="btn-history" onclick="setViewMode('history')">HISTORY</button>
-                <!-- ΝΕΟ ΚΟΥΜΠΙ ΓΙΑ EXPORT ΣΕ EXCEL -->
                 <button class="filter-btn" style="background: rgba(40, 167, 69, 0.2); color: var(--green); border-color: var(--green);" onclick="exportToExcel()">📥 EXCEL</button>
             </div>
             <div id="cp-list-simple" style="max-height: 250px; overflow-y: auto;"></div>
@@ -91,13 +90,19 @@
         </div>
 
         <div class="panel">
-            <div style="display:flex; justify-content: space-between; align-items: center;">
-                <h2>1. LOG EVENT (MEMBER-BOSS LOCK)</h2>
-                <button id="undo-btn" class="btn btn-red" style="display:none; width:auto; padding: 5px 15px; margin: 0; font-size: 10px;" onclick="undoLastAction()">↩ UNDO LAST LOG</button>
+            <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <h2 style="margin:0;">1. LOG EVENT (MEMBER-BOSS LOCK)</h2>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <!-- ΝΕΟΣ ΜΕΤΡΗΤΗΣ ΟΝΟΜΑΤΩΝ -->
+                    <span id="input-count" style="font-size: 11px; color: var(--gold); font-family: 'Cinzel'; font-weight: bold;">0 NAMES</span>
+                    <button id="undo-btn" class="btn btn-red" style="display:none; width:auto; padding: 5px 15px; margin: 0; font-size: 10px;" onclick="undoLastAction()">↩ UNDO LAST LOG</button>
+                </div>
             </div>
             
             <textarea id="mass-input" rows="3" placeholder="Paste names... (Smart & Fuzzy filtering enabled)" oninput="analyzeAttendance()"></textarea>
             <div id="detected-list"></div>
+            <!-- ΝΕΟ ΔΙΑΓΡΑΜΜΑ ΓΙΑ ΑΓΝΟΗΜΕΝΑ ΟΝΟΜΑΤΑ -->
+            <div id="unmatched-list"></div>
 
             <div class="boss-grid">
                 <div class="boss-btn" onclick="logValidatedEvent('VAL', 3)"><img src="https://i.ibb.co/84gZPVRP/necklace-valakas.png"><span>VAL</span></div>
@@ -142,7 +147,6 @@
                     <div>
                         <h3 style="color:var(--red); margin:0;">MARKETPLACE</h3>
                         <select id="loot-market">
-                            <!-- ΑΛΛΑΓΗ ΤΙΜΗΣ VALAKAS ΣΕ 2500 -->
                             <option value="2500|Valakas Necklace">Valakas Necklace (2500)</option>
                             <option value="1100|Antharas Earring">Antharas Earring (1100)</option>
                             <option value="950|Baium Ring">Baium Ring (950)</option>
@@ -222,7 +226,6 @@
                 <div>
                     <h3 style="color:var(--red); margin:0;">MARKETPLACE (BUY LOOT)</h3>
                     <select id="ext-loot-market">
-                        <!-- ΑΛΛΑΓΗ ΤΙΜΗΣ VALAKAS ΣΕ 2500 -->
                         <option value="2500|Valakas Necklace">Valakas Necklace (2500)</option>
                         <option value="1100|Antharas Earring">Antharas Earring (1100)</option>
                         <option value="950|Baium Ring">Baium Ring (950)</option>
@@ -258,9 +261,8 @@
     let allExtClans = {}, currentExtID = null;
     let viewMode = 'active'; 
     const bossKeys = ['VAL', 'ANT', 'BAI', 'SIE', 'ZAK', 'FRI', 'AQ', 'ORF', 'COR'];
-    let lastAction = null; // Μεταβλητή για το UNDO
+    let lastAction = null; 
 
-    // Realtime Syncs
     db.ref('cps/').on('value', snap => { 
         allCPs = snap.val() || {}; 
         renderSimpleList(); 
@@ -295,18 +297,14 @@
             }).join('');
     }
 
-    // --- ΝΕΑ ΣΥΝΑΡΤΗΣΗ ΕΞΑΓΩΓΗΣ ΣΕ EXCEL (.CSV) ---
     function exportToExcel() {
-        // Επικεφαλίδες (Mε \uFEFF για υποστήριξη Ελληνικών UTF-8 στο Excel)
         let csvContent = "data:text/csv;charset=utf-8,\uFEFF"; 
         csvContent += "CP / Caller Name,Clan / Role,Leader,Members,Total Points\n";
 
-        // Μαζεύουμε όλα τα ενεργά CPs και τα φτιάχνουμε γραμμή-γραμμή
         Object.keys(allCPs).forEach(id => {
             const cp = allCPs[id];
-            if (cp.clan === 'history') return; // Αγνοούμε τα σβησμένα
+            if (cp.clan === 'history') return; 
             
-            // Το replace βοηθάει αν μέσα στα ονόματα υπάρχουν κόμματα
             let name = `"${(cp.name || "").replace(/"/g, '""')}"`;
             let clan = `"${(cp.clan || "").replace(/"/g, '""').toUpperCase()}"`;
             let leader = `"${(cp.leader || "").replace(/"/g, '""')}"`;
@@ -316,11 +314,10 @@
             csvContent += `${name},${clan},${leader},${members},${points}\n`;
         });
 
-        // Δημιουργία link και αυτόματο κλικ για κατέβασμα
         const encodedUri = encodeURI(csvContent);
         const link = document.createElement("a");
         link.setAttribute("href", encodedUri);
-        link.setAttribute("download", "BMA_Rosters_Data.csv"); // Όνομα αρχείου
+        link.setAttribute("download", "BMA_Rosters_Data.csv"); 
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -369,7 +366,6 @@
         }
     }
 
-    // Levenshtein Algorithm (Υπολογίζει την ομοιότητα δύο λέξεων)
     function getEditDistance(a, b) {
         if(a.length === 0) return b.length;
         if(b.length === 0) return a.length;
@@ -388,12 +384,24 @@
         return matrix[b.length][a.length];
     }
 
+    // --- ΑΝΑΒΑΘΜΙΣΜΕΝΗ ΣΥΝΑΡΤΗΣΗ ΑΝΑΖΗΤΗΣΗΣ ---
     function analyzeAttendance() {
         const input = document.getElementById('mass-input').value.toLowerCase();
         let names = [...new Set(input.match(/[a-z0-9_]+/g) || [])];
         const listDiv = document.getElementById('detected-list');
-        listDiv.innerHTML = ""; matchedData = {};
+        const unmatchedDiv = document.getElementById('unmatched-list');
+        const countSpan = document.getElementById('input-count');
         
+        listDiv.innerHTML = ""; 
+        unmatchedDiv.innerHTML = "";
+        matchedData = {};
+        
+        // 1. Ενημέρωση Μετρητή
+        countSpan.innerText = names.length + " NAMES";
+        if(names.length === 0) return;
+
+        let matchedInputNames = new Set(); 
+
         Object.keys(allCPs).forEach(id => {
             if(allCPs[id].clan === 'history') return;
             
@@ -414,6 +422,7 @@
                 });
                 
                 if (matchedInput) {
+                    matchedInputNames.add(matchedInput); // Καταγραφή του input που βρήκε ταίρι
                     foundRealNames.push(trueName); 
                     
                     if (matchedInput !== trueName && !trueName.includes(matchedInput)) {
@@ -440,6 +449,15 @@
                     </div>`;
             }
         });
+
+        // 2. Εύρεση Ονομάτων που ΑΓΝΟΗΘΗΚΑΝ
+        let unmatchedNames = names.filter(n => !matchedInputNames.has(n) && n.length > 2);
+        if(unmatchedNames.length > 0) {
+            unmatchedDiv.innerHTML = `<div style="padding: 8px; border: 1px dashed var(--red); background: rgba(255, 68, 68, 0.1); border-radius: 5px; margin-top: 10px;">
+                <span style="color: var(--red); font-weight: bold;">⚠️ ΔΕΝ ΒΡΕΘΗΚΑΝ ΣΤΗ ΒΑΣΗ (${unmatchedNames.length}):</span> 
+                <span style="color: #fff; font-size: 11px;">${unmatchedNames.map(n => n.toUpperCase()).join(', ')}</span>
+            </div>`;
+        }
     }
 
     async function logValidatedEvent(bossId, multiplier) {
@@ -489,7 +507,7 @@
         }
         
         alert(`Updated ${totalUpdated} CP(s). Skipped ${skippedTotal} duplicates.`);
-        document.getElementById('mass-input').value = ""; document.getElementById('detected-list').innerHTML = "";
+        document.getElementById('mass-input').value = ""; document.getElementById('detected-list').innerHTML = ""; document.getElementById('unmatched-list').innerHTML = ""; document.getElementById('input-count').innerText = "0 NAMES";
     }
 
     async function undoLastAction() {
