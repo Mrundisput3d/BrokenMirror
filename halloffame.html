@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>BMA | Elite Hall of Fame</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Open+Sans:wght@400;700&family=Cinzel+Decorative:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <style>
@@ -16,8 +16,14 @@
             color: #eee; font-family: 'Open Sans', sans-serif; margin: 0; padding-bottom: 50px;
         }
 
-        nav { background: rgba(0,0,0,0.95); padding: 20px; border-bottom: 2px solid var(--gold); text-align: center; position: sticky; top: 0; z-index: 1000; backdrop-filter: blur(10px); }
-        .logo { font-family: 'Cinzel'; color: var(--gold); text-decoration: none; font-size: 1.8rem; letter-spacing: 5px; text-shadow: 0 0 15px var(--gold); }
+        /* NAVIGATION BAR (Ολόιδιο με index.html) */
+        .top-header { text-align: center; padding-top: 20px; background: rgba(0,0,0,0.5); border-bottom: 1px solid rgba(212, 175, 55, 0.3); padding-bottom: 15px;}
+        .ally-logo { width: 110px; filter: drop-shadow(0 0 15px var(--gold)); }
+        .ally-title { font-family: 'Cinzel Decorative', cursive; font-size: 1.8rem; color: var(--gold); display: block; letter-spacing: 2px; margin-bottom: 20px;}
+        .main-nav { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+        .nav-btn { background: rgba(212, 175, 55, 0.1); border: 1px solid var(--gold); color: var(--gold); padding: 8px 15px; font-family: 'Cinzel'; cursor: pointer; font-size: 0.75rem; border-radius: 4px; text-decoration: none; transition: 0.3s;}
+        .nav-btn:hover { background: rgba(212, 175, 55, 0.3); }
+        .nav-btn.active { background: var(--gold); color: #000; }
 
         .container { max-width: 1600px; margin: 40px auto; padding: 0 40px; }
 
@@ -65,16 +71,25 @@
 
         .rank-icon { font-size: 4.5rem; margin-top: -45px; margin-bottom: 20px; filter: drop-shadow(0 0 20px rgba(0,0,0,0.8)); }
         
-        .p-name { font-family: 'Cinzel'; font-size: 1.9rem; color: #fff; text-align: center; margin: 10px 0; letter-spacing: 1px; }
+        .p-name { font-family: 'Cinzel'; font-size: 1.9rem; color: #fff; text-align: center; margin: 10px 0; letter-spacing: 1px; text-transform: uppercase;}
         .p-stat { font-family: 'Cinzel'; font-size: 4.5rem; font-weight: 900; color: var(--gold); margin: 10px 0; line-height: 1; text-shadow: 0 0 20px rgba(212,175,55,0.3); }
-        .p-label { font-size: 0.75rem; letter-spacing: 4px; color: #888; text-transform: uppercase; font-weight: 700; }
+        .p-label { font-size: 0.75rem; letter-spacing: 4px; color: #888; text-transform: uppercase; font-weight: 700; text-align: center; }
 
         .divider { height: 3px; background: radial-gradient(circle, var(--gold) 0%, transparent 80%); margin: 100px 0; opacity: 0.3; }
     </style>
 </head>
 <body>
 
-    <nav><a href="index.html" class="logo">BMA ELITE ARCHIVES</a></nav>
+    <div class="top-header">
+        <img src="https://i.ibb.co/6R9q5PGv/ALLIANCE-LOGO.png" class="ally-logo">
+        <span class="ally-title">BROKEN MIRROR ALLIANCE</span>
+        <div class="main-nav">
+            <a href="index.html" class="nav-btn">DASHBOARD</a>
+            <a href="history.html" class="nav-btn">LEAVERS HISTORY</a>
+            <a href="pvpzone.html" class="nav-btn">PVP ZONE</a>
+            <a href="halloffame.html" class="nav-btn active">HALL OF FAME</a>
+        </div>
+    </div>
 
     <div class="container">
         
@@ -83,7 +98,9 @@
             <div class="p-label">Legendary Killers of All-Time</div>
             <div class="line"></div>
         </div>
-        <div id="ever-podium" class="podium-wrapper"></div>
+        <div id="ever-podium" class="podium-wrapper">
+            <div style="color:var(--gold); font-family:'Cinzel';">Loading Immortals...</div>
+        </div>
 
         <div class="divider"></div>
 
@@ -120,30 +137,48 @@
             const allCPs = data.cps || {};
             const logs = data.dailyLogs || {};
             
-            const everSorted = Object.values(allCPs)
-                .map(cp => ({ name: cp.name, val: Object.values(cp.bossStats || {}).reduce((a,b)=>a+b, 0) }))
+            // 1. EVER-PODIUM (The Immortals)
+            // Φιλτράρουμε ΟΣΟΥΣ ΔΕΝ ΕΙΝΑΙ ΣΤΟ HISTORY!
+            let activeCPs = Object.keys(allCPs)
+                .map(id => ({ id, ...allCPs[id] }))
+                .filter(cp => cp.clan !== 'history');
+
+            const everSorted = activeCPs
+                .map(cp => {
+                    const totalKills = Object.values(cp.bossStats || {}).reduce((a,b) => a + b, 0);
+                    return { name: cp.name, val: totalKills };
+                })
                 .sort((a,b) => b.val - a.val);
 
+            // 2. WEEKLY & SPECIALISTS (Από τα dailyLogs)
             const last7Days = Array.from({length: 7}, (_, i) => {
                 const d = new Date(); d.setDate(d.getDate() - i);
                 return d.toLocaleDateString('el-GR').replace(/\//g, '-');
             });
 
             let wMap = {}, mMap = {};
+            
             last7Days.forEach(date => {
                 if(logs[date]) {
-                    Object.values(logs[date]).forEach(bossData => {
-                        Object.keys(bossData).forEach(bossId => {
-                            const cid = bossData[bossId].cp;
-                            wMap[cid] = (wMap[cid] || 0) + 1;
-                            if(lowMidKeys.includes(bossId)) mMap[cid] = (mMap[cid] || 0) + 1;
+                    Object.values(logs[date]).forEach(playerObj => {
+                        Object.keys(playerObj).forEach(bossId => {
+                            const cpId = playerObj[bossId].cp;
+                            if(!cpId) return;
+                            
+                            // Ελέγχουμε αν το CP υπάρχει ακόμα και ΔΕΝ είναι στο history
+                            const targetCP = allCPs[cpId];
+                            if(targetCP && targetCP.clan !== 'history') {
+                                const cName = targetCP.name;
+                                wMap[cName] = (wMap[cName] || 0) + 1;
+                                if(lowMidKeys.includes(bossId)) mMap[cName] = (mMap[cName] || 0) + 1;
+                            }
                         });
                     });
                 }
             });
 
-            const wSorted = Object.keys(wMap).map(id => ({ name: allCPs[id]?.name || id, val: wMap[id] })).sort((a,b)=>b.val-a.val);
-            const mSorted = Object.keys(mMap).map(id => ({ name: allCPs[id]?.name || id, val: mMap[id] })).sort((a,b)=>b.val-a.val);
+            const wSorted = Object.keys(wMap).map(name => ({ name, val: wMap[name] })).sort((a,b)=>b.val-a.val);
+            const mSorted = Object.keys(mMap).map(name => ({ name, val: mMap[name] })).sort((a,b)=>b.val-a.val);
 
             renderElite('ever-podium', everSorted.slice(0, 3));
             renderElite('weekly-podium', wSorted.slice(0, 3));
@@ -152,14 +187,14 @@
 
         function renderElite(targetId, top3) {
             const area = document.getElementById(targetId);
-            if(!top3 || top3.length === 0) { area.innerHTML = "<h2>DATA REDACTED</h2>"; return; }
+            if(!top3 || top3.length === 0) { area.innerHTML = "<h2 style='color:#555;'>AWAITING CONTENDERS</h2>"; return; }
             
             const p = [top3[1], top3[0], top3[2]];
             const r = [2, 1, 3];
             const m = ['🥈', '🥇', '🥉'];
 
             area.innerHTML = p.map((cp, i) => {
-                if(!cp) return `<div style="width:310px"></div>`;
+                if(!cp || cp.val === 0) return `<div style="width:310px"></div>`; // Δεν δείχνουμε 0 kills
                 return `
                     <div class="fancy-card r-${r[i]}">
                         <div class="rank-icon">${m[i]}</div>
