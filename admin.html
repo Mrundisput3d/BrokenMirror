@@ -89,8 +89,12 @@
         </div>
 
         <div class="panel">
-            <h2>1. LOG EVENT (MEMBER-BOSS LOCK)</h2>
-            <textarea id="mass-input" rows="3" placeholder="Paste names... (Smart filtering enabled)" oninput="analyzeAttendance()"></textarea>
+            <div style="display:flex; justify-content: space-between; align-items: center;">
+                <h2>1. LOG EVENT (MEMBER-BOSS LOCK)</h2>
+                <button id="undo-btn" class="btn btn-red" style="display:none; width:auto; padding: 5px 15px; margin: 0; font-size: 10px;" onclick="undoLastAction()">↩ UNDO LAST LOG</button>
+            </div>
+            
+            <textarea id="mass-input" rows="3" placeholder="Paste names... (Smart & Fuzzy filtering enabled)" oninput="analyzeAttendance()"></textarea>
             <div id="detected-list"></div>
 
             <div class="boss-grid">
@@ -250,13 +254,14 @@
     let allExtClans = {}, currentExtID = null;
     let viewMode = 'active'; 
     const bossKeys = ['VAL', 'ANT', 'BAI', 'SIE', 'ZAK', 'FRI', 'AQ', 'ORF', 'COR'];
+    let lastAction = null; // Μεταβλητή για το UNDO
 
     // Realtime Syncs
     db.ref('cps/').on('value', snap => { 
         allCPs = snap.val() || {}; 
         renderSimpleList(); 
         renderExtSelect(); 
-        renderMoveCPSelect(); // Νέο: Ανανεώνει το select της μεταφοράς
+        renderMoveCPSelect(); 
         if(currentEditID) loadEdit(currentEditID); 
         if(currentExtID && currentExtID.startsWith('cp_')) loadExtEdit(); 
     });
@@ -286,7 +291,6 @@
             }).join('');
     }
 
-    // Γεμίζει το Select για το Move Member
     function renderMoveCPSelect() {
         const sel = document.getElementById('move-target-cp');
         const currentVal = sel.value;
@@ -330,6 +334,26 @@
         }
     }
 
+    // Levenshtein Algorithm (Υπολογίζει την ομοιότητα δύο λέξεων)
+    function getEditDistance(a, b) {
+        if(a.length === 0) return b.length;
+        if(b.length === 0) return a.length;
+        var matrix = [];
+        for(var i = 0; i <= b.length; i++){ matrix[i] = [i]; }
+        for(var j = 0; j <= a.length; j++){ matrix[0][j] = j; }
+        for(var i = 1; i <= b.length; i++){
+            for(var j = 1; j <= a.length; j++){
+                if(b.charAt(i-1) == a.charAt(j-1)){
+                    matrix[i][j] = matrix[i-1][j-1];
+                } else {
+                    matrix[i][j] = Math.min(matrix[i-1][j-1] + 1, Math.min(matrix[i][j-1] + 1, matrix[i-1][j] + 1));
+                }
+            }
+        }
+        return matrix[b.length][a.length];
+    }
+
+    // SMART & FUZZY MATCHING (Ορθογραφικά λάθη)
     function analyzeAttendance() {
         const input = document.getElementById('mass-input').value.toLowerCase();
         let names = [...new Set(input.match(/[a-z0-9_]+/g) || [])];
@@ -338,12 +362,52 @@
         
         Object.keys(allCPs).forEach(id => {
             if(allCPs[id].clan === 'history') return;
-            const roster = (allCPs[id].members || "").toLowerCase();
-            const leader = (allCPs[id].leader || "").toLowerCase();
-            let found = names.filter(n => (n.length > 2 && (roster.includes(n) || leader === n)));
-            if(found.length > 0) {
-                matchedData[id] = found;
-                listDiv.innerHTML += `<div class="detected-cp-row"><input type="checkbox" class="cp-checkbox" id="check-${id}" checked><span><b>${allCPs[id].name}</b> (${found.length} members found)</span></div>`;
+            
+            // Μαζεύουμε όλα τα πραγματικά ονόματα του CP
+            let roster = (allCPs[id].members || "").toLowerCase().split(',').map(s=>s.trim()).filter(s=>s);
+            if(allCPs[id].leader) roster.push(allCPs[id].leader.toLowerCase().trim());
+            
+            let foundRealNames = [];
+            let displayNames = [];
+
+            roster.forEach(trueName => {
+                let matchedInput = names.find(n => {
+                    if (n.length < 3) return false; // Αγνοούμε μικρά σκουπίδια
+                    if (trueName === n || trueName.includes(n)) return true; // Ακριβές match ή substring
+                    
+                    // Fuzzy match (1 λάθος για μικρά ονόματα, 2 για μεγαλύτερα από 5 γράμματα)
+                    let dist = getEditDistance(n, trueName);
+                    let allowed = trueName.length > 5 ? 2 : 1;
+                    return dist <= allowed;
+                });
+                
+                if (matchedInput) {
+                    foundRealNames.push(trueName); // Αποθηκεύουμε το ΣΩΣΤΟ όνομα της βάσης
+                    
+                    if (matchedInput !== trueName && !trueName.includes(matchedInput)) {
+                        // Αν το βρήκε μέσω Fuzzy (με ορθογραφικό)
+                        displayNames.push(`${trueName.toUpperCase()} <span style="color:#ff4444; font-size:9px;">[ως ${matchedInput.toUpperCase()}]</span>`);
+                    } else {
+                        // Κανονικό Match
+                        displayNames.push(trueName.toUpperCase());
+                    }
+                }
+            });
+            
+            if(foundRealNames.length > 0) {
+                matchedData[id] = foundRealNames; // Αποθηκεύουμε τα πραγματικά ονόματα για το Log
+                const namesList = displayNames.join(', ');
+                
+                listDiv.innerHTML += `
+                    <div class="detected-cp-row">
+                        <input type="checkbox" class="cp-checkbox" id="check-${id}" checked>
+                        <span style="line-height: 1.4;">
+                            <b>${allCPs[id].name}</b> 
+                            <span style="color:#aaa; font-size:11px;">
+                                (${foundRealNames.length} matched: <span style="color:var(--gold);">${namesList}</span>)
+                            </span>
+                        </span>
+                    </div>`;
             }
         });
     }
@@ -352,20 +416,26 @@
         const checkboxes = document.querySelectorAll('.cp-checkbox');
         const today = new Date().toLocaleDateString('el-GR').replace(/\//g, '-');
         let totalUpdated = 0, skippedTotal = 0;
+        
+        let currentAction = { date: today, bossId: bossId, multiplier: multiplier, updates: [] };
 
         for (const cb of checkboxes) {
             if (cb.checked) {
                 const id = cb.id.replace('check-', '');
-                const namesFound = matchedData[id];
+                const namesFound = matchedData[id]; // Εδώ είναι πλέον τα ΣΩΣΤΑ ονόματα!
+                
                 let eligible = namesFound.filter(name => {
                     const alreadyDone = globalDailyLogs[today] && globalDailyLogs[today][name] && globalDailyLogs[today][name][bossId];
                     if (alreadyDone) { skippedTotal++; return false; }
                     return true;
                 });
+                
                 if (eligible.length === 0) continue;
                 
                 const allNames = eligible;
                 const pointsCount = Math.min(allNames.length, 9);
+                
+                currentAction.updates.push({ cpId: id, names: allNames, pointsCount: pointsCount });
 
                 await db.ref('cps/' + id).transaction(cp => {
                     if(cp) {
@@ -382,8 +452,43 @@
                 totalUpdated++;
             }
         }
+        
+        if (totalUpdated > 0) {
+            lastAction = currentAction;
+            document.getElementById('undo-btn').style.display = 'inline-block';
+        }
+        
         alert(`Updated ${totalUpdated} CP(s). Skipped ${skippedTotal} duplicates.`);
         document.getElementById('mass-input').value = ""; document.getElementById('detected-list').innerHTML = "";
+    }
+
+    // --- UNDO ΛΕΙΤΟΥΡΓΙΑ ---
+    async function undoLastAction() {
+        if(!lastAction) return;
+        if(!confirm("Είσαι σίγουρος ότι θες να ακυρώσεις την τελευταία καταχώρηση (Undo);")) return;
+        
+        for(let up of lastAction.updates) {
+            // Διαγραφή Daily Logs παικτών
+            for(let name of up.names) {
+                await db.ref(`dailyLogs/${lastAction.date}/${name}/${lastAction.bossId}`).remove();
+            }
+            
+            // Αφαίρεση στατιστικών και πόντων από το CP
+            await db.ref(`cps/${up.cpId}`).transaction(cp => {
+                if(cp) {
+                    if(cp.bossStats && cp.bossStats[lastAction.bossId]) {
+                        cp.bossStats[lastAction.bossId] -= up.pointsCount;
+                        if(cp.bossStats[lastAction.bossId] < 0) cp.bossStats[lastAction.bossId] = 0;
+                    }
+                    cp.totalPoints -= (up.pointsCount * lastAction.multiplier);
+                }
+                return cp;
+            });
+        }
+        
+        alert("Ανάκληση (Undo) Επιτυχής! Οι πόντοι και τα logs διαγράφηκαν.");
+        lastAction = null;
+        document.getElementById('undo-btn').style.display = 'none';
     }
 
     // --- CP EDIT, RENAME & MOVE LOGIC ---
@@ -473,7 +578,6 @@
         document.getElementById('old-player-name').value = ""; document.getElementById('new-player-name').value = "";
     }
 
-    // ΝΕΑ ΣΥΝΑΡΤΗΣΗ: ΜΕΤΑΦΟΡΑ ΠΑΙΚΤΗ ΑΠΟ CP ΣΕ CP
     async function movePlayerToCP() {
         const playerName = document.getElementById('move-player-name').value.trim();
         const targetCpId = document.getElementById('move-target-cp').value;
@@ -488,11 +592,9 @@
         let sourceMembersArr = [];
         let exactPlayerName = playerName;
 
-        // Βρίσκουμε πού ανήκει τώρα
         for (const id in allCPs) {
             if(allCPs[id].clan === 'history') continue;
             
-            // Check if leader
             if(allCPs[id].leader && allCPs[id].leader.toLowerCase() === searchName) {
                 alert(`ΠΡΟΣΟΧΗ! Ο ${playerName} είναι LEADER στο CP ${allCPs[id].name}. Πρέπει να αλλάξεις χειροκίνητα τον Leader από το Edit CP.`);
                 return;
@@ -503,9 +605,9 @@
 
             if (idx !== -1) {
                 sourceCpId = id;
-                exactPlayerName = membersArr[idx]; // Κρατάμε το σωστό capitalization
+                exactPlayerName = membersArr[idx]; 
                 sourceMembersArr = membersArr;
-                sourceMembersArr.splice(idx, 1); // Τον αφαιρούμε
+                sourceMembersArr.splice(idx, 1); 
                 break;
             }
         }
@@ -526,7 +628,6 @@
 
         if(!confirm(`ΕΠΙΒΕΒΑΙΩΣΗ:\nΝα μεταφερθεί ο ${exactPlayerName} από το ${allCPs[sourceCpId].name} στο ${targetCp.name};`)) return;
 
-        // Ενημέρωση βάσης
         await db.ref(`cps/${sourceCpId}`).update({ members: sourceMembersArr.join(', ') });
         await db.ref(`cps/${targetCpId}`).update({ members: targetMembersArr.join(', ') });
 
