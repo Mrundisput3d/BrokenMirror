@@ -24,13 +24,13 @@
             scroll-behavior: smooth;
         }
 
-        /* --- 1. HERO SECTION (FULL SCREEN) --- */
+        /* --- 1. HERO SECTION (FULL SCREEN) ΜΕ ΤΟΝ BAIUM ΣΟΥ --- */
         .hero-section {
             position: relative;
             width: 100%;
             height: 100vh;
-            /* ΕΔΩ ΜΠΗΚΕ Η ΝΕΑ ΕΠΙΚΗ ΦΩΤΟΓΡΑΦΙΑ */
-            background-image: linear-gradient(90deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 40%, rgba(0,0,0,0) 100%), url('https://images.unsplash.com/photo-1605806616949-1e87b487cb2a?q=80&w=2000&auto=format&fit=crop');
+            /* Το δικό σου Link για τον Baium */
+            background-image: linear-gradient(90deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 40%, rgba(0,0,0,0) 100%), url('https://i.ibb.co/5xFsVVyD/baium.png');
             background-size: cover;
             background-position: center;
             display: flex;
@@ -51,7 +51,7 @@
         }
         .hero-subtitle { font-family: 'Cinzel', serif; color: var(--gold); font-size: 1.2rem; letter-spacing: 4px; margin-bottom: 10px; text-shadow: 0 0 10px rgba(0,0,0,0.8); }
         .hero-title { font-family: 'Cinzel Decorative', cursive; font-size: 4.5rem; color: #fff; margin: 0; line-height: 1.1; text-shadow: 0 5px 15px rgba(0,0,0,0.8); }
-        .hero-description { font-family: 'Open Sans', sans-serif; color: #ccc; font-size: 1.1rem; margin-top: 20px; margin-bottom: 40px; line-height: 1.6; max-width: 600px; }
+        .hero-description { font-family: 'Open Sans', sans-serif; color: #ccc; font-size: 1.1rem; margin-top: 20px; margin-bottom: 40px; line-height: 1.6; max-width: 600px; text-shadow: 0 2px 5px rgba(0,0,0,0.8); }
         
         .hero-buttons { display: flex; gap: 20px; }
         .btn-primary, .btn-secondary {
@@ -65,7 +65,7 @@
         .hero-bottom-fade { position: absolute; bottom: 0; left: 0; width: 100%; height: 150px; background: linear-gradient(to top, var(--bg), transparent); z-index: 5; pointer-events: none; }
 
 
-        /* --- 2. NAVIGATION CARDS (ΜΕ ΤΙΣ ΕΠΙΚΕΣ ΕΙΚΟΝΕΣ) --- */
+        /* --- 2. NAVIGATION CARDS (L2 REBORN ANIMATION STYLE) --- */
         .nav-cards-section {
             max-width: 1400px;
             margin: -80px auto 60px auto; 
@@ -79,10 +79,10 @@
 
         .nav-card {
             position: relative;
+            height: 240px; /* Σταθερό ύψος για να γίνεται σωστά το animation */
             border: 1px solid rgba(255,255,255,0.05);
             border-top: 1px solid rgba(212,175,55,0.3);
             border-radius: 15px;
-            padding: 30px 20px;
             text-align: center;
             text-decoration: none;
             color: #fff;
@@ -92,41 +92,72 @@
             background-size: cover;
             background-position: center;
             z-index: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end; /* Σπρώχνει το content προς τα κάτω */
         }
 
-        /* ΕΔΩ ΜΠΗΚΑΝ ΤΑ ΝΕΑ LINKS ΓΙΑ ΤΑ ΠΑΡΑΘΥΡΑΚΙΑ */
         #card-treasury { background-image: url('https://images.unsplash.com/photo-1618004912476-29818d81ae2e?q=80&w=600&auto=format&fit=crop'); }
         #card-history { background-image: url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=600&auto=format&fit=crop'); }
         #card-warzone { background-image: url('https://images.unsplash.com/photo-1542223189-67a03fa0f0bd?q=80&w=600&auto=format&fit=crop'); }
         #card-fame { background-image: url('https://images.unsplash.com/photo-1588780530902-bfc1eb756285?q=80&w=600&auto=format&fit=crop'); }
 
-        /* Το σκοτεινό φίλτρο πάνω από την εικόνα */
         .nav-card::before { 
             content: ''; 
             position: absolute; 
             top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(10, 12, 15, 0.85); /* Πολύ σκοτεινό στην αρχή */
+            background: linear-gradient(to top, rgba(10, 12, 15, 0.95) 10%, rgba(10, 12, 15, 0.7) 100%);
             z-index: -1; 
             transition: 0.4s; 
         }
 
-        /* Hover Effects */
+        /* --- ΤΟ ANIMATION "ΚΟΥΝΗΜΑ ΓΡΑΜΜΑΤΩΝ" --- */
+        .card-content-wrapper {
+            padding: 20px;
+            transform: translateY(35px); /* Κρύβει το description πιο κάτω */
+            transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .card-icon svg { 
+            width: 45px; height: 45px; 
+            margin-bottom: 15px; 
+            stroke: var(--gold);
+            filter: drop-shadow(0 0 8px rgba(212,175,55,0.4));
+            transition: 0.4s;
+        }
+
+        .card-title { 
+            font-family: 'Cinzel', serif; 
+            font-size: 1.15rem; 
+            color: var(--gold); 
+            margin: 0 0 10px 0; 
+            letter-spacing: 1px; 
+            font-weight: 700; 
+            text-shadow: 0 2px 4px rgba(0,0,0,0.9);
+        }
+
+        .card-desc { 
+            font-size: 0.8rem; 
+            color: #ddd; 
+            line-height: 1.5; 
+            margin: 0; 
+            opacity: 0; /* Αόρατο στην αρχή */
+            transform: translateY(20px);
+            transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+            text-shadow: 0 1px 3px rgba(0,0,0,0.9);
+        }
+
+        /* Τι γίνεται στο HOVER */
         .nav-card:hover { 
-            transform: translateY(-15px); 
+            transform: translateY(-10px); 
             border-color: rgba(212,175,55,0.8); 
-            box-shadow: 0 25px 45px rgba(0,0,0,0.8), 0 0 20px rgba(212,175,55,0.3); 
+            box-shadow: 0 25px 45px rgba(0,0,0,0.8), 0 0 25px rgba(212,175,55,0.3); 
         }
+        .nav-card:hover::before { background: linear-gradient(to top, rgba(10, 12, 15, 0.9) 10%, rgba(10, 12, 15, 0.3) 100%); }
         
-        /* Όταν κάνεις hover, το σκοτεινό φίλτρο φεύγει λίγο για να φανεί η εικόνα! */
-        .nav-card:hover::before { 
-            background: rgba(10, 12, 15, 0.4); 
-        }
-        
-        .card-icon { font-size: 2.5rem; margin-bottom: 15px; filter: drop-shadow(0 0 10px rgba(212,175,55,0.5)); transition: 0.3s; }
-        .nav-card:hover .card-icon { transform: scale(1.1); filter: drop-shadow(0 0 15px rgba(212,175,55,0.8)); }
-        
-        .card-title { font-family: 'Cinzel', serif; font-size: 1.1rem; color: var(--gold); margin: 0 0 10px 0; letter-spacing: 1px; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.9);}
-        .card-desc { font-size: 0.8rem; color: #ccc; line-height: 1.4; margin: 0; text-shadow: 0 1px 3px rgba(0,0,0,0.9);}
+        .nav-card:hover .card-content-wrapper { transform: translateY(0); /* Ανεβαίνει όλο το μπλοκ */ }
+        .nav-card:hover .card-desc { opacity: 1; transform: translateY(0); /* Εμφανίζεται το κείμενο */ }
+        .nav-card:hover .card-icon svg { transform: scale(1.1); filter: drop-shadow(0 0 15px rgba(212,175,55,0.8)); stroke: #fff;}
 
 
         /* --- 3. MAIN DASHBOARD CONTENT --- */
@@ -190,7 +221,7 @@
         .boss-icon { width: 24px; height: 24px; margin-bottom: 5px; }
         .stat-val { font-size: 0.85rem; color: #fff; font-family: 'Cinzel'; display: block; font-weight: bold;}
 
-        /* Responsive Design */
+        /* Responsive */
         @media (max-width: 1024px) {
             .nav-cards-section { grid-template-columns: repeat(2, 1fr); margin-top: -40px; }
             .hero-title { font-size: 3.5rem; }
@@ -262,24 +293,40 @@
 
     <section class="nav-cards-section">
         <a href="market.html" class="nav-card" id="card-treasury">
-            <div class="card-icon">💎</div>
-            <h3 class="card-title">ALLIANCE TREASURY</h3>
-            <p class="card-desc">Loot rules, Point Policies & the official BMA Marketplace.</p>
+            <div class="card-content-wrapper">
+                <div class="card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                </div>
+                <h3 class="card-title">ALLIANCE TREASURY</h3>
+                <p class="card-desc">Loot rules, Point Policies & the official BMA Marketplace.</p>
+            </div>
         </a>
         <a href="history.html" class="nav-card" id="card-history">
-            <div class="card-icon">⚔️</div>
-            <h3 class="card-title">HALL OF RECORDS</h3>
-            <p class="card-desc">Consult the archives. Fallen heroes and legacy leavers.</p>
+            <div class="card-content-wrapper">
+                <div class="card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                </div>
+                <h3 class="card-title">HALL OF RECORDS</h3>
+                <p class="card-desc">Consult the archives. Fallen heroes and legacy leavers.</p>
+            </div>
         </a>
         <a href="pvpzone.html" class="nav-card" id="card-warzone">
-            <div class="card-icon">🩸</div>
-            <h3 class="card-title">WAR ZONE</h3>
-            <p class="card-desc">Live PVP Logs and combat statistics from the battlefield.</p>
+            <div class="card-content-wrapper">
+                <div class="card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                </div>
+                <h3 class="card-title">WAR ZONE</h3>
+                <p class="card-desc">Live PVP Logs and combat statistics from the battlefield.</p>
+            </div>
         </a>
         <a href="halloffame.html" class="nav-card" id="card-fame">
-            <div class="card-icon">👑</div>
-            <h3 class="card-title">HALL OF FAME</h3>
-            <p class="card-desc">The Immortals. Weekly Warlords and Alliance rankings.</p>
+            <div class="card-content-wrapper">
+                <div class="card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="2 20 22 20 19 6 15 13 12 4 9 13 5 6 2 20"></polygon></svg>
+                </div>
+                <h3 class="card-title">HALL OF FAME</h3>
+                <p class="card-desc">The Immortals. Weekly Warlords and Alliance rankings.</p>
+            </div>
         </a>
     </section>
 
