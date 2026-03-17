@@ -2,7 +2,7 @@
 <html lang="el">
 <head>
     <meta charset="UTF-8">
-    <title>BMA | Command Center V18.3</title>
+    <title>BMA | Command Center V18.4</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -46,7 +46,7 @@
 <body>
 
     <div class="header-container">
-        <div style="width:80px"></div> <h1>BMA COMMAND CENTER V18.3</h1>
+        <div style="width:80px"></div> <h1>BMA COMMAND CENTER V18.4</h1>
         <button class="logout-btn" onclick="logout()">LOGOUT</button>
     </div>
 
@@ -56,6 +56,8 @@
             <div class="filter-tabs">
                 <button class="filter-btn active" id="btn-active" onclick="setViewMode('active')">ACTIVE</button>
                 <button class="filter-btn" id="btn-history" onclick="setViewMode('history')">HISTORY</button>
+                <!-- ΝΕΟ ΚΟΥΜΠΙ ΓΙΑ EXPORT ΣΕ EXCEL -->
+                <button class="filter-btn" style="background: rgba(40, 167, 69, 0.2); color: var(--green); border-color: var(--green);" onclick="exportToExcel()">📥 EXCEL</button>
             </div>
             <div id="cp-list-simple" style="max-height: 250px; overflow-y: auto;"></div>
             
@@ -140,7 +142,8 @@
                     <div>
                         <h3 style="color:var(--red); margin:0;">MARKETPLACE</h3>
                         <select id="loot-market">
-                            <option value="3100|Valakas Necklace">Valakas Necklace (3100)</option>
+                            <!-- ΑΛΛΑΓΗ ΤΙΜΗΣ VALAKAS ΣΕ 2500 -->
+                            <option value="2500|Valakas Necklace">Valakas Necklace (2500)</option>
                             <option value="1100|Antharas Earring">Antharas Earring (1100)</option>
                             <option value="950|Baium Ring">Baium Ring (950)</option>
                             <option value="225|Frintezza Necklace">Frintezza Necklace (225)</option>
@@ -219,7 +222,8 @@
                 <div>
                     <h3 style="color:var(--red); margin:0;">MARKETPLACE (BUY LOOT)</h3>
                     <select id="ext-loot-market">
-                        <option value="3100|Valakas Necklace">Valakas Necklace (3100)</option>
+                        <!-- ΑΛΛΑΓΗ ΤΙΜΗΣ VALAKAS ΣΕ 2500 -->
+                        <option value="2500|Valakas Necklace">Valakas Necklace (2500)</option>
                         <option value="1100|Antharas Earring">Antharas Earring (1100)</option>
                         <option value="950|Baium Ring">Baium Ring (950)</option>
                         <option value="225|Frintezza Necklace">Frintezza Necklace (225)</option>
@@ -291,6 +295,37 @@
             }).join('');
     }
 
+    // --- ΝΕΑ ΣΥΝΑΡΤΗΣΗ ΕΞΑΓΩΓΗΣ ΣΕ EXCEL (.CSV) ---
+    function exportToExcel() {
+        // Επικεφαλίδες (Mε \uFEFF για υποστήριξη Ελληνικών UTF-8 στο Excel)
+        let csvContent = "data:text/csv;charset=utf-8,\uFEFF"; 
+        csvContent += "CP / Caller Name,Clan / Role,Leader,Members,Total Points\n";
+
+        // Μαζεύουμε όλα τα ενεργά CPs και τα φτιάχνουμε γραμμή-γραμμή
+        Object.keys(allCPs).forEach(id => {
+            const cp = allCPs[id];
+            if (cp.clan === 'history') return; // Αγνοούμε τα σβησμένα
+            
+            // Το replace βοηθάει αν μέσα στα ονόματα υπάρχουν κόμματα
+            let name = `"${(cp.name || "").replace(/"/g, '""')}"`;
+            let clan = `"${(cp.clan || "").replace(/"/g, '""').toUpperCase()}"`;
+            let leader = `"${(cp.leader || "").replace(/"/g, '""')}"`;
+            let members = `"${(cp.members || "").replace(/"/g, '""')}"`;
+            let points = cp.totalPoints || 0;
+
+            csvContent += `${name},${clan},${leader},${members},${points}\n`;
+        });
+
+        // Δημιουργία link και αυτόματο κλικ για κατέβασμα
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "BMA_Rosters_Data.csv"); // Όνομα αρχείου
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
     function renderMoveCPSelect() {
         const sel = document.getElementById('move-target-cp');
         const currentVal = sel.value;
@@ -353,7 +388,6 @@
         return matrix[b.length][a.length];
     }
 
-    // SMART & FUZZY MATCHING (Ορθογραφικά λάθη)
     function analyzeAttendance() {
         const input = document.getElementById('mass-input').value.toLowerCase();
         let names = [...new Set(input.match(/[a-z0-9_]+/g) || [])];
@@ -363,7 +397,6 @@
         Object.keys(allCPs).forEach(id => {
             if(allCPs[id].clan === 'history') return;
             
-            // Μαζεύουμε όλα τα πραγματικά ονόματα του CP
             let roster = (allCPs[id].members || "").toLowerCase().split(',').map(s=>s.trim()).filter(s=>s);
             if(allCPs[id].leader) roster.push(allCPs[id].leader.toLowerCase().trim());
             
@@ -372,30 +405,27 @@
 
             roster.forEach(trueName => {
                 let matchedInput = names.find(n => {
-                    if (n.length < 3) return false; // Αγνοούμε μικρά σκουπίδια
-                    if (trueName === n || trueName.includes(n)) return true; // Ακριβές match ή substring
+                    if (n.length < 3) return false; 
+                    if (trueName === n || trueName.includes(n)) return true; 
                     
-                    // Fuzzy match (1 λάθος για μικρά ονόματα, 2 για μεγαλύτερα από 5 γράμματα)
                     let dist = getEditDistance(n, trueName);
                     let allowed = trueName.length > 5 ? 2 : 1;
                     return dist <= allowed;
                 });
                 
                 if (matchedInput) {
-                    foundRealNames.push(trueName); // Αποθηκεύουμε το ΣΩΣΤΟ όνομα της βάσης
+                    foundRealNames.push(trueName); 
                     
                     if (matchedInput !== trueName && !trueName.includes(matchedInput)) {
-                        // Αν το βρήκε μέσω Fuzzy (με ορθογραφικό)
                         displayNames.push(`${trueName.toUpperCase()} <span style="color:#ff4444; font-size:9px;">[ως ${matchedInput.toUpperCase()}]</span>`);
                     } else {
-                        // Κανονικό Match
                         displayNames.push(trueName.toUpperCase());
                     }
                 }
             });
             
             if(foundRealNames.length > 0) {
-                matchedData[id] = foundRealNames; // Αποθηκεύουμε τα πραγματικά ονόματα για το Log
+                matchedData[id] = foundRealNames; 
                 const namesList = displayNames.join(', ');
                 
                 listDiv.innerHTML += `
@@ -422,7 +452,7 @@
         for (const cb of checkboxes) {
             if (cb.checked) {
                 const id = cb.id.replace('check-', '');
-                const namesFound = matchedData[id]; // Εδώ είναι πλέον τα ΣΩΣΤΑ ονόματα!
+                const namesFound = matchedData[id]; 
                 
                 let eligible = namesFound.filter(name => {
                     const alreadyDone = globalDailyLogs[today] && globalDailyLogs[today][name] && globalDailyLogs[today][name][bossId];
@@ -462,18 +492,15 @@
         document.getElementById('mass-input').value = ""; document.getElementById('detected-list').innerHTML = "";
     }
 
-    // --- UNDO ΛΕΙΤΟΥΡΓΙΑ ---
     async function undoLastAction() {
         if(!lastAction) return;
         if(!confirm("Είσαι σίγουρος ότι θες να ακυρώσεις την τελευταία καταχώρηση (Undo);")) return;
         
         for(let up of lastAction.updates) {
-            // Διαγραφή Daily Logs παικτών
             for(let name of up.names) {
                 await db.ref(`dailyLogs/${lastAction.date}/${name}/${lastAction.bossId}`).remove();
             }
             
-            // Αφαίρεση στατιστικών και πόντων από το CP
             await db.ref(`cps/${up.cpId}`).transaction(cp => {
                 if(cp) {
                     if(cp.bossStats && cp.bossStats[lastAction.bossId]) {
@@ -490,8 +517,6 @@
         lastAction = null;
         document.getElementById('undo-btn').style.display = 'none';
     }
-
-    // --- CP EDIT, RENAME & MOVE LOGIC ---
 
     function loadEdit(id) {
         currentEditID = id; const cp = allCPs[id];
@@ -683,11 +708,6 @@
 
     function deleteCP() { if(confirm("Delete Forever?")) db.ref('cps/' + currentEditID).remove(); }
 
-
-    /* =========================================
-       EXTERNAL CLANS & CALLERS MANAGER LOGIC
-       ========================================= */
-       
     function formatText(type) {
         const textarea = document.getElementById('ext-description');
         const start = textarea.selectionStart;
