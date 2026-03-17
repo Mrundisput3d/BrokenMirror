@@ -12,8 +12,7 @@
         
         body { 
             background: var(--bg); 
-            /* Πιο φωτεινό background: rgba 0.4 αντί για 0.85 */
-            background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://i.ibb.co/RGpww9dy/HALLOFFAME.png');
+            background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://i.ibb.co/FbHYLMCD/BACKGROUND.png');
             background-size: cover; background-attachment: fixed; background-position: center;
             color: #eee; font-family: 'Open Sans', sans-serif; margin: 0; padding-bottom: 0px;
         }
@@ -98,11 +97,25 @@
         .rank-list-score { font-family: 'Cinzel'; color: var(--gold); font-weight: bold; font-size: 1.1rem; }
         .rank-list-subtitle { font-size: 0.75rem; color: #888; display: block; font-family: 'Open Sans'; letter-spacing: 0; margin-top: 3px; text-transform: uppercase;}
 
-        /* --- DEVELOPER FOOTER --- */
-        .developer-footer { text-align: center; padding: 25px 20px; background: rgba(0, 0, 0, 0.8); border-top: 1px solid rgba(212,175,55,0.2); font-family: 'Cinzel', serif; color: #888; font-size: 0.85rem; letter-spacing: 1px; position: relative; z-index: 5; margin-top: 40px; }
+        /* --- DEVELOPER FOOTER & DISCORD BUTTON --- */
+        .developer-footer { text-align: center; padding: 30px 20px; background: rgba(0, 0, 0, 0.85); border-top: 1px solid rgba(212,175,55,0.2); font-family: 'Cinzel', serif; color: #888; font-size: 0.85rem; letter-spacing: 1px; position: relative; z-index: 5; margin-top: 40px; }
         .dev-name { color: var(--gold); font-weight: bold; font-size: 1rem; }
-        .dev-contact { margin-top: 8px; font-size: 0.8rem; font-family: 'Open Sans', sans-serif; color: #aaa; }
-        .dev-discord { color: #fff; background: rgba(255,255,255,0.08); padding: 3px 10px; border-radius: 5px; margin-left: 5px; font-family: monospace; font-size: 0.9rem; border: 1px solid rgba(255,255,255,0.1); }
+        .dev-contact { margin-top: 15px; font-size: 0.85rem; font-family: 'Open Sans', sans-serif; color: #aaa; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 10px;}
+        
+        /* Νέο Κουμπί Discord */
+        .dev-discord-link {
+            display: inline-flex; align-items: center; gap: 8px;
+            color: #fff; background: rgba(88, 101, 242, 0.15); /* Χρώμα Discord με διαφάνεια */
+            padding: 6px 15px; border-radius: 8px; font-family: monospace; font-size: 1rem;
+            border: 1px solid rgba(88, 101, 242, 0.5);
+            text-decoration: none; transition: 0.3s;
+        }
+        .dev-discord-link:hover {
+            background: rgba(88, 101, 242, 0.9); /* Έντονο χρώμα στο Hover */
+            transform: translateY(-3px); box-shadow: 0 5px 15px rgba(88, 101, 242, 0.4);
+            border-color: #fff; color: #fff;
+        }
+        .discord-icon { width: 18px; height: 18px; fill: #fff; }
 
         /* Responsive */
         @media (max-width: 1024px) {
@@ -113,8 +126,8 @@
         }
         @media (max-width: 768px) {
             .section-header h2 { font-size: 2rem; }
-            .dev-contact { display: block; line-height: 2; }
-            .dev-discord { display: inline-block; margin-top: 5px; }
+            .dev-contact { flex-direction: column; line-height: 1.6; }
+            .dev-discord-link { margin-top: 5px; }
         }
     </style>
 </head>
@@ -180,9 +193,20 @@
 
     </div>
 
+    <!-- NΕΟ DEVELOPER FOOTER ΜΕ TO DISCORD -->
     <footer class="developer-footer">
         <div>Designed & Developed by <span class="dev-name">MrUndisputed</span></div>
-        <div class="dev-contact">Looking for a custom web project? Contact me on Discord: <span class="dev-discord">mrundisputedgiwrgos</span></div>
+        <div class="dev-contact">
+            Looking for a custom web project? Contact me:
+            <!-- ΕΔΩ ΒΑΛΕ ΤΟ NUMERIC ID ΣΟΥ ΣΤΟ ΤΕΛΟΣ ΤΟΥ LINK -->
+            <a href="https://discordapp.com/users/398924786895683585" target="_blank" class="dev-discord-link" title="Click to view my Discord profile">
+                <!-- SVG Εικονίδιο του Discord -->
+                <svg class="discord-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 127.14 96.36">
+                    <path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77.13,77.13,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.31,60,73.31,53s5-12.74,11.43-12.74S96.3,46,96.19,53,91.13,65.69,84.69,65.69Z"/>
+                </svg>
+                mrundisputedgiwrgos
+            </a>
+        </div>
     </footer>
 
     <script>
@@ -204,7 +228,7 @@
             const data = snap.val();
             const allCPs = data.cps || {};
             const logs = data.dailyLogs || {};
-            dailyLogsData = logs; // Αποθήκευση logs για το Top 10
+            dailyLogsData = logs; 
             
             // --- 1. ΥΠΟΛΟΓΙΣΜΟΣ ΓΙΑ ΤΑ PODIUMS (CPs) ---
             let activeCPs = Object.keys(allCPs)
@@ -252,12 +276,10 @@
 
             // --- 2. ΥΠΟΛΟΓΙΣΜΟΣ ΓΙΑ ΤΟ TOP 10 PLAYERS ---
             calculateTop10();
-            // Αν είναι ήδη πατημένο το All Time, κράτα το, αλλιώς Weekly
             const isAllTimeActive = document.getElementById('btn-alltime').classList.contains('active');
             showTop10(isAllTimeActive ? 'alltime' : 'weekly');
         });
 
-        // Σχεδιασμός Podiums (Ο αυθεντικός κώδικάς σου)
         function renderElite(targetId, top3) {
             const area = document.getElementById(targetId);
             if(!top3 || top3.length === 0) { area.innerHTML = "<h2 style='color:#555;'>AWAITING CONTENDERS</h2>"; return; }
@@ -280,7 +302,6 @@
             }).join('');
         }
 
-        // --- ΥΠΟΛΟΓΙΣΜΟΣ TOP 10 PLAYERS ---
         function calculateTop10() {
             let allTimeScores = {};
             let weeklyScores = {};
@@ -317,7 +338,6 @@
                 .slice(0, 10);
         }
 
-        // --- ΕΜΦΑΝΙΣΗ TOP 10 PLAYERS ΣΤΟ UI ---
         function showTop10(type) {
             const btnWeekly = document.getElementById('btn-weekly');
             const btnAllTime = document.getElementById('btn-alltime');
