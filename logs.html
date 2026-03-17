@@ -2,14 +2,19 @@
 <html lang="el">
 <head>
     <meta charset="UTF-8">
-    <title>BMA | Intelligence Center V19</title>
+    <title>BMA | Intelligence Center V19.1</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <style>
         :root { --gold: #d4af37; --bg: #0a0c0f; --card: #15181c; --blue: #3498db; --red: #ff4444; --green: #28a745; }
         body { background: var(--bg); color: #eee; font-family: 'Open Sans', sans-serif; padding: 20px; font-size: 13px; }
         h1, h2 { font-family: 'Cinzel'; color: var(--gold); text-align: center; margin-bottom: 20px; }
+        
+        .header-container { display: flex; justify-content: space-between; align-items: center; max-width: 1500px; margin: 0 auto 20px; }
+        .logout-btn { background: none; border: 1px solid var(--red); color: var(--red); padding: 5px 15px; cursor: pointer; font-family: 'Cinzel'; border-radius: 4px; font-size: 10px; transition: 0.3s; }
+        .logout-btn:hover { background: var(--red); color: white; }
         
         .main-grid { display: grid; grid-template-columns: 1fr 380px; gap: 20px; max-width: 1500px; margin: 0 auto; }
         .panel { background: var(--card); border-radius: 10px; padding: 15px; border: 1px solid #333; border-top: 3px solid var(--gold); margin-bottom: 20px; }
@@ -18,8 +23,10 @@
         .stat-card { background: #000; padding: 10px; border-radius: 5px; text-align: center; border: 1px solid #444; }
         .stat-card b { font-size: 1.2rem; color: var(--gold); }
 
-        .log-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        .log-table th { background: #111; padding: 10px; text-align: left; color: #888; font-size: 0.7rem; border-bottom: 2px solid #333; }
+        /* Scrollable Table Container */
+        .table-container { max-height: 500px; overflow-y: auto; margin-top: 10px; border: 1px solid #333; border-radius: 5px; }
+        .log-table { width: 100%; border-collapse: collapse; }
+        .log-table th { background: #111; padding: 10px; text-align: left; color: #888; font-size: 0.7rem; border-bottom: 2px solid #333; position: sticky; top: 0; z-index: 10; }
         .log-table td { padding: 8px; border-bottom: 1px solid #222; }
         .player-tag { color: var(--gold); font-weight: bold; }
         .boss-tag { background: #1a2a3a; color: var(--blue); padding: 2px 6px; border-radius: 3px; font-size: 0.7rem; font-weight: bold; }
@@ -36,7 +43,10 @@
 </head>
 <body>
 
-    <h1>BMA INTELLIGENCE CENTER V19</h1>
+    <div class="header-container">
+        <div style="width:80px"></div> <h1 style="margin:0;">BMA INTELLIGENCE CENTER V19.1</h1>
+        <button class="logout-btn" onclick="logout()">LOGOUT</button>
+    </div>
 
     <div class="main-grid">
         <div>
@@ -46,7 +56,7 @@
                 <div style="display: flex; gap: 10px; align-items: flex-end;">
                     <div style="flex: 1;">
                         <label>Date Filter:</label>
-                        <input type="text" id="date-filter" placeholder="DD-MM-YYYY">
+                        <input type="text" id="date-filter" placeholder="DD-MM-YYYY" onkeyup="renderLogs()" onchange="renderLogs()">
                     </div>
                     <div style="flex: 2;">
                         <label>Search Player History:</label>
@@ -55,17 +65,19 @@
                     <button class="btn btn-blue" onclick="exportToCSV()">EXPORT CSV</button>
                 </div>
 
-                <table class="log-table">
-                    <thead>
-                        <tr>
-                            <th>TIME & DATE</th>
-                            <th>PLAYER</th>
-                            <th>BOSS</th>
-                            <th>CP OWNER</th>
-                        </tr>
-                    </thead>
-                    <tbody id="logs-list"></tbody>
-                </table>
+                <div class="table-container">
+                    <table class="log-table">
+                        <thead>
+                            <tr>
+                                <th>TIME & DATE</th>
+                                <th>PLAYER</th>
+                                <th>BOSS</th>
+                                <th>CP OWNER</th>
+                            </tr>
+                        </thead>
+                        <tbody id="logs-list"></tbody>
+                    </table>
+                </div>
                 
                 <button class="btn btn-red" onclick="clearAllLogs()">RESET ALL MEMBER LOGS</button>
             </div>
@@ -96,6 +108,20 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
+    // --- Ο ΦΥΛΑΚΑΣ (AUTH CHECK) - ΠΡΟΣΤΕΘΗΚΕ! ---
+    firebase.auth().onAuthStateChanged((user) => {
+        if (!user) {
+            window.location.href = "login.html";
+        }
+    });
+
+    function logout() {
+        firebase.auth().signOut().then(() => {
+            window.location.href = "login.html";
+        });
+    }
+    // ------------------------------
+
     const todayStr = new Date().toLocaleDateString('el-GR').replace(/\//g, '-');
     document.getElementById('date-filter').value = todayStr;
 
@@ -109,30 +135,36 @@
     });
 
     function renderLogs() {
-        const selectedDate = document.getElementById('date-filter').value;
-        const playerSearch = document.getElementById('player-filter').value.toLowerCase();
+        const selectedDate = document.getElementById('date-filter').value.trim();
+        const playerSearch = document.getElementById('player-filter').value.trim().toLowerCase();
         const container = document.getElementById('logs-list');
-        container.innerHTML = "";
-
-        const datesToSearch = playerSearch ? Object.keys(allLogs) : [selectedDate];
+        
+        let htmlString = ""; // Βελτιστοποίηση: Χτίζουμε πρώτα όλο το HTML
+        
+        // Αν ψάχνουμε παίκτη, ψάχνουμε σε όλες τις ημερομηνίες. Διαφορετικά, μόνο στην επιλεγμένη ημερομηνία.
+        const datesToSearch = playerSearch ? Object.keys(allLogs).sort().reverse() : [selectedDate];
 
         datesToSearch.forEach(dateKey => {
             const dayData = allLogs[dateKey];
             if (!dayData) return;
 
             Object.keys(dayData).forEach(pName => {
-                if (playerSearch && !pName.includes(playerSearch)) return;
+                if (playerSearch && !pName.toLowerCase().includes(playerSearch)) return;
+                
                 Object.keys(dayData[pName]).forEach(bossId => {
                     const ev = dayData[pName][bossId];
-                    container.innerHTML += `<tr>
+                    htmlString += `<tr>
                         <td style="color:#666; font-size:0.7rem;">${dateKey} | ${ev.time || ''}</td>
-                        <td class="player-tag">${pName}</td>
+                        <td class="player-tag">${pName.toUpperCase()}</td>
                         <td><span class="boss-tag">${bossId}</span></td>
-                        <td style="color:#28a745">${ev.cp || 'N/A'}</td>
+                        <td style="color:#28a745">${(ev.cp || 'N/A').toUpperCase()}</td>
                     </tr>`;
                 });
             });
         });
+
+        // Βάζουμε το HTML στο DOM μία φορά στο τέλος (Τεράστια αύξηση ταχύτητας)
+        container.innerHTML = htmlString || `<tr><td colspan="4" style="text-align:center; color:#666; padding:20px;">No logs found for this filter.</td></tr>`;
     }
 
     function calculateIntelligence() {
@@ -150,13 +182,15 @@
                     Object.keys(playerEntry).forEach(bossId => {
                         const cpName = playerEntry[bossId].cp;
                         if (!cpName) return;
+                        
+                        const cpNameUpper = cpName.toUpperCase(); // Ομορφιά στο Ranking
 
                         // 1. Γενικό Ranking
-                        cpStats[cpName] = (cpStats[cpName] || 0) + 1;
+                        cpStats[cpNameUpper] = (cpStats[cpNameUpper] || 0) + 1;
                         
                         // 2. Low Epics Ranking
                         if (lowEpicsKeys.includes(bossId)) {
-                            lowEpicStats[cpName] = (lowEpicStats[cpName] || 0) + 1;
+                            lowEpicStats[cpNameUpper] = (lowEpicStats[cpNameUpper] || 0) + 1;
                         }
 
                         // 3. Boss Analytics
@@ -169,7 +203,7 @@
         // Render General Ranking
         document.getElementById('ranking-list').innerHTML = Object.entries(cpStats)
             .sort((a,b) => b[1] - a[1])
-            .map(([name, score]) => `<div class="rank-row"><span>${name}</span><b style="color:var(--gold)">${score}</b></div>`).join('');
+            .map(([name, score]) => `<div class="rank-row"><span>${name}</span><b style="color:var(--gold)">${score}</b></div>`).join('') || "<p style='text-align:center; color:#555;'>No logs in the last 7 days.</p>";
 
         // Render Low Epics Ranking
         document.getElementById('low-epics-ranking-list').innerHTML = Object.entries(lowEpicStats)
@@ -177,31 +211,61 @@
             .map(([name, score]) => `<div class="rank-row"><span>${name}</span><b style="color:var(--green)">${score}</b></div>`).join('') || "<p style='text-align:center; color:#555;'>No Low Epic logs.</p>";
 
         // Render Boss Cards & List
-        const top3 = Object.entries(bossStats).sort((a,b) => b[1] - a[1]).slice(0, 3);
+        const sortedBosses = Object.entries(bossStats).sort((a,b) => b[1] - a[1]);
+        const top3 = sortedBosses.slice(0, 3);
+        
         document.getElementById('boss-analytics').innerHTML = top3.map(([id, count]) => `
-            <div class="stat-card"><small>TOP EVENT: ${id}</small><b>${count}</b> <small>ppl</small></div>`).join('');
+            <div class="stat-card"><small>TOP EVENT: ${id}</small><br><b>${count}</b> <small>ppl</small></div>`).join('');
 
-        document.getElementById('boss-ranking-list').innerHTML = Object.entries(bossStats)
-            .sort((a,b) => b[1] - a[1])
+        document.getElementById('boss-ranking-list').innerHTML = sortedBosses
             .map(([id, count]) => `<div class="rank-row"><span>${id}</span><span style="color:var(--blue)">${count}</span></div>`).join('');
     }
 
     function exportToCSV() {
-        const selectedDate = document.getElementById('date-filter').value;
+        const selectedDate = document.getElementById('date-filter').value.trim();
+        const playerSearch = document.getElementById('player-filter').value.trim().toLowerCase();
+        
         let csv = "Date,Time,Player,Boss,CP\n";
-        const dayData = allLogs[selectedDate];
-        if(!dayData) return alert("No data");
-        Object.keys(dayData).forEach(p => Object.keys(dayData[p]).forEach(b => {
-            csv += `${selectedDate},${dayData[p][b].time},${p},${b},${dayData[p][b].cp}\n`;
-        }));
-        const blob = new Blob([csv], { type: 'text/csv' });
+        let hasData = false;
+
+        const datesToSearch = playerSearch ? Object.keys(allLogs).sort().reverse() : [selectedDate];
+
+        datesToSearch.forEach(dateKey => {
+            const dayData = allLogs[dateKey];
+            if (!dayData) return;
+
+            Object.keys(dayData).forEach(pName => {
+                if (playerSearch && !pName.toLowerCase().includes(playerSearch)) return;
+                
+                Object.keys(dayData[pName]).forEach(bossId => {
+                    const ev = dayData[pName][bossId];
+                    csv += `${dateKey},${ev.time || ''},${pName},${bossId},${ev.cp || 'N/A'}\n`;
+                    hasData = true;
+                });
+            });
+        });
+
+        if(!hasData) {
+            alert("Δεν βρέθηκαν δεδομένα για εξαγωγή με τα τρέχοντα φίλτρα.");
+            return;
+        }
+
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
-        a.href = url; a.download = `BMA_Logs_${selectedDate}.csv`; a.click();
+        a.href = url; 
+        a.download = `BMA_Logs_${playerSearch ? playerSearch : selectedDate}.csv`; 
+        a.click();
+        window.URL.revokeObjectURL(url);
     }
 
     function clearAllLogs() {
-        if(confirm("⚠️ ΔΙΑΓΡΑΦΗ ΟΛΩΝ ΤΩΝ LOGS;")) { db.ref('dailyLogs/').remove(); alert("Cleared."); }
+        // Εxtra επιβεβαίωση γιατί είναι επικίνδυνο κουμπί
+        if(confirm("⚠️ ΕΙΣΑΙ ΣΙΓΟΥΡΟΣ;\nΑυτή η ενέργεια θα διαγράψει ΟΛΟ το ιστορικό συμμετοχών από τη βάση δεδομένων!")) { 
+            db.ref('dailyLogs/').remove().then(() => {
+                alert("Όλα τα logs διαγράφηκαν επιτυχώς.");
+            }); 
+        }
     }
 </script>
 </body>
