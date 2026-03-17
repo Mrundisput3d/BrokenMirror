@@ -2,7 +2,7 @@
 <html lang="el">
 <head>
     <meta charset="UTF-8">
-    <title>BMA | Command Center V18.2</title>
+    <title>BMA | Command Center V18.3</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -46,7 +46,7 @@
 <body>
 
     <div class="header-container">
-        <div style="width:80px"></div> <h1>BMA COMMAND CENTER V18.2</h1>
+        <div style="width:80px"></div> <h1>BMA COMMAND CENTER V18.3</h1>
         <button class="logout-btn" onclick="logout()">LOGOUT</button>
     </div>
 
@@ -57,9 +57,9 @@
                 <button class="filter-btn active" id="btn-active" onclick="setViewMode('active')">ACTIVE</button>
                 <button class="filter-btn" id="btn-history" onclick="setViewMode('history')">HISTORY</button>
             </div>
-            <div id="cp-list-simple" style="max-height: 350px; overflow-y: auto;"></div>
+            <div id="cp-list-simple" style="max-height: 250px; overflow-y: auto;"></div>
             
-            <hr style="border-color:#333; margin: 20px 0;">
+            <hr style="border-color:#333; margin: 15px 0;">
             <h3>NEW CP / CALLER</h3>
             <input type="text" id="new-name" placeholder="Name (π.χ. ANIMALS ή NIKLAUS)">
             <input type="text" id="new-leader" placeholder="Leader (ή Role, π.χ. ALLY LEADER)">
@@ -71,12 +71,21 @@
             </select>
             <button class="btn btn-gold" onclick="createNewCP()">REGISTER</button>
 
-            <hr style="border-color:#333; margin: 20px 0;">
+            <hr style="border-color:#333; margin: 15px 0;">
             <h3 style="color:var(--blue);">MIGRATE / RENAME PLAYER</h3>
             <p style="font-size:10px; color:#888; margin-top:-10px;">Αλλάζει το όνομα παντού και μεταφέρει τα Boss Logs.</p>
             <input type="text" id="old-player-name" placeholder="Παλιό Όνομα">
             <input type="text" id="new-player-name" placeholder="Νέο Όνομα">
             <button class="btn btn-blue" onclick="migratePlayerLogs()">MIGRATE & RENAME</button>
+
+            <hr style="border-color:#333; margin: 15px 0;">
+            <h3 style="color:var(--green);">MOVE MEMBER TO CP</h3>
+            <p style="font-size:10px; color:#888; margin-top:-10px;">Μεταφέρει τον παίκτη αυτόματα στο νέο Roster.</p>
+            <input type="text" id="move-player-name" placeholder="Όνομα Παίκτη">
+            <select id="move-target-cp">
+                <option value="">-- Επίλεξε Νέο CP --</option>
+                </select>
+            <button class="btn btn-green" onclick="movePlayerToCP()">MOVE MEMBER</button>
         </div>
 
         <div class="panel">
@@ -190,7 +199,7 @@
                             <button type="button" class="filter-btn" onclick="formatText('icon2')">🛡️</button>
                         </div>
                         <textarea id="ext-description" rows="6" style="font-family: monospace; font-size:11px;"></textarea>
-                        <div style="font-size:9px; color:#666; margin-top:3px;">* Επίλεξε μια λέξη με το ποντίκι και πάτα ένα κουμπί. Τα 'Enter' γίνονται αυτόματα αλλαγή γραμμής.</div>
+                        <div style="font-size:9px; color:#666; margin-top:3px;">* Επίλεξε μια λέξη με το ποντίκι και πάτα ένα κουμπί.</div>
                     </div>
 
                     <label style="display:block; margin-top:10px; color:#aaa; font-size:11px;">Total Points (Μόνο για Callers)</label>
@@ -247,6 +256,7 @@
         allCPs = snap.val() || {}; 
         renderSimpleList(); 
         renderExtSelect(); 
+        renderMoveCPSelect(); // Νέο: Ανανεώνει το select της μεταφοράς
         if(currentEditID) loadEdit(currentEditID); 
         if(currentExtID && currentExtID.startsWith('cp_')) loadExtEdit(); 
     });
@@ -274,6 +284,22 @@
                     ${allCPs[id].name} ${isCaller} <span style="float:right; color:var(--gold)">${allCPs[id].totalPoints}</span>
                 </div>`;
             }).join('');
+    }
+
+    // Γεμίζει το Select για το Move Member
+    function renderMoveCPSelect() {
+        const sel = document.getElementById('move-target-cp');
+        const currentVal = sel.value;
+        let html = '<option value="">-- Επίλεξε Νέο CP --</option>';
+        Object.keys(allCPs).forEach(id => {
+            if (allCPs[id].clan !== 'history') {
+                html += `<option value="${id}">${allCPs[id].name} (${allCPs[id].clan.toUpperCase()})</option>`;
+            }
+        });
+        sel.innerHTML = html;
+        if (currentVal && sel.querySelector(`option[value="${currentVal}"]`)) {
+            sel.value = currentVal;
+        }
     }
 
     function renderExtSelect() {
@@ -322,7 +348,6 @@
         });
     }
 
-    // --- ΑΛΛΑΓΗ ΣΤΗ ΛΟΓΙΚΗ ΓΙΑ ΝΑ ΜΕΤΡΑΕΙ ΟΛΑ ΤΑ ΑΤΟΜΑ ΣΤΑ PERSONAL LOGS (ΚΑΙ ΤΟΥ 10ου/11ου) ---
     async function logValidatedEvent(bossId, multiplier) {
         const checkboxes = document.querySelectorAll('.cp-checkbox');
         const today = new Date().toLocaleDateString('el-GR').replace(/\//g, '-');
@@ -337,13 +362,9 @@
                     if (alreadyDone) { skippedTotal++; return false; }
                     return true;
                 });
-                
                 if (eligible.length === 0) continue;
                 
-                // Κρατάμε ΟΛΑ τα ονόματα για τα προσωπικά logs
                 const allNames = eligible;
-                
-                // Το CP θα πάρει πόντους για αυστηρά MAX 9 άτομα.
                 const pointsCount = Math.min(allNames.length, 9);
 
                 await db.ref('cps/' + id).transaction(cp => {
@@ -355,11 +376,9 @@
                     return cp;
                 });
 
-                // Όλοι (ακόμα και ο 10ος ή 11ος) παίρνουν το δικό τους personal attendance!
                 for(let name of allNames) {
                     await db.ref(`dailyLogs/${today}/${name}/${bossId}`).set({ cp: id, time: new Date().toLocaleTimeString() });
                 }
-                
                 totalUpdated++;
             }
         }
@@ -367,7 +386,7 @@
         document.getElementById('mass-input').value = ""; document.getElementById('detected-list').innerHTML = "";
     }
 
-    // --- CP EDIT & RENAME LOGIC ---
+    // --- CP EDIT, RENAME & MOVE LOGIC ---
 
     function loadEdit(id) {
         currentEditID = id; const cp = allCPs[id];
@@ -439,13 +458,9 @@
             }
         }
 
-        const cpsRef = db.ref('cps');
-        const cpSnap = await cpsRef.once('value');
-        const cps = cpSnap.val() || {};
-
-        for (const cpId in cps) {
+        for (const cpId in allCPs) {
             let updated = false;
-            let cp = cps[cpId];
+            let cp = allCPs[cpId];
             if (cp.leader && cp.leader.toLowerCase() === oldName.toLowerCase()) { cp.leader = newName; updated = true; }
             if (cp.members) {
                 let membersArr = cp.members.split(',').map(m => m.trim());
@@ -454,9 +469,69 @@
             }
             if (updated) { await db.ref(`cps/${cpId}`).update({ leader: cp.leader, members: cp.members }); cpsUpdated++; }
         }
-
         alert(`ΕΠΙΤΥΧΙΑ!\nLogs moved: ${logsMoved} days.\nCPs updated: ${cpsUpdated}.`);
         document.getElementById('old-player-name').value = ""; document.getElementById('new-player-name').value = "";
+    }
+
+    // ΝΕΑ ΣΥΝΑΡΤΗΣΗ: ΜΕΤΑΦΟΡΑ ΠΑΙΚΤΗ ΑΠΟ CP ΣΕ CP
+    async function movePlayerToCP() {
+        const playerName = document.getElementById('move-player-name').value.trim();
+        const targetCpId = document.getElementById('move-target-cp').value;
+
+        if(!playerName || !targetCpId) {
+            alert("Παρακαλώ συμπλήρωσε το όνομα και διάλεξε το CP προορισμού.");
+            return;
+        }
+
+        const searchName = playerName.toLowerCase();
+        let sourceCpId = null;
+        let sourceMembersArr = [];
+        let exactPlayerName = playerName;
+
+        // Βρίσκουμε πού ανήκει τώρα
+        for (const id in allCPs) {
+            if(allCPs[id].clan === 'history') continue;
+            
+            // Check if leader
+            if(allCPs[id].leader && allCPs[id].leader.toLowerCase() === searchName) {
+                alert(`ΠΡΟΣΟΧΗ! Ο ${playerName} είναι LEADER στο CP ${allCPs[id].name}. Πρέπει να αλλάξεις χειροκίνητα τον Leader από το Edit CP.`);
+                return;
+            }
+
+            let membersArr = (allCPs[id].members || "").split(',').map(m => m.trim()).filter(m => m !== "");
+            let idx = membersArr.findIndex(m => m.toLowerCase() === searchName);
+
+            if (idx !== -1) {
+                sourceCpId = id;
+                exactPlayerName = membersArr[idx]; // Κρατάμε το σωστό capitalization
+                sourceMembersArr = membersArr;
+                sourceMembersArr.splice(idx, 1); // Τον αφαιρούμε
+                break;
+            }
+        }
+
+        if (!sourceCpId) {
+            alert(`Ο παίκτης ${playerName} δεν βρέθηκε στο Roster κανενός ενεργού CP.`);
+            return;
+        }
+
+        if (sourceCpId === targetCpId) {
+            alert(`Ο παίκτης ${exactPlayerName} ανήκει ήδη στο CP ${allCPs[targetCpId].name}!`);
+            return;
+        }
+
+        const targetCp = allCPs[targetCpId];
+        let targetMembersArr = (targetCp.members || "").split(',').map(m => m.trim()).filter(m => m !== "");
+        targetMembersArr.push(exactPlayerName);
+
+        if(!confirm(`ΕΠΙΒΕΒΑΙΩΣΗ:\nΝα μεταφερθεί ο ${exactPlayerName} από το ${allCPs[sourceCpId].name} στο ${targetCp.name};`)) return;
+
+        // Ενημέρωση βάσης
+        await db.ref(`cps/${sourceCpId}`).update({ members: sourceMembersArr.join(', ') });
+        await db.ref(`cps/${targetCpId}`).update({ members: targetMembersArr.join(', ') });
+
+        alert(`Η μεταφορά ολοκληρώθηκε!\nΟ ${exactPlayerName} είναι πλέον στο ${targetCp.name}.`);
+        document.getElementById('move-player-name').value = "";
     }
 
     function toggleHistoryStatus() {
@@ -512,7 +587,6 @@
        EXTERNAL CLANS & CALLERS MANAGER LOGIC
        ========================================= */
        
-    // FORMATTING TOOLBAR FUNCTION
     function formatText(type) {
         const textarea = document.getElementById('ext-description');
         const start = textarea.selectionStart;
@@ -563,7 +637,6 @@
         let lootHtml = "";
 
         if (selVal.startsWith('ext_')) {
-            // Είναι External Clan
             const pureId = selVal.replace('ext_', '');
             targetData = allExtClans[pureId] || { leader: '', description: '', iconUrl: '', lootHistory: [] };
             
@@ -589,13 +662,11 @@
             }
         } 
         else if (selVal.startsWith('cp_')) {
-            // Είναι Caller
             const pureId = selVal.replace('cp_', '');
             targetData = allCPs[pureId] || {};
             
             document.getElementById('ext-leader').value = targetData.leader || targetData.members || "";
             
-            // Κρύβουμε τα πεδία που δεν χρειάζεται ο Caller στο κάτω panel
             document.getElementById('ext-desc-container').style.display = 'none'; 
             document.getElementById('ext-icon-container').style.display = 'none'; 
             document.getElementById('ext-hist-btn').style.display = 'none'; 
@@ -656,7 +727,7 @@
         const newStatus = clan.status === 'history' ? 'active' : 'history';
         db.ref('externalClans/' + pureId).update({ status: newStatus }).then(() => {
             alert("Clan visibility updated!");
-            loadExtEdit(); // Ανανεώνει το κουμπί
+            loadExtEdit(); 
         });
     }
 
