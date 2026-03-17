@@ -98,11 +98,10 @@
             background-color: rgba(0,0,0,0.6);
         }
 
-        /* --- ΕΔΩ ΕΙΝΑΙ ΤΑ ΝΕΑ ΣΟΥ LINKS ΓΙΑ ΤΙΣ ΦΩΤΟΓΡΑΦΙΕΣ --- */
         #card-treasury { background-image: url('https://i.ibb.co/TqNQrNx3/MARKET.png'); }
         #card-history { background-image: url('https://i.ibb.co/N2t24Pht/FALLEN-HEROES.png'); }
         #card-warzone { background-image: url('https://i.ibb.co/G3HdK5jw/PVPZONE.png'); }
-        #card-fame { background-image: url('https://i.ibb.co/RGpww9dy/HALLOFFAME.png'); } /* Έβαλες ίδιο link, άλλαξέ το όταν βρεις τη σωστή! */
+        #card-fame { background-image: url('https://i.ibb.co/G3HdK5jw/PVPZONE.png'); }
 
         .nav-card::before { 
             content: ''; 
@@ -214,40 +213,72 @@
         .boss-icon { width: 24px; height: 24px; margin-bottom: 5px; }
         .stat-val { font-size: 0.85rem; color: #fff; font-family: 'Cinzel'; display: block; font-weight: bold;}
 
-        /* --- 4. MOBILE OPTIMIZATION (RESPONSIVE DESIGN) --- */
+        /* --- 4. DEVELOPER FOOTER --- */
+        .developer-footer {
+            text-align: center;
+            padding: 25px 20px;
+            background: rgba(10, 12, 15, 0.95);
+            border-top: 1px solid rgba(212,175,55,0.2);
+            font-family: 'Cinzel', serif;
+            color: #888;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            position: relative;
+            z-index: 5;
+        }
+        .dev-name {
+            color: var(--gold);
+            font-weight: bold;
+            font-size: 1rem;
+        }
+        .dev-contact {
+            margin-top: 8px;
+            font-size: 0.8rem;
+            font-family: 'Open Sans', sans-serif;
+            color: #aaa;
+        }
+        .dev-discord {
+            color: #fff;
+            background: rgba(255,255,255,0.08);
+            padding: 3px 10px;
+            border-radius: 5px;
+            margin-left: 5px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* --- 5. MOBILE OPTIMIZATION (RESPONSIVE DESIGN) --- */
         @media (max-width: 1024px) {
             .nav-cards-section { grid-template-columns: repeat(2, 1fr); margin-top: -40px; }
         }
 
         @media (max-width: 768px) {
-            /* Fix Header Controls */
             .header-controls { top: 10px; right: 10px; flex-direction: column; align-items: flex-end; gap: 5px;}
             .control-btn { padding: 5px 10px; font-size: 0.65rem; }
             
-            /* Fix Hero Title & Texts */
             .hero-content { padding: 0 20px; text-align: center; margin: 0 auto; }
             .hero-title { font-size: 2.5rem; }
             .hero-subtitle { font-size: 0.9rem; }
             .hero-description { font-size: 0.95rem; margin-bottom: 25px; text-align: justify;}
             
-            /* Stack Buttons */
             .hero-buttons { flex-direction: column; width: 100%; gap: 10px; }
             .btn-primary, .btn-secondary { width: 100%; padding: 12px 20px; box-sizing: border-box; }
             
-            /* Stack Nav Cards */
             .nav-cards-section { grid-template-columns: 1fr; margin-top: -20px; }
             .nav-card { height: 200px; }
             
-            /* Stack Clan Columns */
             .main-wrapper { grid-template-columns: 1fr; }
-            .clan-column { height: 600px; } /* Μικρότερο ύψος στο κινητό για να γίνεται scroll πιο εύκολα */
+            .clan-column { height: 600px; }
             
-            /* Adjust Search & Titles */
             .section-title { font-size: 1.5rem; }
             #global-search { font-size: 0.9rem; padding: 14px 20px; }
             
-            /* Modals padding for mobile */
             #caller-modal, #cp-stats-modal, #member-stats-modal, #clan-modal { padding: 20px; }
+            
+            /* Footer adjustments for mobile */
+            .dev-contact { display: block; line-height: 2; }
+            .dev-discord { display: inline-block; margin-top: 5px; }
         }
     </style>
 </head>
@@ -299,7 +330,7 @@
             </p>
             <div class="hero-buttons">
                 <a href="#data-hub" class="btn-primary">EXPLORE DATA</a>
-                <a href="#" class="btn-secondary">JOIN DISCORD</a>
+                <a href="halloffame.html" class="btn-secondary">VIEW THE LEGENDS</a>
             </div>
         </div>
         <div class="hero-bottom-fade"></div>
@@ -345,7 +376,6 @@
     </section>
 
     <div id="data-hub" class="dashboard-container">
-        
         <div class="section-title-wrapper">
             <h2 class="section-title">INTELLIGENCE NETWORK</h2>
             <div class="section-line"></div>
@@ -373,8 +403,12 @@
             <div class="section-line"></div>
         </div>
         <div class="other-clans-section" id="dynamic-external-clans"></div>
-
     </div>
+
+    <footer class="developer-footer">
+        <div>Designed & Developed by <span class="dev-name">MrUndisputed</span></div>
+        <div class="dev-contact">Looking for a custom web project? Contact me on Discord: <span class="dev-discord">mrundisputedgiwrgos</span></div>
+    </footer>
 
     <script>
         const firebaseConfig = { apiKey: "AIzaSyDRL8EehxdcgVYJ0LJ1khVYkSJcaCMKRes", authDomain: "brokenmirrordb.firebaseapp.com", databaseURL: "https://brokenmirrordb-default-rtdb.europe-west1.firebasedatabase.app", projectId: "brokenmirrordb" };
@@ -657,7 +691,6 @@
         }
         function toggleLeaderLoot() { const p = document.getElementById('leader-loot-panel'); p.style.display = p.style.display==='none'?'block':'none'; }
 
-        // --- MUSIC PLAYER LOGIC ---
         const tracks = [
             {name:"DION THEME", url:"https://www.dropbox.com/scl/fi/ypzqrr336iewt62gncy6u/Lineage-2-Dion-Theme-Song.mp3?rlkey=nl1quliuqleuljgkt5jhqq6hh&st=sb8ij16g&raw=1"},
             {name:"HUNTERS THEME", url:"https://www.dropbox.com/scl/fi/75hck498enzot93zt0lg9/Lineage-2-Hunters-Village-Theme.mp3?rlkey=6mu9ic0gavmofkdvduj72270y&st=qr4cvisl&raw=1"},
