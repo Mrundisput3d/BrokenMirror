@@ -2,7 +2,7 @@
 <html lang="el">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Broken Mirror Alliance | Command Center</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;700;900&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     
@@ -38,7 +38,7 @@
             position: relative;
             width: 100%;
             height: 100vh;
-            background: transparent; /* body takes care of it now */
+            background: transparent;
             display: flex;
             align-items: center;
             overflow: hidden;
@@ -57,7 +57,7 @@
         
         .hero-buttons { display: flex; gap: 20px; }
         .btn-primary, .btn-secondary {
-            font-family: 'Cinzel', serif; font-weight: bold; font-size: 1rem; padding: 15px 35px; border-radius: 5px; cursor: pointer; text-decoration: none; transition: 0.3s; text-transform: uppercase; letter-spacing: 1px;
+            font-family: 'Cinzel', serif; font-weight: bold; font-size: 1rem; padding: 15px 35px; border-radius: 5px; cursor: pointer; text-decoration: none; transition: 0.3s; text-transform: uppercase; letter-spacing: 1px; text-align: center;
         }
         .btn-primary { background: var(--gold); color: #000; border: none; box-shadow: 0 0 20px rgba(212,175,55,0.4); }
         .btn-primary:hover { background: #fff; transform: translateY(-3px); box-shadow: 0 0 30px rgba(255,255,255,0.6); }
@@ -66,8 +66,7 @@
 
         .hero-bottom-fade { position: absolute; bottom: 0; left: 0; width: 100%; height: 150px; background: linear-gradient(to top, var(--bg), transparent); z-index: 5; pointer-events: none; }
 
-
-        /* --- 2. NAVIGATION CARDS (REBORN STYLE ANIMATION) --- */
+        /* --- 2. NAVIGATION CARDS --- */
         .nav-cards-section {
             max-width: 1400px;
             margin: -80px auto 60px auto; 
@@ -99,11 +98,11 @@
             background-color: rgba(0,0,0,0.6);
         }
 
-        /* temporary images if Firebase doesn't load them */
-        #card-treasury { background-image: url('https://w0.peakpx.com/wallpaper/434/969/HD-wallpaper-lineage-2-dwarf-throne-chest.jpg'); }
-        #card-history { background-image: url('https://w0.peakpx.com/wallpaper/226/750/HD-wallpaper-lineage-2-ruins-statue-fantasy.jpg'); }
-        #card-warzone { background-image: url('https://w0.peakpx.com/wallpaper/14/90/HD-wallpaper-lineage-2-battlefield-war.jpg'); }
-        #card-fame { background-image: url('https://w0.peakpx.com/wallpaper/639/101/HD-wallpaper-lineage-2-crown-throne.jpg'); }
+        /* --- ΕΔΩ ΕΙΝΑΙ ΤΑ ΝΕΑ ΣΟΥ LINKS ΓΙΑ ΤΙΣ ΦΩΤΟΓΡΑΦΙΕΣ --- */
+        #card-treasury { background-image: url('https://i.ibb.co/TqNQrNx3/MARKET.png'); }
+        #card-history { background-image: url('https://i.ibb.co/N2t24Pht/FALLEN-HEROES.png'); }
+        #card-warzone { background-image: url('https://i.ibb.co/G3HdK5jw/PVPZONE.png'); }
+        #card-fame { background-image: url('https://i.ibb.co/RGpww9dy/HALLOFFAME.png'); } /* Έβαλες ίδιο link, άλλαξέ το όταν βρεις τη σωστή! */
 
         .nav-card::before { 
             content: ''; 
@@ -118,7 +117,7 @@
             position: relative;
             z-index: 2;
             padding: 20px;
-            transform: translateY(35px); /* Hide description initial */
+            transform: translateY(35px); 
             transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
 
@@ -145,23 +144,20 @@
             color: #ddd; 
             line-height: 1.5; 
             margin: 0; 
-            opacity: 0; /* Hidden initial */
+            opacity: 0; 
             transform: translateY(20px);
             transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
 
-        /* Hover Effects */
         .nav-card:hover { transform: translateY(-10px); border-color: var(--gold); box-shadow: 0 0 30px rgba(212,175,55,0.3); }
         .nav-card:hover::before { background: linear-gradient(to top, rgba(10, 12, 15, 0.9) 10%, rgba(10, 12, 15, 0.2) 100%); }
-        .nav-card:hover .card-content-wrapper { transform: translateY(0); /* SLIDE UP EFFECT */ }
+        .nav-card:hover .card-content-wrapper { transform: translateY(0); }
         .nav-card:hover .card-desc { opacity: 1; transform: translateY(0); }
         .nav-card:hover .card-icon svg { transform: scale(1.1); stroke: #fff; }
 
-
-        /* --- 3. MAIN DASHBOARD CONTENT (Intelligence Network) --- */
+        /* --- 3. MAIN DASHBOARD CONTENT --- */
         .dashboard-container { max-width: 1500px; margin: 0 auto; padding: 0 20px 50px 20px; z-index: 5; position: relative; }
 
-        /* FIXED SEARCH CONTAINER */
         .search-container { text-align: center; margin: 0 auto 50px auto; max-width: 600px; position: relative; z-index: 10;}
         #global-search { 
             width: 100%; padding: 18px 30px; font-family: 'Cinzel', serif; font-size: 1.1rem;
@@ -190,7 +186,6 @@
         
         .cp-box { margin-bottom: 10px; border-radius: 5px; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s; }
         .cp-box.active .cp-content { display: block; }
-        
         .cp-noldor { border-left: 4px solid var(--noldor-sky); background: linear-gradient(90deg, rgba(0,217,255,0.05) 0%, rgba(0,0,0,0.5) 100%); }
         .cp-krim { border-left: 4px solid var(--krim-red); background: linear-gradient(90deg, rgba(255,51,51,0.05) 0%, rgba(0,0,0,0.5) 100%); }
         .cp-btn { width: 100%; background: none; border: none; padding: 14px 15px; color: #fff; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 0.9rem; }
@@ -212,12 +207,48 @@
         .new-clan-name { display: block; font-family: 'Cinzel'; color: #fff; font-size: 1rem; font-weight: bold;}
 
         /* MODALS */
-        #caller-modal, #cp-stats-modal, #member-stats-modal, #clan-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 420px; background: #0f1216; border: 2px solid var(--gold); border-radius: 15px; padding: 30px; z-index: 9999; text-align: center; box-shadow: 0 0 50px rgba(0,0,0,0.9);}
+        #caller-modal, #cp-stats-modal, #member-stats-modal, #clan-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 420px; max-width: 90%; background: #0f1216; border: 2px solid var(--gold); border-radius: 15px; padding: 30px; z-index: 9999; text-align: center; box-shadow: 0 0 50px rgba(0,0,0,0.9); box-sizing: border-box;}
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9998; backdrop-filter: blur(8px); }
         .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 15px; }
         .stat-box { background: #15181c; padding: 8px; border: 1px solid #333; text-align: center; border-radius: 4px; }
         .boss-icon { width: 24px; height: 24px; margin-bottom: 5px; }
         .stat-val { font-size: 0.85rem; color: #fff; font-family: 'Cinzel'; display: block; font-weight: bold;}
+
+        /* --- 4. MOBILE OPTIMIZATION (RESPONSIVE DESIGN) --- */
+        @media (max-width: 1024px) {
+            .nav-cards-section { grid-template-columns: repeat(2, 1fr); margin-top: -40px; }
+        }
+
+        @media (max-width: 768px) {
+            /* Fix Header Controls */
+            .header-controls { top: 10px; right: 10px; flex-direction: column; align-items: flex-end; gap: 5px;}
+            .control-btn { padding: 5px 10px; font-size: 0.65rem; }
+            
+            /* Fix Hero Title & Texts */
+            .hero-content { padding: 0 20px; text-align: center; margin: 0 auto; }
+            .hero-title { font-size: 2.5rem; }
+            .hero-subtitle { font-size: 0.9rem; }
+            .hero-description { font-size: 0.95rem; margin-bottom: 25px; text-align: justify;}
+            
+            /* Stack Buttons */
+            .hero-buttons { flex-direction: column; width: 100%; gap: 10px; }
+            .btn-primary, .btn-secondary { width: 100%; padding: 12px 20px; box-sizing: border-box; }
+            
+            /* Stack Nav Cards */
+            .nav-cards-section { grid-template-columns: 1fr; margin-top: -20px; }
+            .nav-card { height: 200px; }
+            
+            /* Stack Clan Columns */
+            .main-wrapper { grid-template-columns: 1fr; }
+            .clan-column { height: 600px; } /* Μικρότερο ύψος στο κινητό για να γίνεται scroll πιο εύκολα */
+            
+            /* Adjust Search & Titles */
+            .section-title { font-size: 1.5rem; }
+            #global-search { font-size: 0.9rem; padding: 14px 20px; }
+            
+            /* Modals padding for mobile */
+            #caller-modal, #cp-stats-modal, #member-stats-modal, #clan-modal { padding: 20px; }
+        }
     </style>
 </head>
 
@@ -368,7 +399,6 @@
             return "https://i.ibb.co/SXM1FZx8/attedance-points.png"; 
         }
 
-        // Database Listeners
         db.ref('cps/').on('value', (snapshot) => {
             globalCPData = snapshot.val() || {}; 
             updateUI();
@@ -379,7 +409,6 @@
             updateUI();
         });
 
-        // UI Core Functions (Sorting, Filtering, Rendering)
         function updateUI() {
             const query = document.getElementById('global-search').value.toLowerCase().trim();
             const nList = document.getElementById('noldor-list');
@@ -387,14 +416,12 @@
             nList.innerHTML = ""; kList.innerHTML = "";
             let dynamicLeadersHtml = ""; 
 
-            // Sort CPs by total points descending
             const sortedIDs = Object.keys(globalCPData).sort((a,b) => (globalCPData[b].totalPoints || 0) - (globalCPData[a].totalPoints || 0));
             
             sortedIDs.forEach(id => {
                 const cp = globalCPData[id];
                 if(cp.clan === 'history') return;
 
-                // Advanced Filtering Logic
                 let match = false;
                 if (!query) {
                     match = true;
@@ -404,9 +431,8 @@
                     match = searchStr.includes(query);
                 }
 
-                if (!match) return; // Skip if not matching search
+                if (!match) return;
 
-                // Caller/Admin rendering
                 if(cp.clan === 'caller') {
                     const role = cp.leader || "CALLER";
                     const img = cp.imgUrl || "https://i.ibb.co/SXM1FZx8/attedance-points.png";
@@ -419,10 +445,8 @@
                     return; 
                 }
 
-                // Regular CP rendering (Noldor or Krim)
                 const style = cp.clan === 'noldor' ? 'cp-noldor' : 'cp-krim';
                 
-                // Loot History Panel
                 let lootHtml = "No history found.";
                 if(cp.lootHistory && cp.lootHistory.length > 0) {
                     lootHtml = cp.lootHistory.map(l => `
@@ -435,7 +459,6 @@
                     `).join('');
                 }
 
-                // Member List rendering
                 let membersHtml = 'Roster pending...';
                 if (cp.members) {
                     membersHtml = cp.members.split(',').map(m => {
@@ -445,14 +468,12 @@
                     }).join(', ');
                 }
 
-                // Leader Name rendering
                 let leaderHtml = 'Pending...';
                 if (cp.leader) {
                     let lName = cp.leader.trim();
                     leaderHtml = `<span class="member-click" onclick="openMemberStats('${lName}')">${lName}</span>`;
                 }
                 
-                // Open box if filtered search, closed otherwise
                 const activeClass = (query && match) ? 'active' : '';
 
                 const html = `
@@ -478,7 +499,6 @@
 
             document.getElementById('dynamic-leaders').innerHTML = dynamicLeadersHtml;
 
-            // Render External Clans Pacts
             let extHtml = "";
             Object.keys(globalExternalClans).forEach(clanId => {
                 const clan = globalExternalClans[clanId];
@@ -508,7 +528,6 @@
             document.getElementById('dynamic-external-clans').innerHTML = extHtml;
         }
 
-        // MODAL UTILITIES
         function openCpStats(cpId) {
             const cp = globalCPData[cpId];
             if(!cp) return;
@@ -533,16 +552,10 @@
                 const dailyLogs = snapshot.val() || {};
                 const searchName = memberName.trim().toUpperCase();
 
-                // Scan through all daily logs for this member
                 Object.values(dailyLogs).forEach(dayData => {
-                    // Firebase structure is generally dailyLogs -> dateID -> memberName -> bosses
-                    // We need to check if the memberName exists as a key in dayData
-                    // The keys might have leading/trailing spaces, handled here.
-                    
                     Object.keys(dayData).forEach(logMemberName => {
                         if(logMemberName.trim().toUpperCase() === searchName) {
                             const playerBossData = dayData[logMemberName];
-                            // bosses is usually an object {boss1ID: true, boss2ID: true...}
                             Object.keys(playerBossData).forEach(bossId => {
                                 const b = bossId.toUpperCase();
                                 if(b.includes('VAL')) mStats.VAL++;
@@ -573,7 +586,6 @@
             document.getElementById('modal-title').innerText = role.toUpperCase();
             document.getElementById('modal-img').src = img;
             
-            // Render loot history specifically for this Caller/Leader
             let lootHtml = "No history found.";
             if(cp.lootHistory && cp.lootHistory.length > 0) {
                 lootHtml = cp.lootHistory.map(l => `
@@ -587,7 +599,6 @@
             }
             document.getElementById('leader-loot-panel').innerHTML = lootHtml;
             
-            // Attendance button logic (not needed for Ally Leader)
             const attBtn = document.getElementById('caller-attendance-btn');
             if (role.toUpperCase() === 'ALLY LEADER') attBtn.style.display = 'none';
             else { attBtn.style.display = 'block'; attBtn.onclick = function() { openCpStats(callerId); }; }
@@ -607,7 +618,6 @@
             const content = extData.description || "Alliance agreements pending.";
             const formattedContent = content.replace(/\n/g, '<br>');
 
-            // Render loot history specifically for this external clan
             const lootHistory = extData.lootHistory || [];
             let lootHtml = "No history found.";
             if(lootHistory.length > 0) {
@@ -638,7 +648,6 @@
             document.getElementById('overlay').style.display = 'block';
         }
 
-        // Close all modals
         function closeModal() { 
             document.getElementById('caller-modal').style.display='none'; 
             document.getElementById('cp-stats-modal').style.display='none'; 
@@ -657,9 +666,7 @@
         let currentIdx = 0; const audio = document.getElementById('bg-music'); const musicIcon = document.getElementById('music-icon'); let userMuted = false;
         function toggleMusic(e) { if(e) e.stopPropagation(); if (audio.paused) { audio.play(); musicIcon.innerText="🔊"; userMuted = false; } else { audio.pause(); musicIcon.innerText="🔇"; userMuted = true; } }
         function nextTrack(e) { if(e) e.stopPropagation(); currentIdx = (currentIdx + 1) % tracks.length; audio.src = tracks[currentIdx].url; document.getElementById('track-name').innerText = tracks[currentIdx].name; audio.play(); musicIcon.innerText="🔊"; userMuted = false; }
-        // Attempt auto-play when user clicks anywhere on the body (hack for Chrome/Safari)
         function tryAutoPlay() { if(audio.paused && !userMuted) { audio.play().then(() => { musicIcon.innerText = "🔊"; }).catch(() => {}); } }
-        // Update Server Time Clock
         setInterval(() => { document.getElementById('clock').innerText = "SERVER TIME: " + new Date().toLocaleTimeString('el-GR', {timeZone:'UTC', hour12:false}) + " UTC"; }, 1000);
     </script>
 </body>
