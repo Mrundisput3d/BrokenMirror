@@ -329,7 +329,7 @@
     });
 
     async function processBulkImages(files) {
-        if(!GOOGLE_VISION_API_KEY || GOOGLE_VISION_API_KEY.includes("YOUR_GOOGLE")) return alert("Παρακαλώ βάλε το σωστό Google Vision API Key στον κώδικα.");
+        if(!GOOGLE_VISION_API_KEY || GOOGLE_VISION_API_KEY.includes("AIzaSyCAxubXtpx7LSi_qeMsp6isJlDC1rUZ7PU")) return alert("Παρακαλώ βάλε το σωστό Google Vision API Key στον κώδικα.");
         document.getElementById('ocr-loading').style.display = 'block';
         let allExtractedText = "";
         for (let i = 0; i < files.length; i++) {
