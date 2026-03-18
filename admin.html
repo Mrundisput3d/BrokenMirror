@@ -2,7 +2,7 @@
 <html lang="el">
 <head>
     <meta charset="UTF-8">
-    <title>BMA | Command Center V20.2 (Final: Smart Filter, Anti-Cheat & Bug Fixes)</title>
+    <title>BMA | Command Center V20.3 (Final: Smart Paste & Bug Fixes)</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -58,12 +58,11 @@
 <body>
 
     <div class="header-container">
-        <div style="width:80px"></div> <h1>BMA COMMAND CENTER V20.2</h1>
+        <div style="width:80px"></div> <h1>BMA COMMAND CENTER V20.3</h1>
         <button class="logout-btn" onclick="logout()">LOGOUT</button>
     </div>
 
     <div class="layout">
-        <!-- ΑΡΙΣΤΕΡΟ PANEL (ΛΙΣΤΑ CPs) -->
         <div class="panel">
             <h2 style="margin-top:0;">CP / CALLERS LIST</h2>
             <div class="filter-tabs">
@@ -100,7 +99,6 @@
             <button class="btn btn-green" onclick="movePlayerToCP()">MOVE MEMBER</button>
         </div>
 
-        <!-- ΔΕΞΙ PANEL (LOG EVENT & EDIT) -->
         <div class="panel">
             <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                 <h2 style="margin:0; color:var(--gold);">1. LOG EVENT (MEMBER-BOSS LOCK)</h2>
@@ -183,7 +181,6 @@
         </div>
     </div>
     
-    <!-- EXTERNAL CLANS & CALLERS MANAGER -->
     <div style="max-width: 1400px; margin: 20px auto;">
         <div class="panel">
             <h2 style="color:var(--blue); margin-top:0;">EXTERNAL CLANS & CALLERS MANAGER</h2>
@@ -424,10 +421,17 @@
     }
 
     // =========================================================
-    // ΕΝΗΜΕΡΩΜΕΝΗ ΚΑΤΑΧΩΡΗΣΗ ΠΟΝΤΩΝ (ANTI-CHEAT & DOUBLE LEADER FIX)
+    // ΑΝΑΛΥΣΗ ΜΕ SMART PASTE (ΑΛΛΑΖΕΙ ΤΑ ΕΝΤΕR ΣΕ ΚΕΝΑ)
     // =========================================================
     function analyzeAttendance() {
-        const input = document.getElementById('mass-input').value.toLowerCase();
+        const inputField = document.getElementById('mass-input');
+        
+        // 🔥 ΝΕΟ: Αν ο χρήστης κάνει paste κείμενο με "Enter", τα μετατρέπει αυτόματα σε κενά!
+        if (/[\r\n]/.test(inputField.value)) {
+            inputField.value = inputField.value.replace(/[\r\n]+/g, ' ');
+        }
+
+        const input = inputField.value.toLowerCase();
         let names = [...new Set(input.match(/[a-z0-9_]+/g) || [])];
         const listDiv = document.getElementById('detected-list');
         const unmatchedDiv = document.getElementById('unmatched-list');
@@ -444,7 +448,7 @@
             let roster = (allCPs[id].members || "").toLowerCase().split(',').map(s=>s.trim()).filter(s=>s);
             if(allCPs[id].leader) roster.push(allCPs[id].leader.toLowerCase().trim());
             
-            // 🔥 Η ΛΥΣΗ ΤΟΥ BUG: Διαγράφει τα διπλότυπα αν ο Leader υπάρχει ΚΑΙ στα Members!
+            // Διαγράφει τα διπλότυπα αν ο Leader υπάρχει ΚΑΙ στα Members
             roster = [...new Set(roster)]; 
 
             let foundRealNames = []; let displayNames = [];
@@ -476,8 +480,6 @@
     async function logValidatedEvent(bossId, multiplier) {
         try {
             const checkboxes = document.querySelectorAll('.cp-checkbox');
-            
-            // Ασφαλής δημιουργία ημερομηνίας χωρίς κρυφούς χαρακτήρες!
             const d = new Date();
             const today = `${d.getDate()}-${d.getMonth()+1}-${d.getFullYear()}`; 
 
@@ -491,24 +493,22 @@
                     if(!namesFound) continue;
 
                     let eligible = namesFound.filter(name => {
-                        // Καθαρισμός ονόματος για να μην κρασάρει η Firebase
                         const safeName = name.replace(/[.#$\[\]]/g, '_');
                         const alreadyDone = globalDailyLogs[today] && globalDailyLogs[today][safeName] && globalDailyLogs[today][safeName][bossId];
                         
                         if (alreadyDone) { 
                             skippedTotal++; 
-                            return false; // Το Anti-Cheat τον κόβει!
+                            return false;
                         }
                         return true;
                     });
 
-                    if (eligible.length === 0) continue; // Αν κόπηκαν όλοι, πάμε στο επόμενο CP
+                    if (eligible.length === 0) continue; 
 
                     const allNames = eligible;
-                    const pointsCount = Math.min(allNames.length, 9); // Μάξιμουμ 9 πόντοι (1 Party)
+                    const pointsCount = Math.min(allNames.length, 9); 
                     currentAction.updates.push({ cpId: id, names: allNames, pointsCount: pointsCount });
 
-                    // 1. Ενημέρωση CPs
                     await db.ref('cps/' + id).transaction(cp => {
                         if(cp) {
                             if(!cp.bossStats) cp.bossStats = {};
@@ -518,7 +518,6 @@
                         return cp;
                     });
 
-                    // 2. Ενημέρωση Ημερήσιου Ιστορικού (για το Anti-Cheat)
                     for(let name of allNames) {
                         const safeName = name.replace(/[.#$\[\]]/g, '_');
                         await db.ref(`dailyLogs/${today}/${safeName}/${bossId}`).set({ cp: id, time: new Date().toLocaleTimeString('el-GR') });
@@ -532,7 +531,6 @@
                 document.getElementById('undo-btn').style.display = 'inline-block'; 
             }
             
-            // Το νέο, ξεκάθαρο μήνυμα που σου εξηγεί τα πάντα!
             alert(`✅ ΟΛΟΚΛΗΡΩΘΗΚΕ!\nΕνημερώθηκαν: ${totalUpdated} CP(s).\nΑγνοήθηκαν (Anti-Cheat): ${skippedTotal} παίκτες γιατί είχαν ήδη πάρει πόντους για τον '${bossId}' σήμερα!`);
             
             document.getElementById('mass-input').value = ""; 
