@@ -276,11 +276,12 @@
     function renderMoveCPSelect() { const sel = document.getElementById('move-target-cp'); const currentVal = sel.value; let html = '<option value="">-- Επίλεξε Νέο CP --</option>'; Object.keys(allCPs).forEach(id => { if (allCPs[id].clan !== 'history') { html += `<option value="${id}">${allCPs[id].name} (${allCPs[id].clan.toUpperCase()})</option>`; } }); sel.innerHTML = html; if (currentVal && sel.querySelector(`option[value="${currentVal}"]`)) { sel.value = currentVal; } }
     function renderExtSelect() { const sel = document.getElementById('ext-select'); const currentVal = sel.value; let html = '<option value="">-- Επιλογή Clan / Caller --</option>'; html += '<optgroup label="External Clans">'; Object.keys(allExtClans).forEach(id => { const clan = allExtClans[id]; const histTag = clan.status === 'history' ? ' [HISTORY]' : ''; const cName = clan.name || id; html += `<option value="ext_${id}">${cName}${histTag}</option>`; }); html += '</optgroup>'; html += '<optgroup label="Callers (Από CP List)">'; Object.keys(allCPs).forEach(id => { if (allCPs[id].clan === 'caller') { html += `<option value="cp_${id}">${allCPs[id].name}</option>`; } }); html += '</optgroup>'; sel.innerHTML = html; if (currentVal && sel.querySelector(`option[value="${currentVal}"]`)) { sel.value = currentVal; } }
 
-    db.ref('pendingScans/').on('value', snap => {
+       db.ref('pendingScans/').on('value', snap => {
         const queueContainer = document.getElementById('pending-queue-container'); const queueList = document.getElementById('pending-queue-list'); const scans = snap.val();
         if(!scans) { queueContainer.style.display = 'none'; return; }
         queueContainer.style.display = 'block'; queueList.innerHTML = '';
         Object.keys(scans).forEach(key => { const scan = scans[key]; queueList.innerHTML += `<div class="queue-item"><div><b style="color:#fff;">Discord Upload:</b> ${new Date(scan.timestamp).toLocaleString('el-GR')}<br><span style="font-size:10px; color:#aaa;">Extracted Text Length: ${scan.rawText.length} chars</span></div><div><button class="btn btn-gold" onclick="loadPendingScan('${key}')">REVIEW & LOAD</button><button class="btn btn-red" onclick="deletePendingScan('${key}')">✖</button></div></div>`; });
+    });
     });
     function loadPendingScan(key) { db.ref('pendingScans/' + key).once('value', snap => { const scan = snap.val(); if(scan && scan.rawText) { const currentText = document.getElementById('mass-input').value; document.getElementById('mass-input').value = currentText + " \n" + scan.rawText; analyzeAttendance(); deletePendingScan(key); } }); }
     function deletePendingScan(key) { db.ref('pendingScans/' + key).remove(); }
