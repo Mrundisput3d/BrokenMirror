@@ -2,7 +2,7 @@
 <html lang="el">
 <head>
     <meta charset="UTF-8">
-    <title>BMA | Command Center V19.3 (Pro OCR Fixed)</title>
+    <title>BMA | Command Center V19.4 (Pro OCR & Bot Ready)</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -56,12 +56,11 @@
 <body>
 
     <div class="header-container">
-        <div style="width:80px"></div> <h1>BMA COMMAND CENTER V19.3</h1>
+        <div style="width:80px"></div> <h1>BMA COMMAND CENTER V19.4</h1>
         <button class="logout-btn" onclick="logout()">LOGOUT</button>
     </div>
 
     <div class="layout">
-        <!-- ΑΡΙΣΤΕΡΟ PANEL -->
         <div class="panel">
             <h2 style="margin-top:0;">CP / CALLERS LIST</h2>
             <div class="filter-tabs">
@@ -98,7 +97,6 @@
             <button class="btn btn-green" onclick="movePlayerToCP()">MOVE MEMBER</button>
         </div>
 
-        <!-- ΔΕΞΙ PANEL -->
         <div class="panel">
             <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                 <h2 style="margin:0; color:var(--gold);">1. LOG EVENT (MEMBER-BOSS LOCK)</h2>
@@ -237,7 +235,7 @@
     </div>
 
 <script>
-    // ΤΟ GOOGLE API KEY ΣΟΥ ΕΙΝΑΙ ΗΔΗ ΕΔΩ!
+    // ΤΟ GOOGLE API KEY ΣΟΥ 
     const GOOGLE_VISION_API_KEY = "AIzaSyCAxubXtpx7LSi_qeMsp6isJlDC1rUZ7PU"; 
 
     const firebaseConfig = { 
@@ -276,17 +274,42 @@
     function renderMoveCPSelect() { const sel = document.getElementById('move-target-cp'); const currentVal = sel.value; let html = '<option value="">-- Επίλεξε Νέο CP --</option>'; Object.keys(allCPs).forEach(id => { if (allCPs[id].clan !== 'history') { html += `<option value="${id}">${allCPs[id].name} (${allCPs[id].clan.toUpperCase()})</option>`; } }); sel.innerHTML = html; if (currentVal && sel.querySelector(`option[value="${currentVal}"]`)) { sel.value = currentVal; } }
     function renderExtSelect() { const sel = document.getElementById('ext-select'); const currentVal = sel.value; let html = '<option value="">-- Επιλογή Clan / Caller --</option>'; html += '<optgroup label="External Clans">'; Object.keys(allExtClans).forEach(id => { const clan = allExtClans[id]; const histTag = clan.status === 'history' ? ' [HISTORY]' : ''; const cName = clan.name || id; html += `<option value="ext_${id}">${cName}${histTag}</option>`; }); html += '</optgroup>'; html += '<optgroup label="Callers (Από CP List)">'; Object.keys(allCPs).forEach(id => { if (allCPs[id].clan === 'caller') { html += `<option value="cp_${id}">${allCPs[id].name}</option>`; } }); html += '</optgroup>'; sel.innerHTML = html; if (currentVal && sel.querySelector(`option[value="${currentVal}"]`)) { sel.value = currentVal; } }
 
-       db.ref('pendingScans/').on('value', snap => {
-        const queueContainer = document.getElementById('pending-queue-container'); const queueList = document.getElementById('pending-queue-list'); const scans = snap.val();
+    // --- PENDING QUEUE (ΔΙΟΡΘΩΜΕΝΟ ΓΙΑ ΝΑ ΔΕΙΧΝΕΙ ΤΟ ΚΕΙΜΕΝΟ ΤΟΥ ΠΑΙΚΤΗ) ---
+    db.ref('pendingScans/').on('value', snap => {
+        const queueContainer = document.getElementById('pending-queue-container'); 
+        const queueList = document.getElementById('pending-queue-list'); 
+        const scans = snap.val();
+        
         if(!scans) { queueContainer.style.display = 'none'; return; }
-        queueContainer.style.display = 'block'; queueList.innerHTML = '';
-        Object.keys(scans).forEach(key => { const scan = scans[key]; queueList.innerHTML += `<div class="queue-item"><div><b style="color:#fff;">Discord Upload:</b> ${new Date(scan.timestamp).toLocaleString('el-GR')}<br><span style="font-size:10px; color:#aaa;">Extracted Text Length: ${scan.rawText.length} chars</span></div><div><button class="btn btn-gold" onclick="loadPendingScan('${key}')">REVIEW & LOAD</button><button class="btn btn-red" onclick="deletePendingScan('${key}')">✖</button></div></div>`; });
+        
+        queueContainer.style.display = 'block'; 
+        queueList.innerHTML = '';
+        
+        Object.keys(scans).forEach(key => { 
+            const scan = scans[key]; 
+            const sender = scan.submittedBy || "Άγνωστος";
+            const notes = scan.userNotes && scan.userNotes !== "Χωρίς περιγραφή" ? `<br><span style="color:var(--sky); font-size:15px; font-weight:bold; font-family:'Cinzel';">📝 ${scan.userNotes}</span>` : "";
+            
+            queueList.innerHTML += `
+            <div class="queue-item" style="flex-direction:column; align-items:flex-start; border-left-color: var(--sky);">
+                <div style="width:100%; display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <b style="color:#fff;">Από: ${sender}</b> <span style="font-size:10px; color:#aaa;">(${new Date(scan.timestamp).toLocaleString('el-GR')})</span>
+                        ${notes}
+                    </div>
+                    <div>
+                        <button class="btn btn-gold" style="padding: 8px 15px;" onclick="loadPendingScan('${key}')">REVIEW & LOAD</button>
+                        <button class="btn btn-red" onclick="deletePendingScan('${key}')">✖</button>
+                    </div>
+                </div>
+            </div>`; 
+        });
     });
-    });
+
     function loadPendingScan(key) { db.ref('pendingScans/' + key).once('value', snap => { const scan = snap.val(); if(scan && scan.rawText) { const currentText = document.getElementById('mass-input').value; document.getElementById('mass-input').value = currentText + " \n" + scan.rawText; analyzeAttendance(); deletePendingScan(key); } }); }
     function deletePendingScan(key) { db.ref('pendingScans/' + key).remove(); }
 
-    // --- GOOGLE VISION API ΣΩΣΤΟΣ ΚΩΔΙΚΑΣ (ΜΕ ERROR HANDLING) ---
+    // --- GOOGLE VISION API (DRAG & DROP / PASTE IMAGE) ---
     const dropzone = document.getElementById('dropzone');
     const fileInput = document.getElementById('file-input');
     
@@ -332,18 +355,15 @@
                 });
                 
                 const data = await response.json();
-                
-                // ΝΕΟ: Ελέγχει αν η Google έστειλε error (πχ Billing) και σου το δείχνει!
                 if (data.error) {
                     alert("ΣΦΑΛΜΑ GOOGLE API: " + data.error.message);
                     errorOccurred = true;
                     break;
                 }
-
                 if (data.responses && data.responses[0].fullTextAnnotation) { 
                     allExtractedText += data.responses[0].fullTextAnnotation.text + "\n"; 
                 } else {
-                    alert("Η Google δεν βρήκε κανένα κείμενο σε αυτή την εικόνα. Δοκίμασε να την κόψεις καλύτερα.");
+                    alert("Η Google δεν βρήκε κανένα κείμενο σε αυτή την εικόνα.");
                 }
             } catch (error) { 
                 console.error("API Error:", error); 
@@ -354,7 +374,6 @@
         }
         
         document.getElementById('ocr-loading').style.display = 'none';
-        
         if (!errorOccurred && allExtractedText !== "") {
             const currentText = document.getElementById('mass-input').value;
             let cleanText = allExtractedText.replace(/[^a-zA-Z0-9_\n ]/g, ''); 
@@ -379,7 +398,6 @@
         const countSpan = document.getElementById('input-count');
         
         listDiv.innerHTML = ""; unmatchedDiv.innerHTML = ""; matchedData = {};
-        
         countSpan.innerText = names.length + " NAMES";
         if(names.length === 0) return;
 
@@ -448,7 +466,6 @@
         alert("Ανάκληση (Undo) Επιτυχής! Οι πόντοι και τα logs διαγράφηκαν."); lastAction = null; document.getElementById('undo-btn').style.display = 'none';
     }
 
-    // --- CP MANAGEMENT & ACTIONS ---
     function loadEdit(id) {
         currentEditID = id; const cp = allCPs[id]; document.getElementById('edit-section').style.display = 'block';
         document.getElementById('edit-cp-name').value = cp.name || ""; document.getElementById('edit-cp-leader').value = cp.leader || ""; document.getElementById('edit-cp-imgUrl').value = cp.imgUrl || ""; document.getElementById('edit-members').value = cp.members || ""; document.getElementById('edit-points').value = cp.totalPoints || 0;
