@@ -2,7 +2,7 @@
 <html lang="el">
 <head>
     <meta charset="UTF-8">
-    <title>BMA | Command Center V19.2 (Pro OCR & Queue)</title>
+    <title>BMA | Command Center V19.3 (Pro OCR Fixed)</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -50,18 +50,18 @@
         .queue-item { background: #1a1a1a; border-left: 3px solid var(--blue); padding: 10px; margin-bottom: 10px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; }
         .queue-item button { padding: 5px 10px; font-size: 10px; margin: 0 0 0 5px; width: auto; }
         
-        /* ΝΕΟ: Τεράστιος Μετρητής για να φαίνεται ξεκάθαρα! */
         #input-count { font-size: 14px; color: var(--bg); background: var(--gold); padding: 5px 12px; border-radius: 6px; font-family: 'Cinzel'; font-weight: bold; border: 1px solid #fff; }
     </style>
 </head>
 <body>
 
     <div class="header-container">
-        <div style="width:80px"></div> <h1>BMA COMMAND CENTER V19.2</h1>
+        <div style="width:80px"></div> <h1>BMA COMMAND CENTER V19.3</h1>
         <button class="logout-btn" onclick="logout()">LOGOUT</button>
     </div>
 
     <div class="layout">
+        <!-- ΑΡΙΣΤΕΡΟ PANEL -->
         <div class="panel">
             <h2 style="margin-top:0;">CP / CALLERS LIST</h2>
             <div class="filter-tabs">
@@ -98,6 +98,7 @@
             <button class="btn btn-green" onclick="movePlayerToCP()">MOVE MEMBER</button>
         </div>
 
+        <!-- ΔΕΞΙ PANEL -->
         <div class="panel">
             <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                 <h2 style="margin:0; color:var(--gold);">1. LOG EVENT (MEMBER-BOSS LOCK)</h2>
@@ -115,12 +116,14 @@
             <div id="dropzone">
                 <div style="font-size: 2rem; margin-bottom: 5px;">📂</div>
                 <b>DRAG & DROP Η ΚΑΝΕ PASTE (CTRL+V) ΤΙΣ ΕΙΚΟΝΕΣ ΕΔΩ</b><br>
-                <span style="font-size: 10px;">Αν έκοψες εικόνα με Win+Shift+S, απλά πάτα Ctrl+V μέσα στη σελίδα!</span>
+                <span style="font-size: 10px;">Αν έκοψες εικόνα με Win+Shift+S, απλά πάτα Ctrl+V οπουδήποτε στη σελίδα!</span>
                 <input type="file" id="file-input" multiple accept="image/*" style="display:none;">
             </div>
-            <div id="ocr-loading" style="display:none; text-align:center; color:var(--gold); font-family:'Cinzel'; margin-bottom:10px;">⏳ Η Google αναλύει την εικόνα... Περίμενε!</div>
+            <div id="ocr-loading" style="display:none; text-align:center; color:var(--sky); font-weight:bold; font-family:'Cinzel'; margin-bottom:10px;">
+                ⏳ Η Google αναλύει την εικόνα... Περίμενε!
+            </div>
 
-            <textarea id="mass-input" rows="4" placeholder="Αν αντέγραψες κείμενο (π.χ. με Win+Shift+T), κάντο Επικόλληση (Ctrl+V) εδώ μέσα..." oninput="analyzeAttendance()" style="font-family: monospace; font-size: 14px; background: rgba(0,0,0,0.5); border: 2px dashed #444;"></textarea>
+            <textarea id="mass-input" rows="4" placeholder="Τα ονόματα θα εμφανιστούν εδώ..." oninput="analyzeAttendance()" style="font-family: monospace; font-size: 14px; background: rgba(0,0,0,0.5); border: 2px dashed #444;"></textarea>
             
             <div id="detected-list"></div>
             <div id="unmatched-list"></div>
@@ -139,31 +142,17 @@
 
             <div id="edit-section" style="display:none; border-top:2px solid var(--gold); padding-top:20px; margin-top:20px;">
                 <div style="display:flex; gap:10px; margin-bottom:10px;">
-                    <div style="flex:1;">
-                        <label style="color:#aaa; font-size:11px;">Name</label>
-                        <input type="text" id="edit-cp-name" style="font-family:'Cinzel'; color:var(--gold); font-size:1.1rem;">
-                    </div>
-                    <div style="flex:1;">
-                        <label style="color:#aaa; font-size:11px;">Leader / Role</label>
-                        <input type="text" id="edit-cp-leader" style="font-family:'Cinzel';">
-                    </div>
+                    <div style="flex:1;"><label style="color:#aaa; font-size:11px;">Name</label><input type="text" id="edit-cp-name" style="font-family:'Cinzel'; color:var(--gold); font-size:1.1rem;"></div>
+                    <div style="flex:1;"><label style="color:#aaa; font-size:11px;">Leader / Role</label><input type="text" id="edit-cp-leader" style="font-family:'Cinzel';"></div>
                 </div>
-                <div style="margin-bottom:15px;">
-                    <label style="color:#aaa; font-size:11px;">Image URL (Μόνο για Callers)</label>
-                    <input type="text" id="edit-cp-imgUrl" placeholder="https://...">
-                </div>
+                <div style="margin-bottom:15px;"><label style="color:#aaa; font-size:11px;">Image URL (Μόνο για Callers)</label><input type="text" id="edit-cp-imgUrl" placeholder="https://..."></div>
 
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:25px;">
                     <div>
                         <label style="color:#aaa; font-size:11px;">Roster</label>
                         <textarea id="edit-members" rows="8"></textarea>
-                        
                         <h3 style="color:var(--gold);">LOOT HISTORY</h3>
-                        <div style="max-height: 150px; overflow-y: auto; background: #000; border: 1px solid #333;">
-                            <table class="loot-table" id="loot-history-table">
-                                <tbody id="loot-history-body"></tbody>
-                            </table>
-                        </div>
+                        <div style="max-height: 150px; overflow-y: auto; background: #000; border: 1px solid #333;"><table class="loot-table" id="loot-history-table"><tbody id="loot-history-body"></tbody></table></div>
                     </div>
                     <div>
                         <h3 style="color:var(--red); margin:0;">MARKETPLACE</h3>
@@ -178,12 +167,9 @@
                             <option value="25|Core Ring">Core Ring (25)</option>
                         </select>
                         <button class="btn btn-red" onclick="addMarketLoot()">BUY ITEM</button>
-                        
                         <label style="display:block; margin-top:20px; color:#aaa; font-size:11px;">Total Points</label>
                         <input type="number" id="edit-points" style="font-size:1.2rem; color:var(--gold);">
-                        
                         <div class="stat-edit-grid" id="stat-inputs"></div>
-                        
                         <div style="display:flex; gap:10px; margin-top:20px;">
                             <button class="btn btn-gold" style="flex:2;" onclick="updateCP()">SAVE ALL DATA</button>
                             <button class="btn" id="hist-toggle-btn" onclick="toggleHistoryStatus()">HIST</button>
@@ -198,27 +184,28 @@
     <div style="max-width: 1400px; margin: 20px auto;">
         <div class="panel">
             <h2 style="color:var(--blue); margin-top:0;">EXTERNAL CLANS & CALLERS MANAGER</h2>
-            
             <div style="display:flex; gap:10px; padding: 15px; background: #000; border: 1px dashed #444; border-radius: 5px; margin-bottom: 15px;">
                 <input type="text" id="new-ext-name" placeholder="New Clan Name" style="flex:1; margin:0;">
                 <input type="text" id="new-ext-icon" placeholder="Icon Image URL" style="flex:1; margin:0;">
                 <button class="btn btn-gold" style="margin:0; width:auto; padding:0 20px;" onclick="createExtClan()">ADD CLAN</button>
             </div>
             <div style="display:flex; gap:10px; margin-bottom: 15px;">
-                <select id="ext-select" style="flex:1; font-family:'Cinzel';" onchange="loadExtEdit()">
-                    <option value="">-- Επιλογή Clan / Caller --</option>
-                </select>
+                <select id="ext-select" style="flex:1; font-family:'Cinzel';" onchange="loadExtEdit()"><option value="">-- Επιλογή Clan / Caller --</option></select>
             </div>
             <div id="ext-edit-section" style="display:none;" class="external-grid">
                 <div>
                     <label style="color:#aaa; font-size:11px;">Leader Name / Roster</label>
                     <input type="text" id="ext-leader" style="font-family:'Cinzel';">
-                    <div id="ext-icon-container">
-                        <label style="display:block; margin-top:10px; color:#aaa; font-size:11px;">Image URL</label>
-                        <input type="text" id="ext-icon" placeholder="https://...">
-                    </div>
+                    <div id="ext-icon-container"><label style="display:block; margin-top:10px; color:#aaa; font-size:11px;">Image URL</label><input type="text" id="ext-icon" placeholder="https://..."></div>
                     <div id="ext-desc-container">
                         <label style="display:block; margin-top:10px; color:#aaa; font-size:11px;">Agreements / Description</label>
+                        <div style="display:flex; gap:5px; margin-bottom:5px; flex-wrap:wrap;">
+                            <button type="button" class="filter-btn" style="color:var(--gold); border-color:var(--gold);" onclick="formatText('gold')">GOLD BOLD</button>
+                            <button type="button" class="filter-btn" style="color:var(--red); border-color:var(--red);" onclick="formatText('red')">RED TEXT</button>
+                            <button type="button" class="filter-btn" style="color:var(--sky); border-color:var(--sky);" onclick="formatText('blue')">BLUE TEXT</button>
+                            <button type="button" class="filter-btn" onclick="formatText('icon1')">⚔️</button>
+                            <button type="button" class="filter-btn" onclick="formatText('icon2')">🛡️</button>
+                        </div>
                         <textarea id="ext-description" rows="6" style="font-family: monospace; font-size:11px;"></textarea>
                     </div>
                     <label style="display:block; margin-top:10px; color:#aaa; font-size:11px;">Total Points</label>
@@ -243,19 +230,15 @@
                     </select>
                     <button class="btn btn-red" onclick="addExtMarketLoot()">BUY ITEM</button>
                     <h3 style="color:var(--gold); margin-top:20px;">LOOT HISTORY</h3>
-                    <div style="max-height: 150px; overflow-y: auto; background: #000; border: 1px solid #333;">
-                        <table class="loot-table"><tbody id="ext-loot-history-body"></tbody></table>
-                    </div>
+                    <div style="max-height: 150px; overflow-y: auto; background: #000; border: 1px solid #333;"><table class="loot-table"><tbody id="ext-loot-history-body"></tbody></table></div>
                 </div>
             </div>
         </div>
     </div>
 
 <script>
-    // ======= ⚠️ ΡΥΘΜΙΣΕΙΣ GOOGLE CLOUD VISION API ⚠️ =======
-    // Βάλε εδώ το API KEY που πήραμε από τη Google
+    // ΤΟ GOOGLE API KEY ΣΟΥ ΕΙΝΑΙ ΗΔΗ ΕΔΩ!
     const GOOGLE_VISION_API_KEY = "AIzaSyCAxubXtpx7LSi_qeMsp6isJlDC1rUZ7PU"; 
-    // =======================================================
 
     const firebaseConfig = { 
         apiKey: "AIzaSyDRL8EehxdcgVYJ0LJ1khVYkSJcaCMKRes", 
@@ -264,7 +247,6 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // AUTH CHECK
     firebase.auth().onAuthStateChanged((user) => { if (!user) window.location.href = "login.html"; });
     function logout() { firebase.auth().signOut().then(() => window.location.href = "login.html"); }
 
@@ -273,12 +255,10 @@
     const bossKeys = ['VAL', 'ANT', 'BAI', 'SIE', 'ZAK', 'FRI', 'AQ', 'ORF', 'COR'];
     let lastAction = null; 
 
-    // --- REALTIME LISTENERS ---
     db.ref('cps/').on('value', snap => { allCPs = snap.val() || {}; renderSimpleList(); renderExtSelect(); renderMoveCPSelect(); if(currentEditID) loadEdit(currentEditID); if(currentExtID && currentExtID.startsWith('cp_')) loadExtEdit(); });
     db.ref('dailyLogs/').on('value', snap => { globalDailyLogs = snap.val() || {}; });
     db.ref('externalClans/').on('value', snap => { allExtClans = snap.val() || {}; renderExtSelect(); if(currentExtID && currentExtID.startsWith('ext_')) loadExtEdit(); });
 
-    // --- ΠΡΟΒΟΛΗ ΚΑΙ ΕΞΑΓΩΓΗ ΛΙΣΤΑΣ ---
     function setViewMode(mode) { viewMode = mode; document.getElementById('btn-active').classList.toggle('active', mode === 'active'); document.getElementById('btn-history').classList.toggle('active', mode === 'history'); renderSimpleList(); }
     function renderSimpleList() {
         const listDiv = document.getElementById('cp-list-simple');
@@ -296,7 +276,6 @@
     function renderMoveCPSelect() { const sel = document.getElementById('move-target-cp'); const currentVal = sel.value; let html = '<option value="">-- Επίλεξε Νέο CP --</option>'; Object.keys(allCPs).forEach(id => { if (allCPs[id].clan !== 'history') { html += `<option value="${id}">${allCPs[id].name} (${allCPs[id].clan.toUpperCase()})</option>`; } }); sel.innerHTML = html; if (currentVal && sel.querySelector(`option[value="${currentVal}"]`)) { sel.value = currentVal; } }
     function renderExtSelect() { const sel = document.getElementById('ext-select'); const currentVal = sel.value; let html = '<option value="">-- Επιλογή Clan / Caller --</option>'; html += '<optgroup label="External Clans">'; Object.keys(allExtClans).forEach(id => { const clan = allExtClans[id]; const histTag = clan.status === 'history' ? ' [HISTORY]' : ''; const cName = clan.name || id; html += `<option value="ext_${id}">${cName}${histTag}</option>`; }); html += '</optgroup>'; html += '<optgroup label="Callers (Από CP List)">'; Object.keys(allCPs).forEach(id => { if (allCPs[id].clan === 'caller') { html += `<option value="cp_${id}">${allCPs[id].name}</option>`; } }); html += '</optgroup>'; sel.innerHTML = html; if (currentVal && sel.querySelector(`option[value="${currentVal}"]`)) { sel.value = currentVal; } }
 
-    // --- PENDING QUEUE & BOT INBOX ---
     db.ref('pendingScans/').on('value', snap => {
         const queueContainer = document.getElementById('pending-queue-container'); const queueList = document.getElementById('pending-queue-list'); const scans = snap.val();
         if(!scans) { queueContainer.style.display = 'none'; return; }
@@ -306,7 +285,7 @@
     function loadPendingScan(key) { db.ref('pendingScans/' + key).once('value', snap => { const scan = snap.val(); if(scan && scan.rawText) { const currentText = document.getElementById('mass-input').value; document.getElementById('mass-input').value = currentText + " \n" + scan.rawText; analyzeAttendance(); deletePendingScan(key); } }); }
     function deletePendingScan(key) { db.ref('pendingScans/' + key).remove(); }
 
-    // --- GOOGLE CLOUD VISION API (DRAG & DROP / PASTE IMAGE) ---
+    // --- GOOGLE VISION API ΣΩΣΤΟΣ ΚΩΔΙΚΑΣ (ΜΕ ERROR HANDLING) ---
     const dropzone = document.getElementById('dropzone');
     const fileInput = document.getElementById('file-input');
     
@@ -316,7 +295,6 @@
     dropzone.addEventListener('drop', (e) => { e.preventDefault(); dropzone.classList.remove('dragover'); if (e.dataTransfer.files.length > 0) processBulkImages(e.dataTransfer.files); });
     fileInput.addEventListener('change', (e) => { if (e.target.files.length > 0) processBulkImages(e.target.files); });
 
-    // ΝΕΟ: Επικόλληση Εικόνας κατευθείαν μέσα στη σελίδα!
     document.addEventListener('paste', function(e) {
         const items = (e.clipboardData || e.originalEvent.clipboardData).items;
         for (let i = 0; i < items.length; i++) {
@@ -329,29 +307,62 @@
     });
 
     async function processBulkImages(files) {
-        if(!GOOGLE_VISION_API_KEY || GOOGLE_VISION_API_KEY.includes("AIzaSyCAxubXtpx7LSi_qeMsp6isJlDC1rUZ7PU")) return alert("Παρακαλώ βάλε το σωστό Google Vision API Key στον κώδικα.");
         document.getElementById('ocr-loading').style.display = 'block';
         let allExtractedText = "";
+        let errorOccurred = false;
+
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
             if (!file.type.startsWith('image/')) continue;
-            const base64Data = await new Promise((resolve) => { const reader = new FileReader(); reader.onloadend = () => resolve(reader.result.split(',')[1]); reader.readAsDataURL(file); });
+            
+            const base64Data = await new Promise((resolve) => { 
+                const reader = new FileReader(); 
+                reader.onloadend = () => resolve(reader.result.split(',')[1]); 
+                reader.readAsDataURL(file); 
+            });
+            
             const requestBody = { requests: [{ image: { content: base64Data }, features: [{ type: "TEXT_DETECTION" }] }] };
+            
             try {
-                const response = await fetch(`https://vision.googleapis.com/v1/images:annotate?key=${GOOGLE_VISION_API_KEY}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(requestBody) });
+                const response = await fetch(`https://vision.googleapis.com/v1/images:annotate?key=${GOOGLE_VISION_API_KEY}`, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify(requestBody) 
+                });
+                
                 const data = await response.json();
-                if (data.responses && data.responses[0].fullTextAnnotation) { allExtractedText += data.responses[0].fullTextAnnotation.text + "\n"; }
-            } catch (error) { console.error("API Error:", error); }
+                
+                // ΝΕΟ: Ελέγχει αν η Google έστειλε error (πχ Billing) και σου το δείχνει!
+                if (data.error) {
+                    alert("ΣΦΑΛΜΑ GOOGLE API: " + data.error.message);
+                    errorOccurred = true;
+                    break;
+                }
+
+                if (data.responses && data.responses[0].fullTextAnnotation) { 
+                    allExtractedText += data.responses[0].fullTextAnnotation.text + "\n"; 
+                } else {
+                    alert("Η Google δεν βρήκε κανένα κείμενο σε αυτή την εικόνα. Δοκίμασε να την κόψεις καλύτερα.");
+                }
+            } catch (error) { 
+                console.error("API Error:", error); 
+                alert("Αποτυχία σύνδεσης με τη Google.");
+                errorOccurred = true;
+                break;
+            }
         }
+        
         document.getElementById('ocr-loading').style.display = 'none';
-        const currentText = document.getElementById('mass-input').value;
-        let cleanText = allExtractedText.replace(/[^a-zA-Z0-9_\n ]/g, ''); 
-        document.getElementById('mass-input').value = currentText + " \n" + cleanText;
-        analyzeAttendance();
+        
+        if (!errorOccurred && allExtractedText !== "") {
+            const currentText = document.getElementById('mass-input').value;
+            let cleanText = allExtractedText.replace(/[^a-zA-Z0-9_\n ]/g, ''); 
+            document.getElementById('mass-input').value = currentText + " \n" + cleanText;
+            analyzeAttendance();
+        }
     }
 
 
-    // --- SMART FUZZY FILTERING ---
     function getEditDistance(a, b) {
         if(a.length === 0) return b.length; if(b.length === 0) return a.length; var matrix = [];
         for(var i = 0; i <= b.length; i++) matrix[i] = [i]; for(var j = 0; j <= a.length; j++) matrix[0][j] = j;
@@ -368,7 +379,6 @@
         
         listDiv.innerHTML = ""; unmatchedDiv.innerHTML = ""; matchedData = {};
         
-        // --- ΕΔΩ ΕΙΝΑΙ Ο ΔΙΟΡΘΩΜΕΝΟΣ ΜΕΤΡΗΤΗΣ ---
         countSpan.innerText = names.length + " NAMES";
         if(names.length === 0) return;
 
@@ -454,7 +464,6 @@
     function createNewCP() { const n = document.getElementById('new-name').value; if(!n) return; const id = n.replace(/\s+/g, '-').toLowerCase(); db.ref('cps/' + id).set({ name: n, leader: document.getElementById('new-leader').value, imgUrl: document.getElementById('new-imgUrl').value || 'https://i.ibb.co/SXM1FZx8/attedance-points.png', clan: document.getElementById('new-clan').value, totalPoints: 0, members: "", bossStats: { VAL:0, ANT:0, BAI:0, SIE:0, ZAK:0, FRI:0, AQ:0, ORF:0, COR:0 } }); }
     function deleteCP() { if(confirm("Delete Forever?")) db.ref('cps/' + currentEditID).remove(); }
 
-    // --- EXTERNAL CLANS & CALLERS MANAGER LOGIC ---
     function formatText(type) { const textarea = document.getElementById('ext-description'); const start = textarea.selectionStart; const end = textarea.selectionEnd; const selectedText = textarea.value.substring(start, end) || "Κείμενο"; let insertText = ""; if(type === 'gold') insertText = `<b style="color:var(--gold); font-family:'Cinzel';">${selectedText}</b>`; if(type === 'red') insertText = `<span style="color:var(--red); font-weight:bold;">${selectedText}</span>`; if(type === 'blue') insertText = `<span style="color:var(--noldor-sky); font-weight:bold;">${selectedText}</span>`; if(type === 'icon1') insertText = `⚔️`; if(type === 'icon2') insertText = `🛡️`; textarea.value = textarea.value.substring(0, start) + insertText + textarea.value.substring(end); textarea.focus(); }
     function createExtClan() { const name = document.getElementById('new-ext-name').value.trim(); const icon = document.getElementById('new-ext-icon').value.trim(); if(!name) { alert("Βάλε όνομα!"); return; } const id = name.replace(/\s+/g, '').toLowerCase(); db.ref('externalClans/' + id).set({ name: name, iconUrl: icon || 'https://i.ibb.co/SXM1FZx8/attedance-points.png', leader: 'Pending...', description: 'Alliance agreements pending.', status: 'active', lootHistory: [] }); document.getElementById('new-ext-name').value = ''; document.getElementById('new-ext-icon').value = ''; alert("New Clan Created!"); }
     function loadExtEdit() { const selVal = document.getElementById('ext-select').value; if(!selVal) { document.getElementById('ext-edit-section').style.display = 'none'; currentExtID = null; return; } currentExtID = selVal; document.getElementById('ext-edit-section').style.display = 'grid'; let targetData = {}; let lootHtml = ""; if (selVal.startsWith('ext_')) { const pureId = selVal.replace('ext_', ''); targetData = allExtClans[pureId] || { leader: '', description: '', iconUrl: '', lootHistory: [] }; document.getElementById('ext-leader').value = targetData.leader || ""; document.getElementById('ext-description').value = targetData.description || ""; document.getElementById('ext-icon').value = targetData.iconUrl || ""; document.getElementById('ext-desc-container').style.display = 'block'; document.getElementById('ext-icon-container').style.display = 'block'; document.getElementById('ext-points').value = 0; document.getElementById('ext-points').disabled = true; document.getElementById('ext-stat-inputs').style.display = 'none'; const histBtn = document.getElementById('ext-hist-btn'); histBtn.style.display = 'block'; if(targetData.status === 'history') { histBtn.innerText = "RESTORE"; histBtn.className = "btn btn-green"; } else { histBtn.innerText = "HIST"; histBtn.className = "btn btn-blue"; } } else if (selVal.startsWith('cp_')) { const pureId = selVal.replace('cp_', ''); targetData = allCPs[pureId] || {}; document.getElementById('ext-leader').value = targetData.leader || targetData.members || ""; document.getElementById('ext-desc-container').style.display = 'none'; document.getElementById('ext-icon-container').style.display = 'none'; document.getElementById('ext-hist-btn').style.display = 'none'; document.getElementById('ext-points').value = targetData.totalPoints || 0; document.getElementById('ext-points').disabled = false; let statsHtml = ""; bossKeys.forEach(k => { const val = (targetData.bossStats && targetData.bossStats[k]) ? targetData.bossStats[k] : 0; statsHtml += `<div class="stat-field">${k}<br><input type="number" id="ext-inp-${k}" value="${val}"></div>`; }); document.getElementById('ext-stat-inputs').innerHTML = statsHtml; document.getElementById('ext-stat-inputs').style.display = 'grid'; } if(targetData.lootHistory) { targetData.lootHistory.forEach((item, index) => { lootHtml += `<tr><td>${item.item}</td><td>-${item.cost}</td><td onclick="deleteExtLoot(${index})" style="color:red; cursor:pointer;">✖</td></tr>`; }); } document.getElementById('ext-loot-history-body').innerHTML = lootHtml; }
