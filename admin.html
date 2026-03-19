@@ -2,7 +2,7 @@
 <html lang="el">
 <head>
     <meta charset="UTF-8">
-    <title>BMA | Command Center V20.3 (Final: Smart Paste & Bug Fixes)</title>
+    <title>BMA | Command Center V20.4 (External Rename Added)</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -48,18 +48,20 @@
         #dropzone { border: 2px dashed #444; padding: 20px; text-align: center; background: rgba(0,0,0,0.4); border-radius: 8px; color: #888; margin-bottom: 15px; transition: 0.3s; cursor: pointer; }
         #dropzone.dragover { border-color: var(--gold); background: rgba(212,175,55,0.1); color: var(--gold); }
         .queue-item { background: #1a1a1a; border-left: 3px solid var(--blue); padding: 10px; margin-bottom: 10px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; }
-        #pending-queue-list { max-height: 350px; overflow-y: auto; padding-right: 5px; }
         .queue-item button { padding: 5px 10px; font-size: 10px; margin: 0 0 0 5px; width: auto; }
         
         #input-count { font-size: 14px; color: var(--bg); background: var(--gold); padding: 5px 12px; border-radius: 6px; font-family: 'Cinzel'; font-weight: bold; border: 1px solid #fff; }
         
         #mass-input { font-family: 'Open Sans', sans-serif; font-size: 15px; background: rgba(0,0,0,0.5); border: 2px dashed #444; color: var(--gold); line-height: 1.5; padding: 15px; }
+        
+        /* ΝΕΟ: Εσωτερικό σκρολάρισμα για το Inbox */
+        #pending-queue-list { max-height: 350px; overflow-y: auto; padding-right: 5px; }
     </style>
 </head>
 <body>
 
     <div class="header-container">
-        <div style="width:80px"></div> <h1>BMA COMMAND CENTER V20.3</h1>
+        <div style="width:80px"></div> <h1>BMA COMMAND CENTER V20.4</h1>
         <button class="logout-btn" onclick="logout()">LOGOUT</button>
     </div>
 
@@ -195,8 +197,17 @@
             </div>
             <div id="ext-edit-section" style="display:none;" class="external-grid">
                 <div>
-                    <label style="color:#aaa; font-size:11px;">Leader Name / Roster</label>
-                    <input type="text" id="ext-leader" style="font-family:'Cinzel';">
+                    <div style="display:flex; gap:10px; margin-bottom:10px;">
+                        <div style="flex:1;">
+                            <label style="color:#aaa; font-size:11px;">Clan / Caller Name</label>
+                            <input type="text" id="ext-name" style="font-family:'Cinzel'; color:var(--gold); font-size:1.1rem;">
+                        </div>
+                        <div style="flex:1;">
+                            <label style="color:#aaa; font-size:11px;">Leader Name / Roster</label>
+                            <input type="text" id="ext-leader" style="font-family:'Cinzel';">
+                        </div>
+                    </div>
+                    
                     <div id="ext-icon-container"><label style="display:block; margin-top:10px; color:#aaa; font-size:11px;">Image URL</label><input type="text" id="ext-icon" placeholder="https://..."></div>
                     <div id="ext-desc-container">
                         <label style="display:block; margin-top:10px; color:#aaa; font-size:11px;">Agreements / Description</label>
@@ -422,12 +433,11 @@
     }
 
     // =========================================================
-    // ΑΝΑΛΥΣΗ ΜΕ SMART PASTE (ΑΛΛΑΖΕΙ ΤΑ ΕΝΤΕR ΣΕ ΚΕΝΑ)
+    // ΑΝΑΛΥΣΗ ΜΕ SMART PASTE
     // =========================================================
     function analyzeAttendance() {
         const inputField = document.getElementById('mass-input');
         
-        // 🔥 ΝΕΟ: Αν ο χρήστης κάνει paste κείμενο με "Enter", τα μετατρέπει αυτόματα σε κενά!
         if (/[\r\n]/.test(inputField.value)) {
             inputField.value = inputField.value.replace(/[\r\n]+/g, ' ');
         }
@@ -449,7 +459,6 @@
             let roster = (allCPs[id].members || "").toLowerCase().split(',').map(s=>s.trim()).filter(s=>s);
             if(allCPs[id].leader) roster.push(allCPs[id].leader.toLowerCase().trim());
             
-            // Διαγράφει τα διπλότυπα αν ο Leader υπάρχει ΚΑΙ στα Members
             roster = [...new Set(roster)]; 
 
             let foundRealNames = []; let displayNames = [];
@@ -590,8 +599,70 @@
     function createNewCP() { const n = document.getElementById('new-name').value; if(!n) return; const id = n.replace(/\s+/g, '-').toLowerCase(); db.ref('cps/' + id).set({ name: n, leader: document.getElementById('new-leader').value, imgUrl: document.getElementById('new-imgUrl').value || 'https://i.ibb.co/SXM1FZx8/attedance-points.png', clan: document.getElementById('new-clan').value, totalPoints: 0, members: "", bossStats: { VAL:0, ANT:0, BAI:0, SIE:0, ZAK:0, FRI:0, AQ:0, ORF:0, COR:0 } }); }
     function deleteCP() { if(confirm("Delete Forever?")) db.ref('cps/' + currentEditID).remove(); }
     function createExtClan() { const name = document.getElementById('new-ext-name').value.trim(); const icon = document.getElementById('new-ext-icon').value.trim(); if(!name) { alert("Βάλε όνομα!"); return; } const id = name.replace(/\s+/g, '').toLowerCase(); db.ref('externalClans/' + id).set({ name: name, iconUrl: icon || 'https://i.ibb.co/SXM1FZx8/attedance-points.png', leader: 'Pending...', description: 'Alliance agreements pending.', status: 'active', lootHistory: [] }); document.getElementById('new-ext-name').value = ''; document.getElementById('new-ext-icon').value = ''; alert("New Clan Created!"); }
-    function loadExtEdit() { const selVal = document.getElementById('ext-select').value; if(!selVal) { document.getElementById('ext-edit-section').style.display = 'none'; currentExtID = null; return; } currentExtID = selVal; document.getElementById('ext-edit-section').style.display = 'grid'; let targetData = {}; let lootHtml = ""; if (selVal.startsWith('ext_')) { const pureId = selVal.replace('ext_', ''); targetData = allExtClans[pureId] || { leader: '', description: '', iconUrl: '', lootHistory: [] }; document.getElementById('ext-leader').value = targetData.leader || ""; document.getElementById('ext-description').value = targetData.description || ""; document.getElementById('ext-icon').value = targetData.iconUrl || ""; document.getElementById('ext-desc-container').style.display = 'block'; document.getElementById('ext-icon-container').style.display = 'block'; document.getElementById('ext-points').value = 0; document.getElementById('ext-points').disabled = true; document.getElementById('ext-stat-inputs').style.display = 'none'; const histBtn = document.getElementById('ext-hist-btn'); histBtn.style.display = 'block'; if(targetData.status === 'history') { histBtn.innerText = "RESTORE"; histBtn.className = "btn btn-green"; } else { histBtn.innerText = "HIST"; histBtn.className = "btn btn-blue"; } } else if (selVal.startsWith('cp_')) { const pureId = selVal.replace('cp_', ''); targetData = allCPs[pureId] || {}; document.getElementById('ext-leader').value = targetData.leader || targetData.members || ""; document.getElementById('ext-desc-container').style.display = 'none'; document.getElementById('ext-icon-container').style.display = 'none'; document.getElementById('ext-hist-btn').style.display = 'none'; document.getElementById('ext-points').value = targetData.totalPoints || 0; document.getElementById('ext-points').disabled = false; let statsHtml = ""; bossKeys.forEach(k => { const val = (targetData.bossStats && targetData.bossStats[k]) ? targetData.bossStats[k] : 0; statsHtml += `<div class="stat-field">${k}<br><input type="number" id="ext-inp-${k}" value="${val}"></div>`; }); document.getElementById('ext-stat-inputs').innerHTML = statsHtml; document.getElementById('ext-stat-inputs').style.display = 'grid'; } if(targetData.lootHistory) { targetData.lootHistory.forEach((item, index) => { lootHtml += `<tr><td>${item.item}</td><td>-${item.cost}</td><td onclick="deleteExtLoot(${index})" style="color:red; cursor:pointer;">✖</td></tr>`; }); } document.getElementById('ext-loot-history-body').innerHTML = lootHtml; }
-    function updateExtData() { if(!currentExtID) return; const leaderVal = document.getElementById('ext-leader').value; if (currentExtID.startsWith('ext_')) { const pureId = currentExtID.replace('ext_', ''); db.ref('externalClans/' + pureId).update({ leader: leaderVal, iconUrl: document.getElementById('ext-icon').value, description: document.getElementById('ext-description').value }); alert("Clan Data Saved!"); } else if (currentExtID.startsWith('cp_')) { const pureId = currentExtID.replace('cp_', ''); const pts = parseInt(document.getElementById('ext-points').value) || 0; const stats = {}; bossKeys.forEach(k => stats[k] = parseInt(document.getElementById('ext-inp-' + k).value) || 0); db.ref('cps/' + pureId).update({ leader: leaderVal, totalPoints: pts, bossStats: stats }); alert("Caller Data Saved!"); } }
+    
+    // ΝΕΑ FUNCTION: Φορτώνει και το ΟΝΟΜΑ στο Edit Panel
+    function loadExtEdit() { 
+        const selVal = document.getElementById('ext-select').value; 
+        if(!selVal) { document.getElementById('ext-edit-section').style.display = 'none'; currentExtID = null; return; } 
+        currentExtID = selVal; 
+        document.getElementById('ext-edit-section').style.display = 'grid'; 
+        let targetData = {}; let lootHtml = ""; 
+        
+        if (selVal.startsWith('ext_')) { 
+            const pureId = selVal.replace('ext_', ''); 
+            targetData = allExtClans[pureId] || { name: pureId, leader: '', description: '', iconUrl: '', lootHistory: [] }; 
+            document.getElementById('ext-name').value = targetData.name || pureId; // Βάζει το Όνομα
+            document.getElementById('ext-leader').value = targetData.leader || ""; 
+            document.getElementById('ext-description').value = targetData.description || ""; 
+            document.getElementById('ext-icon').value = targetData.iconUrl || ""; 
+            document.getElementById('ext-desc-container').style.display = 'block'; 
+            document.getElementById('ext-icon-container').style.display = 'block'; 
+            document.getElementById('ext-points').value = 0; 
+            document.getElementById('ext-points').disabled = true; 
+            document.getElementById('ext-stat-inputs').style.display = 'none'; 
+            const histBtn = document.getElementById('ext-hist-btn'); histBtn.style.display = 'block'; 
+            if(targetData.status === 'history') { histBtn.innerText = "RESTORE"; histBtn.className = "btn btn-green"; } else { histBtn.innerText = "HIST"; histBtn.className = "btn btn-blue"; } 
+            
+        } else if (selVal.startsWith('cp_')) { 
+            const pureId = selVal.replace('cp_', ''); 
+            targetData = allCPs[pureId] || {}; 
+            document.getElementById('ext-name').value = targetData.name || ""; // Βάζει το Όνομα Caller
+            document.getElementById('ext-leader').value = targetData.leader || targetData.members || ""; 
+            document.getElementById('ext-desc-container').style.display = 'none'; 
+            document.getElementById('ext-icon-container').style.display = 'none'; 
+            document.getElementById('ext-hist-btn').style.display = 'none'; 
+            document.getElementById('ext-points').value = targetData.totalPoints || 0; 
+            document.getElementById('ext-points').disabled = false; 
+            let statsHtml = ""; 
+            bossKeys.forEach(k => { const val = (targetData.bossStats && targetData.bossStats[k]) ? targetData.bossStats[k] : 0; statsHtml += `<div class="stat-field">${k}<br><input type="number" id="ext-inp-${k}" value="${val}"></div>`; }); 
+            document.getElementById('ext-stat-inputs').innerHTML = statsHtml; 
+            document.getElementById('ext-stat-inputs').style.display = 'grid'; 
+        } 
+        
+        if(targetData.lootHistory) { targetData.lootHistory.forEach((item, index) => { lootHtml += `<tr><td>${item.item}</td><td>-${item.cost}</td><td onclick="deleteExtLoot(${index})" style="color:red; cursor:pointer;">✖</td></tr>`; }); } 
+        document.getElementById('ext-loot-history-body').innerHTML = lootHtml; 
+    }
+
+    // ΝΕΑ FUNCTION: Αποθηκεύει και το ΟΝΟΜΑ
+    function updateExtData() { 
+        if(!currentExtID) return; 
+        const nameVal = document.getElementById('ext-name').value.trim(); // Διαβάζει το νέο όνομα
+        const leaderVal = document.getElementById('ext-leader').value; 
+        
+        if (currentExtID.startsWith('ext_')) { 
+            const pureId = currentExtID.replace('ext_', ''); 
+            db.ref('externalClans/' + pureId).update({ name: nameVal, leader: leaderVal, iconUrl: document.getElementById('ext-icon').value, description: document.getElementById('ext-description').value }); 
+            alert("Clan Data Saved!"); 
+            
+        } else if (currentExtID.startsWith('cp_')) { 
+            const pureId = currentExtID.replace('cp_', ''); 
+            const pts = parseInt(document.getElementById('ext-points').value) || 0; 
+            const stats = {}; bossKeys.forEach(k => stats[k] = parseInt(document.getElementById('ext-inp-' + k).value) || 0); 
+            db.ref('cps/' + pureId).update({ name: nameVal, leader: leaderVal, totalPoints: pts, bossStats: stats }); 
+            alert("Caller Data Saved!"); 
+        } 
+    }
+    
     function toggleExtHistory() { if(!currentExtID || !currentExtID.startsWith('ext_')) return; const pureId = currentExtID.replace('ext_', ''); const clan = allExtClans[pureId] || {}; const newStatus = clan.status === 'history' ? 'active' : 'history'; db.ref('externalClans/' + pureId).update({ status: newStatus }).then(() => { alert("Clan visibility updated!"); loadExtEdit(); }); }
     function addExtMarketLoot() { if(!currentExtID) return; const loot = document.getElementById('ext-loot-market').value.split('|'); const newItem = { item: loot[1], cost: loot[0], date: new Date().toLocaleDateString('el-GR') }; if (currentExtID.startsWith('ext_')) { const pureId = currentExtID.replace('ext_', ''); db.ref('externalClans/' + pureId).transaction(ext => { if(ext === null) ext = {}; if(!ext.lootHistory) ext.lootHistory = []; ext.lootHistory.push(newItem); return ext; }); } else if (currentExtID.startsWith('cp_')) { const pureId = currentExtID.replace('cp_', ''); db.ref('cps/' + pureId).transaction(cp => { if(cp) { cp.totalPoints -= parseInt(loot[0]); if(!cp.lootHistory) cp.lootHistory = []; cp.lootHistory.push(newItem); } return cp; }); } }
     function deleteExtLoot(idx) { if(!confirm("Are you sure you want to delete this loot? (Points will refund if it's a Caller)")) return; if (currentExtID.startsWith('ext_')) { const pureId = currentExtID.replace('ext_', ''); const ext = allExtClans[pureId]; ext.lootHistory.splice(idx, 1); db.ref('externalClans/' + pureId).update({ lootHistory: ext.lootHistory }); } else if (currentExtID.startsWith('cp_')) { const pureId = currentExtID.replace('cp_', ''); const cp = allCPs[pureId]; cp.totalPoints += parseInt(cp.lootHistory[idx].cost); cp.lootHistory.splice(idx, 1); db.ref('cps/' + pureId).update({ totalPoints: cp.totalPoints, lootHistory: cp.lootHistory }); } }
