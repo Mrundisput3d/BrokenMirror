@@ -2,7 +2,7 @@
 <html lang="el">
 <head>
     <meta charset="UTF-8">
-    <title>BMA | Command Center V20.4 (External Rename Added)</title>
+    <title>BMA | Command Center V20.5 (Individual Player Ticks)</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -21,14 +21,15 @@
         .panel { background: var(--card); border: 1px solid #333; padding: 15px; border-radius: 10px; border-top: 3px solid var(--gold); }
         
         #cp-list-simple { max-height: 380px; overflow-y: auto; background: rgba(0,0,0,0.4); border: 1px solid #333; border-radius: 5px; padding: 5px; }
-        .detected-cp-row { background: #000; padding: 8px; margin: 4px 0; border-radius: 5px; display: flex; align-items: center; border: 1px solid #333; }
-        .detected-cp-row input { margin-right: 12px; width: 18px; height: 18px; accent-color: var(--gold); }
+        .detected-cp-row { background: #000; padding: 8px; margin: 4px 0; border-radius: 5px; border: 1px solid #333; }
+        .detected-cp-row input[type="checkbox"] { accent-color: var(--gold); cursor: pointer; }
+        
         .boss-grid { display: grid; grid-template-columns: repeat(9, 1fr); gap: 6px; margin: 15px 0; }
         .boss-btn { background: #111; border: 1px solid #444; padding: 10px 2px; text-align: center; cursor: pointer; border-radius: 6px; transition: 0.2s; }
         .boss-btn:hover { border-color: var(--gold); background: #1a1a1a; }
         .boss-btn img { width: 28px; display: block; margin: 0 auto 5px; }
         .boss-btn span { font-size: 0.6rem; color: var(--gold); font-weight: bold; }
-        input, select, textarea { width: 100%; padding: 10px; margin: 5px 0; background: #000; color: #fff; border: 1px solid #444; border-radius: 4px; box-sizing: border-box; }
+        input[type="text"], input[type="number"], select, textarea { width: 100%; padding: 10px; margin: 5px 0; background: #000; color: #fff; border: 1px solid #444; border-radius: 4px; box-sizing: border-box; }
         .btn { width: 100%; padding: 12px; border: none; border-radius: 4px; cursor: pointer; font-family: 'Cinzel'; font-weight: bold; margin-top: 10px; }
         .btn-gold { background: var(--gold); color: #000; }
         .btn-red { background: var(--red); color: #fff; }
@@ -54,14 +55,13 @@
         
         #mass-input { font-family: 'Open Sans', sans-serif; font-size: 15px; background: rgba(0,0,0,0.5); border: 2px dashed #444; color: var(--gold); line-height: 1.5; padding: 15px; }
         
-        /* ΝΕΟ: Εσωτερικό σκρολάρισμα για το Inbox */
         #pending-queue-list { max-height: 350px; overflow-y: auto; padding-right: 5px; }
     </style>
 </head>
 <body>
 
     <div class="header-container">
-        <div style="width:80px"></div> <h1>BMA COMMAND CENTER V20.4</h1>
+        <div style="width:80px"></div> <h1>BMA COMMAND CENTER V20.5</h1>
         <button class="logout-btn" onclick="logout()">LOGOUT</button>
     </div>
 
@@ -250,7 +250,7 @@
     firebase.auth().onAuthStateChanged((user) => { if (!user) window.location.href = "login.html"; });
     function logout() { firebase.auth().signOut().then(() => window.location.href = "login.html"); }
 
-    let allCPs = {}, matchedData = {}, currentEditID = null, globalDailyLogs = {};
+    let allCPs = {}, currentEditID = null, globalDailyLogs = {};
     let allExtClans = {}, currentExtID = null, viewMode = 'active'; 
     const bossKeys = ['VAL', 'ANT', 'BAI', 'SIE', 'ZAK', 'FRI', 'AQ', 'ORF', 'COR'];
     let lastAction = null; 
@@ -433,8 +433,13 @@
     }
 
     // =========================================================
-    // ΑΝΑΛΥΣΗ ΜΕ SMART PASTE
+    // ΑΝΑΛΥΣΗ ΜΕ SMART PASTE ΚΑΙ ΑΤΟΜΙΚΑ ΤΙΚΣ!
     // =========================================================
+    function toggleCP(cpId, isChecked) {
+        // Όταν πατάς το Master κουμπί του CP, επιλέγει/ξε-επιλέγει όλους τους παίκτες από κάτω του
+        document.querySelectorAll('.cp-child-' + cpId).forEach(cb => cb.checked = isChecked);
+    }
+
     function analyzeAttendance() {
         const inputField = document.getElementById('mass-input');
         
@@ -448,7 +453,7 @@
         const unmatchedDiv = document.getElementById('unmatched-list');
         const countSpan = document.getElementById('input-count');
         
-        listDiv.innerHTML = ""; unmatchedDiv.innerHTML = ""; matchedData = {};
+        listDiv.innerHTML = ""; unmatchedDiv.innerHTML = "";
         countSpan.innerText = names.length + " NAMES";
         if(names.length === 0) return;
 
@@ -478,8 +483,25 @@
             });
             
             if(foundRealNames.length > 0) {
-                matchedData[id] = foundRealNames; const namesList = displayNames.join(', ');
-                listDiv.innerHTML += `<div class="detected-cp-row"><input type="checkbox" class="cp-checkbox" id="check-${id}" checked><span style="line-height: 1.4;"><b>${allCPs[id].name}</b> <span style="color:#aaa; font-size:11px;">(${foundRealNames.length} matched: <span style="color:var(--gold);">${namesList}</span>)</span></span></div>`;
+                // Φτιάχνουμε τα ατομικά checkboxes για κάθε παίκτη!
+                let playerHtml = foundRealNames.map((trueName, idx) => {
+                    let displayName = displayNames[idx];
+                    return `<label style="display:inline-flex; align-items:center; margin-right:15px; margin-top:5px; font-size:11px; cursor:pointer; background:#1a1a1a; padding:4px 8px; border-radius:4px; border:1px solid #333;">
+                                <input type="checkbox" class="player-checkbox cp-child-${id}" data-cp="${id}" value="${trueName}" checked style="margin-right:6px; width:14px; height:14px;">
+                                <span style="color:var(--gold);">${displayName}</span>
+                            </label>`;
+                }).join('');
+
+                listDiv.innerHTML += `
+                <div class="detected-cp-row" style="display:block;">
+                    <div style="border-bottom: 1px solid #222; padding-bottom: 8px; margin-bottom: 8px; display:flex; align-items:center;">
+                        <input type="checkbox" checked onchange="toggleCP('${id}', this.checked)" style="margin-right: 10px; width: 16px; height: 16px;">
+                        <b style="font-size:14px;">${allCPs[id].name}</b> <span style="color:#aaa; font-size:11px; margin-left:8px;">(${foundRealNames.length} matched)</span>
+                    </div>
+                    <div style="padding-left: 26px; display:flex; flex-wrap:wrap;">
+                        ${playerHtml}
+                    </div>
+                </div>`;
             }
         });
 
@@ -487,53 +509,62 @@
         if(unmatchedNames.length > 0) { unmatchedDiv.innerHTML = `<div style="padding: 8px; border: 1px dashed var(--red); background: rgba(255, 68, 68, 0.1); border-radius: 5px; margin-top: 10px;"><span style="color: var(--red); font-weight: bold;">⚠️ ΔΕΝ ΒΡΕΘΗΚΑΝ ΣΤΗ ΒΑΣΗ (${unmatchedNames.length}):</span> <span style="color: #fff; font-size: 11px;">${unmatchedNames.map(n => n.toUpperCase()).join(', ')}</span></div>`; }
     }
 
+    // =========================================================
+    // ΥΠΟΒΟΛΗ (ΜΕ ΒΑΣΗ ΤΟΥΣ ΕΠΙΛΕΓΜΕΝΟΥΣ ΠΑΙΚΤΕΣ ΠΛΕΟΝ)
+    // =========================================================
     async function logValidatedEvent(bossId, multiplier) {
         try {
-            const checkboxes = document.querySelectorAll('.cp-checkbox');
+            // Αντί να ψάχνουμε ποια CPs είναι τσεκαρισμένα, ψάχνουμε ποιοι ΠΑΙΚΤΕΣ είναι τσεκαρισμένοι
+            const playerCheckboxes = document.querySelectorAll('.player-checkbox');
+            let checkedPlayersByCp = {};
+            
+            playerCheckboxes.forEach(cb => {
+                if (cb.checked) {
+                    let id = cb.dataset.cp;
+                    if (!checkedPlayersByCp[id]) checkedPlayersByCp[id] = [];
+                    checkedPlayersByCp[id].push(cb.value);
+                }
+            });
+
             const d = new Date();
             const today = `${d.getDate()}-${d.getMonth()+1}-${d.getFullYear()}`; 
 
             let totalUpdated = 0, skippedTotal = 0;
             let currentAction = { date: today, bossId: bossId, multiplier: multiplier, updates: [] };
 
-            for (const cb of checkboxes) {
-                if (cb.checked) {
-                    const id = cb.id.replace('check-', '');
-                    const namesFound = matchedData[id];
-                    if(!namesFound) continue;
-
-                    let eligible = namesFound.filter(name => {
-                        const safeName = name.replace(/[.#$\[\]]/g, '_');
-                        const alreadyDone = globalDailyLogs[today] && globalDailyLogs[today][safeName] && globalDailyLogs[today][safeName][bossId];
-                        
-                        if (alreadyDone) { 
-                            skippedTotal++; 
-                            return false;
-                        }
-                        return true;
-                    });
-
-                    if (eligible.length === 0) continue; 
-
-                    const allNames = eligible;
-                    const pointsCount = Math.min(allNames.length, 9); 
-                    currentAction.updates.push({ cpId: id, names: allNames, pointsCount: pointsCount });
-
-                    await db.ref('cps/' + id).transaction(cp => {
-                        if(cp) {
-                            if(!cp.bossStats) cp.bossStats = {};
-                            cp.bossStats[bossId] = (cp.bossStats[bossId] || 0) + pointsCount;
-                            cp.totalPoints = (cp.totalPoints || 0) + (pointsCount * multiplier);
-                        }
-                        return cp;
-                    });
-
-                    for(let name of allNames) {
-                        const safeName = name.replace(/[.#$\[\]]/g, '_');
-                        await db.ref(`dailyLogs/${today}/${safeName}/${bossId}`).set({ cp: id, time: new Date().toLocaleTimeString('el-GR') });
+            for (const id in checkedPlayersByCp) {
+                const namesFound = checkedPlayersByCp[id];
+                
+                let eligible = namesFound.filter(name => {
+                    const safeName = name.replace(/[.#$\[\]]/g, '_');
+                    const alreadyDone = globalDailyLogs[today] && globalDailyLogs[today][safeName] && globalDailyLogs[today][safeName][bossId];
+                    if (alreadyDone) { 
+                        skippedTotal++; 
+                        return false;
                     }
-                    totalUpdated++;
+                    return true;
+                });
+
+                if (eligible.length === 0) continue; 
+
+                const allNames = eligible;
+                const pointsCount = Math.min(allNames.length, 9); 
+                currentAction.updates.push({ cpId: id, names: allNames, pointsCount: pointsCount });
+
+                await db.ref('cps/' + id).transaction(cp => {
+                    if(cp) {
+                        if(!cp.bossStats) cp.bossStats = {};
+                        cp.bossStats[bossId] = (cp.bossStats[bossId] || 0) + pointsCount;
+                        cp.totalPoints = (cp.totalPoints || 0) + (pointsCount * multiplier);
+                    }
+                    return cp;
+                });
+
+                for(let name of allNames) {
+                    const safeName = name.replace(/[.#$\[\]]/g, '_');
+                    await db.ref(`dailyLogs/${today}/${safeName}/${bossId}`).set({ cp: id, time: new Date().toLocaleTimeString('el-GR') });
                 }
+                totalUpdated++;
             }
             
             if (totalUpdated > 0) { 
@@ -600,7 +631,6 @@
     function deleteCP() { if(confirm("Delete Forever?")) db.ref('cps/' + currentEditID).remove(); }
     function createExtClan() { const name = document.getElementById('new-ext-name').value.trim(); const icon = document.getElementById('new-ext-icon').value.trim(); if(!name) { alert("Βάλε όνομα!"); return; } const id = name.replace(/\s+/g, '').toLowerCase(); db.ref('externalClans/' + id).set({ name: name, iconUrl: icon || 'https://i.ibb.co/SXM1FZx8/attedance-points.png', leader: 'Pending...', description: 'Alliance agreements pending.', status: 'active', lootHistory: [] }); document.getElementById('new-ext-name').value = ''; document.getElementById('new-ext-icon').value = ''; alert("New Clan Created!"); }
     
-    // ΝΕΑ FUNCTION: Φορτώνει και το ΟΝΟΜΑ στο Edit Panel
     function loadExtEdit() { 
         const selVal = document.getElementById('ext-select').value; 
         if(!selVal) { document.getElementById('ext-edit-section').style.display = 'none'; currentExtID = null; return; } 
@@ -611,7 +641,7 @@
         if (selVal.startsWith('ext_')) { 
             const pureId = selVal.replace('ext_', ''); 
             targetData = allExtClans[pureId] || { name: pureId, leader: '', description: '', iconUrl: '', lootHistory: [] }; 
-            document.getElementById('ext-name').value = targetData.name || pureId; // Βάζει το Όνομα
+            document.getElementById('ext-name').value = targetData.name || pureId; 
             document.getElementById('ext-leader').value = targetData.leader || ""; 
             document.getElementById('ext-description').value = targetData.description || ""; 
             document.getElementById('ext-icon').value = targetData.iconUrl || ""; 
@@ -626,7 +656,7 @@
         } else if (selVal.startsWith('cp_')) { 
             const pureId = selVal.replace('cp_', ''); 
             targetData = allCPs[pureId] || {}; 
-            document.getElementById('ext-name').value = targetData.name || ""; // Βάζει το Όνομα Caller
+            document.getElementById('ext-name').value = targetData.name || ""; 
             document.getElementById('ext-leader').value = targetData.leader || targetData.members || ""; 
             document.getElementById('ext-desc-container').style.display = 'none'; 
             document.getElementById('ext-icon-container').style.display = 'none'; 
@@ -643,10 +673,9 @@
         document.getElementById('ext-loot-history-body').innerHTML = lootHtml; 
     }
 
-    // ΝΕΑ FUNCTION: Αποθηκεύει και το ΟΝΟΜΑ
     function updateExtData() { 
         if(!currentExtID) return; 
-        const nameVal = document.getElementById('ext-name').value.trim(); // Διαβάζει το νέο όνομα
+        const nameVal = document.getElementById('ext-name').value.trim(); 
         const leaderVal = document.getElementById('ext-leader').value; 
         
         if (currentExtID.startsWith('ext_')) { 
