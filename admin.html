@@ -719,6 +719,40 @@
     function toggleExtHistory() { if(!currentExtID || !currentExtID.startsWith('ext_')) return; const pureId = currentExtID.replace('ext_', ''); const clan = allExtClans[pureId] || {}; const newStatus = clan.status === 'history' ? 'active' : 'history'; db.ref('externalClans/' + pureId).update({ status: newStatus }).then(() => { alert("Clan visibility updated!"); loadExtEdit(); }); }
     function addExtMarketLoot() { if(!currentExtID) return; const loot = document.getElementById('ext-loot-market').value.split('|'); const newItem = { item: loot[1], cost: loot[0], date: new Date().toLocaleDateString('el-GR') }; if (currentExtID.startsWith('ext_')) { const pureId = currentExtID.replace('ext_', ''); db.ref('externalClans/' + pureId).transaction(ext => { if(ext === null) ext = {}; if(!ext.lootHistory) ext.lootHistory = []; ext.lootHistory.push(newItem); return ext; }); } else if (currentExtID.startsWith('cp_')) { const pureId = currentExtID.replace('cp_', ''); db.ref('cps/' + pureId).transaction(cp => { if(cp) { cp.totalPoints -= parseInt(loot[0]); if(!cp.lootHistory) cp.lootHistory = []; cp.lootHistory.push(newItem); } return cp; }); } }
     function deleteExtLoot(idx) { if(!confirm("Are you sure you want to delete this loot? (Points will refund if it's a Caller)")) return; if (currentExtID.startsWith('ext_')) { const pureId = currentExtID.replace('ext_', ''); const ext = allExtClans[pureId]; ext.lootHistory.splice(idx, 1); db.ref('externalClans/' + pureId).update({ lootHistory: ext.lootHistory }); } else if (currentExtID.startsWith('cp_')) { const pureId = currentExtID.replace('cp_', ''); const cp = allCPs[pureId]; cp.totalPoints += parseInt(cp.lootHistory[idx].cost); cp.lootHistory.splice(idx, 1); db.ref('cps/' + pureId).update({ totalPoints: cp.totalPoints, lootHistory: cp.lootHistory }); } }
-</script>
+// =========================================================
+    // AUTO-CLEANUP: ΚΑΘΑΡΙΣΜΟΣ LOGS ΠΑΛΑΙΟΤΕΡΩΝ ΤΩΝ 30 ΗΜΕΡΩΝ
+    // =========================================================
+    async function cleanOldLogs() {
+        try {
+            const snap = await db.ref('dailyLogs/').once('value');
+            const logs = snap.val() || {};
+            const nowMs = Date.now();
+            const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000; // 30 μέρες σε milliseconds
+
+            let deletedCount = 0;
+            for (let dateStr in logs) {
+                // Η μορφή της ημερομηνίας είναι DD-MM-YYYY
+                let parts = dateStr.split('-');
+                if (parts.length === 3) {
+                    // Η Javascript διαβάζει: Έτος, Μήνας (0-11), Ημέρα
+                    let logDate = new Date(parts[2], parts[1] - 1, parts[0]).getTime();
+                    
+                    // Αν έχουν περάσει πάνω από 30 μέρες, διέγραψε αυτόν τον φάκελο!
+                    if (nowMs - logDate > thirtyDaysMs) {
+                        await db.ref('dailyLogs/' + dateStr).remove();
+                        deletedCount++;
+                    }
+                }
+            }
+            if (deletedCount > 0) {
+                console.log(`🧹 Auto-Cleanup: Διαγράφηκαν ${deletedCount} παλιά logs (πάνω από 30 μέρες). Η βάση είναι πεντακάθαρη!`);
+            }
+        } catch (error) {
+            console.error("Σφάλμα κατά τον καθαρισμό των παλιών logs:", error);
+        }
+    }
+    
+    // Τρέξε τον καθαριστή αυτόματα 5 δευτερόλεπτα αφού φορτώσει η σελίδα (για να μην καθυστερεί το UI)
+    setTimeout(cleanOldLogs, 5000);</script>
 </body>
 </html>
