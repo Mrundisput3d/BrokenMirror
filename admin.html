@@ -436,7 +436,6 @@
     // ΑΝΑΛΥΣΗ ΜΕ SMART PASTE ΚΑΙ ΑΤΟΜΙΚΑ ΤΙΚΣ!
     // =========================================================
     function toggleCP(cpId, isChecked) {
-        // Όταν πατάς το Master κουμπί του CP, επιλέγει/ξε-επιλέγει όλους τους παίκτες από κάτω του
         document.querySelectorAll('.cp-child-' + cpId).forEach(cb => cb.checked = isChecked);
     }
 
@@ -483,7 +482,6 @@
             });
             
             if(foundRealNames.length > 0) {
-                // Φτιάχνουμε τα ατομικά checkboxes για κάθε παίκτη!
                 let playerHtml = foundRealNames.map((trueName, idx) => {
                     let displayName = displayNames[idx];
                     return `<label style="display:inline-flex; align-items:center; margin-right:15px; margin-top:5px; font-size:11px; cursor:pointer; background:#1a1a1a; padding:4px 8px; border-radius:4px; border:1px solid #333;">
@@ -510,11 +508,10 @@
     }
 
     // =========================================================
-    // ΥΠΟΒΟΛΗ (ΜΕ ΒΑΣΗ ΤΟΥΣ ΕΠΙΛΕΓΜΕΝΟΥΣ ΠΑΙΚΤΕΣ ΠΛΕΟΝ)
+    // ΥΠΟΒΟΛΗ (12-HOUR ROLLING WINDOW ANTI-CHEAT)
     // =========================================================
     async function logValidatedEvent(bossId, multiplier) {
         try {
-            // Αντί να ψάχνουμε ποια CPs είναι τσεκαρισμένα, ψάχνουμε ποιοι ΠΑΙΚΤΕΣ είναι τσεκαρισμένοι
             const playerCheckboxes = document.querySelectorAll('.player-checkbox');
             let checkedPlayersByCp = {};
             
@@ -528,6 +525,9 @@
 
             const d = new Date();
             const today = `${d.getDate()}-${d.getMonth()+1}-${d.getFullYear()}`; 
+            
+            const nowMs = Date.now();
+            const twelveHoursMs = 12 * 60 * 60 * 1000;
 
             let totalUpdated = 0, skippedTotal = 0;
             let currentAction = { date: today, bossId: bossId, multiplier: multiplier, updates: [] };
@@ -537,8 +537,28 @@
                 
                 let eligible = namesFound.filter(name => {
                     const safeName = name.replace(/[.#$\[\]]/g, '_');
-                    const alreadyDone = globalDailyLogs[today] && globalDailyLogs[today][safeName] && globalDailyLogs[today][safeName][bossId];
-                    if (alreadyDone) { 
+                    
+                    // --- ΕΛΕΓΧΟΣ ANTI-CHEAT 12 ΩΡΩΝ ---
+                    let isLocked = false;
+                    for (let dateKey in globalDailyLogs) {
+                        if (globalDailyLogs[dateKey][safeName] && globalDailyLogs[dateKey][safeName][bossId]) {
+                            let log = globalDailyLogs[dateKey][safeName][bossId];
+                            
+                            // Αν το log έχει timestamp, ελέγχουμε αυστηρά τις 12 ώρες
+                            if (log.timestamp) {
+                                if (nowMs - log.timestamp < twelveHoursMs) {
+                                    isLocked = true;
+                                    break;
+                                }
+                            } else if (dateKey === today) {
+                                // Fallback: Αν είναι παλιό log χωρίς timestamp, κρατάμε τον κανόνα της "τρέχουσας ημέρας"
+                                isLocked = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (isLocked) { 
                         skippedTotal++; 
                         return false;
                     }
@@ -562,7 +582,11 @@
 
                 for(let name of allNames) {
                     const safeName = name.replace(/[.#$\[\]]/g, '_');
-                    await db.ref(`dailyLogs/${today}/${safeName}/${bossId}`).set({ cp: id, time: new Date().toLocaleTimeString('el-GR') });
+                    await db.ref(`dailyLogs/${today}/${safeName}/${bossId}`).set({ 
+                        cp: id, 
+                        time: new Date().toLocaleTimeString('el-GR'),
+                        timestamp: nowMs // <--- ΕΔΩ ΑΠΟΘΗΚΕΥΕΤΑΙ Η ΩΡΑ ΣΕ ΧΙΛΙΟΣΤΑ ΤΟΥ ΔΕΥΤΕΡΟΛΕΠΤΟΥ
+                    });
                 }
                 totalUpdated++;
             }
@@ -572,7 +596,7 @@
                 document.getElementById('undo-btn').style.display = 'inline-block'; 
             }
             
-            alert(`✅ ΟΛΟΚΛΗΡΩΘΗΚΕ!\nΕνημερώθηκαν: ${totalUpdated} CP(s).\nΑγνοήθηκαν (Anti-Cheat): ${skippedTotal} παίκτες γιατί είχαν ήδη πάρει πόντους για τον '${bossId}' σήμερα!`);
+            alert(`✅ ΟΛΟΚΛΗΡΩΘΗΚΕ!\nΕνημερώθηκαν: ${totalUpdated} CP(s).\nΑγνοήθηκαν (Anti-Cheat): ${skippedTotal} παίκτες γιατί έχουν πάρει πόντους για τον '${bossId}' τις τελευταίες 12 ώρες!`);
             
             document.getElementById('mass-input').value = ""; 
             document.getElementById('detected-list').innerHTML = ""; 
