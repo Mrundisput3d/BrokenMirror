@@ -103,7 +103,6 @@
         .dev-name { color: var(--gold); font-weight: bold; font-size: 1rem; }
         .dev-contact { margin-top: 15px; font-size: 0.85rem; font-family: 'Open Sans', sans-serif; color: #aaa; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 10px;}
         
-        /* Νέο Κουμπί Discord */
         .dev-discord-link {
             display: inline-flex; align-items: center; gap: 8px;
             color: #fff; background: rgba(88, 101, 242, 0.15); 
@@ -217,7 +216,6 @@
 
         const lowMidKeys = ['ZAK', 'FRI', 'AQ', 'ORF', 'COR'];
 
-        // Μεταβλητές για το Top 10
         let dailyLogsData = {};
         let top10AllTime = [];
         let top10Weekly = [];
@@ -228,7 +226,7 @@
             const logs = data.dailyLogs || {};
             dailyLogsData = logs; 
             
-            // --- ΝΕΟ: Φτιάχνουμε "Χάρτη" για να βρίσκουμε το πραγματικό Όνομα και το CP του κάθε παίκτη ---
+            // --- ΝΕΟ: Χάρτης Ονομάτων. Κάνουμε τα πάντα UPPERCASE για να μην ξεφύγει τίποτα! ---
             let playerInfoMap = {};
             Object.keys(allCPs).forEach(cpId => {
                 const cp = allCPs[cpId];
@@ -263,7 +261,6 @@
                 })
                 .sort((a,b) => b.val - a.val);
 
-            // FIX 1: Ο σωστός υπολογισμός ημερομηνιών για να ταιριάζουν ακριβώς με τη βάση δεδομένων
             const last7Days = Array.from({length: 7}, (_, i) => {
                 const d = new Date(); 
                 d.setDate(d.getDate() - i);
@@ -325,7 +322,7 @@
             }).join('');
         }
 
-        // FIX 2: Περνάμε τον χάρτη των ονομάτων και τις σωστές 7 μέρες μέσα στη συνάρτηση
+        // --- ΔΙΟΡΘΩΜΕΝΗ ΣΥΝΑΡΤΗΣΗ (Case-Insensitive Logging) ---
         function calculateTop10(playerInfoMap, last7Days) {
             let allTimeScores = {};
             let weeklyScores = {};
@@ -334,34 +331,35 @@
             Object.keys(dailyLogsData).forEach(date => {
                 const dayData = dailyLogsData[date];
                 Object.keys(dayData).forEach(safeName => {
-                    if(!allTimeScores[safeName]) allTimeScores[safeName] = 0;
-                    allTimeScores[safeName] += Object.keys(dayData[safeName]).length;
+                    let upperSafe = safeName.toUpperCase(); // Το κάνουμε UPPERCASE για να ταιριάζει με τον Χάρτη
+                    if(!allTimeScores[upperSafe]) allTimeScores[upperSafe] = 0;
+                    allTimeScores[upperSafe] += Object.keys(dayData[safeName]).length;
                 });
             });
 
-            // Υπολογισμός Weekly (χρησιμοποιώντας τον ασφαλή πίνακα last7Days)
+            // Υπολογισμός Weekly 
             last7Days.forEach(date => {
                 if(dailyLogsData[date]) {
                     const dayData = dailyLogsData[date];
                     Object.keys(dayData).forEach(safeName => {
-                        if(!weeklyScores[safeName]) weeklyScores[safeName] = 0;
-                        weeklyScores[safeName] += Object.keys(dayData[safeName]).length;
+                        let upperSafe = safeName.toUpperCase(); // Το κάνουμε UPPERCASE για να ταιριάζει με τον Χάρτη
+                        if(!weeklyScores[upperSafe]) weeklyScores[upperSafe] = 0;
+                        weeklyScores[upperSafe] += Object.keys(dayData[safeName]).length;
                     });
                 }
             });
 
-            // Μετατροπή σε λίστα και προσθήκη του πραγματικού Ονόματος & CP
             top10AllTime = Object.entries(allTimeScores)
-                .map(([safeName, score]) => {
-                    let info = playerInfoMap[safeName] || { realName: safeName.replace(/_/g, ''), cpName: "No CP" };
+                .map(([upperSafe, score]) => {
+                    let info = playerInfoMap[upperSafe] || { realName: upperSafe.replace(/_/g, ''), cpName: "No CP" };
                     return { name: info.realName, cp: info.cpName, score: score };
                 })
                 .sort((a, b) => b.score - a.score)
                 .slice(0, 10);
 
             top10Weekly = Object.entries(weeklyScores)
-                .map(([safeName, score]) => {
-                    let info = playerInfoMap[safeName] || { realName: safeName.replace(/_/g, ''), cpName: "No CP" };
+                .map(([upperSafe, score]) => {
+                    let info = playerInfoMap[upperSafe] || { realName: upperSafe.replace(/_/g, ''), cpName: "No CP" };
                     return { name: info.realName, cp: info.cpName, score: score };
                 })
                 .sort((a, b) => b.score - a.score)
@@ -392,7 +390,6 @@
             }
 
             dataToShow.forEach((player, index) => {
-                // Εδώ πλέον τυπώνουμε και το player.cp!
                 listDiv.innerHTML += `
                     <div class="rank-list-item">
                         <div class="rank-list-number">#${index + 1}</div>
