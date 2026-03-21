@@ -94,6 +94,7 @@
         .rank-list-item:nth-child(3) .rank-list-number { color: var(--bronze); text-shadow: 0 0 10px var(--bronze); }
         
         .rank-list-name { font-weight: bold; font-size: 1.1rem; color: #fff; flex-grow: 1; margin-left: 15px; letter-spacing: 1px; font-family: 'Cinzel';}
+        .rank-list-cp { color: var(--gold); font-size: 0.85rem; font-family: 'Open Sans'; font-weight: normal; margin-left: 8px;}
         .rank-list-score { font-family: 'Cinzel'; color: var(--gold); font-weight: bold; font-size: 1.1rem; }
         .rank-list-subtitle { font-size: 0.75rem; color: #888; display: block; font-family: 'Open Sans'; letter-spacing: 0; margin-top: 3px; text-transform: uppercase;}
 
@@ -105,13 +106,13 @@
         /* Νέο Κουμπί Discord */
         .dev-discord-link {
             display: inline-flex; align-items: center; gap: 8px;
-            color: #fff; background: rgba(88, 101, 242, 0.15); /* Χρώμα Discord με διαφάνεια */
+            color: #fff; background: rgba(88, 101, 242, 0.15); 
             padding: 6px 15px; border-radius: 8px; font-family: monospace; font-size: 1rem;
             border: 1px solid rgba(88, 101, 242, 0.5);
             text-decoration: none; transition: 0.3s;
         }
         .dev-discord-link:hover {
-            background: rgba(88, 101, 242, 0.9); /* Έντονο χρώμα στο Hover */
+            background: rgba(88, 101, 242, 0.9); 
             transform: translateY(-3px); box-shadow: 0 5px 15px rgba(88, 101, 242, 0.4);
             border-color: #fff; color: #fff;
         }
@@ -193,14 +194,11 @@
 
     </div>
 
-    <!-- NΕΟ DEVELOPER FOOTER ΜΕ TO DISCORD -->
     <footer class="developer-footer">
         <div>Designed & Developed by <span class="dev-name">MrUndisputed</span></div>
         <div class="dev-contact">
             Looking for a custom web project? Contact me:
-            <!-- ΕΔΩ ΒΑΛΕ ΤΟ NUMERIC ID ΣΟΥ ΣΤΟ ΤΕΛΟΣ ΤΟΥ LINK -->
             <a href="https://discordapp.com/users/398924786895683585" target="_blank" class="dev-discord-link" title="Click to view my Discord profile">
-                <!-- SVG Εικονίδιο του Discord -->
                 <svg class="discord-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 127.14 96.36">
                     <path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77.13,77.13,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.31,60,73.31,53s5-12.74,11.43-12.74S96.3,46,96.19,53,91.13,65.69,84.69,65.69Z"/>
                 </svg>
@@ -225,11 +223,34 @@
         let top10Weekly = [];
 
         db.ref().on('value', snap => {
-            const data = snap.val();
+            const data = snap.val() || {};
             const allCPs = data.cps || {};
             const logs = data.dailyLogs || {};
             dailyLogsData = logs; 
             
+            // --- ΝΕΟ: Φτιάχνουμε "Χάρτη" για να βρίσκουμε το πραγματικό Όνομα και το CP του κάθε παίκτη ---
+            let playerInfoMap = {};
+            Object.keys(allCPs).forEach(cpId => {
+                const cp = allCPs[cpId];
+                if(cp.clan === 'history') return;
+                const cpName = cp.name || "Unknown CP";
+
+                if(cp.leader) {
+                    let realName = cp.leader.trim();
+                    let safeName = realName.toUpperCase().replace(/[.#$\[\]]/g, '_');
+                    playerInfoMap[safeName] = { realName: realName.toUpperCase(), cpName: cpName };
+                }
+                if(cp.members) {
+                    cp.members.split(',').forEach(m => {
+                        let realName = m.trim();
+                        if(realName) {
+                            let safeName = realName.toUpperCase().replace(/[.#$\[\]]/g, '_');
+                            playerInfoMap[safeName] = { realName: realName.toUpperCase(), cpName: cpName };
+                        }
+                    });
+                }
+            });
+
             // --- 1. ΥΠΟΛΟΓΙΣΜΟΣ ΓΙΑ ΤΑ PODIUMS (CPs) ---
             let activeCPs = Object.keys(allCPs)
                 .map(id => ({ id, ...allCPs[id] }))
@@ -242,9 +263,11 @@
                 })
                 .sort((a,b) => b.val - a.val);
 
+            // FIX 1: Ο σωστός υπολογισμός ημερομηνιών για να ταιριάζουν ακριβώς με τη βάση δεδομένων
             const last7Days = Array.from({length: 7}, (_, i) => {
-                const d = new Date(); d.setDate(d.getDate() - i);
-                return d.toLocaleDateString('el-GR').replace(/\//g, '-');
+                const d = new Date(); 
+                d.setDate(d.getDate() - i);
+                return d.getDate() + '-' + (d.getMonth() + 1) + '-' + d.getFullYear();
             });
 
             let wMap = {}, mMap = {};
@@ -275,7 +298,7 @@
             renderElite('mid-podium', mSorted.slice(0, 3));
 
             // --- 2. ΥΠΟΛΟΓΙΣΜΟΣ ΓΙΑ ΤΟ TOP 10 PLAYERS ---
-            calculateTop10();
+            calculateTop10(playerInfoMap, last7Days);
             const isAllTimeActive = document.getElementById('btn-alltime').classList.contains('active');
             showTop10(isAllTimeActive ? 'alltime' : 'weekly');
         });
@@ -302,38 +325,45 @@
             }).join('');
         }
 
-        function calculateTop10() {
+        // FIX 2: Περνάμε τον χάρτη των ονομάτων και τις σωστές 7 μέρες μέσα στη συνάρτηση
+        function calculateTop10(playerInfoMap, last7Days) {
             let allTimeScores = {};
             let weeklyScores = {};
 
-            const sortedDates = Object.keys(dailyLogsData).sort();
-            const last7Dates = sortedDates.slice(-7);
-
-            sortedDates.forEach(date => {
+            // Υπολογισμός All-Time
+            Object.keys(dailyLogsData).forEach(date => {
                 const dayData = dailyLogsData[date];
-                Object.keys(dayData).forEach(playerName => {
-                    const cleanName = playerName.trim().toUpperCase();
-                    if(!allTimeScores[cleanName]) allTimeScores[cleanName] = 0;
-                    allTimeScores[cleanName] += Object.keys(dayData[playerName]).length;
+                Object.keys(dayData).forEach(safeName => {
+                    if(!allTimeScores[safeName]) allTimeScores[safeName] = 0;
+                    allTimeScores[safeName] += Object.keys(dayData[safeName]).length;
                 });
             });
 
-            last7Dates.forEach(date => {
-                const dayData = dailyLogsData[date];
-                Object.keys(dayData).forEach(playerName => {
-                    const cleanName = playerName.trim().toUpperCase();
-                    if(!weeklyScores[cleanName]) weeklyScores[cleanName] = 0;
-                    weeklyScores[cleanName] += Object.keys(dayData[playerName]).length;
-                });
+            // Υπολογισμός Weekly (χρησιμοποιώντας τον ασφαλή πίνακα last7Days)
+            last7Days.forEach(date => {
+                if(dailyLogsData[date]) {
+                    const dayData = dailyLogsData[date];
+                    Object.keys(dayData).forEach(safeName => {
+                        if(!weeklyScores[safeName]) weeklyScores[safeName] = 0;
+                        weeklyScores[safeName] += Object.keys(dayData[safeName]).length;
+                    });
+                }
             });
 
+            // Μετατροπή σε λίστα και προσθήκη του πραγματικού Ονόματος & CP
             top10AllTime = Object.entries(allTimeScores)
-                .map(([name, score]) => ({ name, score }))
+                .map(([safeName, score]) => {
+                    let info = playerInfoMap[safeName] || { realName: safeName.replace(/_/g, ''), cpName: "No CP" };
+                    return { name: info.realName, cp: info.cpName, score: score };
+                })
                 .sort((a, b) => b.score - a.score)
                 .slice(0, 10);
 
             top10Weekly = Object.entries(weeklyScores)
-                .map(([name, score]) => ({ name, score }))
+                .map(([safeName, score]) => {
+                    let info = playerInfoMap[safeName] || { realName: safeName.replace(/_/g, ''), cpName: "No CP" };
+                    return { name: info.realName, cp: info.cpName, score: score };
+                })
                 .sort((a, b) => b.score - a.score)
                 .slice(0, 10);
         }
@@ -362,11 +392,12 @@
             }
 
             dataToShow.forEach((player, index) => {
+                // Εδώ πλέον τυπώνουμε και το player.cp!
                 listDiv.innerHTML += `
                     <div class="rank-list-item">
                         <div class="rank-list-number">#${index + 1}</div>
                         <div class="rank-list-name">
-                            ${player.name}
+                            ${player.name} <span class="rank-list-cp">(${player.cp})</span>
                             <span class="rank-list-subtitle">${subtitleText}</span>
                         </div>
                         <div class="rank-list-score">${player.score}</div>
