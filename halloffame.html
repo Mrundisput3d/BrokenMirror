@@ -226,7 +226,6 @@
             const logs = data.dailyLogs || {};
             dailyLogsData = logs; 
             
-            // --- ΝΕΟ: Χάρτης Ονομάτων. Κάνουμε τα πάντα UPPERCASE για να μην ξεφύγει τίποτα! ---
             let playerInfoMap = {};
             Object.keys(allCPs).forEach(cpId => {
                 const cp = allCPs[cpId];
@@ -254,12 +253,13 @@
                 .map(id => ({ id, ...allCPs[id] }))
                 .filter(cp => cp.clan !== 'history');
 
+            // FIX: Ταξινόμηση CPs με Δευτερεύον Κριτήριο (Αλφαβητικά) στην ισοβαθμία!
             const everSorted = activeCPs
                 .map(cp => {
                     const totalKills = Object.values(cp.bossStats || {}).reduce((a,b) => a + b, 0);
                     return { name: cp.name, val: totalKills };
                 })
-                .sort((a,b) => b.val - a.val);
+                .sort((a, b) => b.val !== a.val ? b.val - a.val : a.name.localeCompare(b.name));
 
             const last7Days = Array.from({length: 7}, (_, i) => {
                 const d = new Date(); 
@@ -287,8 +287,9 @@
                 }
             });
 
-            const wSorted = Object.keys(wMap).map(name => ({ name, val: wMap[name] })).sort((a,b)=>b.val-a.val);
-            const mSorted = Object.keys(mMap).map(name => ({ name, val: mMap[name] })).sort((a,b)=>b.val-a.val);
+            // FIX: Ταξινόμηση και στα Weekly / Mid Podiums με tie-breaker
+            const wSorted = Object.keys(wMap).map(name => ({ name, val: wMap[name] })).sort((a,b)=> b.val !== a.val ? b.val - a.val : a.name.localeCompare(b.name));
+            const mSorted = Object.keys(mMap).map(name => ({ name, val: mMap[name] })).sort((a,b)=> b.val !== a.val ? b.val - a.val : a.name.localeCompare(b.name));
 
             renderElite('ever-podium', everSorted.slice(0, 3));
             renderElite('weekly-podium', wSorted.slice(0, 3));
@@ -322,39 +323,37 @@
             }).join('');
         }
 
-        // --- ΔΙΟΡΘΩΜΕΝΗ ΣΥΝΑΡΤΗΣΗ (Case-Insensitive Logging) ---
         function calculateTop10(playerInfoMap, last7Days) {
             let allTimeScores = {};
             let weeklyScores = {};
 
-            // Υπολογισμός All-Time
             Object.keys(dailyLogsData).forEach(date => {
                 const dayData = dailyLogsData[date];
                 Object.keys(dayData).forEach(safeName => {
-                    let upperSafe = safeName.toUpperCase(); // Το κάνουμε UPPERCASE για να ταιριάζει με τον Χάρτη
+                    let upperSafe = safeName.toUpperCase();
                     if(!allTimeScores[upperSafe]) allTimeScores[upperSafe] = 0;
                     allTimeScores[upperSafe] += Object.keys(dayData[safeName]).length;
                 });
             });
 
-            // Υπολογισμός Weekly 
             last7Days.forEach(date => {
                 if(dailyLogsData[date]) {
                     const dayData = dailyLogsData[date];
                     Object.keys(dayData).forEach(safeName => {
-                        let upperSafe = safeName.toUpperCase(); // Το κάνουμε UPPERCASE για να ταιριάζει με τον Χάρτη
+                        let upperSafe = safeName.toUpperCase(); 
                         if(!weeklyScores[upperSafe]) weeklyScores[upperSafe] = 0;
                         weeklyScores[upperSafe] += Object.keys(dayData[safeName]).length;
                     });
                 }
             });
 
+            // FIX: Ταξινόμηση Παικτών με Tie-breaker (Αλφαβητικά)
             top10AllTime = Object.entries(allTimeScores)
                 .map(([upperSafe, score]) => {
                     let info = playerInfoMap[upperSafe] || { realName: upperSafe.replace(/_/g, ''), cpName: "No CP" };
                     return { name: info.realName, cp: info.cpName, score: score };
                 })
-                .sort((a, b) => b.score - a.score)
+                .sort((a, b) => b.score !== a.score ? b.score - a.score : a.name.localeCompare(b.name))
                 .slice(0, 10);
 
             top10Weekly = Object.entries(weeklyScores)
@@ -362,7 +361,7 @@
                     let info = playerInfoMap[upperSafe] || { realName: upperSafe.replace(/_/g, ''), cpName: "No CP" };
                     return { name: info.realName, cp: info.cpName, score: score };
                 })
-                .sort((a, b) => b.score - a.score)
+                .sort((a, b) => b.score !== a.score ? b.score - a.score : a.name.localeCompare(b.name))
                 .slice(0, 10);
         }
 
