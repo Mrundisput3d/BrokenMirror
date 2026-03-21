@@ -2,7 +2,7 @@
 <html lang="el">
 <head>
     <meta charset="UTF-8">
-    <title>BMA | Command Center V20.5 (Individual Player Ticks)</title>
+    <title>BMA | Command Center V20.5 (Secure Edition)</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -112,7 +112,7 @@
             </div>
 
             <div id="pending-queue-container" style="display:none; margin-bottom: 15px; padding: 10px; border: 1px solid var(--blue); background: rgba(52, 152, 219, 0.1); border-radius: 5px;">
-                <h3 style="color:var(--blue); margin: 0 0 10px 0;">📥 INBOX: Discord Bot Scans</h3>
+                <h3 style="color:var(--blue); margin: 0 0 10px 0;">📥 INBOX: Discord Bot & Desktop Scans</h3>
                 <div id="pending-queue-list"></div>
             </div>
             
@@ -242,22 +242,70 @@
 
     const firebaseConfig = { 
         apiKey: "AIzaSyDRL8EehxdcgVYJ0LJ1khVYkSJcaCMKRes", 
+        authDomain: "brokenmirrordb.firebaseapp.com", // ΣΗΜΑΝΤΙΚΗ ΠΡΟΣΘΗΚΗ ΓΙΑ ΤΟ AUTH
         databaseURL: "https://brokenmirrordb-default-rtdb.europe-west1.firebasedatabase.app" 
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
-
-    firebase.auth().onAuthStateChanged((user) => { if (!user) window.location.href = "login.html"; });
-    function logout() { firebase.auth().signOut().then(() => window.location.href = "login.html"); }
 
     let allCPs = {}, currentEditID = null, globalDailyLogs = {};
     let allExtClans = {}, currentExtID = null, viewMode = 'active'; 
     const bossKeys = ['VAL', 'ANT', 'BAI', 'SIE', 'ZAK', 'FRI', 'AQ', 'ORF', 'COR'];
     let lastAction = null; 
 
-    db.ref('cps/').on('value', snap => { allCPs = snap.val() || {}; renderSimpleList(); renderExtSelect(); renderMoveCPSelect(); if(currentEditID) loadEdit(currentEditID); if(currentExtID && currentExtID.startsWith('cp_')) loadExtEdit(); });
-    db.ref('dailyLogs/').on('value', snap => { globalDailyLogs = snap.val() || {}; });
-    db.ref('externalClans/').on('value', snap => { allExtClans = snap.val() || {}; renderExtSelect(); if(currentExtID && currentExtID.startsWith('ext_')) loadExtEdit(); });
+    // === ΣΥΣΤΗΜΑ ΑΣΦΑΛΕΙΑΣ & LISTENERS ===
+    firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+        .then(() => {
+            firebase.auth().onAuthStateChanged((user) => { 
+                if (!user) {
+                    console.warn("Αποτυχία επιβεβαίωσης. Επιστροφή στο Login.");
+                    window.location.href = "admin_login.html"; 
+                } else {
+                    console.log("✅ Admin Συνδεδεμένος:", user.email);
+                    startDatabaseListeners(); 
+                }
+            });
+        })
+        .catch((error) => console.error("Σφάλμα Auth Persistence:", error));
+
+    function logout() { firebase.auth().signOut().then(() => window.location.href = "admin_login.html"); }
+
+    function startDatabaseListeners() {
+        // CPs, Logs και Clans
+        db.ref('cps/').on('value', snap => { allCPs = snap.val() || {}; renderSimpleList(); renderExtSelect(); renderMoveCPSelect(); if(currentEditID) loadEdit(currentEditID); if(currentExtID && currentExtID.startsWith('cp_')) loadExtEdit(); });
+        db.ref('dailyLogs/').on('value', snap => { globalDailyLogs = snap.val() || {}; });
+        db.ref('externalClans/').on('value', snap => { allExtClans = snap.val() || {}; renderExtSelect(); if(currentExtID && currentExtID.startsWith('ext_')) loadExtEdit(); });
+
+        // Inbox (Pending Queue) - Μεταφέρθηκε εδώ!
+        db.ref('pendingScans/').on('value', snap => {
+            const queueContainer = document.getElementById('pending-queue-container'); 
+            const queueList = document.getElementById('pending-queue-list'); 
+            const scans = snap.val();
+            
+            if(!scans) { queueContainer.style.display = 'none'; return; }
+            queueContainer.style.display = 'block'; queueList.innerHTML = '';
+            
+            Object.keys(scans).forEach(key => { 
+                const scan = scans[key]; 
+                const sender = scan.submittedBy || "Άγνωστος";
+                const notes = scan.userNotes && scan.userNotes !== "Χωρίς περιγραφή" ? `<br><span style="color:var(--sky); font-size:15px; font-weight:bold; font-family:'Cinzel';">📝 ${scan.userNotes}</span>` : "";
+                
+                queueList.innerHTML += `
+                <div class="queue-item" style="flex-direction:column; align-items:flex-start; border-left-color: var(--sky);">
+                    <div style="width:100%; display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <b style="color:#fff;">Από: ${sender}</b> <span style="font-size:10px; color:#aaa;">(${new Date(scan.timestamp).toLocaleString('el-GR')})</span>
+                            ${notes}
+                        </div>
+                        <div>
+                            <button class="btn btn-gold" style="padding: 8px 15px;" onclick="loadPendingScan('${key}')">REVIEW & LOAD</button>
+                            <button class="btn btn-red" onclick="deletePendingScan('${key}')">✖</button>
+                        </div>
+                    </div>
+                </div>`; 
+            });
+        });
+    }
 
     // =========================================================
     // SMART FILTER JAVASCRIPT
@@ -309,37 +357,8 @@
     }
 
     // =========================================================
-    // INBOX (PENDING QUEUE)
+    // INBOX HANDLERS (Pending Scans Functions)
     // =========================================================
-    db.ref('pendingScans/').on('value', snap => {
-        const queueContainer = document.getElementById('pending-queue-container'); 
-        const queueList = document.getElementById('pending-queue-list'); 
-        const scans = snap.val();
-        
-        if(!scans) { queueContainer.style.display = 'none'; return; }
-        queueContainer.style.display = 'block'; queueList.innerHTML = '';
-        
-        Object.keys(scans).forEach(key => { 
-            const scan = scans[key]; 
-            const sender = scan.submittedBy || "Άγνωστος";
-            const notes = scan.userNotes && scan.userNotes !== "Χωρίς περιγραφή" ? `<br><span style="color:var(--sky); font-size:15px; font-weight:bold; font-family:'Cinzel';">📝 ${scan.userNotes}</span>` : "";
-            
-            queueList.innerHTML += `
-            <div class="queue-item" style="flex-direction:column; align-items:flex-start; border-left-color: var(--sky);">
-                <div style="width:100%; display:flex; justify-content:space-between; align-items:center;">
-                    <div>
-                        <b style="color:#fff;">Από: ${sender}</b> <span style="font-size:10px; color:#aaa;">(${new Date(scan.timestamp).toLocaleString('el-GR')})</span>
-                        ${notes}
-                    </div>
-                    <div>
-                        <button class="btn btn-gold" style="padding: 8px 15px;" onclick="loadPendingScan('${key}')">REVIEW & LOAD</button>
-                        <button class="btn btn-red" onclick="deletePendingScan('${key}')">✖</button>
-                    </div>
-                </div>
-            </div>`; 
-        });
-    });
-
     function loadPendingScan(key) { 
         db.ref('pendingScans/' + key).once('value', snap => { 
             const scan = snap.val(); 
@@ -538,20 +557,17 @@
                 let eligible = namesFound.filter(name => {
                     const safeName = name.replace(/[.#$\[\]]/g, '_');
                     
-                    // --- ΕΛΕΓΧΟΣ ANTI-CHEAT 12 ΩΡΩΝ ---
                     let isLocked = false;
                     for (let dateKey in globalDailyLogs) {
                         if (globalDailyLogs[dateKey][safeName] && globalDailyLogs[dateKey][safeName][bossId]) {
                             let log = globalDailyLogs[dateKey][safeName][bossId];
                             
-                            // Αν το log έχει timestamp, ελέγχουμε αυστηρά τις 12 ώρες
                             if (log.timestamp) {
                                 if (nowMs - log.timestamp < twelveHoursMs) {
                                     isLocked = true;
                                     break;
                                 }
                             } else if (dateKey === today) {
-                                // Fallback: Αν είναι παλιό log χωρίς timestamp, κρατάμε τον κανόνα της "τρέχουσας ημέρας"
                                 isLocked = true;
                                 break;
                             }
@@ -585,7 +601,7 @@
                     await db.ref(`dailyLogs/${today}/${safeName}/${bossId}`).set({ 
                         cp: id, 
                         time: new Date().toLocaleTimeString('el-GR'),
-                        timestamp: nowMs // <--- ΕΔΩ ΑΠΟΘΗΚΕΥΕΤΑΙ Η ΩΡΑ ΣΕ ΧΙΛΙΟΣΤΑ ΤΟΥ ΔΕΥΤΕΡΟΛΕΠΤΟΥ
+                        timestamp: nowMs
                     });
                 }
                 totalUpdated++;
@@ -719,7 +735,8 @@
     function toggleExtHistory() { if(!currentExtID || !currentExtID.startsWith('ext_')) return; const pureId = currentExtID.replace('ext_', ''); const clan = allExtClans[pureId] || {}; const newStatus = clan.status === 'history' ? 'active' : 'history'; db.ref('externalClans/' + pureId).update({ status: newStatus }).then(() => { alert("Clan visibility updated!"); loadExtEdit(); }); }
     function addExtMarketLoot() { if(!currentExtID) return; const loot = document.getElementById('ext-loot-market').value.split('|'); const newItem = { item: loot[1], cost: loot[0], date: new Date().toLocaleDateString('el-GR') }; if (currentExtID.startsWith('ext_')) { const pureId = currentExtID.replace('ext_', ''); db.ref('externalClans/' + pureId).transaction(ext => { if(ext === null) ext = {}; if(!ext.lootHistory) ext.lootHistory = []; ext.lootHistory.push(newItem); return ext; }); } else if (currentExtID.startsWith('cp_')) { const pureId = currentExtID.replace('cp_', ''); db.ref('cps/' + pureId).transaction(cp => { if(cp) { cp.totalPoints -= parseInt(loot[0]); if(!cp.lootHistory) cp.lootHistory = []; cp.lootHistory.push(newItem); } return cp; }); } }
     function deleteExtLoot(idx) { if(!confirm("Are you sure you want to delete this loot? (Points will refund if it's a Caller)")) return; if (currentExtID.startsWith('ext_')) { const pureId = currentExtID.replace('ext_', ''); const ext = allExtClans[pureId]; ext.lootHistory.splice(idx, 1); db.ref('externalClans/' + pureId).update({ lootHistory: ext.lootHistory }); } else if (currentExtID.startsWith('cp_')) { const pureId = currentExtID.replace('cp_', ''); const cp = allCPs[pureId]; cp.totalPoints += parseInt(cp.lootHistory[idx].cost); cp.lootHistory.splice(idx, 1); db.ref('cps/' + pureId).update({ totalPoints: cp.totalPoints, lootHistory: cp.lootHistory }); } }
-// =========================================================
+
+    // =========================================================
     // AUTO-CLEANUP: ΚΑΘΑΡΙΣΜΟΣ LOGS ΠΑΛΑΙΟΤΕΡΩΝ ΤΩΝ 30 ΗΜΕΡΩΝ
     // =========================================================
     async function cleanOldLogs() {
@@ -727,17 +744,13 @@
             const snap = await db.ref('dailyLogs/').once('value');
             const logs = snap.val() || {};
             const nowMs = Date.now();
-            const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000; // 30 μέρες σε milliseconds
+            const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000; 
 
             let deletedCount = 0;
             for (let dateStr in logs) {
-                // Η μορφή της ημερομηνίας είναι DD-MM-YYYY
                 let parts = dateStr.split('-');
                 if (parts.length === 3) {
-                    // Η Javascript διαβάζει: Έτος, Μήνας (0-11), Ημέρα
                     let logDate = new Date(parts[2], parts[1] - 1, parts[0]).getTime();
-                    
-                    // Αν έχουν περάσει πάνω από 30 μέρες, διέγραψε αυτόν τον φάκελο!
                     if (nowMs - logDate > thirtyDaysMs) {
                         await db.ref('dailyLogs/' + dateStr).remove();
                         deletedCount++;
@@ -745,14 +758,14 @@
                 }
             }
             if (deletedCount > 0) {
-                console.log(`🧹 Auto-Cleanup: Διαγράφηκαν ${deletedCount} παλιά logs (πάνω από 30 μέρες). Η βάση είναι πεντακάθαρη!`);
+                console.log(`🧹 Auto-Cleanup: Διαγράφηκαν ${deletedCount} παλιά logs.`);
             }
         } catch (error) {
             console.error("Σφάλμα κατά τον καθαρισμό των παλιών logs:", error);
         }
     }
     
-    // Τρέξε τον καθαριστή αυτόματα 5 δευτερόλεπτα αφού φορτώσει η σελίδα (για να μην καθυστερεί το UI)
-    setTimeout(cleanOldLogs, 5000);</script>
+    setTimeout(cleanOldLogs, 5000);
+</script>
 </body>
 </html>
