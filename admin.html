@@ -638,7 +638,7 @@
         document.getElementById('loot-history-body').innerHTML = lootHtml; 
         
         const toggleBtn = document.getElementById('hist-toggle-btn'); if(cp.clan === 'history') { toggleBtn.innerText = "RESTORE"; toggleBtn.className = "btn btn-green"; } else { toggleBtn.innerText = "HIST"; toggleBtn.className = "btn btn-blue"; } 
-        recalcEditPoints(); // Τρέξε το μία φορά στο φόρτωμα
+        recalcEditPoints(); 
     }
 
     function updateCP() { 
@@ -656,14 +656,13 @@
     async function movePlayerToCP() { const playerName = document.getElementById('move-player-name').value.trim(); const targetCpId = document.getElementById('move-target-cp').value; if(!playerName || !targetCpId) { alert("Παρακαλώ συμπλήρωσε το όνομα και διάλεξε το CP προορισμού."); return; } const searchName = playerName.toLowerCase(); let sourceCpId = null; let sourceMembersArr = []; let exactPlayerName = playerName; for (const id in allCPs) { if(allCPs[id].clan === 'history') continue; if(allCPs[id].leader && allCPs[id].leader.toLowerCase() === searchName) { alert(`ΠΡΟΣΟΧΗ! Ο ${playerName} είναι LEADER στο CP ${allCPs[id].name}. Πρέπει να αλλάξεις χειροκίνητα τον Leader από το Edit CP.`); return; } let membersArr = (allCPs[id].members || "").split(',').map(m => m.trim()).filter(m => m !== ""); let idx = membersArr.findIndex(m => m.toLowerCase() === searchName); if (idx !== -1) { sourceCpId = id; exactPlayerName = membersArr[idx]; sourceMembersArr = membersArr; sourceMembersArr.splice(idx, 1); break; } } if (!sourceCpId) { alert(`Ο παίκτης ${playerName} δεν βρέθηκε στο Roster κανενός ενεργού CP.`); return; } if (sourceCpId === targetCpId) { alert(`Ο παίκτης ${exactPlayerName} ανήκει ήδη στο CP ${allCPs[targetCpId].name}!`); return; } const targetCp = allCPs[targetCpId]; let targetMembersArr = (targetCp.members || "").split(',').map(m => m.trim()).filter(m => m !== ""); targetMembersArr.push(exactPlayerName); if(!confirm(`ΕΠΙΒΕΒΑΙΩΣΗ:\nΝα μεταφερθεί ο ${exactPlayerName} από το ${allCPs[sourceCpId].name} στο ${targetCp.name};`)) return; await db.ref(`cps/${sourceCpId}`).update({ members: sourceMembersArr.join(', ') }); await db.ref(`cps/${targetCpId}`).update({ members: targetMembersArr.join(', ') }); alert(`Η μεταφορά ολοκληρώθηκε!\nΟ ${exactPlayerName} είναι πλέον στο ${targetCp.name}.`); document.getElementById('move-player-name').value = ""; }
     function toggleHistoryStatus() { const cp = allCPs[currentEditID]; if(cp.clan === 'history') { const newClan = prompt("Σε ποια ομάδα; (noldor, kriminalides, caller)", "noldor"); if (newClan === null) return; const formattedClan = newClan.trim().toLowerCase(); if (formattedClan !== "noldor" && formattedClan !== "kriminalides" && formattedClan !== "caller") return alert("Λάθος όνομα!"); db.ref('cps/' + currentEditID).update({ clan: formattedClan }).then(() => alert("Restored!")); } else { if(confirm("Move to History?")) db.ref('cps/' + currentEditID).update({ clan: 'history' }).then(() => alert("Moved!")); } }
     
-    // --- ΔΙΟΡΘΩΜΕΝΑ MARKET LOOTS ---
     function deleteLoot(idx) { 
         if(!confirm("Refund points?")) return; 
         const cp = allCPs[currentEditID]; 
         const cost = parseInt(cp.lootHistory[idx].cost);
         cp.lootHistory.splice(idx, 1); 
-        cp.totalPoints += cost; // Επιστροφή πόντων ΑΜΕΣΑ στη βάση
-        db.ref('cps/' + currentEditID).update({ lootHistory: cp.lootHistory, totalPoints: cp.totalPoints }); 
+        cp.totalPoints += cost; 
+        db.ref('cps/' + currentEditID).update({ lootHistory: cp.lootHistory, totalPoints: cp.totalPoints }).then(() => loadEdit(currentEditID)); 
     }
     
     function addMarketLoot() { 
@@ -672,10 +671,10 @@
             if(cp) { 
                 if(!cp.lootHistory) cp.lootHistory = []; 
                 cp.lootHistory.push({ item: loot[1], cost: loot[0], date: new Date().toLocaleDateString('el-GR') }); 
-                cp.totalPoints -= parseInt(loot[0]); // Αφαίρεση πόντων ΑΜΕΣΑ στη βάση
+                cp.totalPoints -= parseInt(loot[0]); 
             } 
             return cp; 
-        }); 
+        }).then(() => loadEdit(currentEditID)); 
     }
     
     function createNewCP() { const n = document.getElementById('new-name').value; if(!n) return; const id = n.replace(/\s+/g, '-').toLowerCase(); db.ref('cps/' + id).set({ name: n, leader: document.getElementById('new-leader').value, imgUrl: document.getElementById('new-imgUrl').value || 'https://i.ibb.co/SXM1FZx8/attedance-points.png', clan: document.getElementById('new-clan').value, totalPoints: 0, members: "", bossStats: { VAL:0, ANT:0, BAI:0, SIE:0, ZAK:0, FRI:0, AQ:0, ORF:0, COR:0 } }); }
@@ -717,7 +716,6 @@
     
     function toggleExtHistory() { if(!currentExtID || !currentExtID.startsWith('ext_')) return; const pureId = currentExtID.replace('ext_', ''); const clan = allExtClans[pureId] || {}; const newStatus = clan.status === 'history' ? 'active' : 'history'; db.ref('externalClans/' + pureId).update({ status: newStatus }).then(() => { alert("Clan visibility updated!"); loadExtEdit(); }); }
     
-    // --- ΔΙΟΡΘΩΜΕΝΑ EXTERNAL MARKET LOOTS ---
     function addExtMarketLoot() { 
         if(!currentExtID) return; 
         const loot = document.getElementById('ext-loot-market').value.split('|'); 
@@ -725,46 +723,57 @@
         if (currentExtID.startsWith('ext_')) { 
             const pureId = currentExtID.replace('ext_', ''); 
             db.ref('externalClans/' + pureId).transaction(ext => { 
-                if(ext === null) ext = {}; 
-                if(!ext.lootHistory) ext.lootHistory = []; 
-                ext.lootHistory.push(newItem); 
-                return ext; 
-            }); 
+                if(ext === null) ext = {}; if(!ext.lootHistory) ext.lootHistory = []; ext.lootHistory.push(newItem); return ext; 
+            }).then(() => loadExtEdit()); 
         } else if (currentExtID.startsWith('cp_')) { 
             const pureId = currentExtID.replace('cp_', ''); 
             db.ref('cps/' + pureId).transaction(cp => { 
-                if(cp) { 
-                    if(!cp.lootHistory) cp.lootHistory = []; 
-                    cp.lootHistory.push(newItem); 
-                    cp.totalPoints -= parseInt(loot[0]); // Αφαίρεση πόντων Caller στη βάση
-                } 
+                if(cp) { if(!cp.lootHistory) cp.lootHistory = []; cp.lootHistory.push(newItem); cp.totalPoints -= parseInt(loot[0]); } 
                 return cp; 
-            }); 
+            }).then(() => loadExtEdit()); 
         } 
     }
     
     function deleteExtLoot(idx) { 
         if(!confirm("Are you sure you want to delete this loot?")) return; 
         if (currentExtID.startsWith('ext_')) { 
-            const pureId = currentExtID.replace('ext_', ''); 
-            const ext = allExtClans[pureId]; 
-            ext.lootHistory.splice(idx, 1); 
-            db.ref('externalClans/' + pureId).update({ lootHistory: ext.lootHistory }); 
+            const pureId = currentExtID.replace('ext_', ''); const ext = allExtClans[pureId]; ext.lootHistory.splice(idx, 1); 
+            db.ref('externalClans/' + pureId).update({ lootHistory: ext.lootHistory }).then(() => loadExtEdit()); 
         } else if (currentExtID.startsWith('cp_')) { 
-            const pureId = currentExtID.replace('cp_', ''); 
-            const cp = allCPs[pureId]; 
-            const cost = parseInt(cp.lootHistory[idx].cost);
-            cp.lootHistory.splice(idx, 1); 
-            cp.totalPoints += cost; // Επιστροφή πόντων Caller στη βάση
-            db.ref('cps/' + pureId).update({ lootHistory: cp.lootHistory, totalPoints: cp.totalPoints }); 
+            const pureId = currentExtID.replace('cp_', ''); const cp = allCPs[pureId]; const cost = parseInt(cp.lootHistory[idx].cost); cp.lootHistory.splice(idx, 1); cp.totalPoints += cost; 
+            db.ref('cps/' + pureId).update({ lootHistory: cp.lootHistory, totalPoints: cp.totalPoints }).then(() => loadExtEdit()); 
         } 
     }
 
     async function cleanOldLogs() {
         try {
-            const snap = await db.ref('dailyLogs/').once('value'); const logs = snap.val() || {}; const nowMs = Date.now(); const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000; let deletedCount = 0;
-            for (let dateStr in logs) { let parts = dateStr.split('-'); if (parts.length === 3) { let logDate = new Date(parts[2], parts[1] - 1, parts[0]).getTime(); if (nowMs - logDate > thirtyDaysMs) { await db.ref('dailyLogs/' + dateStr).remove(); deletedCount++; } } }
-            if (deletedCount > 0) { console.log(`🧹 Auto-Cleanup: Διαγράφηκαν ${deletedCount} παλιά logs.`); }
+            const snap = await db.ref('dailyLogs/').once('value'); const logs = snap.val() || {}; 
+            const nowMs = Date.now(); const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000; let deletedCount = 0;
+            let pUpdates = {}; let cUpdates = {};
+
+            for (let dateStr in logs) { 
+                let parts = dateStr.split('-'); 
+                if (parts.length === 3) { 
+                    let logDate = new Date(parts[2], parts[1] - 1, parts[0]).getTime(); 
+                    if (nowMs - logDate > thirtyDaysMs) { 
+                        let dayData = logs[dateStr];
+                        for (let pName in dayData) {
+                            let count = Object.keys(dayData[pName]).length;
+                            pUpdates[pName] = (pUpdates[pName] || 0) + count;
+                            for (let bId in dayData[pName]) {
+                                let cpId = dayData[pName][bId].cp;
+                                if (cpId) cUpdates[cpId] = (cUpdates[cpId] || 0) + 1;
+                            }
+                        }
+                        await db.ref('dailyLogs/' + dateStr).remove(); deletedCount++; 
+                    } 
+                } 
+            }
+            if (deletedCount > 0) { 
+                for(let p in pUpdates) await db.ref(`archive/players/${p}`).transaction(c => (c||0) + pUpdates[p]);
+                for(let c in cUpdates) await db.ref(`archive/cps/${c}`).transaction(c => (c||0) + cUpdates[c]);
+                console.log(`🧹 Auto-Cleanup: Αρχειοθετήθηκαν & διαγράφηκαν ${deletedCount} παλιά logs.`); 
+            }
         } catch (error) {}
     }
     setTimeout(cleanOldLogs, 5000);
