@@ -212,7 +212,6 @@
         const db = firebase.database();
 
         const lowMidKeys = ['ZAK', 'FRI', 'AQ', 'ORF', 'COR'];
-
         let dailyLogsData = {};
         let top10AllTime = [];
         let top10Weekly = [];
@@ -221,6 +220,7 @@
             const data = snap.val() || {};
             const allCPs = data.cps || {};
             const logs = data.dailyLogs || {};
+            const archive = data.archive || { players: {}, cps: {} }; 
             dailyLogsData = logs; 
             
             let playerInfoMap = {};
@@ -230,25 +230,29 @@
                 const cpName = cp.name || "Unknown CP";
 
                 if(cp.leader) {
-                    let realName = cp.leader.trim();
-                    let safeName = realName.toUpperCase().replace(/[.#$\[\]]/g, '_');
-                    playerInfoMap[safeName] = { realName: realName.toUpperCase(), cpName: cpName };
+                    let safeName = cp.leader.trim().toUpperCase().replace(/[.#$\[\]]/g, '_');
+                    playerInfoMap[safeName] = { realName: cp.leader.trim().toUpperCase(), cpName: cpName };
                 }
                 if(cp.members) {
                     cp.members.split(',').forEach(m => {
-                        let realName = m.trim();
-                        if(realName) {
-                            let safeName = realName.toUpperCase().replace(/[.#$\[\]]/g, '_');
-                            playerInfoMap[safeName] = { realName: realName.toUpperCase(), cpName: cpName };
+                        if(m.trim()) {
+                            let safeName = m.trim().toUpperCase().replace(/[.#$\[\]]/g, '_');
+                            playerInfoMap[safeName] = { realName: m.trim().toUpperCase(), cpName: cpName };
                         }
                     });
                 }
             });
 
-            // === ΝΕΑ ΛΟΓΙΚΗ: ΥΠΟΛΟΓΙΣΜΟΣ ΟΛΩΝ ΤΩΝ PODIUMS ΑΠΟ ΤΑ LOGS ===
             let everCPMap = {}, weeklyCPMap = {}, midCPMap = {};
 
-            // 1. Υπολογισμός All-Time (Immortals) από ΟΛΑ τα διαθέσιμα Logs
+            // 1. ALL-TIME (IMMORTALS) ΓΙΑ CPs: Φορτώνουμε το Archive
+            Object.keys(archive.cps).forEach(cpId => {
+                if(allCPs[cpId] && allCPs[cpId].clan !== 'history') {
+                    everCPMap[allCPs[cpId].name] = (everCPMap[allCPs[cpId].name] || 0) + archive.cps[cpId];
+                }
+            });
+
+            // 2. Προσθέτουμε τις τρέχουσες μέρες
             Object.keys(logs).forEach(date => {
                 Object.values(logs[date]).forEach(playerObj => {
                     Object.keys(playerObj).forEach(bossId => {
@@ -261,10 +265,8 @@
                 });
             });
 
-            // 2. Υπολογισμός Weekly και Mid από τις τελευταίες 7 ημέρες
             const last7Days = Array.from({length: 7}, (_, i) => {
-                const d = new Date(); 
-                d.setDate(d.getDate() - i);
+                const d = new Date(); d.setDate(d.getDate() - i);
                 return d.getDate() + '-' + (d.getMonth() + 1) + '-' + d.getFullYear();
             });
 
@@ -283,7 +285,6 @@
                 }
             });
 
-            // Ταξινόμηση
             const everSorted = Object.keys(everCPMap).map(name => ({ name, val: everCPMap[name] })).sort((a,b)=> b.val !== a.val ? b.val - a.val : a.name.localeCompare(b.name));
             const wSorted = Object.keys(weeklyCPMap).map(name => ({ name, val: weeklyCPMap[name] })).sort((a,b)=> b.val !== a.val ? b.val - a.val : a.name.localeCompare(b.name));
             const mSorted = Object.keys(midCPMap).map(name => ({ name, val: midCPMap[name] })).sort((a,b)=> b.val !== a.val ? b.val - a.val : a.name.localeCompare(b.name));
@@ -292,7 +293,7 @@
             renderElite('weekly-podium', wSorted.slice(0, 3));
             renderElite('mid-podium', mSorted.slice(0, 3));
 
-            calculateTop10(playerInfoMap, last7Days);
+            calculateTop10(playerInfoMap, last7Days, archive.players);
             const isAllTimeActive = document.getElementById('btn-alltime').classList.contains('active');
             showTop10(isAllTimeActive ? 'alltime' : 'weekly');
         });
@@ -319,26 +320,31 @@
             }).join('');
         }
 
-        function calculateTop10(playerInfoMap, last7Days) {
-            let allTimeScores = {};
-            let weeklyScores = {};
+        function calculateTop10(playerInfoMap, last7Days, archivePlayers) {
+            let allTimeScores = {}; let weeklyScores = {};
+
+            // Φορτώνουμε Archive Παικτών
+            if (archivePlayers) {
+                Object.keys(archivePlayers).forEach(safeName => {
+                    let upperSafe = safeName.toUpperCase();
+                    allTimeScores[upperSafe] = (allTimeScores[upperSafe] || 0) + archivePlayers[safeName];
+                });
+            }
 
             Object.keys(dailyLogsData).forEach(date => {
-                const dayData = dailyLogsData[date];
-                Object.keys(dayData).forEach(safeName => {
+                Object.keys(dailyLogsData[date]).forEach(safeName => {
                     let upperSafe = safeName.toUpperCase();
                     if(!allTimeScores[upperSafe]) allTimeScores[upperSafe] = 0;
-                    allTimeScores[upperSafe] += Object.keys(dayData[safeName]).length;
+                    allTimeScores[upperSafe] += Object.keys(dailyLogsData[date][safeName]).length;
                 });
             });
 
             last7Days.forEach(date => {
                 if(dailyLogsData[date]) {
-                    const dayData = dailyLogsData[date];
-                    Object.keys(dayData).forEach(safeName => {
+                    Object.keys(dailyLogsData[date]).forEach(safeName => {
                         let upperSafe = safeName.toUpperCase(); 
                         if(!weeklyScores[upperSafe]) weeklyScores[upperSafe] = 0;
-                        weeklyScores[upperSafe] += Object.keys(dayData[safeName]).length;
+                        weeklyScores[upperSafe] += Object.keys(dailyLogsData[date][safeName]).length;
                     });
                 }
             });
@@ -347,30 +353,18 @@
                 .map(([upperSafe, score]) => {
                     let info = playerInfoMap[upperSafe] || { realName: upperSafe.replace(/_/g, ''), cpName: "No CP" };
                     return { name: info.realName, cp: info.cpName, score: score };
-                })
-                .sort((a, b) => b.score !== a.score ? b.score - a.score : a.name.localeCompare(b.name))
-                .slice(0, 10);
+                }).sort((a, b) => b.score !== a.score ? b.score - a.score : a.name.localeCompare(b.name)).slice(0, 10);
 
             top10Weekly = Object.entries(weeklyScores)
                 .map(([upperSafe, score]) => {
                     let info = playerInfoMap[upperSafe] || { realName: upperSafe.replace(/_/g, ''), cpName: "No CP" };
                     return { name: info.realName, cp: info.cpName, score: score };
-                })
-                .sort((a, b) => b.score !== a.score ? b.score - a.score : a.name.localeCompare(b.name))
-                .slice(0, 10);
+                }).sort((a, b) => b.score !== a.score ? b.score - a.score : a.name.localeCompare(b.name)).slice(0, 10);
         }
 
         function showTop10(type) {
-            const btnWeekly = document.getElementById('btn-weekly');
-            const btnAllTime = document.getElementById('btn-alltime');
-            
-            if(type === 'weekly') {
-                btnWeekly.classList.add('active');
-                btnAllTime.classList.remove('active');
-            } else {
-                btnAllTime.classList.add('active');
-                btnWeekly.classList.remove('active');
-            }
+            document.getElementById('btn-weekly').classList.toggle('active', type === 'weekly');
+            document.getElementById('btn-alltime').classList.toggle('active', type === 'alltime');
             
             const listDiv = document.getElementById('players-ranking-list');
             listDiv.innerHTML = '';
