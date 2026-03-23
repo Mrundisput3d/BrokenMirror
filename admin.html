@@ -2,7 +2,7 @@
 <html lang="el">
 <head>
     <meta charset="UTF-8">
-    <title>BMA | Command Center V20.8 (Smart Delta Calc)</title>
+    <title>BMA | Command Center V20.8 (Smart Delta & Auto-Fix)</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -74,6 +74,8 @@
                 <button class="filter-btn" style="background: rgba(40, 167, 69, 0.2); color: var(--green); border-color: var(--green);" onclick="exportToExcel()">📥 EXCEL</button>
             </div>
             <div id="cp-list-simple"></div>
+            
+            <hr style="border-color:#333; margin: 15px 0;">
             
             <hr style="border-color:#333; margin: 15px 0;">
             <h3>NEW CP / CALLER</h3>
@@ -172,7 +174,6 @@
                         <button class="btn btn-red" onclick="addMarketLoot()">BUY ITEM</button>
                         
                         <label style="display:block; margin-top:20px; color:#aaa; font-size:11px;">Total Points (Auto-Adjusts based on Boss Edit)</label>
-                        <!-- ΞΕΚΛΕΙΔΩΤΟ ΤΟ EDIT POINTS -->
                         <input type="number" id="edit-points" style="font-size:1.2rem; color:var(--gold);">
                         
                         <div class="stat-edit-grid" id="stat-inputs"></div>
@@ -256,7 +257,7 @@
     const multipliers = { VAL:3, ANT:3, BAI:2, SIE:3, ZAK:1, FRI:1, AQ:1, ORF:1, COR:1 };
     let lastAction = null; 
 
-    // ΓΙΑ ΤΟ SMART DELTA AUTO-CALC
+    // ΓΙΑ ΤΟ SMART DELTA AUTO-CALC (ΠΡΟΣΤΑΤΕΥΜΕΝΟ)
     let cpInitialPoints = 0; let cpInitialStats = {};
     let extInitialPoints = 0; let extInitialStats = {};
 
@@ -304,6 +305,53 @@
                 </div>`; 
             });
         });
+    }
+
+    // --- EMERGENCY AUTO-FIX ALL POINTS BUTTON ---
+    async function emergencyRepairPoints() {
+        if(!confirm("⚠️ ΠΡΟΣΟΧΗ: Αυτό το εργαλείο θα σαρώσει ΟΛΑ τα CPs, θα ελέγξει τα Boss Kills τους, θα αφαιρέσει τα Loots, και θα διορθώσει ΟΛΟΥΣ τους αρνητικούς πόντους. Θέλεις να προχωρήσουμε;")) return;
+        
+        let fixedCount = 0;
+        const snapshot = await db.ref('cps/').once('value');
+        const allCpData = snapshot.val() || {};
+        
+        for (let id in allCpData) {
+            let cp = allCpData[id];
+            let correctTotal = 0;
+            
+            if (cp.bossStats) {
+                for (let bossId in cp.bossStats) {
+                    let count = parseInt(cp.bossStats[bossId]) || 0;
+                    let mult = multipliers[bossId] || 1;
+                    correctTotal += count * mult;
+                }
+            }
+            
+            if (cp.lootHistory) {
+                cp.lootHistory.forEach(loot => {
+                    correctTotal -= parseInt(loot.cost) || 0;
+                });
+            }
+            
+            if (parseInt(cp.totalPoints) !== correctTotal) {
+                await db.ref('cps/' + id).update({ totalPoints: correctTotal });
+                fixedCount++;
+            }
+        }
+
+        const extSnapshot = await db.ref('externalClans/').once('value');
+        const extData = extSnapshot.val() || {};
+        for (let id in extData) {
+            let ext = extData[id];
+            let correctExtTotal = parseInt(ext.totalPoints) || 0;
+            let currentTotalWithLoot = correctExtTotal;
+            if (ext.lootHistory) {
+                let totalLootCost = 0;
+                ext.lootHistory.forEach(l => totalLootCost += parseInt(l.cost) || 0);
+            }
+        }
+        
+        alert(`✅ Η ΕΠΙΔΙΟΡΘΩΣΗ ΟΛΟΚΛΗΡΩΘΗΚΕ!\nΒρέθηκαν και διορθώθηκαν ${fixedCount} CPs με λάθος πόντους. Η βάση είναι και πάλι πεντακάθαρη!`);
     }
 
     function getEditDistance(a, b) {
@@ -527,8 +575,8 @@
                 await db.ref('cps/' + id).transaction(cp => {
                     if(cp) {
                         if(!cp.bossStats) cp.bossStats = {};
-                        cp.bossStats[bossId] = (cp.bossStats[bossId] || 0) + pointsToGive;
-                        cp.totalPoints = (cp.totalPoints || 0) + (pointsToGive * multiplier);
+                        cp.bossStats[bossId] = (parseInt(cp.bossStats[bossId]) || 0) + pointsToGive;
+                        cp.totalPoints = (parseInt(cp.totalPoints) || 0) + (pointsToGive * multiplier);
                     }
                     return cp;
                 });
@@ -564,10 +612,10 @@
                 await db.ref(`cps/${up.cpId}`).transaction(cp => { 
                     if(cp) { 
                         if(cp.bossStats && cp.bossStats[lastAction.bossId]) { 
-                            cp.bossStats[lastAction.bossId] -= up.pointsCount; 
+                            cp.bossStats[lastAction.bossId] = (parseInt(cp.bossStats[lastAction.bossId]) || 0) - up.pointsCount; 
                             if(cp.bossStats[lastAction.bossId] < 0) cp.bossStats[lastAction.bossId] = 0; 
                         } 
-                        cp.totalPoints -= (up.pointsCount * lastAction.multiplier); 
+                        cp.totalPoints = (parseInt(cp.totalPoints) || 0) - (up.pointsCount * lastAction.multiplier); 
                     } 
                     return cp; 
                 });
@@ -583,13 +631,15 @@
     function renderMoveCPSelect() { const sel = document.getElementById('move-target-cp'); const currentVal = sel.value; let html = '<option value="">-- Επίλεξε Νέο CP --</option>'; Object.keys(allCPs).forEach(id => { if (allCPs[id].clan !== 'history') { html += `<option value="${id}">${allCPs[id].name} (${allCPs[id].clan.toUpperCase()})</option>`; } }); sel.innerHTML = html; if (currentVal && sel.querySelector(`option[value="${currentVal}"]`)) { sel.value = currentVal; } }
     function renderExtSelect() { const sel = document.getElementById('ext-select'); const currentVal = sel.value; let html = '<option value="">-- Επιλογή Clan / Caller --</option>'; html += '<optgroup label="External Clans">'; Object.keys(allExtClans).forEach(id => { const clan = allExtClans[id]; const histTag = clan.status === 'history' ? ' [HISTORY]' : ''; const cName = clan.name || id; html += `<option value="ext_${id}">${cName}${histTag}</option>`; }); html += '</optgroup>'; html += '<optgroup label="Callers (Από CP List)">'; Object.keys(allCPs).forEach(id => { if (allCPs[id].clan === 'caller') { html += `<option value="cp_${id}">${allCPs[id].name}</option>`; } }); html += '</optgroup>'; sel.innerHTML = html; if (currentVal && sel.querySelector(`option[value="${currentVal}"]`)) { sel.value = currentVal; } }
 
-    // --- ΔΙΑΦΟΡΙΚΟΣ ΥΠΟΛΟΓΙΣΜΟΣ ΠΟΝΤΩΝ (SMART DELTA) ---
+    // --- ΔΙΑΦΟΡΙΚΟΣ ΥΠΟΛΟΓΙΣΜΟΣ ΠΟΝΤΩΝ (SMART DELTA) ΠΡΟΣΤΑΤΕΥΜΕΝΟΣ ΜΕ parseInt ---
     function recalcEditPoints() {
         if(!currentEditID) return;
         let delta = 0;
         bossKeys.forEach(k => {
-            const currentVal = parseInt(document.getElementById('inp-' + k).value) || 0;
-            const initVal = cpInitialStats[k] || 0;
+            const el = document.getElementById('inp-' + k);
+            if (!el) return;
+            const currentVal = parseInt(el.value) || 0;
+            const initVal = parseInt(cpInitialStats[k]) || 0;
             delta += (currentVal - initVal) * multipliers[k];
         });
         document.getElementById('edit-points').value = cpInitialPoints + delta;
@@ -599,8 +649,10 @@
         if(!currentExtID || !currentExtID.startsWith('cp_')) return;
         let delta = 0;
         bossKeys.forEach(k => {
-            const currentVal = parseInt(document.getElementById('ext-inp-' + k).value) || 0;
-            const initVal = extInitialStats[k] || 0;
+            const el = document.getElementById('ext-inp-' + k);
+            if (!el) return;
+            const currentVal = parseInt(el.value) || 0;
+            const initVal = parseInt(extInitialStats[k]) || 0;
             delta += (currentVal - initVal) * multipliers[k];
         });
         document.getElementById('ext-points').value = extInitialPoints + delta;
@@ -609,10 +661,9 @@
     function loadEdit(id) { 
         currentEditID = id; const cp = allCPs[id]; 
         
-        // Αποθήκευση αρχικής κατάστασης για το "Smart Delta"
-        cpInitialPoints = cp.totalPoints || 0;
+        cpInitialPoints = parseInt(cp.totalPoints) || 0;
         cpInitialStats = {};
-        bossKeys.forEach(k => cpInitialStats[k] = (cp.bossStats && cp.bossStats[k]) ? cp.bossStats[k] : 0);
+        bossKeys.forEach(k => cpInitialStats[k] = (cp.bossStats && cp.bossStats[k]) ? parseInt(cp.bossStats[k]) : 0);
         
         document.getElementById('edit-section').style.display = 'block'; 
         document.getElementById('edit-cp-name').value = cp.name || ""; 
@@ -649,14 +700,13 @@
     async function movePlayerToCP() { const playerName = document.getElementById('move-player-name').value.trim(); const targetCpId = document.getElementById('move-target-cp').value; if(!playerName || !targetCpId) { alert("Παρακαλώ συμπλήρωσε το όνομα και διάλεξε το CP προορισμού."); return; } const searchName = playerName.toLowerCase(); let sourceCpId = null; let sourceMembersArr = []; let exactPlayerName = playerName; for (const id in allCPs) { if(allCPs[id].clan === 'history') continue; if(allCPs[id].leader && allCPs[id].leader.toLowerCase() === searchName) { alert(`ΠΡΟΣΟΧΗ! Ο ${playerName} είναι LEADER στο CP ${allCPs[id].name}. Πρέπει να αλλάξεις χειροκίνητα τον Leader από το Edit CP.`); return; } let membersArr = (allCPs[id].members || "").split(',').map(m => m.trim()).filter(m => m !== ""); let idx = membersArr.findIndex(m => m.toLowerCase() === searchName); if (idx !== -1) { sourceCpId = id; exactPlayerName = membersArr[idx]; sourceMembersArr = membersArr; sourceMembersArr.splice(idx, 1); break; } } if (!sourceCpId) { alert(`Ο παίκτης ${playerName} δεν βρέθηκε στο Roster κανενός ενεργού CP.`); return; } if (sourceCpId === targetCpId) { alert(`Ο παίκτης ${exactPlayerName} ανήκει ήδη στο CP ${allCPs[targetCpId].name}!`); return; } const targetCp = allCPs[targetCpId]; let targetMembersArr = (targetCp.members || "").split(',').map(m => m.trim()).filter(m => m !== ""); targetMembersArr.push(exactPlayerName); if(!confirm(`ΕΠΙΒΕΒΑΙΩΣΗ:\nΝα μεταφερθεί ο ${exactPlayerName} από το ${allCPs[sourceCpId].name} στο ${targetCp.name};`)) return; await db.ref(`cps/${sourceCpId}`).update({ members: sourceMembersArr.join(', ') }); await db.ref(`cps/${targetCpId}`).update({ members: targetMembersArr.join(', ') }); alert(`Η μεταφορά ολοκληρώθηκε!\nΟ ${exactPlayerName} είναι πλέον στο ${targetCp.name}.`); document.getElementById('move-player-name').value = ""; }
     function toggleHistoryStatus() { const cp = allCPs[currentEditID]; if(cp.clan === 'history') { const newClan = prompt("Σε ποια ομάδα; (noldor, kriminalides, caller)", "noldor"); if (newClan === null) return; const formattedClan = newClan.trim().toLowerCase(); if (formattedClan !== "noldor" && formattedClan !== "kriminalides" && formattedClan !== "caller") return alert("Λάθος όνομα!"); db.ref('cps/' + currentEditID).update({ clan: formattedClan }).then(() => alert("Restored!")); } else { if(confirm("Move to History?")) db.ref('cps/' + currentEditID).update({ clan: 'history' }).then(() => alert("Moved!")); } }
     
-    // Η ΑΦΑΙΡΕΣΗ ΚΑΙ ΕΠΙΣΤΡΟΦΗ ΠΟΝΤΩΝ ΣΤΟ MARKET ΓΙΝΕΤΑΙ ΑΜΕΣΑ ΣΤΗ ΒΑΣΗ
     function addMarketLoot() { 
         const loot = document.getElementById('loot-market').value.split('|'); 
         db.ref('cps/' + currentEditID).transaction(cp => { 
             if(cp) { 
                 if(!cp.lootHistory) cp.lootHistory = []; 
                 cp.lootHistory.push({ item: loot[1], cost: loot[0], date: new Date().toLocaleDateString('el-GR') }); 
-                cp.totalPoints -= parseInt(loot[0]); 
+                cp.totalPoints = (parseInt(cp.totalPoints) || 0) - parseInt(loot[0]); 
             } 
             return cp; 
         }).then(() => loadEdit(currentEditID)); 
@@ -665,9 +715,9 @@
     function deleteLoot(idx) { 
         if(!confirm("Refund points?")) return; 
         const cp = allCPs[currentEditID]; 
-        const cost = parseInt(cp.lootHistory[idx].cost);
+        const cost = parseInt(cp.lootHistory[idx].cost) || 0;
         cp.lootHistory.splice(idx, 1); 
-        cp.totalPoints += cost; 
+        cp.totalPoints = (parseInt(cp.totalPoints) || 0) + cost; 
         db.ref('cps/' + currentEditID).update({ lootHistory: cp.lootHistory, totalPoints: cp.totalPoints }).then(() => loadEdit(currentEditID)); 
     }
     
@@ -683,14 +733,17 @@
         
         if (selVal.startsWith('ext_')) { 
             const pureId = selVal.replace('ext_', ''); targetData = allExtClans[pureId] || { name: pureId, leader: '', description: '', iconUrl: '', lootHistory: [] }; 
-            document.getElementById('ext-name').value = targetData.name || pureId; document.getElementById('ext-leader').value = targetData.leader || ""; document.getElementById('ext-description').value = targetData.description || ""; document.getElementById('ext-icon').value = targetData.iconUrl || ""; document.getElementById('ext-desc-container').style.display = 'block'; document.getElementById('ext-icon-container').style.display = 'block'; document.getElementById('ext-points').value = 0; document.getElementById('ext-points').disabled = true; document.getElementById('ext-stat-inputs').style.display = 'none'; 
+            document.getElementById('ext-name').value = targetData.name || pureId; document.getElementById('ext-leader').value = targetData.leader || ""; document.getElementById('ext-description').value = targetData.description || ""; document.getElementById('ext-icon').value = targetData.iconUrl || ""; document.getElementById('ext-desc-container').style.display = 'block'; document.getElementById('ext-icon-container').style.display = 'block'; 
+            document.getElementById('ext-points').value = parseInt(targetData.totalPoints) || 0; 
+            document.getElementById('ext-points').disabled = false; 
+            document.getElementById('ext-stat-inputs').style.display = 'none'; 
             const histBtn = document.getElementById('ext-hist-btn'); histBtn.style.display = 'block'; if(targetData.status === 'history') { histBtn.innerText = "RESTORE"; histBtn.className = "btn btn-green"; } else { histBtn.innerText = "HIST"; histBtn.className = "btn btn-blue"; } 
         } else if (selVal.startsWith('cp_')) { 
             const pureId = selVal.replace('cp_', ''); targetData = allCPs[pureId] || {}; 
             
-            extInitialPoints = targetData.totalPoints || 0;
+            extInitialPoints = parseInt(targetData.totalPoints) || 0;
             extInitialStats = {};
-            bossKeys.forEach(k => extInitialStats[k] = (targetData.bossStats && targetData.bossStats[k]) ? targetData.bossStats[k] : 0);
+            bossKeys.forEach(k => extInitialStats[k] = (targetData.bossStats && targetData.bossStats[k]) ? parseInt(targetData.bossStats[k]) : 0);
 
             document.getElementById('ext-name').value = targetData.name || ""; document.getElementById('ext-leader').value = targetData.leader || targetData.members || ""; document.getElementById('ext-desc-container').style.display = 'none'; document.getElementById('ext-icon-container').style.display = 'none'; document.getElementById('ext-hist-btn').style.display = 'none'; 
             document.getElementById('ext-points').value = extInitialPoints; 
@@ -707,7 +760,9 @@
         if(!currentExtID) return; 
         const nameVal = document.getElementById('ext-name').value.trim(); const leaderVal = document.getElementById('ext-leader').value; 
         if (currentExtID.startsWith('ext_')) { 
-            const pureId = currentExtID.replace('ext_', ''); db.ref('externalClans/' + pureId).update({ name: nameVal, leader: leaderVal, iconUrl: document.getElementById('ext-icon').value, description: document.getElementById('ext-description').value }); alert("Clan Data Saved!"); 
+            const pureId = currentExtID.replace('ext_', ''); 
+            const finalPts = parseInt(document.getElementById('ext-points').value) || 0;
+            db.ref('externalClans/' + pureId).update({ name: nameVal, leader: leaderVal, iconUrl: document.getElementById('ext-icon').value, description: document.getElementById('ext-description').value, totalPoints: finalPts }); alert("Clan Data Saved!"); 
         } else if (currentExtID.startsWith('cp_')) { 
             const pureId = currentExtID.replace('cp_', ''); 
             const finalPts = parseInt(document.getElementById('ext-points').value) || 0; 
@@ -725,12 +780,14 @@
         if (currentExtID.startsWith('ext_')) { 
             const pureId = currentExtID.replace('ext_', ''); 
             db.ref('externalClans/' + pureId).transaction(ext => { 
-                if(ext === null) ext = {}; if(!ext.lootHistory) ext.lootHistory = []; ext.lootHistory.push(newItem); return ext; 
+                if(ext === null) ext = {}; if(!ext.lootHistory) ext.lootHistory = []; ext.lootHistory.push(newItem); 
+                ext.totalPoints = (parseInt(ext.totalPoints) || 0) - parseInt(loot[0]); 
+                return ext; 
             }).then(() => loadExtEdit()); 
         } else if (currentExtID.startsWith('cp_')) { 
             const pureId = currentExtID.replace('cp_', ''); 
             db.ref('cps/' + pureId).transaction(cp => { 
-                if(cp) { if(!cp.lootHistory) cp.lootHistory = []; cp.lootHistory.push(newItem); cp.totalPoints -= parseInt(loot[0]); } 
+                if(cp) { if(!cp.lootHistory) cp.lootHistory = []; cp.lootHistory.push(newItem); cp.totalPoints = (parseInt(cp.totalPoints) || 0) - parseInt(loot[0]); } 
                 return cp; 
             }).then(() => loadExtEdit()); 
         } 
@@ -739,18 +796,19 @@
     function deleteExtLoot(idx) { 
         if(!confirm("Are you sure you want to delete this loot?")) return; 
         if (currentExtID.startsWith('ext_')) { 
-            const pureId = currentExtID.replace('ext_', ''); const ext = allExtClans[pureId]; ext.lootHistory.splice(idx, 1); 
-            db.ref('externalClans/' + pureId).update({ lootHistory: ext.lootHistory }).then(() => loadExtEdit()); 
+            const pureId = currentExtID.replace('ext_', ''); const ext = allExtClans[pureId]; 
+            const cost = parseInt(ext.lootHistory[idx].cost) || 0; ext.lootHistory.splice(idx, 1); 
+            ext.totalPoints = (parseInt(ext.totalPoints) || 0) + cost;
+            db.ref('externalClans/' + pureId).update({ lootHistory: ext.lootHistory, totalPoints: ext.totalPoints }).then(() => loadExtEdit()); 
         } else if (currentExtID.startsWith('cp_')) { 
-            const pureId = currentExtID.replace('cp_', ''); const cp = allCPs[pureId]; const cost = parseInt(cp.lootHistory[idx].cost); cp.lootHistory.splice(idx, 1); cp.totalPoints += cost; 
+            const pureId = currentExtID.replace('cp_', ''); const cp = allCPs[pureId]; const cost = parseInt(cp.lootHistory[idx].cost) || 0; cp.lootHistory.splice(idx, 1); cp.totalPoints = (parseInt(cp.totalPoints) || 0) + cost; 
             db.ref('cps/' + pureId).update({ lootHistory: cp.lootHistory, totalPoints: cp.totalPoints }).then(() => loadExtEdit()); 
         } 
     }
 
     async function cleanOldLogs() {
         try {
-            const snap = await db.ref('dailyLogs/').once('value'); const logs = snap.val() || {}; 
-            const nowMs = Date.now(); const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000; let deletedCount = 0;
+            const snap = await db.ref('dailyLogs/').once('value'); const logs = snap.val() || {}; const nowMs = Date.now(); const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000; let deletedCount = 0;
             let pUpdates = {}; let cUpdates = {};
 
             for (let dateStr in logs) { 
