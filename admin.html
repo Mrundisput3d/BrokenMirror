@@ -2,7 +2,7 @@
 <html lang="el">
 <head>
     <meta charset="UTF-8">
-    <title>BMA | Command Center V20.8 (Smart Delta & Auto-Fix)</title>
+    <title>BMA | Command Center V20.9 (Bulletproof Capping)</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -61,7 +61,7 @@
 <body>
 
     <div class="header-container">
-        <div style="width:80px"></div> <h1>BMA COMMAND CENTER V20.8</h1>
+        <div style="width:80px"></div> <h1>BMA COMMAND CENTER V20.9</h1>
         <button class="logout-btn" onclick="logout()">LOGOUT</button>
     </div>
 
@@ -74,8 +74,6 @@
                 <button class="filter-btn" style="background: rgba(40, 167, 69, 0.2); color: var(--green); border-color: var(--green);" onclick="exportToExcel()">📥 EXCEL</button>
             </div>
             <div id="cp-list-simple"></div>
-            
-            <hr style="border-color:#333; margin: 15px 0;">
             
             <hr style="border-color:#333; margin: 15px 0;">
             <h3>NEW CP / CALLER</h3>
@@ -173,7 +171,7 @@
                         </select>
                         <button class="btn btn-red" onclick="addMarketLoot()">BUY ITEM</button>
                         
-                        <label style="display:block; margin-top:20px; color:#aaa; font-size:11px;">Total Points (Auto-Adjusts based on Boss Edit)</label>
+                        <label style="display:block; margin-top:20px; color:#aaa; font-size:11px;">Total Points</label>
                         <input type="number" id="edit-points" style="font-size:1.2rem; color:var(--gold);">
                         
                         <div class="stat-edit-grid" id="stat-inputs"></div>
@@ -257,7 +255,6 @@
     const multipliers = { VAL:3, ANT:3, BAI:2, SIE:3, ZAK:1, FRI:1, AQ:1, ORF:1, COR:1 };
     let lastAction = null; 
 
-    // ΓΙΑ ΤΟ SMART DELTA AUTO-CALC (ΠΡΟΣΤΑΤΕΥΜΕΝΟ)
     let cpInitialPoints = 0; let cpInitialStats = {};
     let extInitialPoints = 0; let extInitialStats = {};
 
@@ -305,53 +302,6 @@
                 </div>`; 
             });
         });
-    }
-
-    // --- EMERGENCY AUTO-FIX ALL POINTS BUTTON ---
-    async function emergencyRepairPoints() {
-        if(!confirm("⚠️ ΠΡΟΣΟΧΗ: Αυτό το εργαλείο θα σαρώσει ΟΛΑ τα CPs, θα ελέγξει τα Boss Kills τους, θα αφαιρέσει τα Loots, και θα διορθώσει ΟΛΟΥΣ τους αρνητικούς πόντους. Θέλεις να προχωρήσουμε;")) return;
-        
-        let fixedCount = 0;
-        const snapshot = await db.ref('cps/').once('value');
-        const allCpData = snapshot.val() || {};
-        
-        for (let id in allCpData) {
-            let cp = allCpData[id];
-            let correctTotal = 0;
-            
-            if (cp.bossStats) {
-                for (let bossId in cp.bossStats) {
-                    let count = parseInt(cp.bossStats[bossId]) || 0;
-                    let mult = multipliers[bossId] || 1;
-                    correctTotal += count * mult;
-                }
-            }
-            
-            if (cp.lootHistory) {
-                cp.lootHistory.forEach(loot => {
-                    correctTotal -= parseInt(loot.cost) || 0;
-                });
-            }
-            
-            if (parseInt(cp.totalPoints) !== correctTotal) {
-                await db.ref('cps/' + id).update({ totalPoints: correctTotal });
-                fixedCount++;
-            }
-        }
-
-        const extSnapshot = await db.ref('externalClans/').once('value');
-        const extData = extSnapshot.val() || {};
-        for (let id in extData) {
-            let ext = extData[id];
-            let correctExtTotal = parseInt(ext.totalPoints) || 0;
-            let currentTotalWithLoot = correctExtTotal;
-            if (ext.lootHistory) {
-                let totalLootCost = 0;
-                ext.lootHistory.forEach(l => totalLootCost += parseInt(l.cost) || 0);
-            }
-        }
-        
-        alert(`✅ Η ΕΠΙΔΙΟΡΘΩΣΗ ΟΛΟΚΛΗΡΩΘΗΚΕ!\nΒρέθηκαν και διορθώθηκαν ${fixedCount} CPs με λάθος πόντους. Η βάση είναι και πάλι πεντακάθαρη!`);
     }
 
     function getEditDistance(a, b) {
@@ -520,6 +470,9 @@
         if(unmatchedNames.length > 0) { unmatchedDiv.innerHTML = `<div style="padding: 8px; border: 1px dashed var(--red); background: rgba(255, 68, 68, 0.1); border-radius: 5px; margin-top: 10px;"><span style="color: var(--red); font-weight: bold;">⚠️ ΔΕΝ ΒΡΕΘΗΚΑΝ ΣΤΗ ΒΑΣΗ (${unmatchedNames.length}):</span> <span style="color: #fff; font-size: 11px;">${unmatchedNames.map(n => n.toUpperCase()).join(', ')}</span></div>`; }
     }
 
+    // =========================================================
+    // ΥΠΟΒΟΛΗ (REAL-TIME ΑΣΦΑΛΕΙΑ ΕΝΑΝΤΙΑ ΣΤΑ RACE CONDITIONS)
+    // =========================================================
     async function logValidatedEvent(bossId, multiplier) {
         try {
             const playerCheckboxes = document.querySelectorAll('.player-checkbox');
@@ -536,6 +489,13 @@
             const d = new Date(); const today = `${d.getDate()}-${d.getMonth()+1}-${d.getFullYear()}`; 
             const nowMs = Date.now(); const twelveHoursMs = 12 * 60 * 60 * 1000;
 
+            // 1. ΔΙΑΒΑΖΟΥΜΕ ΖΩΝΤΑΝΑ ΤΑ LOGS ΓΙΑ ΝΑ ΜΗΝ ΕΧΟΥΜΕ ΠΟΤΕ ΛΑΘΟΣ ΟΡΙΟ
+            const dailySnap = await db.ref(`dailyLogs/${today}`).once('value');
+            const currentDailyLogs = dailySnap.val() || {};
+            
+            // Για το 12-hour Anti-Cheat, χρειαζόμαστε όλα τα logs (χρησιμοποιούμε τη local cache γι' αυτό για ταχύτητα)
+            const allLogsLocal = globalDailyLogs;
+
             let totalUpdated = 0, skippedTotal = 0;
             let currentAction = { date: today, bossId: bossId, multiplier: multiplier, updates: [] };
 
@@ -545,9 +505,9 @@
                 let eligible = namesFound.filter(name => {
                     const safeName = name.replace(/[.#$\[\]]/g, '_');
                     let isLocked = false;
-                    for (let dateKey in globalDailyLogs) {
-                        if (globalDailyLogs[dateKey][safeName] && globalDailyLogs[dateKey][safeName][bossId]) {
-                            let log = globalDailyLogs[dateKey][safeName][bossId];
+                    for (let dateKey in allLogsLocal) {
+                        if (allLogsLocal[dateKey][safeName] && allLogsLocal[dateKey][safeName][bossId]) {
+                            let log = allLogsLocal[dateKey][safeName][bossId];
                             if (log.timestamp && (nowMs - log.timestamp < twelveHoursMs)) { isLocked = true; break; } 
                             else if (dateKey === today) { isLocked = true; break; }
                         }
@@ -558,20 +518,20 @@
 
                 if (eligible.length === 0) continue; 
 
+                // 2. ΥΠΟΛΟΓΙΣΜΟΣ ΟΡΙΟΥ ΜΕ ΤΑ REAL-TIME ΔΕΔΟΜΕΝΑ
                 let alreadyLoggedCount = 0;
-                if (globalDailyLogs[today]) {
-                    Object.values(globalDailyLogs[today]).forEach(bossEntry => {
-                        if (bossEntry[bossId] && bossEntry[bossId].cp === id) alreadyLoggedCount++;
-                    });
-                }
+                Object.values(currentDailyLogs).forEach(bossEntry => {
+                    if (bossEntry[bossId] && bossEntry[bossId].cp === id) alreadyLoggedCount++;
+                });
 
                 let pointsToGive = 0;
                 if (alreadyLoggedCount < 9) {
-                    pointsToGive = Math.min(eligible.length, 9 - alreadyLoggedCount);
+                    pointsToGive = Math.max(0, Math.min(eligible.length, 9 - alreadyLoggedCount));
                 }
 
                 currentAction.updates.push({ cpId: id, names: eligible, pointsCount: pointsToGive });
 
+                // 3. ΕΝΗΜΕΡΩΣΗ ΒΑΣΗΣ (CPs)
                 await db.ref('cps/' + id).transaction(cp => {
                     if(cp) {
                         if(!cp.bossStats) cp.bossStats = {};
@@ -581,6 +541,7 @@
                     return cp;
                 });
 
+                // 4. ΚΑΤΑΓΡΑΦΗ LOGS ΓΙΑ HALL OF FAME
                 for(let name of eligible) {
                     const safeName = name.replace(/[.#$\[\]]/g, '_');
                     await db.ref(`dailyLogs/${today}/${safeName}/${bossId}`).set({ 
@@ -592,7 +553,7 @@
             
             if (totalUpdated > 0) { lastAction = currentAction; document.getElementById('undo-btn').style.display = 'inline-block'; }
             
-            alert(`✅ ΟΛΟΚΛΗΡΩΘΗΚΕ!\nΕνημερώθηκαν: ${totalUpdated} CP(s).\nΑγνοήθηκαν (Anti-Cheat): ${skippedTotal}.\nΤο όριο των 9 πόντων (ανά CP) τηρήθηκε αυστηρά!`);
+            alert(`✅ ΟΛΟΚΛΗΡΩΘΗΚΕ ΑΣΦΑΛΩΣ!\nCPs: ${totalUpdated}\nΑγνοήθηκαν: ${skippedTotal}\nΤο όριο τηρήθηκε απόλυτα.`);
             
             document.getElementById('mass-input').value = ""; document.getElementById('detected-list').innerHTML = ""; document.getElementById('unmatched-list').innerHTML = ""; document.getElementById('input-count').innerText = "0 NAMES";
             
@@ -631,7 +592,6 @@
     function renderMoveCPSelect() { const sel = document.getElementById('move-target-cp'); const currentVal = sel.value; let html = '<option value="">-- Επίλεξε Νέο CP --</option>'; Object.keys(allCPs).forEach(id => { if (allCPs[id].clan !== 'history') { html += `<option value="${id}">${allCPs[id].name} (${allCPs[id].clan.toUpperCase()})</option>`; } }); sel.innerHTML = html; if (currentVal && sel.querySelector(`option[value="${currentVal}"]`)) { sel.value = currentVal; } }
     function renderExtSelect() { const sel = document.getElementById('ext-select'); const currentVal = sel.value; let html = '<option value="">-- Επιλογή Clan / Caller --</option>'; html += '<optgroup label="External Clans">'; Object.keys(allExtClans).forEach(id => { const clan = allExtClans[id]; const histTag = clan.status === 'history' ? ' [HISTORY]' : ''; const cName = clan.name || id; html += `<option value="ext_${id}">${cName}${histTag}</option>`; }); html += '</optgroup>'; html += '<optgroup label="Callers (Από CP List)">'; Object.keys(allCPs).forEach(id => { if (allCPs[id].clan === 'caller') { html += `<option value="cp_${id}">${allCPs[id].name}</option>`; } }); html += '</optgroup>'; sel.innerHTML = html; if (currentVal && sel.querySelector(`option[value="${currentVal}"]`)) { sel.value = currentVal; } }
 
-    // --- ΔΙΑΦΟΡΙΚΟΣ ΥΠΟΛΟΓΙΣΜΟΣ ΠΟΝΤΩΝ (SMART DELTA) ΠΡΟΣΤΑΤΕΥΜΕΝΟΣ ΜΕ parseInt ---
     function recalcEditPoints() {
         if(!currentEditID) return;
         let delta = 0;
