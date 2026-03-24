@@ -2,7 +2,7 @@
 <html lang="el">
 <head>
     <meta charset="UTF-8">
-    <title>BMA | Command Center V21.2 (Fixed Restore)</title>
+    <title>BMA | Command Center V21.3 (Visible Externals)</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -61,7 +61,7 @@
 <body>
 
     <div class="header-container">
-        <div style="width:80px"></div> <h1>BMA COMMAND CENTER V21.2</h1>
+        <div style="width:80px"></div> <h1>BMA COMMAND CENTER V21.3</h1>
         <button class="logout-btn" onclick="logout()">LOGOUT</button>
     </div>
 
@@ -591,10 +591,46 @@
     }
 
     function setViewMode(mode) { viewMode = mode; document.getElementById('btn-active').classList.toggle('active', mode === 'active'); document.getElementById('btn-history').classList.toggle('active', mode === 'history'); renderSimpleList(); }
-    function renderSimpleList() { const listDiv = document.getElementById('cp-list-simple'); listDiv.innerHTML = Object.keys(allCPs).filter(id => viewMode === 'history' ? allCPs[id].clan === 'history' : allCPs[id].clan !== 'history').map(id => { const isCaller = allCPs[id].clan === 'caller' ? ' <span style="color:#aaa; font-size:10px;">[CALLER]</span>' : ''; return `<div onclick="loadEdit('${id}')" style="cursor:pointer; padding:8px; border-bottom:1px solid #222;">${allCPs[id].name} ${isCaller} <span style="float:right; color:var(--gold)">${allCPs[id].totalPoints}</span></div>`; }).join(''); }
+    
+    function renderSimpleList() { 
+        const listDiv = document.getElementById('cp-list-simple'); 
+        listDiv.innerHTML = Object.keys(allCPs).filter(id => viewMode === 'history' ? allCPs[id].clan === 'history' : allCPs[id].clan !== 'history').map(id => { 
+            let tag = '';
+            if(allCPs[id].clan === 'caller') tag = ' <span style="color:#aaa; font-size:10px;">[CALLER]</span>';
+            else if(allCPs[id].clan === 'external') tag = ' <span style="color:#aaa; font-size:10px;">[EXTERNAL]</span>';
+            
+            return `<div onclick="loadEdit('${id}')" style="cursor:pointer; padding:8px; border-bottom:1px solid #222;">${allCPs[id].name} ${tag} <span style="float:right; color:var(--gold)">${allCPs[id].totalPoints}</span></div>`; 
+        }).join(''); 
+    }
+    
     function exportToExcel() { let csvContent = "data:text/csv;charset=utf-8,\uFEFF"; csvContent += "CP / Caller Name,Clan / Role,Leader,Members,Total Points\n"; Object.keys(allCPs).forEach(id => { const cp = allCPs[id]; if (cp.clan === 'history') return; let name = `"${(cp.name || "").replace(/"/g, '""')}"`; let clan = `"${(cp.clan || "").replace(/"/g, '""').toUpperCase()}"`; let leader = `"${(cp.leader || "").replace(/"/g, '""')}"`; let members = `"${(cp.members || "").replace(/"/g, '""')}"`; let points = cp.totalPoints || 0; csvContent += `${name},${clan},${leader},${members},${points}\n`; }); const encodedUri = encodeURI(csvContent); const link = document.createElement("a"); link.setAttribute("href", encodedUri); link.setAttribute("download", "BMA_Rosters_Data.csv"); document.body.appendChild(link); link.click(); document.body.removeChild(link); }
     function renderMoveCPSelect() { const sel = document.getElementById('move-target-cp'); const currentVal = sel.value; let html = '<option value="">-- Επίλεξε Νέο CP --</option>'; Object.keys(allCPs).forEach(id => { if (allCPs[id].clan !== 'history') { html += `<option value="${id}">${allCPs[id].name} (${allCPs[id].clan.toUpperCase()})</option>`; } }); sel.innerHTML = html; if (currentVal && sel.querySelector(`option[value="${currentVal}"]`)) { sel.value = currentVal; } }
-    function renderExtSelect() { const sel = document.getElementById('ext-select'); const currentVal = sel.value; let html = '<option value="">-- Επιλογή Clan / Caller --</option>'; html += '<optgroup label="External Clans">'; Object.keys(allExtClans).forEach(id => { const clan = allExtClans[id]; const histTag = clan.status === 'history' ? ' [HISTORY]' : ''; const cName = clan.name || id; html += `<option value="ext_${id}">${cName}${histTag}</option>`; }); html += '</optgroup>'; html += '<optgroup label="Callers (Από CP List)">'; Object.keys(allCPs).forEach(id => { if (allCPs[id].clan === 'caller') { html += `<option value="cp_${id}">${allCPs[id].name}</option>`; } }); html += '</optgroup>'; sel.innerHTML = html; if (currentVal && sel.querySelector(`option[value="${currentVal}"]`)) { sel.value = currentVal; } }
+    
+    function renderExtSelect() { 
+        const sel = document.getElementById('ext-select'); 
+        const currentVal = sel.value; 
+        let html = '<option value="">-- Επιλογή Clan / Caller --</option>'; 
+        
+        html += '<optgroup label="External Clans">'; 
+        Object.keys(allExtClans).forEach(id => { 
+            const clan = allExtClans[id]; 
+            const histTag = clan.status === 'history' ? ' [HISTORY]' : ''; 
+            const cName = clan.name || id; 
+            html += `<option value="ext_${id}">${cName}${histTag}</option>`; 
+        }); 
+        html += '</optgroup>'; 
+        
+        html += '<optgroup label="Callers & Externals (Από CP List)">'; 
+        Object.keys(allCPs).forEach(id => { 
+            if (allCPs[id].clan === 'caller' || allCPs[id].clan === 'external') { 
+                html += `<option value="cp_${id}">${allCPs[id].name} (${allCPs[id].clan.toUpperCase()})</option>`; 
+            } 
+        }); 
+        html += '</optgroup>'; 
+        
+        sel.innerHTML = html; 
+        if (currentVal && sel.querySelector(`option[value="${currentVal}"]`)) { sel.value = currentVal; } 
+    }
 
     function recalcEditPoints() {
         if(!currentEditID) return;
@@ -670,7 +706,6 @@
     async function migratePlayerLogs() { const oldName = document.getElementById('old-player-name').value.trim(); const newName = document.getElementById('new-player-name').value.trim(); if(!oldName || !newName) { alert("Συμπλήρωσε τα ονόματα."); return; } if(!confirm(`Το όνομα ${oldName} θα αλλάξει σε ${newName}. Συνέχεια;`)) return; let logsMoved = 0; let cpsUpdated = 0; const logsRef = db.ref('dailyLogs'); const snap = await logsRef.once('value'); const logs = snap.val() || {}; for (const date in logs) { let foundKey = Object.keys(logs[date]).find(k => k.toLowerCase() === oldName.toLowerCase()); if (foundKey) { const dataToMove = logs[date][foundKey]; await db.ref(`dailyLogs/${date}/${newName}`).set(dataToMove); await db.ref(`dailyLogs/${date}/${foundKey}`).remove(); logsMoved++; } } for (const cpId in allCPs) { let updated = false; let cp = allCPs[cpId]; if (cp.leader && cp.leader.toLowerCase() === oldName.toLowerCase()) { cp.leader = newName; updated = true; } if (cp.members) { let membersArr = cp.members.split(',').map(m => m.trim()); let idx = membersArr.findIndex(m => m.toLowerCase() === oldName.toLowerCase()); if (idx !== -1) { membersArr[idx] = newName; cp.members = membersArr.join(', '); updated = true; } } if (updated) { await db.ref(`cps/${cpId}`).update({ leader: cp.leader, members: cp.members }); cpsUpdated++; } } alert(`ΕΠΙΤΥΧΙΑ!\nLogs moved: ${logsMoved} days.\nCPs updated: ${cpsUpdated}.`); document.getElementById('old-player-name').value = ""; document.getElementById('new-player-name').value = ""; }
     async function movePlayerToCP() { const playerName = document.getElementById('move-player-name').value.trim(); const targetCpId = document.getElementById('move-target-cp').value; if(!playerName || !targetCpId) { alert("Παρακαλώ συμπλήρωσε το όνομα και διάλεξε το CP προορισμού."); return; } const searchName = playerName.toLowerCase(); let sourceCpId = null; let sourceMembersArr = []; let exactPlayerName = playerName; for (const id in allCPs) { if(allCPs[id].clan === 'history') continue; if(allCPs[id].leader && allCPs[id].leader.toLowerCase() === searchName) { alert(`ΠΡΟΣΟΧΗ! Ο ${playerName} είναι LEADER στο CP ${allCPs[id].name}. Πρέπει να αλλάξεις χειροκίνητα τον Leader από το Edit CP.`); return; } let membersArr = (allCPs[id].members || "").split(',').map(m => m.trim()).filter(m => m !== ""); let idx = membersArr.findIndex(m => m.toLowerCase() === searchName); if (idx !== -1) { sourceCpId = id; exactPlayerName = membersArr[idx]; sourceMembersArr = membersArr; sourceMembersArr.splice(idx, 1); break; } } if (!sourceCpId) { alert(`Ο παίκτης ${playerName} δεν βρέθηκε στο Roster κανενός ενεργού CP.`); return; } if (sourceCpId === targetCpId) { alert(`Ο παίκτης ${exactPlayerName} ανήκει ήδη στο CP ${allCPs[targetCpId].name}!`); return; } const targetCp = allCPs[targetCpId]; let targetMembersArr = (targetCp.members || "").split(',').map(m => m.trim()).filter(m => m !== ""); targetMembersArr.push(exactPlayerName); if(!confirm(`ΕΠΙΒΕΒΑΙΩΣΗ:\nΝα μεταφερθεί ο ${exactPlayerName} από το ${allCPs[sourceCpId].name} στο ${targetCp.name};`)) return; await db.ref(`cps/${sourceCpId}`).update({ members: sourceMembersArr.join(', ') }); await db.ref(`cps/${targetCpId}`).update({ members: targetMembersArr.join(', ') }); alert(`Η μεταφορά ολοκληρώθηκε!\nΟ ${exactPlayerName} είναι πλέον στο ${targetCp.name}.`); document.getElementById('move-player-name').value = ""; }
     
-    // Η ΔΙΟΡΘΩΜΕΝΗ ΚΑΙ ΑΛΕΞΙΣΦΑΙΡΗ ΕΝΤΟΛΗ RESTORE
     function toggleHistoryStatus() { 
         const cp = allCPs[currentEditID]; 
         if(cp.clan === 'history') { 
