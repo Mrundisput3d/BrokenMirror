@@ -2,7 +2,7 @@
 <html lang="el">
 <head>
     <meta charset="UTF-8">
-    <title>BMA | Command Center V20.9 (Bulletproof Capping)</title>
+    <title>BMA | Command Center V21.0 (Callers x3 Bonus & Fixes)</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -61,7 +61,7 @@
 <body>
 
     <div class="header-container">
-        <div style="width:80px"></div> <h1>BMA COMMAND CENTER V20.9</h1>
+        <div style="width:80px"></div> <h1>BMA COMMAND CENTER V21.0</h1>
         <button class="logout-btn" onclick="logout()">LOGOUT</button>
     </div>
 
@@ -229,6 +229,11 @@
                         <option value="2500|Valakas Necklace">Valakas Necklace (2500)</option>
                         <option value="1100|Antharas Earring">Antharas Earring (1100)</option>
                         <option value="950|Baium Ring">Baium Ring (950)</option>
+                        <option value="225|Frintezza Necklace">Frintezza Necklace (225)</option>
+                        <option value="175|Zaken Earring">Zaken Earring (175)</option>
+                        <option value="150|Queen Ant Ring">Queen Ant Ring (150)</option>
+                        <option value="75|Orfen Earring">Orfen Earring (75)</option>
+                        <option value="25|Core Ring">Core Ring (25)</option>
                     </select>
                     <button class="btn btn-red" onclick="addExtMarketLoot()">BUY ITEM</button>
                     <h3 style="color:var(--gold); margin-top:20px;">LOOT HISTORY</h3>
@@ -470,9 +475,6 @@
         if(unmatchedNames.length > 0) { unmatchedDiv.innerHTML = `<div style="padding: 8px; border: 1px dashed var(--red); background: rgba(255, 68, 68, 0.1); border-radius: 5px; margin-top: 10px;"><span style="color: var(--red); font-weight: bold;">⚠️ ΔΕΝ ΒΡΕΘΗΚΑΝ ΣΤΗ ΒΑΣΗ (${unmatchedNames.length}):</span> <span style="color: #fff; font-size: 11px;">${unmatchedNames.map(n => n.toUpperCase()).join(', ')}</span></div>`; }
     }
 
-    // =========================================================
-    // ΥΠΟΒΟΛΗ (REAL-TIME ΑΣΦΑΛΕΙΑ ΕΝΑΝΤΙΑ ΣΤΑ RACE CONDITIONS)
-    // =========================================================
     async function logValidatedEvent(bossId, multiplier) {
         try {
             const playerCheckboxes = document.querySelectorAll('.player-checkbox');
@@ -489,11 +491,9 @@
             const d = new Date(); const today = `${d.getDate()}-${d.getMonth()+1}-${d.getFullYear()}`; 
             const nowMs = Date.now(); const twelveHoursMs = 12 * 60 * 60 * 1000;
 
-            // 1. ΔΙΑΒΑΖΟΥΜΕ ΖΩΝΤΑΝΑ ΤΑ LOGS ΓΙΑ ΝΑ ΜΗΝ ΕΧΟΥΜΕ ΠΟΤΕ ΛΑΘΟΣ ΟΡΙΟ
             const dailySnap = await db.ref(`dailyLogs/${today}`).once('value');
             const currentDailyLogs = dailySnap.val() || {};
             
-            // Για το 12-hour Anti-Cheat, χρειαζόμαστε όλα τα logs (χρησιμοποιούμε τη local cache γι' αυτό για ταχύτητα)
             const allLogsLocal = globalDailyLogs;
 
             let totalUpdated = 0, skippedTotal = 0;
@@ -518,7 +518,6 @@
 
                 if (eligible.length === 0) continue; 
 
-                // 2. ΥΠΟΛΟΓΙΣΜΟΣ ΟΡΙΟΥ ΜΕ ΤΑ REAL-TIME ΔΕΔΟΜΕΝΑ
                 let alreadyLoggedCount = 0;
                 Object.values(currentDailyLogs).forEach(bossEntry => {
                     if (bossEntry[bossId] && bossEntry[bossId].cp === id) alreadyLoggedCount++;
@@ -531,17 +530,19 @@
 
                 currentAction.updates.push({ cpId: id, names: eligible, pointsCount: pointsToGive });
 
-                // 3. ΕΝΗΜΕΡΩΣΗ ΒΑΣΗΣ (CPs)
                 await db.ref('cps/' + id).transaction(cp => {
                     if(cp) {
+                        // BONUS ΥΠΟΛΟΓΙΣΜΟΣ ΓΙΑ CALLERS x3!
+                        let isCaller = cp.clan === 'caller';
+                        let actualMultiplier = isCaller ? (multiplier * 3) : multiplier;
+
                         if(!cp.bossStats) cp.bossStats = {};
                         cp.bossStats[bossId] = (parseInt(cp.bossStats[bossId]) || 0) + pointsToGive;
-                        cp.totalPoints = (parseInt(cp.totalPoints) || 0) + (pointsToGive * multiplier);
+                        cp.totalPoints = (parseInt(cp.totalPoints) || 0) + (pointsToGive * actualMultiplier);
                     }
                     return cp;
                 });
 
-                // 4. ΚΑΤΑΓΡΑΦΗ LOGS ΓΙΑ HALL OF FAME
                 for(let name of eligible) {
                     const safeName = name.replace(/[.#$\[\]]/g, '_');
                     await db.ref(`dailyLogs/${today}/${safeName}/${bossId}`).set({ 
@@ -572,11 +573,15 @@
                 }
                 await db.ref(`cps/${up.cpId}`).transaction(cp => { 
                     if(cp) { 
+                        // BONUS ΑΦΑΙΡΕΣΗ ΓΙΑ CALLERS x3 ΣΤΟ UNDO!
+                        let isCaller = cp.clan === 'caller';
+                        let actualMultiplier = isCaller ? (lastAction.multiplier * 3) : lastAction.multiplier;
+
                         if(cp.bossStats && cp.bossStats[lastAction.bossId]) { 
                             cp.bossStats[lastAction.bossId] = (parseInt(cp.bossStats[lastAction.bossId]) || 0) - up.pointsCount; 
                             if(cp.bossStats[lastAction.bossId] < 0) cp.bossStats[lastAction.bossId] = 0; 
                         } 
-                        cp.totalPoints = (parseInt(cp.totalPoints) || 0) - (up.pointsCount * lastAction.multiplier); 
+                        cp.totalPoints = (parseInt(cp.totalPoints) || 0) - (up.pointsCount * actualMultiplier); 
                     } 
                     return cp; 
                 });
@@ -594,26 +599,35 @@
 
     function recalcEditPoints() {
         if(!currentEditID) return;
+        const cp = allCPs[currentEditID];
+        const isCaller = cp && cp.clan === 'caller';
         let delta = 0;
         bossKeys.forEach(k => {
             const el = document.getElementById('inp-' + k);
             if (!el) return;
             const currentVal = parseInt(el.value) || 0;
             const initVal = parseInt(cpInitialStats[k]) || 0;
-            delta += (currentVal - initVal) * multipliers[k];
+            // BONUS ΥΠΟΛΟΓΙΣΜΟΣ x3 ΣΤΟ EDIT
+            let actualMultiplier = isCaller ? (multipliers[k] * 3) : multipliers[k];
+            delta += (currentVal - initVal) * actualMultiplier;
         });
         document.getElementById('edit-points').value = cpInitialPoints + delta;
     }
 
     function recalcExtPoints() {
         if(!currentExtID || !currentExtID.startsWith('cp_')) return;
+        const pureId = currentExtID.replace('cp_', '');
+        const cp = allCPs[pureId];
+        const isCaller = cp && cp.clan === 'caller';
         let delta = 0;
         bossKeys.forEach(k => {
             const el = document.getElementById('ext-inp-' + k);
             if (!el) return;
             const currentVal = parseInt(el.value) || 0;
             const initVal = parseInt(extInitialStats[k]) || 0;
-            delta += (currentVal - initVal) * multipliers[k];
+            // BONUS ΥΠΟΛΟΓΙΣΜΟΣ x3 ΣΤΟ EXTERNAL EDIT
+            let actualMultiplier = isCaller ? (multipliers[k] * 3) : multipliers[k];
+            delta += (currentVal - initVal) * actualMultiplier;
         });
         document.getElementById('ext-points').value = extInitialPoints + delta;
     }
