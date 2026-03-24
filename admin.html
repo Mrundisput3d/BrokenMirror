@@ -2,7 +2,7 @@
 <html lang="el">
 <head>
     <meta charset="UTF-8">
-    <title>BMA | Command Center V22.0 (Video Manager & Smart Fixes)</title>
+    <title>BMA | Command Center V22.1 (Animals Live Sync & Videos)</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -61,7 +61,7 @@
 <body>
 
     <div class="header-container">
-        <div style="width:80px"></div> <h1>BMA COMMAND CENTER V22.0</h1>
+        <div style="width:80px"></div> <h1>BMA COMMAND CENTER V22.1</h1>
         <button class="logout-btn" onclick="logout()">LOGOUT</button>
     </div>
 
@@ -541,6 +541,7 @@
         if(unmatchedNames.length > 0) { unmatchedDiv.innerHTML = `<div style="padding: 8px; border: 1px dashed var(--red); background: rgba(255, 68, 68, 0.1); border-radius: 5px; margin-top: 10px;"><span style="color: var(--red); font-weight: bold;">⚠️ ΔΕΝ ΒΡΕΘΗΚΑΝ ΣΤΗ ΒΑΣΗ (${unmatchedNames.length}):</span> <span style="color: #fff; font-size: 11px;">${unmatchedNames.map(n => n.toUpperCase()).join(', ')}</span></div>`; }
     }
 
+    // Η ΝΕΑ ΣΥΝΑΡΤΗΣΗ ΠΟΥ ΕΝΗΜΕΡΩΝΕΙ ΚΑΙ ΤΟΝ ANIMALS TRACKER
     async function logValidatedEvent(bossId, multiplier) {
         try {
             const playerCheckboxes = document.querySelectorAll('.player-checkbox');
@@ -610,9 +611,17 @@
 
                 for(let name of eligible) {
                     const safeName = name.replace(/[.#$\[\]]/g, '_');
+                    
+                    // 1. Κανονικό Log για το Alliance Hall of Fame
                     await db.ref(`dailyLogs/${today}/${safeName}/${bossId}`).set({ 
                         cp: id, time: new Date().toLocaleTimeString('el-GR'), timestamp: nowMs
                     });
+                    
+                    // 2. ΑΘΑΝΑΤΟ LOG ΜΟΝΟ ΓΙΑ ΤΟΥΣ ANIMALS (Άμεσος Συγχρονισμός)
+                    if (id.toLowerCase() === 'animals' || (allCPs[id] && allCPs[id].name.toLowerCase() === 'animals')) {
+                        const animalsRef = db.ref(`animalsTracker/${safeName}/${bossId}`);
+                        await animalsRef.transaction(current => (current || 0) + 1);
+                    }
                 }
                 totalUpdated++;
             }
@@ -626,6 +635,7 @@
         } catch (error) { alert("⚠️ ΣΦΑΛΜΑ ΒΑΣΗΣ ΔΕΔΟΜΕΝΩΝ: " + error.message); }
     }
 
+    // Η ΝΕΑ ΣΥΝΑΡΤΗΣΗ ΠΟΥ ΑΦΑΙΡΕΙ ΚΑΙ ΑΠΟ ΤΟΝ ANIMALS TRACKER
     async function undoLastAction() {
         if(!lastAction) return; 
         if(!confirm("Είσαι σίγουρος ότι θες να ακυρώσεις την τελευταία καταχώρηση (Undo);")) return;
@@ -634,7 +644,18 @@
             for(let up of lastAction.updates) {
                 for(let name of up.names) { 
                     const safeName = name.replace(/[.#$\[\]]/g, '_');
+                    
+                    // 1. Σβήσιμο από τα Daily Logs
                     await db.ref(`dailyLogs/${lastAction.date}/${safeName}/${lastAction.bossId}`).remove(); 
+                    
+                    // 2. Σβήσιμο από το ΑΘΑΝΑΤΟ LOG των ANIMALS (Αν ήταν Animals)
+                    if (up.cpId.toLowerCase() === 'animals' || (allCPs[up.cpId] && allCPs[up.cpId].name.toLowerCase() === 'animals')) {
+                        const animalsRef = db.ref(`animalsTracker/${safeName}/${lastAction.bossId}`);
+                        await animalsRef.transaction(current => {
+                            let newVal = (current || 0) - 1;
+                            return newVal < 0 ? 0 : newVal;
+                        });
+                    }
                 }
                 await db.ref(`cps/${up.cpId}`).transaction(cp => { 
                     if(cp) { 
