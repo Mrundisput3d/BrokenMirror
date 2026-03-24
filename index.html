@@ -267,7 +267,7 @@
     </style>
 </head>
 
-<body onclick="tryAutoPlay()">
+<body>
 
     <div class="header-controls">
         <div class="control-btn" onclick="toggleMusic(event)"><span id="music-icon">🔇</span> <span id="track-name">DION THEME</span></div>
@@ -389,7 +389,6 @@
         <div class="other-clans-section" id="dynamic-external-clans"></div>
     </div>
 
-    <!-- DEVELOPER FOOTER ΜΕ TO DISCORD -->
     <footer class="developer-footer">
         <div>Designed & Developed by <span class="dev-name">MrUndisputed</span></div>
         <div class="dev-contact">
@@ -605,7 +604,6 @@
             document.getElementById('member-stats-modal').style.display = 'block';
             document.getElementById('overlay').style.display = 'block';
 
-            // ΒΕΛΤΙΩΣΗ: Πλέον χρησιμοποιεί τη globalDailyLogs για αστραπιαίο φόρτωμα και επιλύθηκε το bug με τις αγκύλες στα ονόματα!
             setTimeout(() => {
                 let mStats = { VAL:0, ANT:0, BAI:0, FRI:0, ZAK:0, AQ:0, ORF:0, COR:0, SIE:0 };
                 const safeSearchName = getSafeName(memberName).toUpperCase();
@@ -720,10 +718,31 @@
             {name:"HUNTERS THEME", url:"https://www.dropbox.com/scl/fi/75hck498enzot93zt0lg9/Lineage-2-Hunters-Village-Theme.mp3?rlkey=6mu9ic0gavmofkdvduj72270y&st=qr4cvisl&raw=1"},
             {name:"GIRAN THEME", url:"https://www.dropbox.com/scl/fi/iu8j9wn9wky8fav176ayf/Lineage-2-Giran-Theme.mp3?rlkey=xp1j0upa076sy21tgcta6t9c3&st=0a4ihyhg&raw=1"}
         ];
-        let currentIdx = 0; const audio = document.getElementById('bg-music'); const musicIcon = document.getElementById('music-icon'); let userMuted = false;
-        function toggleMusic(e) { if(e) e.stopPropagation(); if (audio.paused) { audio.play(); musicIcon.innerText="🔊"; userMuted = false; } else { audio.pause(); musicIcon.innerText="🔇"; userMuted = true; } }
-        function nextTrack(e) { if(e) e.stopPropagation(); currentIdx = (currentIdx + 1) % tracks.length; audio.src = tracks[currentIdx].url; document.getElementById('track-name').innerText = tracks[currentIdx].name; audio.play(); musicIcon.innerText="🔊"; userMuted = false; }
-        function tryAutoPlay() { if(audio.paused && !userMuted) { audio.play().then(() => { musicIcon.innerText = "🔊"; }).catch(() => {}); } }
+        
+        let currentIdx = 0; 
+        const audio = document.getElementById('bg-music'); 
+        const musicIcon = document.getElementById('music-icon'); 
+        
+        function toggleMusic(e) { 
+            if(e) e.stopPropagation(); 
+            if (audio.paused) { 
+                audio.play(); 
+                musicIcon.innerText="🔊"; 
+            } else { 
+                audio.pause(); 
+                musicIcon.innerText="🔇"; 
+            } 
+        }
+        
+        function nextTrack(e) { 
+            if(e) e.stopPropagation(); 
+            currentIdx = (currentIdx + 1) % tracks.length; 
+            audio.src = tracks[currentIdx].url; 
+            document.getElementById('track-name').innerText = tracks[currentIdx].name; 
+            audio.play(); 
+            musicIcon.innerText="🔊"; 
+        }
+
         setInterval(() => { document.getElementById('clock').innerText = "SERVER TIME: " + new Date().toLocaleTimeString('el-GR', {timeZone:'UTC', hour12:false}) + " UTC"; }, 1000);
     </script>
 </body>
