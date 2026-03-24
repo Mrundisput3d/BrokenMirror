@@ -2,7 +2,7 @@
 <html lang="el">
 <head>
     <meta charset="UTF-8">
-    <title>BMA | Command Center V21.4 (Move to External)</title>
+    <title>BMA | Command Center V22.0 (Video Manager & Smart Fixes)</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -61,7 +61,7 @@
 <body>
 
     <div class="header-container">
-        <div style="width:80px"></div> <h1>BMA COMMAND CENTER V21.4</h1>
+        <div style="width:80px"></div> <h1>BMA COMMAND CENTER V22.0</h1>
         <button class="logout-btn" onclick="logout()">LOGOUT</button>
     </div>
 
@@ -84,6 +84,7 @@
                 <option value="noldor">Noldor</option>
                 <option value="kriminalides">Kriminalides</option>
                 <option value="caller">Caller (Στρογγυλό εικονίδιο / x3 Bonus)</option>
+                <option value="external">External Clan</option>
             </select>
             <button class="btn btn-gold" onclick="createNewCP()">REGISTER</button>
 
@@ -187,7 +188,8 @@
     </div>
     
     <div style="max-width: 1400px; margin: 20px auto;">
-        <div class="panel">
+        
+        <div class="panel" style="margin-bottom: 20px;">
             <h2 style="color:var(--blue); margin-top:0;">EXTERNAL CLANS & CALLERS MANAGER</h2>
             <div style="display:flex; gap:10px; padding: 15px; background: #000; border: 1px dashed #444; border-radius: 5px; margin-bottom: 15px;">
                 <input type="text" id="new-ext-name" placeholder="New Clan Name" style="flex:1; margin:0;">
@@ -241,6 +243,20 @@
                 </div>
             </div>
         </div>
+        
+        <div class="panel">
+            <h2 style="color:var(--gold); margin-top:0;">PVP ZONE MANAGER</h2>
+            <p style="color:#aaa; font-size:11px; margin-top:-10px;">Πρόσθεσε εδώ βίντεο από το YouTube. Θα εμφανιστούν αυτόματα στη σελίδα "PVP Zone".</p>
+            <div style="display:flex; gap:10px; padding: 15px; background: #000; border: 1px dashed var(--gold); border-radius: 5px; margin-bottom: 15px; flex-wrap: wrap;">
+                <input type="text" id="new-vid-title" placeholder="Video Title (π.χ. ADEN SIEGE)" style="flex:1; min-width: 200px;">
+                <input type="text" id="new-vid-url" placeholder="Οποιοδήποτε YouTube Link..." style="flex:2; min-width: 200px;">
+                <input type="text" id="new-vid-uploader" placeholder="Uploaded By" style="flex:1; min-width: 150px;">
+                <button class="btn btn-gold" style="margin:0; width:auto; padding:0 20px;" onclick="addVideo()">ADD VIDEO</button>
+            </div>
+            <div id="admin-video-list" style="max-height: 250px; overflow-y: auto; background: rgba(0,0,0,0.4); border: 1px solid #333; border-radius: 5px; padding: 5px;">
+                </div>
+        </div>
+
     </div>
 
 <script>
@@ -307,7 +323,57 @@
                 </div>`; 
             });
         });
+        
+        // Λίστα για τα βίντεο στο Admin Panel
+        db.ref('videos/').on('value', snap => {
+            const vids = snap.val() || {};
+            const list = document.getElementById('admin-video-list');
+            list.innerHTML = '';
+            const sortedVids = Object.keys(vids).map(k => ({key: k, ...vids[k]})).sort((a,b) => b.timestamp - a.timestamp);
+            
+            if(sortedVids.length === 0) { list.innerHTML = "<div style='color:#555; text-align:center; padding:10px;'>Δεν υπάρχουν βίντεο.</div>"; return; }
+            
+            sortedVids.forEach(v => {
+                list.innerHTML += `<div style="display:flex; justify-content:space-between; padding:8px; border-bottom:1px solid #222; align-items:center;">
+                    <div><span style="color:var(--gold); font-weight:bold;">${v.title}</span> <span style="font-size:10px; color:#888;">(Uploaded by: ${v.uploader} | Date: ${v.date})</span></div>
+                    <button class="btn btn-red" style="width:auto; padding:5px 10px; margin:0;" onclick="deleteVideo('${v.key}')">✖ DEL</button>
+                </div>`;
+            });
+        });
     }
+
+    // --- VIDEO MANAGER FUNCTIONS ---
+    function extractYouTubeID(url) {
+        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+        const match = url.match(regExp);
+        return (match && match[2].length === 11) ? match[2] : null;
+    }
+
+    function addVideo() {
+        const title = document.getElementById('new-vid-title').value.trim();
+        const rawUrl = document.getElementById('new-vid-url').value.trim();
+        const uploader = document.getElementById('new-vid-uploader').value.trim();
+
+        if(!title || !rawUrl || !uploader) { alert("Παρακαλώ συμπλήρωσε όλα τα πεδία για το βίντεο!"); return; }
+
+        const vidId = extractYouTubeID(rawUrl);
+        if(!vidId) { alert("Αυτό δεν μοιάζει με έγκυρο YouTube Link. Έλεγξέ το ξανά!"); return; }
+
+        const embedUrl = "https://www.youtube.com/embed/" + vidId;
+        const date = new Date().toLocaleDateString('el-GR');
+        
+        db.ref('videos/').push({
+            title: title, embedUrl: embedUrl, uploader: uploader, date: date, timestamp: firebase.database.ServerValue.TIMESTAMP
+        }).then(() => {
+            document.getElementById('new-vid-title').value = ''; document.getElementById('new-vid-url').value = ''; document.getElementById('new-vid-uploader').value = '';
+            alert("✅ Το Video προστέθηκε επιτυχώς στη σελίδα PVP Zone!");
+        });
+    }
+
+    function deleteVideo(key) {
+        if(confirm("Είσαι σίγουρος ότι θέλεις να διαγράψεις αυτό το βίντεο;")) { db.ref('videos/' + key).remove(); }
+    }
+    // -------------------------------
 
     function getEditDistance(a, b) {
         if(a.length === 0) return b.length; if(b.length === 0) return a.length; var matrix = [];
@@ -594,8 +660,11 @@
     function renderSimpleList() { 
         const listDiv = document.getElementById('cp-list-simple'); 
         listDiv.innerHTML = Object.keys(allCPs).filter(id => viewMode === 'history' ? allCPs[id].clan === 'history' : allCPs[id].clan !== 'history').map(id => { 
-            const isCaller = allCPs[id].clan === 'caller' ? ' <span style="color:#aaa; font-size:10px;">[CALLER]</span>' : ''; 
-            return `<div onclick="loadEdit('${id}')" style="cursor:pointer; padding:8px; border-bottom:1px solid #222;">${allCPs[id].name} ${isCaller} <span style="float:right; color:var(--gold)">${allCPs[id].totalPoints}</span></div>`; 
+            let tag = '';
+            if(allCPs[id].clan === 'caller') tag = ' <span style="color:#aaa; font-size:10px;">[CALLER]</span>';
+            else if(allCPs[id].clan === 'external') tag = ' <span style="color:#aaa; font-size:10px;">[EXTERNAL]</span>';
+            
+            return `<div onclick="loadEdit('${id}')" style="cursor:pointer; padding:8px; border-bottom:1px solid #222;">${allCPs[id].name} ${tag} <span style="float:right; color:var(--gold)">${allCPs[id].totalPoints}</span></div>`; 
         }).join(''); 
     }
     
@@ -616,10 +685,10 @@
         }); 
         html += '</optgroup>'; 
         
-        html += '<optgroup label="Callers (Από CP List)">'; 
+        html += '<optgroup label="Callers & Externals (Από CP List)">'; 
         Object.keys(allCPs).forEach(id => { 
-            if (allCPs[id].clan === 'caller') { 
-                html += `<option value="cp_${id}">${allCPs[id].name}</option>`; 
+            if (allCPs[id].clan === 'caller' || allCPs[id].clan === 'external') { 
+                html += `<option value="cp_${id}">${allCPs[id].name} (${allCPs[id].clan.toUpperCase()})</option>`; 
             } 
         }); 
         html += '</optgroup>'; 
@@ -702,7 +771,6 @@
     async function migratePlayerLogs() { const oldName = document.getElementById('old-player-name').value.trim(); const newName = document.getElementById('new-player-name').value.trim(); if(!oldName || !newName) { alert("Συμπλήρωσε τα ονόματα."); return; } if(!confirm(`Το όνομα ${oldName} θα αλλάξει σε ${newName}. Συνέχεια;`)) return; let logsMoved = 0; let cpsUpdated = 0; const logsRef = db.ref('dailyLogs'); const snap = await logsRef.once('value'); const logs = snap.val() || {}; for (const date in logs) { let foundKey = Object.keys(logs[date]).find(k => k.toLowerCase() === oldName.toLowerCase()); if (foundKey) { const dataToMove = logs[date][foundKey]; await db.ref(`dailyLogs/${date}/${newName}`).set(dataToMove); await db.ref(`dailyLogs/${date}/${foundKey}`).remove(); logsMoved++; } } for (const cpId in allCPs) { let updated = false; let cp = allCPs[cpId]; if (cp.leader && cp.leader.toLowerCase() === oldName.toLowerCase()) { cp.leader = newName; updated = true; } if (cp.members) { let membersArr = cp.members.split(',').map(m => m.trim()); let idx = membersArr.findIndex(m => m.toLowerCase() === oldName.toLowerCase()); if (idx !== -1) { membersArr[idx] = newName; cp.members = membersArr.join(', '); updated = true; } } if (updated) { await db.ref(`cps/${cpId}`).update({ leader: cp.leader, members: cp.members }); cpsUpdated++; } } alert(`ΕΠΙΤΥΧΙΑ!\nLogs moved: ${logsMoved} days.\nCPs updated: ${cpsUpdated}.`); document.getElementById('old-player-name').value = ""; document.getElementById('new-player-name').value = ""; }
     async function movePlayerToCP() { const playerName = document.getElementById('move-player-name').value.trim(); const targetCpId = document.getElementById('move-target-cp').value; if(!playerName || !targetCpId) { alert("Παρακαλώ συμπλήρωσε το όνομα και διάλεξε το CP προορισμού."); return; } const searchName = playerName.toLowerCase(); let sourceCpId = null; let sourceMembersArr = []; let exactPlayerName = playerName; for (const id in allCPs) { if(allCPs[id].clan === 'history') continue; if(allCPs[id].leader && allCPs[id].leader.toLowerCase() === searchName) { alert(`ΠΡΟΣΟΧΗ! Ο ${playerName} είναι LEADER στο CP ${allCPs[id].name}. Πρέπει να αλλάξεις χειροκίνητα τον Leader από το Edit CP.`); return; } let membersArr = (allCPs[id].members || "").split(',').map(m => m.trim()).filter(m => m !== ""); let idx = membersArr.findIndex(m => m.toLowerCase() === searchName); if (idx !== -1) { sourceCpId = id; exactPlayerName = membersArr[idx]; sourceMembersArr = membersArr; sourceMembersArr.splice(idx, 1); break; } } if (!sourceCpId) { alert(`Ο παίκτης ${playerName} δεν βρέθηκε στο Roster κανενός ενεργού CP.`); return; } if (sourceCpId === targetCpId) { alert(`Ο παίκτης ${exactPlayerName} ανήκει ήδη στο CP ${allCPs[targetCpId].name}!`); return; } const targetCp = allCPs[targetCpId]; let targetMembersArr = (targetCp.members || "").split(',').map(m => m.trim()).filter(m => m !== ""); targetMembersArr.push(exactPlayerName); if(!confirm(`ΕΠΙΒΕΒΑΙΩΣΗ:\nΝα μεταφερθεί ο ${exactPlayerName} από το ${allCPs[sourceCpId].name} στο ${targetCp.name};`)) return; await db.ref(`cps/${sourceCpId}`).update({ members: sourceMembersArr.join(', ') }); await db.ref(`cps/${targetCpId}`).update({ members: targetMembersArr.join(', ') }); alert(`Η μεταφορά ολοκληρώθηκε!\nΟ ${exactPlayerName} είναι πλέον στο ${targetCp.name}.`); document.getElementById('move-player-name').value = ""; }
     
-    // Η ΔΙΟΡΘΩΜΕΝΗ ΕΝΤΟΛΗ RESTORE ΓΙΑ EXTERNAL CLANS!
     function toggleHistoryStatus() { 
         const cp = allCPs[currentEditID]; 
         if(cp.clan === 'history') { 
