@@ -2,7 +2,7 @@
 <html lang="el">
 <head>
     <meta charset="UTF-8">
-    <title>BMA | Command Center V21.0 (Callers x3 Bonus & Fixes)</title>
+    <title>BMA | Command Center V21.1 (External Restores & Caller Bonus)</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -61,7 +61,7 @@
 <body>
 
     <div class="header-container">
-        <div style="width:80px"></div> <h1>BMA COMMAND CENTER V21.0</h1>
+        <div style="width:80px"></div> <h1>BMA COMMAND CENTER V21.1</h1>
         <button class="logout-btn" onclick="logout()">LOGOUT</button>
     </div>
 
@@ -83,7 +83,8 @@
             <select id="new-clan">
                 <option value="noldor">Noldor</option>
                 <option value="kriminalides">Kriminalides</option>
-                <option value="caller">Caller (Στρογγυλό εικονίδιο)</option>
+                <option value="caller">Caller (Στρογγυλό εικονίδιο / x3 Bonus)</option>
+                <option value="external">External Clan</option>
             </select>
             <button class="btn btn-gold" onclick="createNewCP()">REGISTER</button>
 
@@ -532,7 +533,6 @@
 
                 await db.ref('cps/' + id).transaction(cp => {
                     if(cp) {
-                        // BONUS ΥΠΟΛΟΓΙΣΜΟΣ ΓΙΑ CALLERS x3!
                         let isCaller = cp.clan === 'caller';
                         let actualMultiplier = isCaller ? (multiplier * 3) : multiplier;
 
@@ -573,7 +573,6 @@
                 }
                 await db.ref(`cps/${up.cpId}`).transaction(cp => { 
                     if(cp) { 
-                        // BONUS ΑΦΑΙΡΕΣΗ ΓΙΑ CALLERS x3 ΣΤΟ UNDO!
                         let isCaller = cp.clan === 'caller';
                         let actualMultiplier = isCaller ? (lastAction.multiplier * 3) : lastAction.multiplier;
 
@@ -607,7 +606,6 @@
             if (!el) return;
             const currentVal = parseInt(el.value) || 0;
             const initVal = parseInt(cpInitialStats[k]) || 0;
-            // BONUS ΥΠΟΛΟΓΙΣΜΟΣ x3 ΣΤΟ EDIT
             let actualMultiplier = isCaller ? (multipliers[k] * 3) : multipliers[k];
             delta += (currentVal - initVal) * actualMultiplier;
         });
@@ -625,7 +623,6 @@
             if (!el) return;
             const currentVal = parseInt(el.value) || 0;
             const initVal = parseInt(extInitialStats[k]) || 0;
-            // BONUS ΥΠΟΛΟΓΙΣΜΟΣ x3 ΣΤΟ EXTERNAL EDIT
             let actualMultiplier = isCaller ? (multipliers[k] * 3) : multipliers[k];
             delta += (currentVal - initVal) * actualMultiplier;
         });
@@ -672,7 +669,21 @@
 
     async function migratePlayerLogs() { const oldName = document.getElementById('old-player-name').value.trim(); const newName = document.getElementById('new-player-name').value.trim(); if(!oldName || !newName) { alert("Συμπλήρωσε τα ονόματα."); return; } if(!confirm(`Το όνομα ${oldName} θα αλλάξει σε ${newName}. Συνέχεια;`)) return; let logsMoved = 0; let cpsUpdated = 0; const logsRef = db.ref('dailyLogs'); const snap = await logsRef.once('value'); const logs = snap.val() || {}; for (const date in logs) { let foundKey = Object.keys(logs[date]).find(k => k.toLowerCase() === oldName.toLowerCase()); if (foundKey) { const dataToMove = logs[date][foundKey]; await db.ref(`dailyLogs/${date}/${newName}`).set(dataToMove); await db.ref(`dailyLogs/${date}/${foundKey}`).remove(); logsMoved++; } } for (const cpId in allCPs) { let updated = false; let cp = allCPs[cpId]; if (cp.leader && cp.leader.toLowerCase() === oldName.toLowerCase()) { cp.leader = newName; updated = true; } if (cp.members) { let membersArr = cp.members.split(',').map(m => m.trim()); let idx = membersArr.findIndex(m => m.toLowerCase() === oldName.toLowerCase()); if (idx !== -1) { membersArr[idx] = newName; cp.members = membersArr.join(', '); updated = true; } } if (updated) { await db.ref(`cps/${cpId}`).update({ leader: cp.leader, members: cp.members }); cpsUpdated++; } } alert(`ΕΠΙΤΥΧΙΑ!\nLogs moved: ${logsMoved} days.\nCPs updated: ${cpsUpdated}.`); document.getElementById('old-player-name').value = ""; document.getElementById('new-player-name').value = ""; }
     async function movePlayerToCP() { const playerName = document.getElementById('move-player-name').value.trim(); const targetCpId = document.getElementById('move-target-cp').value; if(!playerName || !targetCpId) { alert("Παρακαλώ συμπλήρωσε το όνομα και διάλεξε το CP προορισμού."); return; } const searchName = playerName.toLowerCase(); let sourceCpId = null; let sourceMembersArr = []; let exactPlayerName = playerName; for (const id in allCPs) { if(allCPs[id].clan === 'history') continue; if(allCPs[id].leader && allCPs[id].leader.toLowerCase() === searchName) { alert(`ΠΡΟΣΟΧΗ! Ο ${playerName} είναι LEADER στο CP ${allCPs[id].name}. Πρέπει να αλλάξεις χειροκίνητα τον Leader από το Edit CP.`); return; } let membersArr = (allCPs[id].members || "").split(',').map(m => m.trim()).filter(m => m !== ""); let idx = membersArr.findIndex(m => m.toLowerCase() === searchName); if (idx !== -1) { sourceCpId = id; exactPlayerName = membersArr[idx]; sourceMembersArr = membersArr; sourceMembersArr.splice(idx, 1); break; } } if (!sourceCpId) { alert(`Ο παίκτης ${playerName} δεν βρέθηκε στο Roster κανενός ενεργού CP.`); return; } if (sourceCpId === targetCpId) { alert(`Ο παίκτης ${exactPlayerName} ανήκει ήδη στο CP ${allCPs[targetCpId].name}!`); return; } const targetCp = allCPs[targetCpId]; let targetMembersArr = (targetCp.members || "").split(',').map(m => m.trim()).filter(m => m !== ""); targetMembersArr.push(exactPlayerName); if(!confirm(`ΕΠΙΒΕΒΑΙΩΣΗ:\nΝα μεταφερθεί ο ${exactPlayerName} από το ${allCPs[sourceCpId].name} στο ${targetCp.name};`)) return; await db.ref(`cps/${sourceCpId}`).update({ members: sourceMembersArr.join(', ') }); await db.ref(`cps/${targetCpId}`).update({ members: targetMembersArr.join(', ') }); alert(`Η μεταφορά ολοκληρώθηκε!\nΟ ${exactPlayerName} είναι πλέον στο ${targetCp.name}.`); document.getElementById('move-player-name').value = ""; }
-    function toggleHistoryStatus() { const cp = allCPs[currentEditID]; if(cp.clan === 'history') { const newClan = prompt("Σε ποια ομάδα; (noldor, kriminalides, caller)", "noldor"); if (newClan === null) return; const formattedClan = newClan.trim().toLowerCase(); if (formattedClan !== "noldor" && formattedClan !== "kriminalides" && formattedClan !== "caller") return alert("Λάθος όνομα!"); db.ref('cps/' + currentEditID).update({ clan: formattedClan }).then(() => alert("Restored!")); } else { if(confirm("Move to History?")) db.ref('cps/' + currentEditID).update({ clan: 'history' }).then(() => alert("Moved!")); } }
+    
+    function toggleHistoryStatus() { 
+        const cp = allCPs[currentEditID]; 
+        if(cp.clan === 'history') { 
+            const newClan = prompt("Σε ποια ομάδα; (noldor, kriminalides, caller, external)", "noldor"); 
+            if (newClan === null) return; 
+            const formattedClan = newClan.trim().toLowerCase(); 
+            if (formattedClan !== "noldor" && formattedClan !== "kriminalides" && formattedClan !== "caller" && formattedClan !== "external") {
+                return alert("Λάθος όνομα! Δοκίμασε ξανά.");
+            }
+            db.ref('cps/' + currentEditID).update({ clan: formattedClan }).then(() => alert("Restored!")); 
+        } else { 
+            if(confirm("Move to History?")) db.ref('cps/' + currentEditID).update({ clan: 'history' }).then(() => alert("Moved!")); 
+        } 
+    }
     
     function addMarketLoot() { 
         const loot = document.getElementById('loot-market').value.split('|'); 
