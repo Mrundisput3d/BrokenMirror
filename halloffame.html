@@ -212,17 +212,34 @@
         const db = firebase.database();
 
         const lowMidKeys = ['ZAK', 'FRI', 'AQ', 'ORF', 'COR'];
+        
+        let allCPs = {};
         let dailyLogsData = {};
+        let archive = { players: {}, cps: {} };
+
         let top10AllTime = [];
         let top10Weekly = [];
 
-        db.ref().on('value', snap => {
-            const data = snap.val() || {};
-            const allCPs = data.cps || {};
-            const logs = data.dailyLogs || {};
-            const archive = data.archive || { players: {}, cps: {} }; 
-            dailyLogsData = logs; 
-            
+        let loadCount = 0;
+
+        function checkAndRender() {
+            loadCount++;
+            if (loadCount >= 3) {
+                processHallOfFame();
+            } else if (loadCount > 3) {
+                processHallOfFame(); // Update if new data comes in
+            }
+        }
+
+        // Φορτώνουμε τους φακέλους ξεχωριστά αντί για όλη τη βάση!
+        db.ref('cps').on('value', snap => { allCPs = snap.val() || {}; checkAndRender(); });
+        db.ref('dailyLogs').on('value', snap => { dailyLogsData = snap.val() || {}; checkAndRender(); });
+        db.ref('archive').on('value', snap => { archive = snap.val() || { players: {}, cps: {} }; checkAndRender(); }, err => { 
+            console.warn("Το Archive είναι κλειδωμένο! Βεβαιώσου ότι πρόσθεσες το 'archive': { '.read': true } στα Firebase Rules.");
+            archive = { players: {}, cps: {} }; checkAndRender(); 
+        });
+
+        function processHallOfFame() {
             let playerInfoMap = {};
             Object.keys(allCPs).forEach(cpId => {
                 const cp = allCPs[cpId];
@@ -246,15 +263,17 @@
             let everCPMap = {}, weeklyCPMap = {}, midCPMap = {};
 
             // 1. ALL-TIME (IMMORTALS) ΓΙΑ CPs: Φορτώνουμε το Archive
-            Object.keys(archive.cps).forEach(cpId => {
-                if(allCPs[cpId] && allCPs[cpId].clan !== 'history') {
-                    everCPMap[allCPs[cpId].name] = (everCPMap[allCPs[cpId].name] || 0) + archive.cps[cpId];
-                }
-            });
+            if(archive && archive.cps) {
+                Object.keys(archive.cps).forEach(cpId => {
+                    if(allCPs[cpId] && allCPs[cpId].clan !== 'history') {
+                        everCPMap[allCPs[cpId].name] = (everCPMap[allCPs[cpId].name] || 0) + archive.cps[cpId];
+                    }
+                });
+            }
 
             // 2. Προσθέτουμε τις τρέχουσες μέρες
-            Object.keys(logs).forEach(date => {
-                Object.values(logs[date]).forEach(playerObj => {
+            Object.keys(dailyLogsData).forEach(date => {
+                Object.values(dailyLogsData[date]).forEach(playerObj => {
                     Object.keys(playerObj).forEach(bossId => {
                         const cpId = playerObj[bossId].cp;
                         if(cpId && allCPs[cpId] && allCPs[cpId].clan !== 'history') {
@@ -271,8 +290,8 @@
             });
 
             last7Days.forEach(date => {
-                if(logs[date]) {
-                    Object.values(logs[date]).forEach(playerObj => {
+                if(dailyLogsData[date]) {
+                    Object.values(dailyLogsData[date]).forEach(playerObj => {
                         Object.keys(playerObj).forEach(bossId => {
                             const cpId = playerObj[bossId].cp;
                             if(cpId && allCPs[cpId] && allCPs[cpId].clan !== 'history') {
@@ -296,7 +315,7 @@
             calculateTop10(playerInfoMap, last7Days, archive.players);
             const isAllTimeActive = document.getElementById('btn-alltime').classList.contains('active');
             showTop10(isAllTimeActive ? 'alltime' : 'weekly');
-        });
+        }
 
         function renderElite(targetId, top3) {
             const area = document.getElementById(targetId);
@@ -362,7 +381,7 @@
                 }).sort((a, b) => b.score !== a.score ? b.score - a.score : a.name.localeCompare(b.name)).slice(0, 10);
         }
 
-        function showTop10(type) {
+        window.showTop10 = function(type) {
             document.getElementById('btn-weekly').classList.toggle('active', type === 'weekly');
             document.getElementById('btn-alltime').classList.toggle('active', type === 'alltime');
             
