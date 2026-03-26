@@ -2,7 +2,7 @@
 <html lang="el">
 <head>
     <meta charset="UTF-8">
-    <title>BMA | Command Center V22.1 (Animals Live Sync & Videos)</title>
+    <title>BMA | Command Center V22.2 (Anti-Cheat 12h Fix)</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -61,7 +61,7 @@
 <body>
 
     <div class="header-container">
-        <div style="width:80px"></div> <h1>BMA COMMAND CENTER V22.1</h1>
+        <div style="width:80px"></div> <h1>BMA COMMAND CENTER V22.2</h1>
         <button class="logout-btn" onclick="logout()">LOGOUT</button>
     </div>
 
@@ -575,8 +575,14 @@
                     for (let dateKey in allLogsLocal) {
                         if (allLogsLocal[dateKey][safeName] && allLogsLocal[dateKey][safeName][bossId]) {
                             let log = allLogsLocal[dateKey][safeName][bossId];
-                            if (log.timestamp && (nowMs - log.timestamp < twelveHoursMs)) { isLocked = true; break; } 
-                            else if (dateKey === today) { isLocked = true; break; }
+                            
+                            // ΑΝΤΙ-CHEAT: ΕΛΕΓΧΕΙ ΜΟΝΟ ΤΟ 12ΩΡΟ. 
+                            // Αν έχουν περάσει 12 ώρες, επιτρέπει τη συμμετοχή ακόμα και στην ίδια μέρα!
+                            if (log.timestamp) {
+                                if (nowMs - log.timestamp < twelveHoursMs) { isLocked = true; break; }
+                            } else if (dateKey === today) { 
+                                isLocked = true; break; 
+                            }
                         }
                     }
                     if (isLocked) { skippedTotal++; return false; }
@@ -628,7 +634,7 @@
             
             if (totalUpdated > 0) { lastAction = currentAction; document.getElementById('undo-btn').style.display = 'inline-block'; }
             
-            alert(`✅ ΟΛΟΚΛΗΡΩΘΗΚΕ ΑΣΦΑΛΩΣ!\nCPs: ${totalUpdated}\nΑγνοήθηκαν: ${skippedTotal}\nΤο όριο τηρήθηκε απόλυτα.`);
+            alert(`✅ ΟΛΟΚΛΗΡΩΘΗΚΕ ΑΣΦΑΛΩΣ!\nCPs: ${totalUpdated}\nΑγνοήθηκαν (κάτω από 12 ώρες): ${skippedTotal}\nΤο όριο τηρήθηκε απόλυτα.`);
             
             document.getElementById('mass-input').value = ""; document.getElementById('detected-list').innerHTML = ""; document.getElementById('unmatched-list').innerHTML = ""; document.getElementById('input-count').innerText = "0 NAMES";
             
