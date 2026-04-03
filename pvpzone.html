@@ -80,6 +80,11 @@
             background: #000;
         }
 
+        /* ΝΕΑ ΚΛΑΣΗ ΕΙΔΙΚΑ ΓΙΑ TIKTOK */
+        .video-wrapper.tiktok-ratio {
+            padding-bottom: 120%; /* Πιο ψηλό κάδρο για κάθετα βίντεο */
+        }
+
         .video-wrapper iframe {
             position: absolute;
             top: 0;
@@ -155,10 +160,14 @@
             const sortedVids = Object.values(vids).sort((a,b) => b.timestamp - a.timestamp);
 
             sortedVids.forEach(v => {
+                // Έξυπνος έλεγχος: Είναι TikTok;
+                const isTikTok = v.embedUrl.includes('tiktok.com');
+                const extraClass = isTikTok ? 'tiktok-ratio' : '';
+
                 grid.innerHTML += `
                 <div class="video-card">
                     <span class="video-title">${v.title}</span>
-                    <div class="video-wrapper">
+                    <div class="video-wrapper ${extraClass}">
                         <iframe src="${v.embedUrl}" allowfullscreen></iframe>
                     </div>
                     <div class="video-info">Uploaded by ${v.uploader} | ${v.date}</div>
