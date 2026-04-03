@@ -2,7 +2,7 @@
 <html lang="el">
 <head>
     <meta charset="UTF-8">
-    <title>BMA | Command Center V22.2 (Anti-Cheat 12h Fix)</title>
+    <title>BMA | Command Center V22.3 (TikTok & YouTube Support)</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -61,7 +61,7 @@
 <body>
 
     <div class="header-container">
-        <div style="width:80px"></div> <h1>BMA COMMAND CENTER V22.2</h1>
+        <div style="width:80px"></div> <h1>BMA COMMAND CENTER V22.3</h1>
         <button class="logout-btn" onclick="logout()">LOGOUT</button>
     </div>
 
@@ -249,7 +249,7 @@
             <p style="color:#aaa; font-size:11px; margin-top:-10px;">Πρόσθεσε εδώ βίντεο από το YouTube. Θα εμφανιστούν αυτόματα στη σελίδα "PVP Zone".</p>
             <div style="display:flex; gap:10px; padding: 15px; background: #000; border: 1px dashed var(--gold); border-radius: 5px; margin-bottom: 15px; flex-wrap: wrap;">
                 <input type="text" id="new-vid-title" placeholder="Video Title (π.χ. ADEN SIEGE)" style="flex:1; min-width: 200px;">
-                <input type="text" id="new-vid-url" placeholder="Οποιοδήποτε YouTube Link..." style="flex:2; min-width: 200px;">
+                <input type="text" id="new-vid-url" placeholder="YouTube ή Πλήρες TikTok Link..." style="flex:2; min-width: 200px;">
                 <input type="text" id="new-vid-uploader" placeholder="Uploaded By" style="flex:1; min-width: 150px;">
                 <button class="btn btn-gold" style="margin:0; width:auto; padding:0 20px;" onclick="addVideo()">ADD VIDEO</button>
             </div>
@@ -343,12 +343,6 @@
     }
 
     // --- VIDEO MANAGER FUNCTIONS ---
-    function extractYouTubeID(url) {
-        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-        const match = url.match(regExp);
-        return (match && match[2].length === 11) ? match[2] : null;
-    }
-
     function addVideo() {
         const title = document.getElementById('new-vid-title').value.trim();
         const rawUrl = document.getElementById('new-vid-url').value.trim();
@@ -356,10 +350,25 @@
 
         if(!title || !rawUrl || !uploader) { alert("Παρακαλώ συμπλήρωσε όλα τα πεδία για το βίντεο!"); return; }
 
-        const vidId = extractYouTubeID(rawUrl);
-        if(!vidId) { alert("Αυτό δεν μοιάζει με έγκυρο YouTube Link. Έλεγξέ το ξανά!"); return; }
+        let embedUrl = "";
 
-        const embedUrl = "https://www.youtube.com/embed/" + vidId;
+        // 1. Έλεγχος για YouTube
+        const ytRegExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+        const ytMatch = rawUrl.match(ytRegExp);
+
+        // 2. Έλεγχος για TikTok (Ψάχνει το ID μετά το /video/)
+        const ttRegExp = /tiktok\.com\/.*video\/(\d+)/;
+        const ttMatch = rawUrl.match(ttRegExp);
+
+        if (ytMatch && ytMatch[2].length === 11) {
+            embedUrl = "https://www.youtube.com/embed/" + ytMatch[2]; // YouTube Embed
+        } else if (ttMatch && ttMatch[1]) {
+            embedUrl = "https://www.tiktok.com/embed/v2/" + ttMatch[1]; // TikTok Embed
+        } else {
+            alert("⚠️ Δεν αναγνωρίστηκε! Βάλε έγκυρο YouTube Link ή ΠΛΗΡΕΣ TikTok Link (π.χ. tiktok.com/@user/video/123...).\nΜην βάζεις τα κοντά links του κινητού (vm.tiktok.com).");
+            return;
+        }
+
         const date = new Date().toLocaleDateString('el-GR');
         
         db.ref('videos/').push({
@@ -371,7 +380,7 @@
     }
 
     function deleteVideo(key) {
-        if(confirm("Είσαι σίγουρος ότι θέλεις να διαγράψεις αυτό το βίντεο;")) { db.ref('videos/' + key).remove(); }
+        if(confirm("Είσαι σίγουρος ότι θέλεις διαγράψεις αυτό το βίντεο;")) { db.ref('videos/' + key).remove(); }
     }
     // -------------------------------
 
