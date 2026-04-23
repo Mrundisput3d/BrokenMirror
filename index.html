@@ -410,9 +410,10 @@
 
         let globalCPData = {}; 
         let globalExternalClans = {}; 
-        let globalDailyLogs = {}; // Αποθηκεύει όλα τα logs
+        let globalDailyLogs = {};
+        // *** FIX: New global to hold archived totals ***
+        let globalArchive = {};
 
-        // Helper Συνάρτηση για ασφαλή ανάγνωση ονομάτων με σύμβολα (π.χ. [Hero])
         function getSafeName(name) {
             return name.replace(/[.#$\[\]]/g, '_');
         }
@@ -441,9 +442,14 @@
             updateUI();
         });
 
-        // ΝΕΟ: Τραβάει τα Daily Logs παγκόσμια για να υπολογίσει το Activity
         db.ref('dailyLogs/').on('value', (snapshot) => {
             globalDailyLogs = snapshot.val() || {};
+            updateUI();
+        });
+
+        // *** FIX: Listen to archive/ and merge into attendance totals ***
+        db.ref('archive/').on('value', (snapshot) => {
+            globalArchive = snapshot.val() || {};
             updateUI();
         });
 
@@ -454,7 +460,7 @@
             nList.innerHTML = ""; kList.innerHTML = "";
             let dynamicLeadersHtml = ""; 
 
-            // ΒΗΜΑ 1: Υπολογισμός "Activity" (Attendances) για κάθε παίκτη από τα logs
+            // ΒΗΜΑ 1: Υπολογισμός "Activity" (Attendances) από τα dailyLogs
             let attendanceMap = {};
             Object.values(globalDailyLogs).forEach(dayData => {
                 Object.keys(dayData).forEach(safeName => {
@@ -462,6 +468,13 @@
                     let upperName = safeName.toUpperCase();
                     attendanceMap[upperName] = (attendanceMap[upperName] || 0) + count;
                 });
+            });
+
+            // *** FIX: Add archived totals on top of current month logs ***
+            // archive/ is a flat map of { safeName: totalCount }
+            Object.keys(globalArchive).forEach(safeName => {
+                let upperName = safeName.toUpperCase();
+                attendanceMap[upperName] = (attendanceMap[upperName] || 0) + globalArchive[safeName];
             });
 
             const sortedIDs = Object.keys(globalCPData).sort((a,b) => (globalCPData[b].totalPoints || 0) - (globalCPData[a].totalPoints || 0));
@@ -511,14 +524,14 @@
                 if (cp.members) {
                     let memberArray = cp.members.split(',').map(m => m.trim()).filter(m => m !== '');
                     
-                    // ΒΗΜΑ 2: Ταξινόμηση Roster βάσει Activity (Φθίνουσα)
+                    // Sort roster by total attendance (archive + dailyLogs combined)
                     memberArray.sort((a, b) => {
                         let scoreA = attendanceMap[getSafeName(a).toUpperCase()] || 0;
                         let scoreB = attendanceMap[getSafeName(b).toUpperCase()] || 0;
                         return scoreB - scoreA;
                     });
 
-                    // ΒΗΜΑ 3: Δημιουργία HTML με Title attribute
+                    // Build HTML with total attendance in tooltip
                     membersHtml = memberArray.map(mName => {
                         let score = attendanceMap[getSafeName(mName).toUpperCase()] || 0;
                         return `<span class="member-click" onclick="openMemberStats('${mName}')" title="Attendances: ${score}">${mName}</span>`;
@@ -605,6 +618,9 @@
             document.getElementById('overlay').style.display = 'block';
 
             setTimeout(() => {
+                // Start with archived per-boss counts if available
+                // Note: archive only stores total count per player, not per-boss breakdown
+                // So per-boss modal still shows only current month — that is expected behaviour
                 let mStats = { VAL:0, ANT:0, BAI:0, FRI:0, ZAK:0, AQ:0, ORF:0, COR:0, SIE:0 };
                 const safeSearchName = getSafeName(memberName).toUpperCase();
 
@@ -628,7 +644,12 @@
                     });
                 });
 
-                document.getElementById('member-stats-name').innerText = memberName.toUpperCase();
+                // Total score shown in the modal title includes archived totals
+                const archiveScore = globalArchive[memberName.toLowerCase()] || globalArchive[safeSearchName.toLowerCase()] || 0;
+                const currentTotal = Object.values(mStats).reduce((a,b) => a+b, 0);
+                const totalAll = currentTotal + archiveScore;
+
+                document.getElementById('member-stats-name').innerText = memberName.toUpperCase() + " (" + totalAll + " total)";
                 document.getElementById('member-stats-grid').innerHTML = Object.keys(bossIcons).map(b => {
                     return `<div class="stat-box"><img src="${bossIcons[b]}" class="boss-icon"><span class="stat-val">${mStats[b]}</span></div>`;
                 }).join('');
