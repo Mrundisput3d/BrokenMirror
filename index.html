@@ -447,8 +447,8 @@
             updateUI();
         });
 
-        // *** FIX: Listen to archive/ and merge into attendance totals ***
-        db.ref('archive/').on('value', (snapshot) => {
+        // *** FIX: Listen to archive/players/ and merge into attendance totals ***
+        db.ref('archive/players/').on('value', (snapshot) => {
             globalArchive = snapshot.val() || {};
             updateUI();
         });
