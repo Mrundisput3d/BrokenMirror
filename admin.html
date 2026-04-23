@@ -67,7 +67,7 @@
 
     <div class="layout">
         <div class="panel">
-            <h2 style="margin-top:0;">CP / CALLERS LIST</h2>
+            <h2 style="margin-top:0;">CP / SHOT CALLERS LIST</h2>
             <div class="filter-tabs">
                 <button class="filter-btn active" id="btn-active" onclick="setViewMode('active')">ACTIVE</button>
                 <button class="filter-btn" id="btn-history" onclick="setViewMode('history')">HISTORY</button>
@@ -76,16 +76,26 @@
             <div id="cp-list-simple"></div>
             
             <hr style="border-color:#333; margin: 15px 0;">
-            <h3>NEW CP / CALLER</h3>
+            <h3>NEW CP / SHOT CALLER</h3>
             <input type="text" id="new-name" placeholder="Name (π.χ. ANIMALS ή NIKLAUS)">
             <input type="text" id="new-leader" placeholder="Leader (ή Role, π.χ. ALLY LEADER)">
-            <input type="text" id="new-imgUrl" placeholder="Image URL (Μόνο για Callers)">
-            <select id="new-clan">
+            <input type="text" id="new-imgUrl" placeholder="Image URL (Μόνο για Shot Callers)">
+            <select id="new-clan" onchange="toggleNewCallerMultiplier()">
                 <option value="noldor">Noldor</option>
                 <option value="kriminalides">Kriminalides</option>
-                <option value="caller">Caller (Στρογγυλό εικονίδιο / x3 Bonus)</option>
+                <option value="caller">Shot Caller (π.χ. TSAKNORRIS - Στρογγυλό εικονίδιο)</option>
                 <option value="external">External Clan</option>
             </select>
+            <div id="new-caller-multiplier-row" style="display:none; background: rgba(212,175,55,0.1); border: 1px solid var(--gold); border-radius: 4px; padding: 10px; margin: 5px 0;">
+                <label style="color:var(--gold); font-size:11px; font-family:'Cinzel'; display:block; margin-bottom:5px;">⚡ CALLER MULTIPLIER</label>
+                <select id="new-caller-multiplier" style="width:100%; margin:0;">
+                    <option value="1">x1 — Standard</option>
+                    <option value="2">x2 — Double</option>
+                    <option value="3" selected>x3 — Triple (Default)</option>
+                    <option value="4">x4 — Quad</option>
+                    <option value="5">x5 — Penta</option>
+                </select>
+            </div>
             <button class="btn btn-gold" onclick="createNewCP()">REGISTER</button>
 
             <hr style="border-color:#333; margin: 15px 0;">
@@ -149,7 +159,17 @@
                     <div style="flex:1;"><label style="color:#aaa; font-size:11px;">Name</label><input type="text" id="edit-cp-name" style="font-family:'Cinzel'; color:var(--gold); font-size:1.1rem;"></div>
                     <div style="flex:1;"><label style="color:#aaa; font-size:11px;">Leader / Role</label><input type="text" id="edit-cp-leader" style="font-family:'Cinzel';"></div>
                 </div>
-                <div style="margin-bottom:15px;"><label style="color:#aaa; font-size:11px;">Image URL (Μόνο για Callers)</label><input type="text" id="edit-cp-imgUrl" placeholder="https://..."></div>
+                <div style="margin-bottom:15px;"><label style="color:#aaa; font-size:11px;">Image URL (Μόνο για Shot Callers)</label><input type="text" id="edit-cp-imgUrl" placeholder="https://..."></div>
+                <div id="edit-caller-multiplier-row" style="display:none; background: rgba(212,175,55,0.1); border: 1px solid var(--gold); border-radius: 4px; padding: 10px; margin-bottom:15px;">
+                    <label style="color:var(--gold); font-size:11px; font-family:'Cinzel'; display:block; margin-bottom:5px;">⚡ CALLER MULTIPLIER</label>
+                    <select id="edit-caller-multiplier" style="width:100%; margin:0;" onchange="updateCallerPoints()">
+                        <option value="1">x1 — Standard</option>
+                        <option value="2">x2 — Double</option>
+                        <option value="3">x3 — Triple</option>
+                        <option value="4">x4 — Quad</option>
+                        <option value="5">x5 — Penta</option>
+                    </select>
+                </div>
 
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:25px;">
                     <div>
@@ -615,7 +635,8 @@
                 await db.ref('cps/' + id).transaction(cp => {
                     if(cp) {
                         let isCaller = cp.clan === 'caller';
-                        let actualMultiplier = isCaller ? (multiplier * 3) : multiplier;
+                        let callerMult = parseInt(cp.callerMultiplier) || 3;
+                        let actualMultiplier = isCaller ? (multiplier * callerMult) : multiplier;
 
                         if(!cp.bossStats) cp.bossStats = {};
                         cp.bossStats[bossId] = (parseInt(cp.bossStats[bossId]) || 0) + pointsToGive;
@@ -675,7 +696,8 @@
                 await db.ref(`cps/${up.cpId}`).transaction(cp => { 
                     if(cp) { 
                         let isCaller = cp.clan === 'caller';
-                        let actualMultiplier = isCaller ? (lastAction.multiplier * 3) : lastAction.multiplier;
+                        let callerMult = parseInt(cp.callerMultiplier) || 3;
+                        let actualMultiplier = isCaller ? (lastAction.multiplier * callerMult) : lastAction.multiplier;
 
                         if(cp.bossStats && cp.bossStats[lastAction.bossId]) { 
                             cp.bossStats[lastAction.bossId] = (parseInt(cp.bossStats[lastAction.bossId]) || 0) - up.pointsCount; 
@@ -737,16 +759,39 @@
         if(!currentEditID) return;
         const cp = allCPs[currentEditID];
         const isCaller = cp && cp.clan === 'caller';
+        const callerMult = parseInt(document.getElementById('edit-caller-multiplier')?.value) || parseInt(cp?.callerMultiplier) || 3;
         let delta = 0;
         bossKeys.forEach(k => {
             const el = document.getElementById('inp-' + k);
             if (!el) return;
             const currentVal = parseInt(el.value) || 0;
             const initVal = parseInt(cpInitialStats[k]) || 0;
-            let actualMultiplier = isCaller ? (multipliers[k] * 3) : multipliers[k];
+            let actualMultiplier = isCaller ? (multipliers[k] * callerMult) : multipliers[k];
             delta += (currentVal - initVal) * actualMultiplier;
         });
         document.getElementById('edit-points').value = cpInitialPoints + delta;
+    }
+
+    function updateCallerPoints() {
+        if(!currentEditID) return;
+        const cp = allCPs[currentEditID];
+        if (cp && cp.clan === 'caller') {
+            const callerMult = parseInt(document.getElementById('edit-caller-multiplier').value) || 3;
+            let newTotal = 0;
+            bossKeys.forEach(k => {
+                const el = document.getElementById('inp-' + k);
+                const currentVal = parseInt(el?.value) || 0;
+                newTotal += currentVal * (multipliers[k] * callerMult);
+            });
+            if (cp.lootHistory) {
+                cp.lootHistory.forEach(item => { newTotal -= parseInt(item.cost) || 0; });
+            }
+            document.getElementById('edit-points').value = newTotal;
+            cpInitialPoints = newTotal;
+            bossKeys.forEach(k => {
+                cpInitialStats[k] = parseInt(document.getElementById('inp-' + k).value) || 0;
+            });
+        }
     }
 
     function recalcExtPoints() {
@@ -754,13 +799,14 @@
         const pureId = currentExtID.replace('cp_', '');
         const cp = allCPs[pureId];
         const isCaller = cp && cp.clan === 'caller';
+        const callerMult = parseInt(cp?.callerMultiplier) || 3;
         let delta = 0;
         bossKeys.forEach(k => {
             const el = document.getElementById('ext-inp-' + k);
             if (!el) return;
             const currentVal = parseInt(el.value) || 0;
             const initVal = parseInt(extInitialStats[k]) || 0;
-            let actualMultiplier = isCaller ? (multipliers[k] * 3) : multipliers[k];
+            let actualMultiplier = isCaller ? (multipliers[k] * callerMult) : multipliers[k];
             delta += (currentVal - initVal) * actualMultiplier;
         });
         document.getElementById('ext-points').value = extInitialPoints + delta;
@@ -779,6 +825,16 @@
         document.getElementById('edit-cp-imgUrl').value = cp.imgUrl || ""; 
         document.getElementById('edit-members').value = cp.members || ""; 
         document.getElementById('edit-points').value = cpInitialPoints; 
+
+        // Show/hide multiplier row based on whether this is a caller
+        const multRow = document.getElementById('edit-caller-multiplier-row');
+        const multSel = document.getElementById('edit-caller-multiplier');
+        if (cp.clan === 'caller') {
+            multRow.style.display = 'block';
+            multSel.value = String(parseInt(cp.callerMultiplier) || 3);
+        } else {
+            multRow.style.display = 'none';
+        }
         
         let statsHtml = ""; 
         bossKeys.forEach(k => { 
@@ -797,11 +853,20 @@
         const stats = {}; 
         bossKeys.forEach(k => stats[k] = parseInt(document.getElementById('inp-' + k).value) || 0); 
         const finalPoints = parseInt(document.getElementById('edit-points').value) || 0;
-        
-        db.ref('cps/' + currentEditID).update({ 
-            name: document.getElementById('edit-cp-name').value, leader: document.getElementById('edit-cp-leader').value, imgUrl: document.getElementById('edit-cp-imgUrl').value, members: document.getElementById('edit-members').value, 
-            totalPoints: finalPoints, bossStats: stats 
-        }).then(() => alert("Data & Points Saved Successfully!")); 
+        const cp = allCPs[currentEditID];
+        const updatePayload = { 
+            name: document.getElementById('edit-cp-name').value, 
+            leader: document.getElementById('edit-cp-leader').value, 
+            imgUrl: document.getElementById('edit-cp-imgUrl').value, 
+            members: document.getElementById('edit-members').value, 
+            totalPoints: finalPoints, 
+            bossStats: stats 
+        };
+        // Save multiplier only for callers
+        if (cp && cp.clan === 'caller') {
+            updatePayload.callerMultiplier = parseInt(document.getElementById('edit-caller-multiplier').value) || 3;
+        }
+        db.ref('cps/' + currentEditID).update(updatePayload).then(() => alert("Data & Points Saved Successfully!")); 
     }
 
     async function migratePlayerLogs() { const oldName = document.getElementById('old-player-name').value.trim(); const newName = document.getElementById('new-player-name').value.trim(); if(!oldName || !newName) { alert("Συμπλήρωσε τα ονόματα."); return; } if(!confirm(`Το όνομα ${oldName} θα αλλάξει σε ${newName}. Συνέχεια;`)) return; let logsMoved = 0; let cpsUpdated = 0; const logsRef = db.ref('dailyLogs'); const snap = await logsRef.once('value'); const logs = snap.val() || {}; for (const date in logs) { let foundKey = Object.keys(logs[date]).find(k => k.toLowerCase() === oldName.toLowerCase()); if (foundKey) { const dataToMove = logs[date][foundKey]; await db.ref(`dailyLogs/${date}/${newName}`).set(dataToMove); await db.ref(`dailyLogs/${date}/${foundKey}`).remove(); logsMoved++; } } for (const cpId in allCPs) { let updated = false; let cp = allCPs[cpId]; if (cp.leader && cp.leader.toLowerCase() === oldName.toLowerCase()) { cp.leader = newName; updated = true; } if (cp.members) { let membersArr = cp.members.split(',').map(m => m.trim()); let idx = membersArr.findIndex(m => m.toLowerCase() === oldName.toLowerCase()); if (idx !== -1) { membersArr[idx] = newName; cp.members = membersArr.join(', '); updated = true; } } if (updated) { await db.ref(`cps/${cpId}`).update({ leader: cp.leader, members: cp.members }); cpsUpdated++; } } alert(`ΕΠΙΤΥΧΙΑ!\nLogs moved: ${logsMoved} days.\nCPs updated: ${cpsUpdated}.`); document.getElementById('old-player-name').value = ""; document.getElementById('new-player-name').value = ""; }
@@ -875,7 +940,36 @@
         db.ref('cps/' + currentEditID).update({ lootHistory: cp.lootHistory, totalPoints: cp.totalPoints }).then(() => loadEdit(currentEditID)); 
     }
     
-    function createNewCP() { const n = document.getElementById('new-name').value; if(!n) return; const id = n.replace(/\s+/g, '-').toLowerCase(); db.ref('cps/' + id).set({ name: n, leader: document.getElementById('new-leader').value, imgUrl: document.getElementById('new-imgUrl').value || 'https://i.ibb.co/SXM1FZx8/attedance-points.png', clan: document.getElementById('new-clan').value, totalPoints: 0, members: "", bossStats: { VAL:0, ANT:0, BAI:0, SIE:0, ZAK:0, FRI:0, AQ:0, ORF:0, COR:0 } }); }
+    function createNewCP() { 
+        const n = document.getElementById('new-name').value; 
+        if(!n) return; 
+        const id = n.replace(/\s+/g, '-').toLowerCase(); 
+        const clan = document.getElementById('new-clan').value;
+        const cpData = { 
+            name: n, 
+            leader: document.getElementById('new-leader').value, 
+            imgUrl: document.getElementById('new-imgUrl').value || 'https://i.ibb.co/SXM1FZx8/attedance-points.png', 
+            clan: clan, 
+            totalPoints: 0, 
+            members: "", 
+            bossStats: { VAL:0, ANT:0, BAI:0, SIE:0, ZAK:0, FRI:0, AQ:0, ORF:0, COR:0 } 
+        };
+        if (clan === 'caller') {
+            cpData.callerMultiplier = parseInt(document.getElementById('new-caller-multiplier').value) || 3;
+        }
+        db.ref('cps/' + id).set(cpData).then(() => {
+            document.getElementById('new-name').value = '';
+            document.getElementById('new-leader').value = '';
+            document.getElementById('new-imgUrl').value = '';
+            document.getElementById('new-clan').value = 'noldor';
+            toggleNewCallerMultiplier();
+            alert('✅ ' + n + ' registered successfully!');
+        });
+    }
+    function toggleNewCallerMultiplier() {
+        const clan = document.getElementById('new-clan').value;
+        document.getElementById('new-caller-multiplier-row').style.display = clan === 'caller' ? 'block' : 'none';
+    }
     function deleteCP() { if(confirm("Delete Forever?")) db.ref('cps/' + currentEditID).remove(); }
     function createExtClan() { const name = document.getElementById('new-ext-name').value.trim(); const icon = document.getElementById('new-ext-icon').value.trim(); if(!name) { alert("Βάλε όνομα!"); return; } const id = name.replace(/\s+/g, '').toLowerCase(); db.ref('externalClans/' + id).set({ name: name, iconUrl: icon || 'https://i.ibb.co/SXM1FZx8/attedance-points.png', leader: 'Pending...', description: 'Alliance agreements pending.', status: 'active', lootHistory: [] }); document.getElementById('new-ext-name').value = ''; document.getElementById('new-ext-icon').value = ''; alert("New Clan Created!"); }
     
