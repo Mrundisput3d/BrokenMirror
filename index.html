@@ -406,7 +406,7 @@
         const firebaseConfig = { apiKey: "AIzaSyDRL8EehxdcgVYJ0LJ1khVYkSJcaCMKRes", authDomain: "brokenmirrordb.firebaseapp.com", databaseURL: "https://brokenmirrordb-default-rtdb.europe-west1.firebasedatabase.app", projectId: "brokenmirrordb" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-        const bossIcons = { "VAL": "https://i.ibb.co/84gZPVRP/necklace-valakas.png", "ANT": "https://i.ibb.co/rfqvc6mv/earring-antharas.png", "BAI": "https://i.ibb.co/XrZkv67h/ring-of-baium.png", "FRI": "https://i.ibb.co/gF4YKGTM/frintezza-necklace.png", "ZAK": "https://i.ibb.co/spkC6Gzz/zaken-earring.png", "AQ":  "https://i.ibb.co/rKRtZmBG/ring-of-queen-ant.png", "ORF": "https://i.ibb.co/j9dDnXwH/earring-orfen.png", "COR": "https://i.ibb.co/ksv37fNZ/ring-of-.png", "SIE": "https://i.ibb.co/Txfby6wD/images.png" };
+        const bossIcons = { "VAL": "https://i.ibb.co/84gZPVRP/necklace-valakas.png", "ANT": "https://i.ibb.co/rfqvc6mv/earring-antharas.png", "BAI": "https://i.ibb.co/XrZkv67h/ring-of-baium.png", "FRI": "https://i.ibb.co/gF4YKGTM/frintezza-necklace.png", "ZAK": "https://i.ibb.co/spkC6Gzz/zaken-earring.png", "AQ":  "https://i.ibb.co/rKRtZmBG/ring-of-queen-ant.png", "ORF": "https://i.ibb.co/j9dDnXwH/earring-orfen.png", "COR": "https://i.ibb.co/ksv37fNZ/ring-of-.png", "SIE": "https://i.ibb.co/Txfby6wD/images.png", "DPVP": "https://i.ibb.co/G3HdK5jw/PVPZONE.png" };
 
         let globalCPData = {}; 
         let globalExternalClans = {}; 
@@ -621,7 +621,7 @@
                 // Start with archived per-boss counts if available
                 // Note: archive only stores total count per player, not per-boss breakdown
                 // So per-boss modal still shows only current month — that is expected behaviour
-                let mStats = { VAL:0, ANT:0, BAI:0, FRI:0, ZAK:0, AQ:0, ORF:0, COR:0, SIE:0 };
+                let mStats = { VAL:0, ANT:0, BAI:0, FRI:0, ZAK:0, AQ:0, ORF:0, COR:0, SIE:0, DPVP:0 };
                 const safeSearchName = getSafeName(memberName).toUpperCase();
 
                 Object.values(globalDailyLogs).forEach(dayData => {
@@ -639,6 +639,7 @@
                                 else if(b.includes('ORF')) mStats.ORF++;
                                 else if(b.includes('COR')) mStats.COR++;
                                 else if(b.includes('SIE')) mStats.SIE++;
+                                else if(b.includes('DPVP') || b.includes('PVP')) mStats.DPVP++;
                             });
                         }
                     });
