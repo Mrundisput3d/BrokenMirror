@@ -231,7 +231,7 @@
         
         for (let i = 0; i < 7; i++) {
             let d = new Date(); d.setDate(now.getDate() - i);
-            let dateKey = d.toLocaleDateString('el-GR').replace(/\//g, '-');
+            let dateKey = `${d.getDate()}-${d.getMonth()+1}-${d.getFullYear()}`;
             
             if (allLogs[dateKey]) {
                 Object.values(allLogs[dateKey]).forEach(playerEntry => {
