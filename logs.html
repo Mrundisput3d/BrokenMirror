@@ -55,21 +55,21 @@
             <div class="panel">
                 <div style="display: flex; gap: 10px; align-items: flex-end;">
                     <div style="flex: 1;">
-                        <label>Date Filter:</label>
-                        <input type="text" id="date-filter" placeholder="DD-MM-YYYY" onkeyup="renderLogs()" onchange="renderLogs()">
+                        <label style="color:#aaa; font-size:11px;">Ημερομηνία:</label>
+                        <input type="date" id="date-filter" onchange="renderLogs()" style="font-family:'Cinzel'; cursor:pointer; height: 35px;">
                     </div>
                     <div style="flex: 2;">
-                        <label>Search Player History:</label>
-                        <input type="text" id="player-filter" placeholder="Type name..." oninput="renderLogs()">
+                        <label style="color:#aaa; font-size:11px;">Ιστορικό Παίκτη (Αναζήτηση):</label>
+                        <input type="text" id="player-filter" placeholder="Πληκτρολόγησε όνομα..." list="players-list" oninput="renderLogs()" style="height: 35px;">
                     </div>
-                    <button class="btn btn-blue" onclick="exportToCSV()">EXPORT CSV</button>
+                    <button class="btn btn-blue" onclick="exportToCSV()" style="height: 35px; margin-bottom: 0;">EXPORT CSV</button>
                 </div>
 
                 <div class="table-container">
                     <table class="log-table">
                         <thead>
-                            <tr>
-                                <th>TIME & DATE</th>
+                            <tr id="log-table-head">
+                                <th>TIME</th>
                                 <th>PLAYER</th>
                                 <th>BOSS</th>
                                 <th>CP OWNER</th>
@@ -78,8 +78,6 @@
                         <tbody id="logs-list"></tbody>
                     </table>
                 </div>
-                
-                <button class="btn btn-red" onclick="clearAllLogs()">RESET ALL MEMBER LOGS</button>
             </div>
         </div>
 
@@ -122,49 +120,107 @@
     }
     // ------------------------------
 
-    const todayStr = new Date().toLocaleDateString('el-GR').replace(/\//g, '-');
-    document.getElementById('date-filter').value = todayStr;
+    const d = new Date();
+    const todayISO = new Date(d.getTime() - (d.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
+    document.getElementById('date-filter').value = todayISO;
 
     let allLogs = {};
     const lowEpicsKeys = ['ZAK', 'ORF', 'COR', 'AQ', 'FRI'];
 
     db.ref('dailyLogs/').on('value', snap => {
         allLogs = snap.val() || {};
+        populatePlayerDatalist();
         renderLogs();
         calculateIntelligence();
     });
 
+    function populatePlayerDatalist() {
+        let players = new Set();
+        Object.values(allLogs).forEach(day => {
+            Object.keys(day).forEach(pName => players.add(pName));
+        });
+        let dl = document.getElementById('players-list');
+        if (!dl) {
+            dl = document.createElement('datalist');
+            dl.id = 'players-list';
+            document.body.appendChild(dl);
+        }
+        dl.innerHTML = Array.from(players).sort().map(p => `<option value="${p.toUpperCase()}">`).join('');
+    }
+
+    function getSelectedDateStr() {
+        const rawDate = document.getElementById('date-filter').value;
+        if (!rawDate) return "";
+        const parts = rawDate.split('-');
+        if (parts.length === 3) {
+            return `${parseInt(parts[2], 10)}-${parseInt(parts[1], 10)}-${parts[0]}`;
+        }
+        return rawDate;
+    }
+
     function renderLogs() {
-        const selectedDate = document.getElementById('date-filter').value.trim();
+        const selectedDate = getSelectedDateStr();
         const playerSearch = document.getElementById('player-filter').value.trim().toLowerCase();
         const container = document.getElementById('logs-list');
+        const thead = document.getElementById('log-table-head');
         
-        let htmlString = ""; // Βελτιστοποίηση: Χτίζουμε πρώτα όλο το HTML
+        let htmlString = "";
         
-        // Αν ψάχνουμε παίκτη, ψάχνουμε σε όλες τις ημερομηνίες. Διαφορετικά, μόνο στην επιλεγμένη ημερομηνία.
-        const datesToSearch = playerSearch ? Object.keys(allLogs).sort().reverse() : [selectedDate];
+        if (playerSearch) {
+            if(thead) thead.innerHTML = `<th>DATE</th><th>TIME</th><th>BOSS</th><th>CP OWNER</th>`;
+            const dates = Object.keys(allLogs).sort((a, b) => {
+                let [da, ma, ya] = a.split('-'); let [db, mb, yb] = b.split('-');
+                return new Date(yb, mb-1, da) - new Date(ya, ma-1, db);
+            }).reverse();
 
-        datesToSearch.forEach(dateKey => {
-            const dayData = allLogs[dateKey];
-            if (!dayData) return;
+            dates.forEach(dateKey => {
+                const dayData = allLogs[dateKey];
+                if (!dayData) return;
 
-            Object.keys(dayData).forEach(pName => {
-                if (playerSearch && !pName.toLowerCase().includes(playerSearch)) return;
-                
-                Object.keys(dayData[pName]).forEach(bossId => {
-                    const ev = dayData[pName][bossId];
+                const pNameKey = Object.keys(dayData).find(k => k.toLowerCase() === playerSearch);
+                if (pNameKey && dayData[pNameKey]) {
+                    Object.keys(dayData[pNameKey]).forEach(bossId => {
+                        const ev = dayData[pNameKey][bossId];
+                        htmlString += `<tr>
+                            <td style="color:var(--gold); font-weight:bold;">${dateKey}</td>
+                            <td style="color:#888; font-size:0.75rem;">${ev.time || '-'}</td>
+                            <td><span class="boss-tag">${bossId}</span></td>
+                            <td style="color:#28a745">${(ev.cp || 'N/A').toUpperCase()}</td>
+                        </tr>`;
+                    });
+                }
+            });
+            if (!htmlString) htmlString = `<tr><td colspan="4" style="text-align:center; padding:20px; color:#aaa;">Δεν βρέθηκαν συμμετοχές για τον παίκτη.</td></tr>`;
+            
+        } else {
+            if(thead) thead.innerHTML = `<th>TIME</th><th>PLAYER</th><th>BOSS</th><th>CP OWNER</th>`;
+            const datesToSearch = selectedDate ? [selectedDate] : [];
+            
+            datesToSearch.forEach(dateKey => {
+                const dayData = allLogs[dateKey];
+                if (!dayData) return;
+
+                let allEvents = [];
+                Object.keys(dayData).forEach(pName => {
+                    Object.keys(dayData[pName]).forEach(bossId => {
+                        allEvents.push({ pName, bossId, ev: dayData[pName][bossId] });
+                    });
+                });
+                allEvents.sort((a, b) => (b.ev.timestamp || 0) - (a.ev.timestamp || 0));
+
+                allEvents.forEach(item => {
                     htmlString += `<tr>
-                        <td style="color:#666; font-size:0.7rem;">${dateKey} | ${ev.time || ''}</td>
-                        <td class="player-tag">${pName.toUpperCase()}</td>
-                        <td><span class="boss-tag">${bossId}</span></td>
-                        <td style="color:#28a745">${(ev.cp || 'N/A').toUpperCase()}</td>
+                        <td style="color:#666; font-size:0.7rem;">${item.ev.time || ''}</td>
+                        <td class="player-tag">${item.pName.toUpperCase()}</td>
+                        <td><span class="boss-tag">${item.bossId}</span></td>
+                        <td style="color:#28a745">${(item.ev.cp || 'N/A').toUpperCase()}</td>
                     </tr>`;
                 });
             });
-        });
+            if (!htmlString) htmlString = `<tr><td colspan="4" style="text-align:center; padding:20px; color:#aaa;">Δεν βρέθηκαν συμμετοχές για ${selectedDate}.</td></tr>`;
+        }
 
-        // Βάζουμε το HTML στο DOM μία φορά στο τέλος (Τεράστια αύξηση ταχύτητας)
-        container.innerHTML = htmlString || `<tr><td colspan="4" style="text-align:center; color:#666; padding:20px;">No logs found for this filter.</td></tr>`;
+        container.innerHTML = htmlString;
     }
 
     function calculateIntelligence() {
@@ -222,7 +278,7 @@
     }
 
     function exportToCSV() {
-        const selectedDate = document.getElementById('date-filter').value.trim();
+        const selectedDate = getSelectedDateStr();
         const playerSearch = document.getElementById('player-filter').value.trim().toLowerCase();
         
         let csv = "Date,Time,Player,Boss,CP\n";
@@ -257,15 +313,6 @@
         a.download = `BMA_Logs_${playerSearch ? playerSearch : selectedDate}.csv`; 
         a.click();
         window.URL.revokeObjectURL(url);
-    }
-
-    function clearAllLogs() {
-        // Εxtra επιβεβαίωση γιατί είναι επικίνδυνο κουμπί
-        if(confirm("⚠️ ΕΙΣΑΙ ΣΙΓΟΥΡΟΣ;\nΑυτή η ενέργεια θα διαγράψει ΟΛΟ το ιστορικό συμμετοχών από τη βάση δεδομένων!")) { 
-            db.ref('dailyLogs/').remove().then(() => {
-                alert("Όλα τα logs διαγράφηκαν επιτυχώς.");
-            }); 
-        }
     }
 </script>
 </body>
