@@ -879,7 +879,74 @@
         db.ref('cps/' + currentEditID).update(updatePayload).then(() => alert("Data & Points Saved Successfully!")); 
     }
 
-    async function migratePlayerLogs() { const oldName = document.getElementById('old-player-name').value.trim(); const newName = document.getElementById('new-player-name').value.trim(); if(!oldName || !newName) { alert("Συμπλήρωσε τα ονόματα."); return; } if(!confirm(`Το όνομα ${oldName} θα αλλάξει σε ${newName}. Συνέχεια;`)) return; let logsMoved = 0; let cpsUpdated = 0; const logsRef = db.ref('dailyLogs'); const snap = await logsRef.once('value'); const logs = snap.val() || {}; for (const date in logs) { let foundKey = Object.keys(logs[date]).find(k => k.toLowerCase() === oldName.toLowerCase()); if (foundKey) { const dataToMove = logs[date][foundKey]; await db.ref(`dailyLogs/${date}/${newName}`).set(dataToMove); await db.ref(`dailyLogs/${date}/${foundKey}`).remove(); logsMoved++; } } for (const cpId in allCPs) { let updated = false; let cp = allCPs[cpId]; if (cp.leader && cp.leader.toLowerCase() === oldName.toLowerCase()) { cp.leader = newName; updated = true; } if (cp.members) { let membersArr = cp.members.split(',').map(m => m.trim()); let idx = membersArr.findIndex(m => m.toLowerCase() === oldName.toLowerCase()); if (idx !== -1) { membersArr[idx] = newName; cp.members = membersArr.join(', '); updated = true; } } if (updated) { await db.ref(`cps/${cpId}`).update({ leader: cp.leader, members: cp.members }); cpsUpdated++; } } alert(`ΕΠΙΤΥΧΙΑ!\nLogs moved: ${logsMoved} days.\nCPs updated: ${cpsUpdated}.`); document.getElementById('old-player-name').value = ""; document.getElementById('new-player-name').value = ""; }
+    async function migratePlayerLogs() { 
+        const oldName = document.getElementById('old-player-name').value.trim(); 
+        const newName = document.getElementById('new-player-name').value.trim(); 
+        if(!oldName || !newName) { alert("Συμπλήρωσε τα ονόματα."); return; } 
+        if(!confirm(`Το όνομα ${oldName} θα αλλάξει σε ${newName}. Συνέχεια;`)) return; 
+        
+        let logsMoved = 0; let cpsUpdated = 0; 
+        const safeOldName = oldName.replace(/[.#$\[\]]/g, '_');
+        const safeNewName = newName.replace(/[.#$\[\]]/g, '_');
+
+        const logsRef = db.ref('dailyLogs'); 
+        const snap = await logsRef.once('value'); 
+        const logs = snap.val() || {}; 
+        for (const date in logs) { 
+            let foundKey = Object.keys(logs[date]).find(k => k.toLowerCase() === safeOldName.toLowerCase() || k.toLowerCase() === oldName.toLowerCase()); 
+            if (foundKey) { 
+                const dataToMove = logs[date][foundKey]; 
+                await db.ref(`dailyLogs/${date}/${safeNewName}`).set(dataToMove); 
+                await db.ref(`dailyLogs/${date}/${foundKey}`).remove(); 
+                logsMoved++; 
+            } 
+        } 
+        
+        for (const cpId in allCPs) { 
+            let updated = false; 
+            let cp = allCPs[cpId]; 
+            if (cp.leader && cp.leader.toLowerCase() === oldName.toLowerCase()) { 
+                cp.leader = newName; updated = true; 
+            } 
+            if (cp.members) { 
+                let membersArr = cp.members.split(',').map(m => m.trim()); 
+                let idx = membersArr.findIndex(m => m.toLowerCase() === oldName.toLowerCase()); 
+                if (idx !== -1) { 
+                    membersArr[idx] = newName; 
+                    cp.members = membersArr.join(', '); 
+                    updated = true; 
+                } 
+            } 
+            if (updated) { 
+                await db.ref(`cps/${cpId}`).update({ leader: cp.leader, members: cp.members }); 
+                cpsUpdated++; 
+            } 
+        } 
+
+        const archivePlayersRef = db.ref('archive/players');
+        const archivePlayersSnap = await archivePlayersRef.once('value');
+        const archivePlayers = archivePlayersSnap.val() || {};
+        let archiveKey = Object.keys(archivePlayers).find(k => k.toLowerCase() === safeOldName.toLowerCase() || k.toLowerCase() === oldName.toLowerCase());
+        if (archiveKey) {
+            const dataToMove = archivePlayers[archiveKey];
+            await db.ref(`archive/players/${safeNewName}`).set(dataToMove);
+            await db.ref(`archive/players/${archiveKey}`).remove();
+        }
+
+        const animalsRef = db.ref('animalsTracker');
+        const animalsSnap = await animalsRef.once('value');
+        const animals = animalsSnap.val() || {};
+        let animalsKey = Object.keys(animals).find(k => k.toLowerCase() === safeOldName.toLowerCase() || k.toLowerCase() === oldName.toLowerCase());
+        if (animalsKey) {
+            const dataToMove = animals[animalsKey];
+            await db.ref(`animalsTracker/${safeNewName}`).set(dataToMove);
+            await db.ref(`animalsTracker/${animalsKey}`).remove();
+        }
+
+        alert(`ΕΠΙΤΥΧΙΑ!\nLogs moved: ${logsMoved} days.\nCPs updated: ${cpsUpdated}.\nArchive & Tracker updated.`); 
+        document.getElementById('old-player-name').value = ""; 
+        document.getElementById('new-player-name').value = ""; 
+    }
     async function movePlayerToCP() { const playerName = document.getElementById('move-player-name').value.trim(); const targetCpId = document.getElementById('move-target-cp').value; if(!playerName || !targetCpId) { alert("Παρακαλώ συμπλήρωσε το όνομα και διάλεξε το CP προορισμού."); return; } const searchName = playerName.toLowerCase(); let sourceCpId = null; let sourceMembersArr = []; let exactPlayerName = playerName; for (const id in allCPs) { if(allCPs[id].clan === 'history') continue; if(allCPs[id].leader && allCPs[id].leader.toLowerCase() === searchName) { alert(`ΠΡΟΣΟΧΗ! Ο ${playerName} είναι LEADER στο CP ${allCPs[id].name}. Πρέπει να αλλάξεις χειροκίνητα τον Leader από το Edit CP.`); return; } let membersArr = (allCPs[id].members || "").split(',').map(m => m.trim()).filter(m => m !== ""); let idx = membersArr.findIndex(m => m.toLowerCase() === searchName); if (idx !== -1) { sourceCpId = id; exactPlayerName = membersArr[idx]; sourceMembersArr = membersArr; sourceMembersArr.splice(idx, 1); break; } } if (!sourceCpId) { alert(`Ο παίκτης ${playerName} δεν βρέθηκε στο Roster κανενός ενεργού CP.`); return; } if (sourceCpId === targetCpId) { alert(`Ο παίκτης ${exactPlayerName} ανήκει ήδη στο CP ${allCPs[targetCpId].name}!`); return; } const targetCp = allCPs[targetCpId]; let targetMembersArr = (targetCp.members || "").split(',').map(m => m.trim()).filter(m => m !== ""); targetMembersArr.push(exactPlayerName); if(!confirm(`ΕΠΙΒΕΒΑΙΩΣΗ:\nΝα μεταφερθεί ο ${exactPlayerName} από το ${allCPs[sourceCpId].name} στο ${targetCp.name};`)) return; await db.ref(`cps/${sourceCpId}`).update({ members: sourceMembersArr.join(', ') }); await db.ref(`cps/${targetCpId}`).update({ members: targetMembersArr.join(', ') }); alert(`Η μεταφορά ολοκληρώθηκε!\nΟ ${exactPlayerName} είναι πλέον στο ${targetCp.name}.`); document.getElementById('move-player-name').value = ""; }
     
     function toggleHistoryStatus() { 
