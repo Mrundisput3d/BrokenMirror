@@ -203,6 +203,7 @@
                         <div class="stat-edit-grid" id="stat-inputs"></div>
                         <div style="display:flex; gap:10px; margin-top:20px;">
                             <button class="btn btn-gold" style="flex:2;" onclick="updateCP()">SAVE ALL DATA</button>
+                            <button class="btn btn-blue" onclick="changeCPClan()">CLAN</button>
                             <button class="btn" id="hist-toggle-btn" onclick="toggleHistoryStatus()">HIST</button>
                             <button class="btn btn-red" onclick="deleteCP()">DEL</button>
                         </div>
@@ -247,6 +248,7 @@
                     <div id="ext-stat-inputs" class="stat-edit-grid" style="margin-top: 15px;"></div>
                     <div style="display:flex; gap:10px; margin-top:20px;">
                         <button class="btn btn-gold" style="flex:2;" onclick="updateExtData()">SAVE DATA</button>
+                        <button class="btn btn-blue" id="ext-transfer-btn" onclick="transferExtToCP()" style="display:none; padding:12px 5px; font-size:11px;">TO CP</button>
                         <button class="btn" id="ext-hist-btn" onclick="toggleExtHistory()">HIST</button>
                     </div>
                 </div>
@@ -996,6 +998,23 @@
         } 
     }
     
+    function changeCPClan() {
+        if(!currentEditID) return;
+        const cp = allCPs[currentEditID];
+        const newClan = prompt("Σε ποια ομάδα να ανήκει; (noldor, kriminalides, caller, external)", cp.clan);
+        if (!newClan) return;
+        const formattedClan = newClan.trim().toLowerCase();
+        if (['noldor', 'kriminalides', 'caller', 'external'].includes(formattedClan)) {
+            db.ref('cps/' + currentEditID).update({ clan: formattedClan }).then(() => {
+                alert("Η ομάδα άλλαξε επιτυχώς σε " + formattedClan.toUpperCase() + "!");
+                loadEdit(currentEditID);
+                renderSimpleList();
+            });
+        } else {
+            alert("Λάθος όνομα! Επίλεξε noldor, kriminalides, caller, ή external.");
+        }
+    }
+
     function addMarketLoot() { 
         const loot = document.getElementById('loot-market').value.split('|'); 
         db.ref('cps/' + currentEditID).transaction(cp => { 
@@ -1063,6 +1082,7 @@
             document.getElementById('ext-points').disabled = false; 
             document.getElementById('ext-stat-inputs').style.display = 'none'; 
             const histBtn = document.getElementById('ext-hist-btn'); histBtn.style.display = 'block'; if(targetData.status === 'history') { histBtn.innerText = "RESTORE"; histBtn.className = "btn btn-green"; } else { histBtn.innerText = "HIST"; histBtn.className = "btn btn-blue"; } 
+            const transferBtn = document.getElementById('ext-transfer-btn'); if(transferBtn) transferBtn.style.display = 'block';
         } else if (selVal.startsWith('cp_')) { 
             const pureId = selVal.replace('cp_', ''); targetData = allCPs[pureId] || {}; 
             
@@ -1071,6 +1091,7 @@
             bossKeys.forEach(k => extInitialStats[k] = (targetData.bossStats && targetData.bossStats[k]) ? parseInt(targetData.bossStats[k]) : 0);
 
             document.getElementById('ext-name').value = targetData.name || ""; document.getElementById('ext-leader').value = targetData.leader || targetData.members || ""; document.getElementById('ext-desc-container').style.display = 'none'; document.getElementById('ext-icon-container').style.display = 'none'; document.getElementById('ext-hist-btn').style.display = 'none'; 
+            const transferBtn = document.getElementById('ext-transfer-btn'); if(transferBtn) transferBtn.style.display = 'none';
             document.getElementById('ext-points').value = extInitialPoints; 
             document.getElementById('ext-points').disabled = false; 
 
@@ -1098,6 +1119,42 @@
     
     function toggleExtHistory() { if(!currentExtID || !currentExtID.startsWith('ext_')) return; const pureId = currentExtID.replace('ext_', ''); const clan = allExtClans[pureId] || {}; const newStatus = clan.status === 'history' ? 'active' : 'history'; db.ref('externalClans/' + pureId).update({ status: newStatus }).then(() => { alert("Clan visibility updated!"); loadExtEdit(); }); }
     
+    function transferExtToCP() {
+        if(!currentExtID || !currentExtID.startsWith('ext_')) return; 
+        const pureId = currentExtID.replace('ext_', ''); 
+        const clan = allExtClans[pureId]; 
+        if(!clan) return;
+
+        const newClan = prompt("Σε ποιο Clan να μεταφερθεί ως CP;\n(noldor ή kriminalides)", "noldor");
+        if (!newClan) return;
+        const formattedClan = newClan.trim().toLowerCase();
+        
+        if (['noldor', 'kriminalides'].includes(formattedClan)) {
+            if(confirm(`Είσαι σίγουρος;\nΗ ομάδα "${clan.name}" θα μεταφερθεί ΟΡΙΣΤΙΚΑ στα ενεργά CPs (${formattedClan.toUpperCase()}).`)) {
+                const cpData = {
+                    name: clan.name || "",
+                    leader: clan.leader || "",
+                    imgUrl: clan.iconUrl || "https://i.ibb.co/SXM1FZx8/attedance-points.png",
+                    clan: formattedClan,
+                    totalPoints: clan.totalPoints || 0,
+                    members: "", 
+                    bossStats: { VAL:0, ANT:0, BAI:0, SIE:0, ZAK:0, FRI:0, AQ:0, ORF:0, COR:0, DPVP:0 },
+                    lootHistory: clan.lootHistory || []
+                };
+                db.ref('cps/' + pureId).set(cpData).then(() => {
+                    db.ref('externalClans/' + pureId).remove().then(() => {
+                        alert("Η ομάδα μεταφέρθηκε επιτυχώς στα ενεργά CPs!");
+                        document.getElementById('ext-edit-section').style.display = 'none';
+                        currentExtID = null;
+                        document.getElementById('ext-select').value = "";
+                    });
+                });
+            }
+        } else {
+            alert("Λάθος όνομα! Πρέπει να γράψεις 'noldor' ή 'kriminalides'.");
+        }
+    }
+
     function addExtMarketLoot() { 
         if(!currentExtID) return; 
         const loot = document.getElementById('ext-loot-market').value.split('|'); 
