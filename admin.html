@@ -24,7 +24,7 @@
         .detected-cp-row { background: #000; padding: 8px; margin: 4px 0; border-radius: 5px; border: 1px solid #333; }
         .detected-cp-row input[type="checkbox"] { accent-color: var(--gold); cursor: pointer; }
         
-        .boss-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px; margin: 15px 0; }
+        .boss-grid { display: grid; grid-template-columns: repeat(11, 1fr); gap: 6px; margin: 15px 0; }
         .boss-btn { background: #111; border: 1px solid #444; padding: 10px 2px; text-align: center; cursor: pointer; border-radius: 6px; transition: 0.2s; }
         .boss-btn:hover { border-color: var(--gold); background: #1a1a1a; }
         .boss-btn img { width: 28px; display: block; margin: 0 auto 5px; }
@@ -157,6 +157,18 @@
                 <div class="boss-btn" onclick="logValidatedEvent('ORF', 1)"><img src="https://i.ibb.co/j9dDnXwH/earring-orfen.png"><span>ORF</span></div>
                 <div class="boss-btn" onclick="logValidatedEvent('COR', 1)"><img src="https://i.ibb.co/ksv37fNZ/ring-of-.png"><span>CORE</span></div>
                 <div class="boss-btn" onclick="logValidatedEvent('DPVP', 3)"><img src="https://i.ibb.co/G3HdK5jw/PVPZONE.png" style="border-radius: 15px;"><span>D. PVP</span></div>
+                <div class="boss-btn" onclick="addNamesToSlotsManager()" style="border-color: var(--green);"><div style="font-size:24px; margin-bottom:5px;">📋</div><span style="color:var(--green);">SLOTS</span></div>
+            </div>
+
+            <!-- New Control Bar for Slots Manager -->
+            <div id="slots-controls" style="display:flex; justify-content: space-between; align-items: center; background: rgba(40, 167, 69, 0.1); border: 1px dashed var(--green); padding: 10px; border-radius: 5px; margin-bottom: 15px;">
+                <div style="color:var(--green); font-family:'Cinzel'; font-weight:bold;">
+                    📊 CLAN SLOTS: <span id="slots-counter" style="color:#fff; font-size:16px;">0</span> NAMES SAVED
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <button class="btn btn-green" style="margin:0; width:auto; padding: 8px 15px;" onclick="generateSlotsExcel()">GENERATE EXCEL</button>
+                    <button class="btn btn-red" style="margin:0; width:auto; padding: 8px 15px;" onclick="resetSlotsManager()">RESET</button>
+                </div>
             </div>
 
             <div id="edit-section" style="display:none; border-top:2px solid var(--gold); padding-top:20px; margin-top:20px;">
@@ -282,27 +294,6 @@
             </div>
             <div id="admin-video-list" style="max-height: 250px; overflow-y: auto; background: rgba(0,0,0,0.4); border: 1px solid #333; border-radius: 5px; padding: 5px;">
                 </div>
-        </div>
-
-        </div>
-
-        <div class="panel" style="margin-top: 20px;">
-            <h2 style="color:var(--green); margin-top:0;">CLAN SLOTS MANAGER</h2>
-            <p style="color:#aaa; font-size:11px; margin-top:-10px;">Drop screenshots of clan lists (Noldors/Kriminalides) here. You can upload multiple batches (10-15 photos). Click 'GENERATE EXCEL' when ready.</p>
-            
-            <div id="slots-dropzone" style="border: 2px dashed #28a745; padding: 20px; text-align: center; background: rgba(0,0,0,0.4); border-radius: 8px; color: #888; margin-bottom: 15px; transition: 0.3s; cursor: pointer;">
-                <div style="font-size: 2rem; margin-bottom: 5px;">📥</div>
-                <b style="color:var(--green);">DRAG & DROP Η ΚΑΝΕ PASTE (CTRL+V) CLAN SCREENSHOTS ΕΔΩ</b>
-                <input type="file" id="slots-file-input" multiple accept="image/*" style="display:none;">
-            </div>
-            
-            <div id="slots-ocr-loading" style="display:none; text-align:center; color:var(--sky); font-weight:bold; font-family:'Cinzel'; margin-bottom:10px;">
-                ⏳ Η Google αναλύει τις εικόνες... Περίμενε!
-            </div>
-
-            <textarea id="slots-mass-input" rows="6" placeholder="Τα ονόματα από όλες τις εικόνες θα μαζευτούν εδώ..."></textarea>
-            
-            <button class="btn btn-green" onclick="generateSlotsExcel()" style="margin-top: 15px; font-size: 1.1rem;">📊 GENERATE EXCEL</button>
         </div>
 
     </div>
@@ -491,71 +482,51 @@
         for (let i = 0; i < items.length; i++) {
             if (items[i].type.indexOf("image") === 0) {
                 const file = items[i].getAsFile();
-                // Determine which dropzone the user intended to paste to.
-                // For simplicity, if we are hovering or focused on slots, we could use that.
-                // But default paste behavior on the page: let's send to both or ask.
-                // We'll leave the main one active, but also allow slots if they are focused.
-                if (document.activeElement === document.getElementById('slots-mass-input') || document.activeElement.id === 'slots-dropzone') {
-                    processSlotsImages([file]);
-                } else {
-                    processBulkImages([file]); 
-                }
+                processBulkImages([file]); 
                 break;
             }
         }
     });
 
     // --- CLAN SLOTS MANAGER LOGIC ---
-    const slotsDropzone = document.getElementById('slots-dropzone');
-    const slotsFileInput = document.getElementById('slots-file-input');
-    slotsDropzone.addEventListener('click', () => slotsFileInput.click());
-    slotsDropzone.addEventListener('dragover', (e) => { e.preventDefault(); slotsDropzone.style.backgroundColor = 'rgba(40, 167, 69, 0.1)'; });
-    slotsDropzone.addEventListener('dragleave', () => slotsDropzone.style.backgroundColor = 'rgba(0,0,0,0.4)');
-    slotsDropzone.addEventListener('drop', (e) => { e.preventDefault(); slotsDropzone.style.backgroundColor = 'rgba(0,0,0,0.4)'; if (e.dataTransfer.files.length > 0) processSlotsImages(e.dataTransfer.files); });
-    slotsFileInput.addEventListener('change', (e) => { if (e.target.files.length > 0) processSlotsImages(e.target.files); });
+    let accumulatedSlotsNames = new Set();
 
-    async function processSlotsImages(files) {
-        document.getElementById('slots-ocr-loading').style.display = 'block';
-        let allExtractedText = ""; let errorOccurred = false;
-
-        for (let i = 0; i < files.length; i++) {
-            const file = files[i];
-            if (!file.type.startsWith('image/')) continue;
-            
-            const base64Data = await new Promise((resolve) => { 
-                const reader = new FileReader(); reader.onloadend = () => resolve(reader.result.split(',')[1]); reader.readAsDataURL(file); 
-            });
-            
-            const requestBody = { requests: [{ image: { content: base64Data }, features: [{ type: "TEXT_DETECTION" }] }] };
-            
-            try {
-                const response = await fetch(`https://vision.googleapis.com/v1/images:annotate?key=${GOOGLE_VISION_API_KEY}`, { 
-                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(requestBody) 
-                });
-                const data = await response.json();
-                if (data.error) { alert("ΣΦΑΛΜΑ GOOGLE API: " + data.error.message); errorOccurred = true; break; }
-                if (data.responses && data.responses[0].fullTextAnnotation) { allExtractedText += data.responses[0].fullTextAnnotation.text + "\n"; }
-            } catch (error) { 
-                alert("Αποτυχία σύνδεσης με τη Google."); errorOccurred = true; break;
-            }
-        }
+    function addNamesToSlotsManager() {
+        const inputText = document.getElementById('mass-input').value.trim().toLowerCase();
+        if (!inputText) { alert("Δεν υπάρχει κείμενο στο πλαίσιο!"); return; }
         
-        document.getElementById('slots-ocr-loading').style.display = 'none';
-        if (!errorOccurred && allExtractedText !== "") {
-            let smartText = smartFilterText(allExtractedText);
-            if (smartText) {
-                const currentText = document.getElementById('slots-mass-input').value.trim();
-                document.getElementById('slots-mass-input').value = currentText ? (currentText + " " + smartText) : smartText;
-            } else { alert("Το Smart Filter αγνόησε όλο το κείμενο (Δεν βρέθηκε κανένα όνομα)."); }
+        let extractedNames = inputText.match(/[a-z0-9_]+/g) || [];
+        if (extractedNames.length === 0) { alert("Δεν βρέθηκαν ονόματα."); return; }
+
+        let addedCount = 0;
+        extractedNames.forEach(n => {
+            if (n.length > 2) {
+                accumulatedSlotsNames.add(n);
+                addedCount++;
+            }
+        });
+
+        document.getElementById('slots-counter').innerText = accumulatedSlotsNames.size;
+        
+        document.getElementById('mass-input').value = "";
+        document.getElementById('detected-list').innerHTML = "";
+        document.getElementById('unmatched-list').innerHTML = "";
+        document.getElementById('input-count').innerText = "0 NAMES";
+        
+        alert("✅ Προστέθηκαν " + addedCount + " ονόματα στο Slots Manager!");
+    }
+
+    function resetSlotsManager() {
+        if(confirm("Είσαι σίγουρος ότι θες να διαγράψεις τα αποθηκευμένα ονόματα;")) {
+            accumulatedSlotsNames.clear();
+            document.getElementById('slots-counter').innerText = "0";
         }
     }
 
     function generateSlotsExcel() {
-        const inputText = document.getElementById('slots-mass-input').value.trim().toLowerCase();
-        if (!inputText) { alert("Δεν υπάρχει κείμενο για ανάλυση!"); return; }
+        if (accumulatedSlotsNames.size === 0) { alert("Δεν υπάρχουν αποθηκευμένα ονόματα! Πάτα το κουμπί 'SLOTS' πρώτα."); return; }
         
-        let extractedNames = [...new Set(inputText.match(/[a-z0-9_]+/g) || [])];
-        if (extractedNames.length === 0) return;
+        let extractedNames = Array.from(accumulatedSlotsNames);
 
         let columns = {};
         let cpIds = Object.keys(allCPs).filter(id => allCPs[id].clan === 'noldor' || allCPs[id].clan === 'kriminalides');
@@ -591,7 +562,7 @@
 
         // Add unmatched names to 'Not Found'
         extractedNames.forEach(n => {
-            if (!matchedInputNames.has(n) && n.length > 2) {
+            if (!matchedInputNames.has(n)) {
                 columns["Not Found"].push(n.toUpperCase());
             }
         });
