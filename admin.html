@@ -284,6 +284,27 @@
                 </div>
         </div>
 
+        </div>
+
+        <div class="panel" style="margin-top: 20px;">
+            <h2 style="color:var(--green); margin-top:0;">CLAN SLOTS MANAGER</h2>
+            <p style="color:#aaa; font-size:11px; margin-top:-10px;">Drop screenshots of clan lists (Noldors/Kriminalides) here. You can upload multiple batches (10-15 photos). Click 'GENERATE EXCEL' when ready.</p>
+            
+            <div id="slots-dropzone" style="border: 2px dashed #28a745; padding: 20px; text-align: center; background: rgba(0,0,0,0.4); border-radius: 8px; color: #888; margin-bottom: 15px; transition: 0.3s; cursor: pointer;">
+                <div style="font-size: 2rem; margin-bottom: 5px;">📥</div>
+                <b style="color:var(--green);">DRAG & DROP Η ΚΑΝΕ PASTE (CTRL+V) CLAN SCREENSHOTS ΕΔΩ</b>
+                <input type="file" id="slots-file-input" multiple accept="image/*" style="display:none;">
+            </div>
+            
+            <div id="slots-ocr-loading" style="display:none; text-align:center; color:var(--sky); font-weight:bold; font-family:'Cinzel'; margin-bottom:10px;">
+                ⏳ Η Google αναλύει τις εικόνες... Περίμενε!
+            </div>
+
+            <textarea id="slots-mass-input" rows="6" placeholder="Τα ονόματα από όλες τις εικόνες θα μαζευτούν εδώ..."></textarea>
+            
+            <button class="btn btn-green" onclick="generateSlotsExcel()" style="margin-top: 15px; font-size: 1.1rem;">📊 GENERATE EXCEL</button>
+        </div>
+
     </div>
 
 <script>
@@ -470,11 +491,141 @@
         for (let i = 0; i < items.length; i++) {
             if (items[i].type.indexOf("image") === 0) {
                 const file = items[i].getAsFile();
-                processBulkImages([file]); 
+                // Determine which dropzone the user intended to paste to.
+                // For simplicity, if we are hovering or focused on slots, we could use that.
+                // But default paste behavior on the page: let's send to both or ask.
+                // We'll leave the main one active, but also allow slots if they are focused.
+                if (document.activeElement === document.getElementById('slots-mass-input') || document.activeElement.id === 'slots-dropzone') {
+                    processSlotsImages([file]);
+                } else {
+                    processBulkImages([file]); 
+                }
                 break;
             }
         }
     });
+
+    // --- CLAN SLOTS MANAGER LOGIC ---
+    const slotsDropzone = document.getElementById('slots-dropzone');
+    const slotsFileInput = document.getElementById('slots-file-input');
+    slotsDropzone.addEventListener('click', () => slotsFileInput.click());
+    slotsDropzone.addEventListener('dragover', (e) => { e.preventDefault(); slotsDropzone.style.backgroundColor = 'rgba(40, 167, 69, 0.1)'; });
+    slotsDropzone.addEventListener('dragleave', () => slotsDropzone.style.backgroundColor = 'rgba(0,0,0,0.4)');
+    slotsDropzone.addEventListener('drop', (e) => { e.preventDefault(); slotsDropzone.style.backgroundColor = 'rgba(0,0,0,0.4)'; if (e.dataTransfer.files.length > 0) processSlotsImages(e.dataTransfer.files); });
+    slotsFileInput.addEventListener('change', (e) => { if (e.target.files.length > 0) processSlotsImages(e.target.files); });
+
+    async function processSlotsImages(files) {
+        document.getElementById('slots-ocr-loading').style.display = 'block';
+        let allExtractedText = ""; let errorOccurred = false;
+
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            if (!file.type.startsWith('image/')) continue;
+            
+            const base64Data = await new Promise((resolve) => { 
+                const reader = new FileReader(); reader.onloadend = () => resolve(reader.result.split(',')[1]); reader.readAsDataURL(file); 
+            });
+            
+            const requestBody = { requests: [{ image: { content: base64Data }, features: [{ type: "TEXT_DETECTION" }] }] };
+            
+            try {
+                const response = await fetch(`https://vision.googleapis.com/v1/images:annotate?key=${GOOGLE_VISION_API_KEY}`, { 
+                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(requestBody) 
+                });
+                const data = await response.json();
+                if (data.error) { alert("ΣΦΑΛΜΑ GOOGLE API: " + data.error.message); errorOccurred = true; break; }
+                if (data.responses && data.responses[0].fullTextAnnotation) { allExtractedText += data.responses[0].fullTextAnnotation.text + "\n"; }
+            } catch (error) { 
+                alert("Αποτυχία σύνδεσης με τη Google."); errorOccurred = true; break;
+            }
+        }
+        
+        document.getElementById('slots-ocr-loading').style.display = 'none';
+        if (!errorOccurred && allExtractedText !== "") {
+            let smartText = smartFilterText(allExtractedText);
+            if (smartText) {
+                const currentText = document.getElementById('slots-mass-input').value.trim();
+                document.getElementById('slots-mass-input').value = currentText ? (currentText + " " + smartText) : smartText;
+            } else { alert("Το Smart Filter αγνόησε όλο το κείμενο (Δεν βρέθηκε κανένα όνομα)."); }
+        }
+    }
+
+    function generateSlotsExcel() {
+        const inputText = document.getElementById('slots-mass-input').value.trim().toLowerCase();
+        if (!inputText) { alert("Δεν υπάρχει κείμενο για ανάλυση!"); return; }
+        
+        let extractedNames = [...new Set(inputText.match(/[a-z0-9_]+/g) || [])];
+        if (extractedNames.length === 0) return;
+
+        let columns = {};
+        let cpIds = Object.keys(allCPs).filter(id => allCPs[id].clan === 'noldor' || allCPs[id].clan === 'kriminalides');
+        
+        cpIds.forEach(id => {
+            columns[allCPs[id].name] = [];
+        });
+        columns["Not Found"] = [];
+
+        let matchedInputNames = new Set();
+
+        cpIds.forEach(id => {
+            let roster = (allCPs[id].members || "").toLowerCase().split(',').map(s=>s.trim()).filter(s=>s);
+            if(allCPs[id].leader) roster.push(allCPs[id].leader.toLowerCase().trim());
+            roster = [...new Set(roster)];
+
+            roster.forEach(trueName => {
+                let matchedInput = extractedNames.find(n => {
+                    if (n.length < 3) return false;
+                    if (trueName === n || trueName.includes(n)) return true;
+                    let dist = getEditDistance(n, trueName); 
+                    let allowed = trueName.length > 5 ? 2 : 1; 
+                    return dist <= allowed;
+                });
+                
+                if (matchedInput) {
+                    matchedInputNames.add(matchedInput);
+                    // Add the correctly formatted trueName to the column
+                    columns[allCPs[id].name].push(trueName.toUpperCase());
+                }
+            });
+        });
+
+        // Add unmatched names to 'Not Found'
+        extractedNames.forEach(n => {
+            if (!matchedInputNames.has(n) && n.length > 2) {
+                columns["Not Found"].push(n.toUpperCase());
+            }
+        });
+
+        // Generate CSV
+        let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
+        let colNames = Object.keys(columns);
+        csvContent += colNames.map(c => `"${c}"`).join(",") + "\n";
+
+        let maxRows = Math.max(...colNames.map(c => columns[c].length));
+
+        for (let i = 0; i < maxRows; i++) {
+            let row = [];
+            colNames.forEach(c => {
+                row.push(`"${columns[c][i] || ""}"`);
+            });
+            csvContent += row.join(",") + "\n";
+        }
+
+        // Add Totals Row
+        let totalsRow = [];
+        colNames.forEach(c => {
+            totalsRow.push(`"${columns[c].length}"`);
+        });
+        csvContent += totalsRow.join(",") + "\n";
+
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "Clan_Slots_Report.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
 
     async function processBulkImages(files) {
         document.getElementById('ocr-loading').style.display = 'block';
