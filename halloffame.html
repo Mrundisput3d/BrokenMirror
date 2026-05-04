@@ -262,28 +262,20 @@
 
             let everCPMap = {}, weeklyCPMap = {}, midCPMap = {};
 
-            // 1. ALL-TIME (IMMORTALS) ΓΙΑ CPs: Φορτώνουμε το Archive
-            if(archive && archive.cps) {
-                Object.keys(archive.cps).forEach(cpId => {
-                    if(allCPs[cpId] && allCPs[cpId].clan !== 'history') {
-                        everCPMap[allCPs[cpId].name] = (everCPMap[allCPs[cpId].name] || 0) + archive.cps[cpId];
+            // 1. ALL-TIME (IMMORTALS) ΓΙΑ CPs: Διαβάζουμε τα συνολικά Attendances από τα bossStats (όπως στο index.html)
+            Object.keys(allCPs).forEach(cpId => {
+                const cp = allCPs[cpId];
+                if(cp && cp.clan !== 'history') {
+                    const cName = cp.name || "Unknown CP";
+                    let totalAttendances = 0;
+                    if (cp.bossStats) {
+                        Object.values(cp.bossStats).forEach(val => totalAttendances += (parseInt(val) || 0));
                     }
-                });
-            }
-
-            // 2. Προσθέτουμε τις τρέχουσες μέρες
-            Object.keys(dailyLogsData).forEach(date => {
-                Object.values(dailyLogsData[date]).forEach(playerObj => {
-                    Object.keys(playerObj).forEach(bossId => {
-                        const cpId = playerObj[bossId].cp;
-                        if(cpId && allCPs[cpId] && allCPs[cpId].clan !== 'history') {
-                            const cName = allCPs[cpId].name;
-                            everCPMap[cName] = (everCPMap[cName] || 0) + 1;
-                        }
-                    });
-                });
+                    everCPMap[cName] = totalAttendances;
+                }
             });
 
+            // 2. Εβδομαδιαία στατιστικά από τα dailyLogs (Weekly Warlords & Specialists)
             const last7Days = Array.from({length: 7}, (_, i) => {
                 const d = new Date(); d.setDate(d.getDate() - i);
                 return d.getDate() + '-' + (d.getMonth() + 1) + '-' + d.getFullYear();
