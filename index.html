@@ -1050,14 +1050,7 @@
             return "https://i.ibb.co/SXM1FZx8/attedance-points.png";
         }
 
-        db.ref('clanConfig/').on('value', (snapshot) => {
-            globalClanConfig = snapshot.val() || {};
-            const sorted = Object.keys(globalClanConfig).filter(k => globalClanConfig[k].type !== 'external').sort((a, b) => (globalClanConfig[a].order || 99) - (globalClanConfig[b].order || 99));
-            if (!activeClanTab || !globalClanConfig[activeClanTab] || globalClanConfig[activeClanTab].type === 'external') {
-                activeClanTab = sorted[0] || null;
-            }
-            updateUI();
-        });
+
 
         db.ref('cps/').on('value', (snapshot) => {
             globalCPData = snapshot.val() || {};
@@ -1065,7 +1058,15 @@
         });
 
         db.ref('externalClans/').on('value', (snapshot) => {
-            globalExternalClans = snapshot.val() || {};
+            let data = snapshot.val() || {};
+            globalClanConfig = data['__clanConfig'] || {};
+            delete data['__clanConfig'];
+            globalExternalClans = data;
+            
+            const sorted = Object.keys(globalClanConfig).filter(k => globalClanConfig[k].type !== 'external').sort((a, b) => (globalClanConfig[a].order || 99) - (globalClanConfig[b].order || 99));
+            if (!activeClanTab || !globalClanConfig[activeClanTab] || globalClanConfig[activeClanTab].type === 'external') {
+                activeClanTab = sorted[0] || null;
+            }
             updateUI();
         });
 
