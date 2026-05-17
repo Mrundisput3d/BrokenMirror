@@ -8,6 +8,7 @@
     
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
     <style>
         :root {
             --gold: #d4af37; --silver: #c0c0c0; --bronze: #cd7f32;
@@ -26,10 +27,12 @@
             margin: 0; padding: 0;
             scroll-behavior: smooth;
         }
+
         /* Music Controls */
         .header-controls { position: absolute; top: 20px; right: 40px; display: flex; gap: 10px; z-index: 100; }
         .control-btn { color: var(--gold); font-family: 'Cinzel'; border: 1px solid var(--gold); padding: 5px 15px; border-radius: 5px; background: rgba(0,0,0,0.6); font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.3s; backdrop-filter: blur(5px);}
         .control-btn:hover { background: var(--gold); color: #000; }
+
         /* --- 1. HERO SECTION (FULL SCREEN) --- */
         .hero-section {
             position: relative;
@@ -41,6 +44,7 @@
             overflow: hidden;
             border-bottom: 2px solid var(--gold);
         }
+
         .hero-content {
             position: relative;
             z-index: 10;
@@ -59,7 +63,9 @@
         .btn-primary:hover { background: #fff; transform: translateY(-3px); box-shadow: 0 0 30px rgba(255,255,255,0.6); }
         .btn-secondary { background: rgba(0,0,0,0.5); color: #fff; border: 1px solid #555; backdrop-filter: blur(5px); }
         .btn-secondary:hover { border-color: #fff; background: rgba(255,255,255,0.1); transform: translateY(-3px); }
+
         .hero-bottom-fade { position: absolute; bottom: 0; left: 0; width: 100%; height: 150px; background: linear-gradient(to top, var(--bg), transparent); z-index: 5; pointer-events: none; }
+
         /* --- 2. NAVIGATION CARDS --- */
         .nav-cards-section {
             max-width: 1400px;
@@ -71,6 +77,7 @@
             grid-template-columns: repeat(4, 1fr);
             gap: 25px;
         }
+
         .nav-card {
             position: relative;
             height: 240px;
@@ -90,10 +97,12 @@
             justify-content: flex-end;
             background-color: rgba(0,0,0,0.6);
         }
+
         #card-treasury { background-image: url('https://i.ibb.co/TqNQrNx3/MARKET.png'); }
         #card-history { background-image: url('https://i.ibb.co/N2t24Pht/FALLEN-HEROES.png'); }
         #card-warzone { background-image: url('https://i.ibb.co/G3HdK5jw/PVPZONE.png'); }
         #card-fame { background-image: url('https://i.ibb.co/RGpww9dy/HALLOFFAME.png'); }
+
         .nav-card::before { 
             content: ''; 
             position: absolute; 
@@ -102,6 +111,7 @@
             z-index: 1; 
             transition: 0.4s; 
         }
+
         .card-content-wrapper {
             position: relative;
             z-index: 2;
@@ -109,6 +119,7 @@
             transform: translateY(35px); 
             transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
+
         .card-icon svg { 
             width: 45px; height: 45px; 
             margin-bottom: 15px; 
@@ -116,6 +127,7 @@
             filter: drop-shadow(0 0 8px rgba(212,175,55,0.4));
             transition: 0.4s;
         }
+
         .card-title { 
             font-family: 'Cinzel', serif; 
             font-size: 1.1rem; 
@@ -125,6 +137,7 @@
             font-weight: 700; 
             text-shadow: 0 2px 4px rgba(0,0,0,0.9);
         }
+
         .card-desc { 
             font-size: 0.8rem; 
             color: #ddd; 
@@ -134,13 +147,16 @@
             transform: translateY(20px);
             transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
+
         .nav-card:hover { transform: translateY(-10px); border-color: var(--gold); box-shadow: 0 0 30px rgba(212,175,55,0.3); }
         .nav-card:hover::before { background: linear-gradient(to top, rgba(10, 12, 15, 0.9) 10%, rgba(10, 12, 15, 0.2) 100%); }
         .nav-card:hover .card-content-wrapper { transform: translateY(0); }
         .nav-card:hover .card-desc { opacity: 1; transform: translateY(0); }
         .nav-card:hover .card-icon svg { transform: scale(1.1); stroke: #fff; }
+
         /* --- 3. MAIN DASHBOARD CONTENT --- */
         .dashboard-container { max-width: 1500px; margin: 0 auto; padding: 0 20px 50px 20px; z-index: 5; position: relative; }
+
         .search-container { text-align: center; margin: 0 auto 50px auto; max-width: 600px; position: relative; z-index: 10;}
         #global-search { 
             width: 100%; padding: 18px 30px; font-family: 'Cinzel', serif; font-size: 1.1rem;
@@ -149,9 +165,11 @@
             box-sizing: border-box; backdrop-filter: blur(5px);
         }
         #global-search:focus { border-color: var(--gold); box-shadow: 0 0 25px rgba(212,175,55,0.3); background: rgba(0,0,0,0.9); }
+
         .section-title-wrapper { text-align: center; margin-bottom: 30px; }
         .section-title { color: #fff; font-family: 'Cinzel'; font-size: 2rem; margin: 0; letter-spacing: 3px; text-transform: uppercase; text-shadow: 0 5px 15px rgba(0,0,0,0.5); }
         .section-line { width: 100px; height: 2px; background: var(--gold); margin: 10px auto; box-shadow: 0 0 10px var(--gold); }
+
         .leaders-row { display: flex; justify-content: center; gap: 40px; margin-bottom: 40px; flex-wrap: wrap; }
         .leader-card { text-align: center; cursor: pointer; width: 120px; transition: 0.3s; }
         .leader-card:hover { transform: scale(1.05); }
@@ -159,6 +177,7 @@
         .leader-img { width: 100%; height: 100%; object-fit: contain; }
         .leader-name { color: var(--gold); font-size: 0.85rem; font-family: 'Cinzel'; display: block; margin-top: 10px; font-weight: bold; }
         .leader-role { color: #888; font-size: 0.65rem; text-transform: uppercase; display: block; }
+
         .main-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 40px; }
         .clan-column { background: rgba(15, 18, 22, 0.9); height: 750px; display: flex; flex-direction: column; border: 1px solid #333; border-radius: 10px; border-top: 3px solid var(--gold); backdrop-filter: blur(5px);}
         .column-header { padding: 15px; text-align: center; font-family: 'Cinzel'; font-size: 1.1rem; border-bottom: 1px solid #222; display: flex; align-items: center; justify-content: center; gap: 12px; background: rgba(0,0,0,0.4); border-radius: 10px 10px 0 0;}
@@ -185,6 +204,7 @@
         .new-clan-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
         .new-clan-icon { width: 60px; height: 60px; margin-bottom: 15px; }
         .new-clan-name { display: block; font-family: 'Cinzel'; color: #fff; font-size: 1rem; font-weight: bold;}
+
         /* MODALS */
         #caller-modal, #cp-stats-modal, #member-stats-modal, #clan-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 420px; max-width: 90%; background: #0f1216; border: 2px solid var(--gold); border-radius: 15px; padding: 30px; z-index: 9999; text-align: center; box-shadow: 0 0 50px rgba(0,0,0,0.9); box-sizing: border-box;}
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9998; backdrop-filter: blur(8px); }
@@ -192,6 +212,7 @@
         .stat-box { background: #15181c; padding: 8px; border: 1px solid #333; text-align: center; border-radius: 4px; }
         .boss-icon { width: 24px; height: 24px; margin-bottom: 5px; }
         .stat-val { font-size: 0.85rem; color: #fff; font-family: 'Cinzel'; display: block; font-weight: bold;}
+
         /* --- 4. DEVELOPER FOOTER & DISCORD BUTTON --- */
         .developer-footer { text-align: center; padding: 30px 20px; background: rgba(0, 0, 0, 0.85); border-top: 1px solid rgba(212,175,55,0.2); font-family: 'Cinzel', serif; color: #888; font-size: 0.85rem; letter-spacing: 1px; position: relative; z-index: 5; margin-top: 40px; }
         .dev-name { color: var(--gold); font-weight: bold; font-size: 1rem; }
@@ -210,10 +231,12 @@
             border-color: #fff; color: #fff;
         }
         .discord-icon { width: 18px; height: 18px; fill: #fff; }
+
         /* --- 5. MOBILE OPTIMIZATION (RESPONSIVE DESIGN) --- */
         @media (max-width: 1024px) {
             .nav-cards-section { grid-template-columns: repeat(2, 1fr); margin-top: -40px; }
         }
+
         @media (max-width: 768px) {
             .header-controls { top: 10px; right: 10px; flex-direction: column; align-items: flex-end; gap: 5px;}
             .control-btn { padding: 5px 10px; font-size: 0.65rem; }
@@ -243,14 +266,18 @@
         }
     </style>
 </head>
+
 <body>
+
     <div class="header-controls">
         <div class="control-btn" onclick="toggleMusic(event)"><span id="music-icon">🔇</span> <span id="track-name">DION THEME</span></div>
         <div class="control-btn" onclick="nextTrack(event)">⏭ NEXT</div>
         <div class="control-btn" id="clock" style="cursor:default;">SERVER TIME: 00:00:00 UTC</div>
     </div>
     <audio id="bg-music" loop><source id="music-source" src="https://www.dropbox.com/scl/fi/ypzqrr336iewt62gncy6u/Lineage-2-Dion-Theme-Song.mp3?rlkey=nl1quliuqleuljgkt5jhqq6hh&st=sb8ij16g&raw=1" type="audio/mpeg"></audio>
+
     <div class="modal-overlay" id="overlay" onclick="closeModal()"></div>
+
     <div id="caller-modal">
         <img id="modal-img" src="" style="width:90px; height:90px; border-radius:50%; border:2px solid var(--gold); background:#000; margin-bottom:15px;">
         <h2 id="modal-name" style="font-family:'Cinzel'; color:var(--gold); margin:0;"></h2>
@@ -277,6 +304,7 @@
         <div id="clan-modal-content"></div>
         <button onclick="closeModal()" style="margin-top:15px; background:var(--gold); color:#000; border:none; padding:12px; cursor:pointer; font-weight:bold; border-radius:4px; width: 100%; font-family:'Cinzel';">CLOSE</button>
     </div>
+
     <header class="hero-section">
         <div class="hero-content">
             <div class="hero-subtitle">Interlude | Elite Alliance</div>
@@ -291,6 +319,7 @@
         </div>
         <div class="hero-bottom-fade"></div>
     </header>
+
     <section class="nav-cards-section">
         <a href="market.html" class="nav-card" id="card-treasury">
             <div class="card-content-wrapper">
@@ -329,15 +358,19 @@
             </div>
         </a>
     </section>
+
     <div id="data-hub" class="dashboard-container">
         <div class="section-title-wrapper">
             <h2 class="section-title">INTELLIGENCE NETWORK</h2>
             <div class="section-line"></div>
         </div>
+
         <div class="search-container">
             <input type="text" id="global-search" placeholder="🔍 Αναζήτηση Member, CP, ή Epic Jewel..." oninput="updateUI()">
         </div>
+
         <div class="leaders-row" id="dynamic-leaders"></div>
+
         <div class="main-wrapper" id="dynamic-internal-clans">
         </div>
         
@@ -347,6 +380,7 @@
         </div>
         <div class="other-clans-section" id="dynamic-external-clans"></div>
     </div>
+
     <footer class="developer-footer">
         <div>Designed & Developed by <span class="dev-name">MrUndisputed</span></div>
         <div class="dev-contact">
@@ -359,20 +393,24 @@
             </a>
         </div>
     </footer>
+
     <script>
         const firebaseConfig = { apiKey: "AIzaSyDRL8EehxdcgVYJ0LJ1khVYkSJcaCMKRes", authDomain: "brokenmirrordb.firebaseapp.com", databaseURL: "https://brokenmirrordb-default-rtdb.europe-west1.firebasedatabase.app", projectId: "brokenmirrordb" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         const bossIcons = { "VAL": "https://i.ibb.co/84gZPVRP/necklace-valakas.png", "ANT": "https://i.ibb.co/rfqvc6mv/earring-antharas.png", "BAI": "https://i.ibb.co/XrZkv67h/ring-of-baium.png", "FRI": "https://i.ibb.co/gF4YKGTM/frintezza-necklace.png", "ZAK": "https://i.ibb.co/spkC6Gzz/zaken-earring.png", "AQ":  "https://i.ibb.co/rKRtZmBG/ring-of-queen-ant.png", "ORF": "https://i.ibb.co/j9dDnXwH/earring-orfen.png", "COR": "https://i.ibb.co/ksv37fNZ/ring-of-.png", "SIE": "https://i.ibb.co/Txfby6wD/images.png", "DPVP": "https://i.ibb.co/G3HdK5jw/PVPZONE.png" };
+
         let globalCPData = {}; 
         let globalExternalClans = {}; 
         let globalInternalClans = {};
         let globalDailyLogs = {};
         // *** FIX: New global to hold archived totals ***
         let globalArchive = {};
+
         function getSafeName(name) {
             return name.replace(/[.#$\[\]]/g, '_');
         }
+
         function getIconForLoot(itemName) {
             if(!itemName) return "https://i.ibb.co/SXM1FZx8/attedance-points.png";
             const upName = itemName.toUpperCase();
@@ -386,14 +424,17 @@
             if(upName.includes("COR")) return bossIcons.COR;
             return "https://i.ibb.co/SXM1FZx8/attedance-points.png"; 
         }
+
         db.ref('cps/').on('value', (snapshot) => {
             globalCPData = snapshot.val() || {}; 
             updateUI();
         });
+
         db.ref('externalClans/').on('value', (snapshot) => {
             globalExternalClans = snapshot.val() || {};
             updateUI();
         });
+
         db.ref('internalClans/').on('value', (snapshot) => {
             let data = snapshot.val() || {};
             let defaults = {
@@ -403,15 +444,18 @@
             globalInternalClans = {...defaults, ...data};
             updateUI();
         });
+
         db.ref('dailyLogs/').on('value', (snapshot) => {
             globalDailyLogs = snapshot.val() || {};
             updateUI();
         });
+
         // *** FIX: Listen to archive/players/ and merge into attendance totals ***
         db.ref('archive/players/').on('value', (snapshot) => {
             globalArchive = snapshot.val() || {};
             updateUI();
         });
+
         function updateUI() {
             const query = document.getElementById('global-search').value.toLowerCase().trim();
             
@@ -430,7 +474,9 @@
                 `;
             });
             mainWrapper.innerHTML = columnsHtml;
+
             let dynamicLeadersHtml = ""; 
+
             // ΒΗΜΑ 1: Υπολογισμός "Activity" (Attendances) από τα dailyLogs
             let attendanceMap = {};
             Object.values(globalDailyLogs).forEach(dayData => {
@@ -440,39 +486,47 @@
                     attendanceMap[upperName] = (attendanceMap[upperName] || 0) + count;
                 });
             });
+
             // *** FIX: Add archived totals on top of current month logs ***
             // archive/ is a flat map of { safeName: totalCount }
             Object.keys(globalArchive).forEach(safeName => {
                 let upperName = safeName.toUpperCase();
                 attendanceMap[upperName] = (attendanceMap[upperName] || 0) + globalArchive[safeName];
             });
+
             const sortedIDs = Object.keys(globalCPData).sort((a,b) => (globalCPData[b].totalPoints || 0) - (globalCPData[a].totalPoints || 0));
             
             sortedIDs.forEach(id => {
-                const cp = globalCPData[id];
-                if(cp.clan === 'history') return;
-                let match = false;
-                if (!query) {
-                    match = true;
-                } else {
-                    const lootItems = cp.lootHistory ? cp.lootHistory.map(l => l.item).join(" ") : "";
-                    const searchStr = `${cp.name || ""} ${cp.leader || ""} ${cp.members || ""} ${lootItems}`.toLowerCase();
-                    match = searchStr.includes(query);
-                }
-                if (!match) return;
-                if(cp.clan === 'caller') {
-                    const role = cp.leader || "CALLER";
-                    const img = cp.imgUrl || "https://i.ibb.co/SXM1FZx8/attedance-points.png";
-                    dynamicLeadersHtml += `
-                        <div class="leader-card" onclick="openCaller('${id}', '${role}', '${img}')">
-                            <div class="img-frame"><img src="${img}" class="leader-img"></div>
-                            <span class="leader-name">${cp.name.toUpperCase()}</span>
-                            <span class="leader-role">${role}</span>
-                        </div>`;
-                    return; 
-                }
-                let internalClanData = globalInternalClans[cp.clan];
+                try {
+                    const cp = globalCPData[id];
+                    if(cp.clan === 'history') return;
+
+                    let match = false;
+                    if (!query) {
+                        match = true;
+                    } else {
+                        const lootItems = cp.lootHistory ? cp.lootHistory.map(l => l.item).join(" ") : "";
+                        const searchStr = `${cp.name || ""} ${cp.leader || ""} ${cp.members || ""} ${lootItems}`.toLowerCase();
+                        match = searchStr.includes(query);
+                    }
+
+                    if (!match) return;
+
+                    if(cp.clan === 'caller') {
+                        const role = cp.leader || "CALLER";
+                        const img = cp.imgUrl || "https://i.ibb.co/SXM1FZx8/attedance-points.png";
+                        dynamicLeadersHtml += `
+                            <div class="leader-card" onclick="openCaller('${id}', '${role}', '${img}')">
+                                <div class="img-frame"><img src="${img}" class="leader-img"></div>
+                                <span class="leader-name">${(cp.name || '').toUpperCase()}</span>
+                                <span class="leader-role">${role}</span>
+                            </div>`;
+                        return; 
+                    }
+
+                    let internalClanData = globalInternalClans[cp.clan];
                 let clanColor = internalClanData ? internalClanData.color : '#fff';
+
                 let lootHtml = "No history found.";
                 if(cp.lootHistory && cp.lootHistory.length > 0) {
                     lootHtml = cp.lootHistory.map(l => `
@@ -484,6 +538,7 @@
                         </div>
                     `).join('');
                 }
+
                 let membersHtml = 'Roster pending...';
                 if (cp.members) {
                     let memberArray = cp.members.split(',').map(m => m.trim()).filter(m => m !== '');
@@ -494,44 +549,56 @@
                         let scoreB = attendanceMap[getSafeName(b).toUpperCase()] || 0;
                         return scoreB - scoreA;
                     });
+
                     // Build HTML with total attendance in tooltip
                     membersHtml = memberArray.map(mName => {
                         let score = attendanceMap[getSafeName(mName).toUpperCase()] || 0;
                         return `<span class="member-click" onclick="openMemberStats('${mName}')" title="Attendances: ${score}">${mName}</span>`;
                     }).join(', ');
                 }
+
                 let leaderHtml = 'Pending...';
                 if (cp.leader) {
                     let lName = cp.leader.trim();
                     let leaderScore = attendanceMap[getSafeName(lName).toUpperCase()] || 0;
                     leaderHtml = `<span class="member-click" onclick="openMemberStats('${lName}')" title="Attendances: ${leaderScore}">${lName}</span>`;
                 }
+
                 const activeClass = (query && match) ? 'active' : '';
+
                 const html = `
                     <div class="cp-box ${activeClass}" style="border-left: 4px solid ${clanColor}; background: linear-gradient(90deg, ${clanColor}11 0%, rgba(0,0,0,0.5) 100%);">
                         <button class="cp-btn" onclick="this.parentElement.classList.toggle('active')">
-                            <span>${cp.name}</span><span style="color:var(--gold); font-size:0.75rem;">${cp.totalPoints || 0} PTS</span>
+                            <span>${cp.name || 'Unnamed'}</span><span style="color:var(--gold); font-size:0.75rem;">${cp.totalPoints || 0} PTS</span>
                         </button>
                         <div class="cp-content">
                             <div class="roster-section">
                                 <span class="leader-item">👑 ${leaderHtml}</span><br>
                                 <span style="color:#888;">Members: ${membersHtml}</span>
                             </div>
+
                             <button class="loot-btn" onclick="const p=this.nextElementSibling; p.style.display=p.style.display==='block'?'none':'block';">VIEW LOOT HISTORY</button>
                             <div class="loot-panel" style="${(query && match && cp.lootHistory && cp.lootHistory.some(l => l.item.toLowerCase().includes(query))) ? 'display:block;' : ''}">${lootHtml}</div>
+
                             <button class="loot-btn" onclick="openCpStats('${id}')">VIEW CP ATTENDANCES</button>
                         </div>
                     </div>`;
-                if(internalClanData) {
-                    listsHtmlContent[cp.clan] += html;
+                    if(internalClanData) {
+                        listsHtmlContent[cp.clan] += html;
+                    }
+                } catch(e) {
+                    console.error("Error processing CP " + id, e);
                 }
             });
+
             // Populate the lists after building HTML
             Object.keys(globalInternalClans).forEach(clanId => {
                 const listEl = document.getElementById(`list-${clanId}`);
                 if(listEl) listEl.innerHTML = listsHtmlContent[clanId];
             });
+
             document.getElementById('dynamic-leaders').innerHTML = dynamicLeadersHtml;
+
             let extHtml = "";
             Object.keys(globalExternalClans).forEach(clanId => {
                 const clan = globalExternalClans[clanId];
@@ -545,7 +612,9 @@
                     const searchStr = `${clan.name || clanId} ${clan.leader || ""} ${lootItems}`.toLowerCase();
                     match = searchStr.includes(query);
                 }
+
                 if (!match) return;
+
                 const cName = clan.name || clanId;
                 const icon = clan.iconUrl || 'https://i.ibb.co/SXM1FZx8/attedance-points.png';
                 
@@ -558,6 +627,7 @@
             });
             document.getElementById('dynamic-external-clans').innerHTML = extHtml;
         }
+
         function openCpStats(cpId) {
             const cp = globalCPData[cpId];
             if(!cp) return;
@@ -570,16 +640,19 @@
             document.getElementById('cp-stats-modal').style.display = 'block';
             document.getElementById('overlay').style.display = 'block';
         }
+
         function openMemberStats(memberName) {
             document.getElementById('member-stats-name').innerText = memberName.toUpperCase() + " (LOADING...)";
             document.getElementById('member-stats-modal').style.display = 'block';
             document.getElementById('overlay').style.display = 'block';
+
             setTimeout(() => {
                 // Start with archived per-boss counts if available
                 // Note: archive only stores total count per player, not per-boss breakdown
                 // So per-boss modal still shows only current month — that is expected behaviour
                 let mStats = { VAL:0, ANT:0, BAI:0, FRI:0, ZAK:0, AQ:0, ORF:0, COR:0, SIE:0, DPVP:0 };
                 const safeSearchName = getSafeName(memberName).toUpperCase();
+
                 Object.values(globalDailyLogs).forEach(dayData => {
                     Object.keys(dayData).forEach(logMemberName => {
                         if(logMemberName.toUpperCase() === safeSearchName) {
@@ -600,16 +673,19 @@
                         }
                     });
                 });
+
                 // Total score shown in the modal title includes archived totals
                 const archiveScore = globalArchive[memberName.toLowerCase()] || globalArchive[safeSearchName.toLowerCase()] || 0;
                 const currentTotal = Object.values(mStats).reduce((a,b) => a+b, 0);
                 const totalAll = currentTotal + archiveScore;
+
                 document.getElementById('member-stats-name').innerText = memberName.toUpperCase() + " (" + totalAll + " total)";
                 document.getElementById('member-stats-grid').innerHTML = Object.keys(bossIcons).map(b => {
                     return `<div class="stat-box"><img src="${bossIcons[b]}" class="boss-icon"><span class="stat-val">${mStats[b]}</span></div>`;
                 }).join('');
             }, 10);
         }
+
         function openCaller(callerId, role, img) {
             const cp = globalCPData[callerId];
             if(!cp) return;
@@ -637,6 +713,7 @@
             document.getElementById('caller-modal').style.display = 'block';
             document.getElementById('overlay').style.display = 'block';
         }
+
         function openClanModal(clanId) {
             const extData = globalExternalClans[clanId];
             if(!extData) return;
@@ -647,6 +724,7 @@
             const leaderName = extData.leader || "Pending...";
             const content = extData.description || "Alliance agreements pending.";
             const formattedContent = content.replace(/\n/g, '<br>');
+
             const lootHistory = extData.lootHistory || [];
             let lootHtml = "No history found.";
             if(lootHistory.length > 0) {
@@ -659,6 +737,7 @@
                     </div>
                 `).join('');
             }
+
             const finalHtml = `
                 <div style="margin-bottom: 15px; font-size:0.95rem;">
                     <span style="color:var(--gold); font-weight:bold; font-family:'Cinzel';">👑 LEADER:</span> 
@@ -670,10 +749,12 @@
                 <button class="loot-btn" onclick="const p=this.nextElementSibling; p.style.display=p.style.display==='block'?'none':'block';">VIEW LOOT HISTORY</button>
                 <div class="loot-panel" style="display:none; text-align:left;">${lootHtml}</div>
             `;
+
             document.getElementById('clan-modal-content').innerHTML = finalHtml;
             document.getElementById('clan-modal').style.display = 'block';
             document.getElementById('overlay').style.display = 'block';
         }
+
         function closeModal() { 
             document.getElementById('caller-modal').style.display='none'; 
             document.getElementById('cp-stats-modal').style.display='none'; 
@@ -682,6 +763,7 @@
             document.getElementById('overlay').style.display='none'; 
         }
         function toggleLeaderLoot() { const p = document.getElementById('leader-loot-panel'); p.style.display = p.style.display==='none'?'block':'none'; }
+
         const tracks = [
             {name:"DION THEME", url:"https://www.dropbox.com/scl/fi/ypzqrr336iewt62gncy6u/Lineage-2-Dion-Theme-Song.mp3?rlkey=nl1quliuqleuljgkt5jhqq6hh&st=sb8ij16g&raw=1"},
             {name:"HUNTERS THEME", url:"https://www.dropbox.com/scl/fi/75hck498enzot93zt0lg9/Lineage-2-Hunters-Village-Theme.mp3?rlkey=6mu9ic0gavmofkdvduj72270y&st=qr4cvisl&raw=1"},
@@ -711,6 +793,7 @@
             audio.play(); 
             musicIcon.innerText="🔊"; 
         }
+
         setInterval(() => { document.getElementById('clock').innerText = "SERVER TIME: " + new Date().toLocaleTimeString('el-GR', {timeZone:'UTC', hour12:false}) + " UTC"; }, 1000);
     </script>
 </body>
