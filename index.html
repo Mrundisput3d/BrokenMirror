@@ -1063,8 +1063,13 @@
             delete data['__clanConfig'];
             globalExternalClans = data;
             
-            const sorted = Object.keys(globalClanConfig).filter(k => globalClanConfig[k].type !== 'external').sort((a, b) => (globalClanConfig[a].order || 99) - (globalClanConfig[b].order || 99));
-            if (!activeClanTab || !globalClanConfig[activeClanTab] || globalClanConfig[activeClanTab].type === 'external') {
+            const sorted = Object.keys(globalClanConfig).sort((a, b) => {
+                const typeA = globalClanConfig[a].type === 'external' ? 1 : 0;
+                const typeB = globalClanConfig[b].type === 'external' ? 1 : 0;
+                if (typeA !== typeB) return typeA - typeB;
+                return (globalClanConfig[a].order || 99) - (globalClanConfig[b].order || 99);
+            });
+            if (!activeClanTab || !globalClanConfig[activeClanTab]) {
                 activeClanTab = sorted[0] || null;
             }
             updateUI();
@@ -1086,23 +1091,28 @@
             clanList.innerHTML = "";
             let dynamicLeadersHtml = "";
 
-            // Build clan tabs from config
+            // Build clan tabs from config (Internal first, then External)
             const tabsBar = document.getElementById('clan-tabs-bar');
-            const internalClans = Object.keys(globalClanConfig)
-                .filter(k => globalClanConfig[k].type !== 'external')
-                .sort((a, b) => (globalClanConfig[a].order || 99) - (globalClanConfig[b].order || 99));
+            const sortedClans = Object.keys(globalClanConfig).sort((a, b) => {
+                const typeA = globalClanConfig[a].type === 'external' ? 1 : 0;
+                const typeB = globalClanConfig[b].type === 'external' ? 1 : 0;
+                if (typeA !== typeB) return typeA - typeB;
+                return (globalClanConfig[a].order || 99) - (globalClanConfig[b].order || 99);
+            });
 
-            if (!activeClanTab || !globalClanConfig[activeClanTab] || globalClanConfig[activeClanTab].type === 'external') {
-                activeClanTab = internalClans[0] || null;
+            if (!activeClanTab || !globalClanConfig[activeClanTab]) {
+                activeClanTab = sortedClans[0] || null;
             }
 
             let tabsHtml = '';
-            internalClans.forEach(key => {
+            sortedClans.forEach(key => {
                 const cfg = globalClanConfig[key];
                 const isActive = key === activeClanTab;
                 const color = cfg.color || '#d4af37';
+                const isExternal = cfg.type === 'external';
                 const activeStyle = isActive ? `border-bottom: 3px solid ${color}; color: ${color}; background: rgba(${hexToRgb(color)}, 0.08);` : '';
-                tabsHtml += `<button class="clan-tab ${isActive ? 'active' : ''}" onclick="switchClanTab('${key}')" style="${activeStyle}"><img src="${cfg.iconUrl || ''}">${cfg.name || key.toUpperCase()}</button>`;
+                const externalStyle = isExternal && !isActive ? `opacity: 0.8; font-style: italic;` : '';
+                tabsHtml += `<button class="clan-tab ${isActive ? 'active' : ''}" onclick="switchClanTab('${key}')" style="${activeStyle} ${externalStyle}"><img src="${cfg.iconUrl || ''}">${cfg.name || key.toUpperCase()}</button>`;
             });
             tabsBar.innerHTML = tabsHtml;
 
