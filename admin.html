@@ -861,6 +861,8 @@
         document.getElementById('edit-cp-imgUrl').value = cp.imgUrl || ""; 
         document.getElementById('edit-members').value = cp.members || ""; 
         document.getElementById('edit-points').value = cpInitialPoints; 
+        document.getElementById('edit-cp-clan').value = cp.clan || "";
+        toggleEditCallerMultiplier();
 
         // Show/hide multiplier row based on whether this is a caller
         const multRow = document.getElementById('edit-caller-multiplier-row');
@@ -895,11 +897,12 @@
             leader: document.getElementById('edit-cp-leader').value, 
             imgUrl: document.getElementById('edit-cp-imgUrl').value, 
             members: document.getElementById('edit-members').value, 
+            clan: document.getElementById('edit-cp-clan').value,
             totalPoints: finalPoints, 
             bossStats: stats 
         };
         // Save multiplier only for callers
-        if (cp && cp.clan === 'caller') {
+        if (updatePayload.clan === 'caller') {
             updatePayload.callerMultiplier = parseInt(document.getElementById('edit-caller-multiplier').value) || 3;
         }
         db.ref('cps/' + currentEditID).update(updatePayload).then(() => alert("Data & Points Saved Successfully!")); 
