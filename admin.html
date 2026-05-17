@@ -81,10 +81,7 @@
             <input type="text" id="new-leader" placeholder="Leader (ή Role, π.χ. ALLY LEADER)">
             <input type="text" id="new-imgUrl" placeholder="Image URL (Μόνο για Shot Callers)">
             <select id="new-clan" onchange="toggleNewCallerMultiplier()">
-                <option value="noldor">Noldor</option>
-                <option value="kriminalides">Kriminalides</option>
-                <option value="caller">Shot Caller (π.χ. TSAKNORRIS - Στρογγυλό εικονίδιο)</option>
-                <option value="external">External Clan</option>
+                <option value="caller">Shot Caller (π.χ. TSAKNORRIS)</option>
             </select>
             <div id="new-caller-multiplier-row" style="display:none; background: rgba(212,175,55,0.1); border: 1px solid var(--gold); border-radius: 4px; padding: 10px; margin: 5px 0;">
                 <label style="color:var(--gold); font-size:11px; font-family:'Cinzel'; display:block; margin-bottom:5px;">⚡ CALLER MULTIPLIER</label>
@@ -210,9 +207,36 @@
     <div style="max-width: 1400px; margin: 20px auto;">
         
         <div class="panel" style="margin-bottom: 20px;">
-            <h2 style="color:var(--blue); margin-top:0;">EXTERNAL CLANS & CALLERS MANAGER</h2>
+            <h2 style="color:var(--blue); margin-top:0;">CLANS & ALLIANCE MANAGER</h2>
+            
+            <h3 style="color:var(--gold); margin-top:0;">⚔️ CLAN REGISTRY</h3>
+            <div style="display:flex; gap:10px; padding: 15px; background: #000; border: 1px dashed var(--gold); border-radius: 5px; margin-bottom: 10px; flex-wrap: wrap; align-items: flex-end;">
+                <div style="flex:1; min-width:150px;"><label style="color:#aaa; font-size:10px;">Clan Name</label><input type="text" id="new-clan-type-name" placeholder="π.χ. Phoenix Order" style="margin:0;"></div>
+                <div style="flex:1; min-width:150px;"><label style="color:#aaa; font-size:10px;">Icon URL</label><input type="text" id="new-clan-type-icon" placeholder="https://..." style="margin:0;"></div>
+                <div style="flex:0 0 80px;"><label style="color:#aaa; font-size:10px;">Color</label><input type="color" id="new-clan-type-color" value="#d4af37" style="margin:0; padding:3px; height:38px; cursor:pointer;"></div>
+                <button class="btn btn-gold" style="margin:0; width:auto; padding:0 20px; min-height:38px;" onclick="createClanType()">ADD CLAN</button>
+            </div>
+            <div style="display:flex; gap:10px; margin-bottom: 5px;">
+                <select id="clan-type-select" style="flex:1; font-family:'Cinzel';" onchange="loadClanTypeEdit()"><option value="">-- Επιλογή Clan Type --</option></select>
+            </div>
+            <div id="clan-type-edit-section" style="display:none; padding: 10px; background: rgba(0,0,0,0.4); border: 1px solid #333; border-radius: 5px; margin-bottom: 15px;">
+                <div style="display:flex; gap:10px; margin-bottom:10px; flex-wrap:wrap; align-items:flex-end;">
+                    <div style="flex:1; min-width:150px;"><label style="color:#aaa; font-size:10px;">Name</label><input type="text" id="edit-clan-type-name" style="margin:0; font-family:'Cinzel'; color:var(--gold);"></div>
+                    <div style="flex:1; min-width:150px;"><label style="color:#aaa; font-size:10px;">Icon URL</label><input type="text" id="edit-clan-type-icon" style="margin:0;"></div>
+                    <div style="flex:0 0 80px;"><label style="color:#aaa; font-size:10px;">Color</label><input type="color" id="edit-clan-type-color" style="margin:0; padding:3px; height:38px; cursor:pointer;"></div>
+                    <div style="flex:0 0 80px;"><label style="color:#aaa; font-size:10px;">Order</label><input type="number" id="edit-clan-type-order" style="margin:0;" min="1"></div>
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <button class="btn btn-gold" style="flex:2;" onclick="updateClanType()">SAVE CLAN</button>
+                    <button class="btn" id="clan-type-toggle-btn" onclick="toggleClanInternalExternal()" style="flex:1;">→ EXTERNAL</button>
+                    <button class="btn btn-red" style="flex:0 0 60px;" onclick="deleteClanType()">DEL</button>
+                </div>
+            </div>
+
+            <hr style="border-color:#333; margin: 15px 0;">
+            <h3 style="color:var(--sky);">🌐 ALLIANCE PACTS (External Clans)</h3>
             <div style="display:flex; gap:10px; padding: 15px; background: #000; border: 1px dashed #444; border-radius: 5px; margin-bottom: 15px;">
-                <input type="text" id="new-ext-name" placeholder="New Clan Name" style="flex:1; margin:0;">
+                <input type="text" id="new-ext-name" placeholder="New Alliance Clan Name" style="flex:1; margin:0;">
                 <input type="text" id="new-ext-icon" placeholder="Icon Image URL" style="flex:1; margin:0;">
                 <button class="btn btn-gold" style="margin:0; width:auto; padding:0 20px;" onclick="createExtClan()">ADD CLAN</button>
             </div>
@@ -292,6 +316,7 @@
 
     let allCPs = {}, currentEditID = null, globalDailyLogs = {};
     let allExtClans = {}, currentExtID = null, viewMode = 'active'; 
+    let globalClanConfig = {}, currentClanTypeID = null;
     const bossKeys = ['VAL', 'ANT', 'BAI', 'SIE', 'ZAK', 'FRI', 'AQ', 'ORF', 'COR'];
     const multipliers = { VAL:3, ANT:3, BAI:2, SIE:3, ZAK:1, FRI:1, AQ:1, ORF:1, COR:1 };
     let lastAction = null; 
@@ -311,6 +336,13 @@
     function logout() { firebase.auth().signOut().then(() => window.location.href = "login.html"); } 
 
     function startDatabaseListeners() {
+        db.ref('clanConfig/').once('value', snap => {
+            if (!snap.exists() || !snap.val().noldor) {
+                db.ref('clanConfig/noldor').set({ name: "Noldor", color: "#00d9ff", iconUrl: "https://i.ibb.co/8LvFNQkC/noldor.png", order: 1, type: "internal" });
+                db.ref('clanConfig/kriminalides').set({ name: "Kriminalides", color: "#ff3333", iconUrl: "https://i.ibb.co/VYMZjzYr/kriminalides.png", order: 2, type: "internal" });
+            }
+        });
+        db.ref('clanConfig/').on('value', snap => { globalClanConfig = snap.val() || {}; renderClanDropdown(); renderClanTypeSelect(); });
         db.ref('cps/').on('value', snap => { allCPs = snap.val() || {}; renderSimpleList(); renderExtSelect(); renderMoveCPSelect(); if(currentEditID) loadEdit(currentEditID); if(currentExtID && currentExtID.startsWith('cp_')) loadExtEdit(); });
         db.ref('dailyLogs/').on('value', snap => { globalDailyLogs = snap.val() || {}; });
         db.ref('externalClans/').on('value', snap => { allExtClans = snap.val() || {}; renderExtSelect(); if(currentExtID && currentExtID.startsWith('ext_')) loadExtEdit(); });
@@ -875,39 +907,25 @@
     function toggleHistoryStatus() { 
         const cp = allCPs[currentEditID]; 
         if(cp.clan === 'history') { 
-            const newClan = prompt("Σε ποια ομάδα; (noldor, kriminalides, caller, external)", "noldor"); 
+            // Build dynamic options from clanConfig + caller
+            const clanKeys = Object.keys(globalClanConfig);
+            let optionsList = clanKeys.map(k => globalClanConfig[k].name || k).join(', ');
+            optionsList += ', caller';
+            const defaultClan = clanKeys[0] || 'caller';
+            const newClan = prompt(`Σε ποια ομάδα; (${optionsList})`, defaultClan); 
             if (newClan === null) return; 
             const formattedClan = newClan.trim().toLowerCase(); 
             
-            if (formattedClan === 'external') {
-                if(confirm("Είσαι σίγουρος; Αυτή η ομάδα θα μεταφερθεί ΟΡΙΣΤΙΚΑ στο κάτω πάνελ (External Clans).")) {
-                    const extData = {
-                        name: cp.name || "",
-                        leader: cp.leader || "",
-                        iconUrl: cp.imgUrl || "https://i.ibb.co/SXM1FZx8/attedance-points.png",
-                        description: "Μεταφέρθηκε από τα ενεργά CPs.",
-                        status: "active",
-                        totalPoints: cp.totalPoints || 0,
-                        lootHistory: cp.lootHistory || []
-                    };
-                    db.ref('externalClans/' + currentEditID).set(extData).then(() => {
-                        db.ref('cps/' + currentEditID).remove().then(() => {
-                            alert("Η ομάδα μεταφέρθηκε επιτυχώς στα External Clans (κάτω πάνελ)!");
-                            document.getElementById('edit-section').style.display = 'none';
-                            currentEditID = null;
-                            setViewMode('active');
-                        });
-                    });
-                }
-            } else if (['noldor', 'kriminalides', 'caller'].includes(formattedClan)) {
+            const validClans = [...clanKeys, 'caller'];
+            if (validClans.includes(formattedClan)) {
                 db.ref('cps/' + currentEditID).update({ clan: formattedClan }).then(() => {
-                    alert("Restored επιτυχώς στα CPs!");
+                    alert("Restored επιτυχώς!");
                     document.getElementById('edit-section').style.display = 'none';
                     currentEditID = null;
                     setViewMode('active');
                 }); 
             } else {
-                alert("Λάθος όνομα! Πρέπει να γράψεις ακριβώς μία από τις 4 λέξεις (π.χ. external). Δοκίμασε ξανά.");
+                alert("Λάθος όνομα! Δοκίμασε ξανά. Διαθέσιμα: " + validClans.join(', '));
             }
         } else { 
             if(confirm("Move to History?")) db.ref('cps/' + currentEditID).update({ clan: 'history' }).then(() => {
@@ -918,7 +936,6 @@
             }); 
         } 
     }
-    
     function addMarketLoot() { 
         const loot = document.getElementById('loot-market').value.split('|'); 
         db.ref('cps/' + currentEditID).transaction(cp => { 
@@ -961,7 +978,7 @@
             document.getElementById('new-name').value = '';
             document.getElementById('new-leader').value = '';
             document.getElementById('new-imgUrl').value = '';
-            document.getElementById('new-clan').value = 'noldor';
+            renderClanDropdown();
             toggleNewCallerMultiplier();
             alert('✅ ' + n + ' registered successfully!');
         });
@@ -971,6 +988,115 @@
         document.getElementById('new-caller-multiplier-row').style.display = clan === 'caller' ? 'block' : 'none';
     }
     function deleteCP() { if(confirm("Delete Forever?")) db.ref('cps/' + currentEditID).remove(); }
+
+    // ===== DYNAMIC CLAN CONFIG FUNCTIONS =====
+    function renderClanDropdown() {
+        const sel = document.getElementById('new-clan');
+        const currentVal = sel.value;
+        let html = '';
+        const sorted = Object.keys(globalClanConfig).sort((a, b) => (globalClanConfig[a].order || 99) - (globalClanConfig[b].order || 99));
+        sorted.forEach(key => {
+            const cfg = globalClanConfig[key];
+            html += `<option value="${key}">${cfg.name || key}</option>`;
+        });
+        html += '<option value="caller">Shot Caller (π.χ. TSAKNORRIS)</option>';
+        sel.innerHTML = html;
+        if (currentVal && sel.querySelector(`option[value="${currentVal}"]`)) sel.value = currentVal;
+        else if (sorted.length > 0) sel.value = sorted[0];
+    }
+
+    function renderClanTypeSelect() {
+        const sel = document.getElementById('clan-type-select');
+        const currentVal = sel.value;
+        let html = '<option value="">-- Επιλογή Clan Type --</option>';
+        const sorted = Object.keys(globalClanConfig).sort((a, b) => (globalClanConfig[a].order || 99) - (globalClanConfig[b].order || 99));
+        sorted.forEach(key => {
+            const cfg = globalClanConfig[key];
+            const typeTag = cfg.type === 'external' ? ' [EXTERNAL]' : ' [INTERNAL]';
+            html += `<option value="${key}">${cfg.name || key}${typeTag}</option>`;
+        });
+        sel.innerHTML = html;
+        if (currentVal && sel.querySelector(`option[value="${currentVal}"]`)) sel.value = currentVal;
+    }
+
+    function createClanType() {
+        const name = document.getElementById('new-clan-type-name').value.trim();
+        const icon = document.getElementById('new-clan-type-icon').value.trim();
+        const color = document.getElementById('new-clan-type-color').value;
+        if (!name) { alert('Βάλε όνομα clan!'); return; }
+        const id = name.replace(/\s+/g, '').toLowerCase();
+        const maxOrder = Object.values(globalClanConfig).reduce((max, c) => Math.max(max, c.order || 0), 0);
+        db.ref('clanConfig/' + id).set({
+            name: name,
+            iconUrl: icon || 'https://i.ibb.co/SXM1FZx8/attedance-points.png',
+            color: color,
+            order: maxOrder + 1,
+            type: 'internal'
+        }).then(() => {
+            document.getElementById('new-clan-type-name').value = '';
+            document.getElementById('new-clan-type-icon').value = '';
+            document.getElementById('new-clan-type-color').value = '#d4af37';
+            alert('✅ Clan Type "' + name + '" created!');
+        });
+    }
+
+    function loadClanTypeEdit() {
+        const key = document.getElementById('clan-type-select').value;
+        if (!key) { document.getElementById('clan-type-edit-section').style.display = 'none'; currentClanTypeID = null; return; }
+        currentClanTypeID = key;
+        const cfg = globalClanConfig[key] || {};
+        document.getElementById('clan-type-edit-section').style.display = 'block';
+        document.getElementById('edit-clan-type-name').value = cfg.name || key;
+        document.getElementById('edit-clan-type-icon').value = cfg.iconUrl || '';
+        document.getElementById('edit-clan-type-color').value = cfg.color || '#d4af37';
+        document.getElementById('edit-clan-type-order').value = cfg.order || 1;
+        const toggleBtn = document.getElementById('clan-type-toggle-btn');
+        if (cfg.type === 'external') {
+            toggleBtn.innerText = '→ INTERNAL';
+            toggleBtn.className = 'btn btn-green';
+        } else {
+            toggleBtn.innerText = '→ EXTERNAL';
+            toggleBtn.className = 'btn btn-blue';
+        }
+    }
+
+    function updateClanType() {
+        if (!currentClanTypeID) return;
+        db.ref('clanConfig/' + currentClanTypeID).update({
+            name: document.getElementById('edit-clan-type-name').value.trim(),
+            iconUrl: document.getElementById('edit-clan-type-icon').value.trim(),
+            color: document.getElementById('edit-clan-type-color').value,
+            order: parseInt(document.getElementById('edit-clan-type-order').value) || 1
+        }).then(() => alert('✅ Clan updated!'));
+    }
+
+    function toggleClanInternalExternal() {
+        if (!currentClanTypeID) return;
+        const cfg = globalClanConfig[currentClanTypeID] || {};
+        const newType = cfg.type === 'external' ? 'internal' : 'external';
+        if (!confirm(`Move "${cfg.name}" to ${newType.toUpperCase()}?`)) return;
+        db.ref('clanConfig/' + currentClanTypeID).update({ type: newType }).then(() => {
+            alert('✅ Clan is now ' + newType.toUpperCase() + '!');
+            loadClanTypeEdit();
+        });
+    }
+
+    function deleteClanType() {
+        if (!currentClanTypeID) return;
+        const cfg = globalClanConfig[currentClanTypeID] || {};
+        // Check if any CPs use this clan
+        const cpsUsing = Object.keys(allCPs).filter(id => allCPs[id].clan === currentClanTypeID);
+        if (cpsUsing.length > 0) {
+            alert(`⚠️ Cannot delete! ${cpsUsing.length} CPs are using this clan type. Move them first.`);
+            return;
+        }
+        if (!confirm(`DELETE clan type "${cfg.name}" permanently?`)) return;
+        db.ref('clanConfig/' + currentClanTypeID).remove().then(() => {
+            alert('Clan type deleted!');
+            document.getElementById('clan-type-edit-section').style.display = 'none';
+            currentClanTypeID = null;
+        });
+    }
     function createExtClan() { const name = document.getElementById('new-ext-name').value.trim(); const icon = document.getElementById('new-ext-icon').value.trim(); if(!name) { alert("Βάλε όνομα!"); return; } const id = name.replace(/\s+/g, '').toLowerCase(); db.ref('externalClans/' + id).set({ name: name, iconUrl: icon || 'https://i.ibb.co/SXM1FZx8/attedance-points.png', leader: 'Pending...', description: 'Alliance agreements pending.', status: 'active', lootHistory: [] }); document.getElementById('new-ext-name').value = ''; document.getElementById('new-ext-icon').value = ''; alert("New Clan Created!"); }
     
     function loadExtEdit() { 
