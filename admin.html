@@ -24,7 +24,7 @@
         .detected-cp-row { background: #000; padding: 8px; margin: 4px 0; border-radius: 5px; border: 1px solid #333; }
         .detected-cp-row input[type="checkbox"] { accent-color: var(--gold); cursor: pointer; }
         
-        .boss-grid { display: grid; grid-template-columns: repeat(11, 1fr); gap: 6px; margin: 15px 0; }
+        .boss-grid { display: grid; grid-template-columns: repeat(9, 1fr); gap: 6px; margin: 15px 0; }
         .boss-btn { background: #111; border: 1px solid #444; padding: 10px 2px; text-align: center; cursor: pointer; border-radius: 6px; transition: 0.2s; }
         .boss-btn:hover { border-color: var(--gold); background: #1a1a1a; }
         .boss-btn img { width: 28px; display: block; margin: 0 auto 5px; }
@@ -117,10 +117,6 @@
             <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                 <h2 style="margin:0; color:var(--gold);">1. LOG EVENT (MEMBER-BOSS LOCK)</h2>
                 <div style="display:flex; align-items:center; gap:10px;">
-                    <label style="display:flex; align-items:center; gap:5px; color:#ff4444; font-size:11px; font-weight:bold; cursor:pointer; background:rgba(255,68,68,0.1); padding:4px 8px; border-radius:4px; border:1px solid #ff4444;" title="Απενεργοποίηση προστασίας 12 ωρών (επιτρέπει διπλά log για το ίδιο boss)">
-                        <input type="checkbox" id="disable-protection-cb" style="width:14px; height:14px; margin:0; accent-color:#ff4444;">
-                        DISABLE 12H LOCK
-                    </label>
                     <span id="input-count">0 NAMES</span>
                     <button id="undo-btn" class="btn btn-red" style="display:none; width:auto; padding: 5px 15px; margin: 0; font-size: 10px;" onclick="undoLastAction()">↩ UNDO LAST</button>
                 </div>
@@ -156,19 +152,6 @@
                 <div class="boss-btn" onclick="logValidatedEvent('AQ', 1)"><img src="https://i.ibb.co/rKRtZmBG/ring-of-queen-ant.png"><span>AQ</span></div>
                 <div class="boss-btn" onclick="logValidatedEvent('ORF', 1)"><img src="https://i.ibb.co/j9dDnXwH/earring-orfen.png"><span>ORF</span></div>
                 <div class="boss-btn" onclick="logValidatedEvent('COR', 1)"><img src="https://i.ibb.co/ksv37fNZ/ring-of-.png"><span>CORE</span></div>
-                <div class="boss-btn" onclick="logValidatedEvent('DPVP', 3)"><img src="https://i.ibb.co/G3HdK5jw/PVPZONE.png" style="border-radius: 15px;"><span>D. PVP</span></div>
-                <div class="boss-btn" onclick="addNamesToSlotsManager()" style="border-color: var(--green);"><div style="font-size:24px; margin-bottom:5px;">📋</div><span style="color:var(--green);">SLOTS</span></div>
-            </div>
-
-            <!-- New Control Bar for Slots Manager -->
-            <div id="slots-controls" style="display:flex; justify-content: space-between; align-items: center; background: rgba(40, 167, 69, 0.1); border: 1px dashed var(--green); padding: 10px; border-radius: 5px; margin-bottom: 15px;">
-                <div style="color:var(--green); font-family:'Cinzel'; font-weight:bold;">
-                    📊 CLAN SLOTS: <span id="slots-counter" style="color:#fff; font-size:16px;">0</span> NAMES SAVED
-                </div>
-                <div style="display:flex; gap:10px;">
-                    <button class="btn btn-green" style="margin:0; width:auto; padding: 8px 15px;" onclick="generateSlotsExcel()">GENERATE EXCEL</button>
-                    <button class="btn btn-red" style="margin:0; width:auto; padding: 8px 15px;" onclick="resetSlotsManager()">RESET</button>
-                </div>
             </div>
 
             <div id="edit-section" style="display:none; border-top:2px solid var(--gold); padding-top:20px; margin-top:20px;">
@@ -213,10 +196,7 @@
                         <input type="number" id="edit-points" style="font-size:1.2rem; color:var(--gold);">
                         
                         <div class="stat-edit-grid" id="stat-inputs"></div>
-                        <label style="display:block; margin-top:20px; color:#aaa; font-size:11px;">CP CLAN ASSIGNMENT</label>
-                        <select id="edit-cp-clan" style="width:100%; margin-bottom: 15px; padding: 10px; background: #004488; color: #fff; border: 1px solid #00d9ff; border-radius: 4px; font-weight: bold; cursor: pointer; text-align: center; font-family: 'Cinzel';" onchange="quickChangeClan(this.value)">
-                        </select>
-                        <div style="display:flex; gap:10px;">
+                        <div style="display:flex; gap:10px; margin-top:20px;">
                             <button class="btn btn-gold" style="flex:2;" onclick="updateCP()">SAVE ALL DATA</button>
                             <button class="btn" id="hist-toggle-btn" onclick="toggleHistoryStatus()">HIST</button>
                             <button class="btn btn-red" onclick="deleteCP()">DEL</button>
@@ -228,20 +208,6 @@
     </div>
     
     <div style="max-width: 1400px; margin: 20px auto;">
-        
-        <div class="panel" style="margin-bottom: 20px; border-top: 3px solid #00d9ff;">
-            <h2 style="color:#00d9ff; margin-top:0;">INTERNAL CLANS MANAGER</h2>
-            <div style="display:flex; gap:10px; padding: 15px; background: #000; border: 1px dashed #444; border-radius: 5px; margin-bottom: 15px;">
-                <input type="text" id="new-int-name" placeholder="New Clan Name (π.χ. SPARTANS)" style="flex:1; margin:0;">
-                <input type="color" id="new-int-color" value="#ffffff" style="width: 50px; padding:0; height:40px; cursor:pointer;" title="Clan Color">
-                <input type="text" id="new-int-icon" placeholder="Icon Image URL" style="flex:1; margin:0;">
-                <button class="btn btn-blue" style="margin:0; width:auto; padding:0 20px; background:#00d9ff; color:#000;" onclick="createIntClan()">ADD INTERNAL CLAN</button>
-            </div>
-            
-            <div id="internal-clans-list" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px;">
-                <!-- Internal clans populated here -->
-            </div>
-        </div>
         
         <div class="panel" style="margin-bottom: 20px;">
             <h2 style="color:var(--blue); margin-top:0;">EXTERNAL CLANS & CALLERS MANAGER</h2>
@@ -276,7 +242,6 @@
                     <div id="ext-stat-inputs" class="stat-edit-grid" style="margin-top: 15px;"></div>
                     <div style="display:flex; gap:10px; margin-top:20px;">
                         <button class="btn btn-gold" style="flex:2;" onclick="updateExtData()">SAVE DATA</button>
-                        <button class="btn btn-blue" id="ext-transfer-btn" onclick="transferExtToCP()" style="display:none; padding:12px 5px; font-size:11px;">TO CP</button>
                         <button class="btn" id="ext-hist-btn" onclick="toggleExtHistory()">HIST</button>
                     </div>
                 </div>
@@ -327,9 +292,8 @@
 
     let allCPs = {}, currentEditID = null, globalDailyLogs = {};
     let allExtClans = {}, currentExtID = null, viewMode = 'active'; 
-    let globalInternalClans = {};
-    const bossKeys = ['VAL', 'ANT', 'BAI', 'SIE', 'ZAK', 'FRI', 'AQ', 'ORF', 'COR', 'DPVP'];
-    const multipliers = { VAL:3, ANT:3, BAI:2, SIE:3, ZAK:1, FRI:1, AQ:1, ORF:1, COR:1, DPVP:3 };
+    const bossKeys = ['VAL', 'ANT', 'BAI', 'SIE', 'ZAK', 'FRI', 'AQ', 'ORF', 'COR'];
+    const multipliers = { VAL:3, ANT:3, BAI:2, SIE:3, ZAK:1, FRI:1, AQ:1, ORF:1, COR:1 };
     let lastAction = null; 
 
     let cpInitialPoints = 0; let cpInitialStats = {};
@@ -350,24 +314,6 @@
         db.ref('cps/').on('value', snap => { allCPs = snap.val() || {}; renderSimpleList(); renderExtSelect(); renderMoveCPSelect(); if(currentEditID) loadEdit(currentEditID); if(currentExtID && currentExtID.startsWith('cp_')) loadExtEdit(); });
         db.ref('dailyLogs/').on('value', snap => { globalDailyLogs = snap.val() || {}; });
         db.ref('externalClans/').on('value', snap => { allExtClans = snap.val() || {}; renderExtSelect(); if(currentExtID && currentExtID.startsWith('ext_')) loadExtEdit(); });
-        db.ref('internalClans/').on('value', snap => {
-            let data = snap.val();
-            let updates = {};
-            if (!data || !data.noldor) updates['noldor'] = { name: "NOLDOR CLAN", color: "#00d9ff", iconUrl: "https://i.ibb.co/8LvFNQkC/noldor.png" };
-            if (!data || !data.kriminalides) updates['kriminalides'] = { name: "KRIMINALIDES CLAN", color: "#ff3333", iconUrl: "https://i.ibb.co/VYMZjzYr/kriminalides.png" };
-            
-            if (Object.keys(updates).length > 0) {
-                db.ref('internalClans/').update(updates);
-            }
-
-            globalInternalClans = data || updates;
-            if(data) {
-                globalInternalClans = {...data, ...updates};
-            }
-            
-            renderInternalClansList();
-            updateNewClanSelects();
-        });
 
         db.ref('pendingScans/').on('value', snap => {
             const queueContainer = document.getElementById('pending-queue-container'); 
@@ -523,116 +469,6 @@
         }
     });
 
-    // --- CLAN SLOTS MANAGER LOGIC ---
-    let accumulatedSlotsNames = new Set();
-
-    function addNamesToSlotsManager() {
-        const inputText = document.getElementById('mass-input').value.trim().toLowerCase();
-        if (!inputText) { alert("Δεν υπάρχει κείμενο στο πλαίσιο!"); return; }
-        
-        let extractedNames = inputText.match(/[a-z0-9_]+/g) || [];
-        if (extractedNames.length === 0) { alert("Δεν βρέθηκαν ονόματα."); return; }
-
-        let addedCount = 0;
-        extractedNames.forEach(n => {
-            if (n.length > 2) {
-                accumulatedSlotsNames.add(n);
-                addedCount++;
-            }
-        });
-
-        document.getElementById('slots-counter').innerText = accumulatedSlotsNames.size;
-        
-        document.getElementById('mass-input').value = "";
-        document.getElementById('detected-list').innerHTML = "";
-        document.getElementById('unmatched-list').innerHTML = "";
-        document.getElementById('input-count').innerText = "0 NAMES";
-        
-        alert("✅ Προστέθηκαν " + addedCount + " ονόματα στο Slots Manager!");
-    }
-
-    function resetSlotsManager() {
-        if(confirm("Είσαι σίγουρος ότι θες να διαγράψεις τα αποθηκευμένα ονόματα;")) {
-            accumulatedSlotsNames.clear();
-            document.getElementById('slots-counter').innerText = "0";
-        }
-    }
-
-    function generateSlotsExcel() {
-        if (accumulatedSlotsNames.size === 0) { alert("Δεν υπάρχουν αποθηκευμένα ονόματα! Πάτα το κουμπί 'SLOTS' πρώτα."); return; }
-        
-        let extractedNames = Array.from(accumulatedSlotsNames);
-
-        let columns = {};
-        let cpIds = Object.keys(allCPs).filter(id => globalInternalClans[allCPs[id].clan]);
-        
-        cpIds.forEach(id => {
-            columns[allCPs[id].name] = [];
-        });
-        columns["Not Found"] = [];
-
-        let matchedInputNames = new Set();
-
-        cpIds.forEach(id => {
-            let roster = (allCPs[id].members || "").toLowerCase().split(',').map(s=>s.trim()).filter(s=>s);
-            if(allCPs[id].leader) roster.push(allCPs[id].leader.toLowerCase().trim());
-            roster = [...new Set(roster)];
-
-            roster.forEach(trueName => {
-                let matchedInput = extractedNames.find(n => {
-                    if (n.length < 3) return false;
-                    if (trueName === n || trueName.includes(n)) return true;
-                    let dist = getEditDistance(n, trueName); 
-                    let allowed = trueName.length > 5 ? 2 : 1; 
-                    return dist <= allowed;
-                });
-                
-                if (matchedInput) {
-                    matchedInputNames.add(matchedInput);
-                    // Add the correctly formatted trueName to the column
-                    columns[allCPs[id].name].push(trueName.toUpperCase());
-                }
-            });
-        });
-
-        // Add unmatched names to 'Not Found'
-        extractedNames.forEach(n => {
-            if (!matchedInputNames.has(n)) {
-                columns["Not Found"].push(n.toUpperCase());
-            }
-        });
-
-        // Generate CSV
-        let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
-        let colNames = Object.keys(columns);
-        csvContent += colNames.map(c => `"${c}"`).join(",") + "\n";
-
-        let maxRows = Math.max(...colNames.map(c => columns[c].length));
-
-        for (let i = 0; i < maxRows; i++) {
-            let row = [];
-            colNames.forEach(c => {
-                row.push(`"${columns[c][i] || ""}"`);
-            });
-            csvContent += row.join(",") + "\n";
-        }
-
-        // Add Totals Row
-        let totalsRow = [];
-        colNames.forEach(c => {
-            totalsRow.push(`"${columns[c].length}"`);
-        });
-        csvContent += totalsRow.join(",") + "\n";
-
-        const encodedUri = encodeURI(csvContent);
-        const link = document.createElement("a");
-        link.setAttribute("href", encodedUri);
-        link.setAttribute("download", "Clan_Slots_Report.csv");
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }
-
     async function processBulkImages(files) {
         document.getElementById('ocr-loading').style.display = 'block';
         let allExtractedText = ""; let errorOccurred = false;
@@ -750,8 +586,6 @@
 
             const d = new Date(); const today = `${d.getDate()}-${d.getMonth()+1}-${d.getFullYear()}`; 
             const nowMs = Date.now(); const twelveHoursMs = 12 * 60 * 60 * 1000;
-            
-            const disableProtection = document.getElementById('disable-protection-cb') ? document.getElementById('disable-protection-cb').checked : false;
 
             const dailySnap = await db.ref(`dailyLogs/${today}`).once('value');
             const currentDailyLogs = dailySnap.val() || {};
@@ -767,19 +601,16 @@
                 let eligible = namesFound.filter(name => {
                     const safeName = name.replace(/[.#$\[\]]/g, '_');
                     let isLocked = false;
-                    
-                    if (!disableProtection) {
-                        for (let dateKey in allLogsLocal) {
-                            if (allLogsLocal[dateKey][safeName] && allLogsLocal[dateKey][safeName][bossId]) {
-                                let log = allLogsLocal[dateKey][safeName][bossId];
-                                
-                                // ΑΝΤΙ-CHEAT: ΕΛΕΓΧΕΙ ΜΟΝΟ ΤΟ 12ΩΡΟ. 
-                                // Αν έχουν περάσει 12 ώρες, επιτρέπει τη συμμετοχή ακόμα και στην ίδια μέρα!
-                                if (log.timestamp) {
-                                    if (nowMs - log.timestamp < twelveHoursMs) { isLocked = true; break; }
-                                } else if (dateKey === today) { 
-                                    isLocked = true; break; 
-                                }
+                    for (let dateKey in allLogsLocal) {
+                        if (allLogsLocal[dateKey][safeName] && allLogsLocal[dateKey][safeName][bossId]) {
+                            let log = allLogsLocal[dateKey][safeName][bossId];
+                            
+                            // ΑΝΤΙ-CHEAT: ΕΛΕΓΧΕΙ ΜΟΝΟ ΤΟ 12ΩΡΟ. 
+                            // Αν έχουν περάσει 12 ώρες, επιτρέπει τη συμμετοχή ακόμα και στην ίδια μέρα!
+                            if (log.timestamp) {
+                                if (nowMs - log.timestamp < twelveHoursMs) { isLocked = true; break; }
+                            } else if (dateKey === today) { 
+                                isLocked = true; break; 
                             }
                         }
                     }
@@ -1004,17 +835,6 @@
         } else {
             multRow.style.display = 'none';
         }
-
-        // Populate the new CP Clan dropdown
-        let clanSelectHtml = "";
-        Object.keys(globalInternalClans).forEach(cId => {
-            clanSelectHtml += `<option value="${cId}">${globalInternalClans[cId].name.replace(' CLAN', '')}</option>`;
-        });
-        clanSelectHtml += `<option value="caller">CALLER</option>`;
-        clanSelectHtml += `<option value="external">EXTERNAL</option>`;
-        const clanSel = document.getElementById('edit-cp-clan');
-        clanSel.innerHTML = clanSelectHtml;
-        clanSel.value = cp.clan;
         
         let statsHtml = ""; 
         bossKeys.forEach(k => { 
@@ -1049,146 +869,46 @@
         db.ref('cps/' + currentEditID).update(updatePayload).then(() => alert("Data & Points Saved Successfully!")); 
     }
 
-    async function migratePlayerLogs() { 
-        const oldName = document.getElementById('old-player-name').value.trim(); 
-        const newName = document.getElementById('new-player-name').value.trim(); 
-        if(!oldName || !newName) { alert("Συμπλήρωσε τα ονόματα."); return; } 
-        if(!confirm(`Το όνομα ${oldName} θα αλλάξει σε ${newName}. Συνέχεια;`)) return; 
-        
-        let logsMoved = 0; let cpsUpdated = 0; 
-        const safeOldName = oldName.replace(/[.#$\[\]]/g, '_');
-        const safeNewName = newName.replace(/[.#$\[\]]/g, '_');
-
-        const logsRef = db.ref('dailyLogs'); 
-        const snap = await logsRef.once('value'); 
-        const logs = snap.val() || {}; 
-        for (const date in logs) { 
-            let foundKey = Object.keys(logs[date]).find(k => k.toLowerCase() === safeOldName.toLowerCase() || k.toLowerCase() === oldName.toLowerCase()); 
-            if (foundKey) { 
-                const dataToMove = logs[date][foundKey]; 
-                await db.ref(`dailyLogs/${date}/${safeNewName}`).set(dataToMove); 
-                await db.ref(`dailyLogs/${date}/${foundKey}`).remove(); 
-                logsMoved++; 
-            } 
-        } 
-        
-        for (const cpId in allCPs) { 
-            let updated = false; 
-            let cp = allCPs[cpId]; 
-            if (cp.leader && cp.leader.toLowerCase() === oldName.toLowerCase()) { 
-                cp.leader = newName; updated = true; 
-            } 
-            if (cp.members) { 
-                let membersArr = cp.members.split(',').map(m => m.trim()); 
-                let idx = membersArr.findIndex(m => m.toLowerCase() === oldName.toLowerCase()); 
-                if (idx !== -1) { 
-                    membersArr[idx] = newName; 
-                    cp.members = membersArr.join(', '); 
-                    updated = true; 
-                } 
-            } 
-            if (updated) { 
-                await db.ref(`cps/${cpId}`).update({ leader: cp.leader, members: cp.members }); 
-                cpsUpdated++; 
-            } 
-        } 
-
-        const archivePlayersRef = db.ref('archive/players');
-        const archivePlayersSnap = await archivePlayersRef.once('value');
-        const archivePlayers = archivePlayersSnap.val() || {};
-        let archiveKey = Object.keys(archivePlayers).find(k => k.toLowerCase() === safeOldName.toLowerCase() || k.toLowerCase() === oldName.toLowerCase());
-        if (archiveKey) {
-            const dataToMove = archivePlayers[archiveKey];
-            await db.ref(`archive/players/${safeNewName}`).set(dataToMove);
-            await db.ref(`archive/players/${archiveKey}`).remove();
-        }
-
-        const animalsRef = db.ref('animalsTracker');
-        const animalsSnap = await animalsRef.once('value');
-        const animals = animalsSnap.val() || {};
-        let animalsKey = Object.keys(animals).find(k => k.toLowerCase() === safeOldName.toLowerCase() || k.toLowerCase() === oldName.toLowerCase());
-        if (animalsKey) {
-            const dataToMove = animals[animalsKey];
-            await db.ref(`animalsTracker/${safeNewName}`).set(dataToMove);
-            await db.ref(`animalsTracker/${animalsKey}`).remove();
-        }
-
-        alert(`ΕΠΙΤΥΧΙΑ!\nLogs moved: ${logsMoved} days.\nCPs updated: ${cpsUpdated}.\nArchive & Tracker updated.`); 
-        document.getElementById('old-player-name').value = ""; 
-        document.getElementById('new-player-name').value = ""; 
-    }
-    async function movePlayerToCP() { 
-        const playerName = document.getElementById('move-player-name').value.trim(); 
-        const targetCpId = document.getElementById('move-target-cp').value; 
-        if(!playerName || !targetCpId) { alert("Παρακαλώ συμπλήρωσε το όνομα και διάλεξε το CP προορισμού."); return; } 
-        const searchName = playerName.toLowerCase(); 
-        let sourceCpId = null; 
-        let sourceMembersArr = []; 
-        let exactPlayerName = playerName; 
-        for (const id in allCPs) { 
-            if(allCPs[id].clan === 'history') continue; 
-            if(allCPs[id].leader && allCPs[id].leader.toLowerCase() === searchName) { 
-                alert(`ΠΡΟΣΟΧΗ! Ο ${playerName} είναι LEADER στο CP ${allCPs[id].name}. Πρέπει να αλλάξεις χειροκίνητα τον Leader από το Edit CP.`); 
-                return; 
-            } 
-            let membersArr = (allCPs[id].members || "").split(',').map(m => m.trim()).filter(m => m !== ""); 
-            let idx = membersArr.findIndex(m => m.toLowerCase() === searchName); 
-            if (idx !== -1) { 
-                sourceCpId = id; exactPlayerName = membersArr[idx]; sourceMembersArr = membersArr; sourceMembersArr.splice(idx, 1); break; 
-            } 
-        } 
-        if (!sourceCpId) { alert(`Ο παίκτης ${playerName} δεν βρέθηκε στο Roster κανενός ενεργού CP.`); return; } 
-        if (sourceCpId === targetCpId) { alert(`Ο παίκτης ${exactPlayerName} ανήκει ήδη στο CP ${allCPs[targetCpId].name}!`); return; } 
-        const targetCp = allCPs[targetCpId]; 
-        let targetMembersArr = (targetCp.members || "").split(',').map(m => m.trim()).filter(m => m !== ""); 
-        targetMembersArr.push(exactPlayerName); 
-        if(!confirm(`ΕΠΙΒΕΒΑΙΩΣΗ:\nΝα μεταφερθεί ο ${exactPlayerName} από το ${allCPs[sourceCpId].name} στο ${targetCp.name};`)) return; 
-        await db.ref(`cps/${sourceCpId}`).update({ members: sourceMembersArr.join(', ') }); 
-        await db.ref(`cps/${targetCpId}`).update({ members: targetMembersArr.join(', ') }); 
-        alert(`Η μεταφορά ολοκληρώθηκε!\nΟ ${exactPlayerName} είναι πλέον στο ${targetCp.name}.`); 
-        document.getElementById('move-player-name').value = ""; 
-    }
-
-    function quickChangeClan(formattedClan) {
-        if(!currentEditID) return;
-        const cp = allCPs[currentEditID];
-        
-        if (formattedClan === 'external') {
-            if(confirm("Είσαι σίγουρος; Αυτή η ομάδα θα μεταφερθεί ΟΡΙΣΤΙΚΑ στο κάτω πάνελ (External Clans).")) {
-                const extData = {
-                    name: cp.name || "",
-                    leader: cp.leader || "",
-                    iconUrl: cp.imgUrl || "https://i.ibb.co/SXM1FZx8/attedance-points.png",
-                    description: "Μεταφέρθηκε από τα ενεργά CPs.",
-                    status: "active",
-                    totalPoints: cp.totalPoints || 0,
-                    lootHistory: cp.lootHistory || []
-                };
-                db.ref('externalClans/' + currentEditID).set(extData).then(() => {
-                    db.ref('cps/' + currentEditID).remove().then(() => {
-                        alert("Η ομάδα μεταφέρθηκε επιτυχώς στα External Clans (κάτω πάνελ)!");
-                        document.getElementById('edit-section').style.display = 'none';
-                        currentEditID = null;
-                        setViewMode('active');
-                    });
-                });
-            } else {
-                document.getElementById('edit-cp-clan').value = cp.clan;
-            }
-        } else if (globalInternalClans[formattedClan] || formattedClan === 'caller') {
-            db.ref('cps/' + currentEditID).update({ clan: formattedClan }).then(() => {
-                alert("Η ομάδα άλλαξε επιτυχώς σε " + formattedClan.toUpperCase() + "!");
-                renderSimpleList();
-            });
-        } else {
-            document.getElementById('edit-cp-clan').value = cp.clan;
-        }
-    }
-
+    async function migratePlayerLogs() { const oldName = document.getElementById('old-player-name').value.trim(); const newName = document.getElementById('new-player-name').value.trim(); if(!oldName || !newName) { alert("Συμπλήρωσε τα ονόματα."); return; } if(!confirm(`Το όνομα ${oldName} θα αλλάξει σε ${newName}. Συνέχεια;`)) return; let logsMoved = 0; let cpsUpdated = 0; const logsRef = db.ref('dailyLogs'); const snap = await logsRef.once('value'); const logs = snap.val() || {}; for (const date in logs) { let foundKey = Object.keys(logs[date]).find(k => k.toLowerCase() === oldName.toLowerCase()); if (foundKey) { const dataToMove = logs[date][foundKey]; await db.ref(`dailyLogs/${date}/${newName}`).set(dataToMove); await db.ref(`dailyLogs/${date}/${foundKey}`).remove(); logsMoved++; } } for (const cpId in allCPs) { let updated = false; let cp = allCPs[cpId]; if (cp.leader && cp.leader.toLowerCase() === oldName.toLowerCase()) { cp.leader = newName; updated = true; } if (cp.members) { let membersArr = cp.members.split(',').map(m => m.trim()); let idx = membersArr.findIndex(m => m.toLowerCase() === oldName.toLowerCase()); if (idx !== -1) { membersArr[idx] = newName; cp.members = membersArr.join(', '); updated = true; } } if (updated) { await db.ref(`cps/${cpId}`).update({ leader: cp.leader, members: cp.members }); cpsUpdated++; } } alert(`ΕΠΙΤΥΧΙΑ!\nLogs moved: ${logsMoved} days.\nCPs updated: ${cpsUpdated}.`); document.getElementById('old-player-name').value = ""; document.getElementById('new-player-name').value = ""; }
+    async function movePlayerToCP() { const playerName = document.getElementById('move-player-name').value.trim(); const targetCpId = document.getElementById('move-target-cp').value; if(!playerName || !targetCpId) { alert("Παρακαλώ συμπλήρωσε το όνομα και διάλεξε το CP προορισμού."); return; } const searchName = playerName.toLowerCase(); let sourceCpId = null; let sourceMembersArr = []; let exactPlayerName = playerName; for (const id in allCPs) { if(allCPs[id].clan === 'history') continue; if(allCPs[id].leader && allCPs[id].leader.toLowerCase() === searchName) { alert(`ΠΡΟΣΟΧΗ! Ο ${playerName} είναι LEADER στο CP ${allCPs[id].name}. Πρέπει να αλλάξεις χειροκίνητα τον Leader από το Edit CP.`); return; } let membersArr = (allCPs[id].members || "").split(',').map(m => m.trim()).filter(m => m !== ""); let idx = membersArr.findIndex(m => m.toLowerCase() === searchName); if (idx !== -1) { sourceCpId = id; exactPlayerName = membersArr[idx]; sourceMembersArr = membersArr; sourceMembersArr.splice(idx, 1); break; } } if (!sourceCpId) { alert(`Ο παίκτης ${playerName} δεν βρέθηκε στο Roster κανενός ενεργού CP.`); return; } if (sourceCpId === targetCpId) { alert(`Ο παίκτης ${exactPlayerName} ανήκει ήδη στο CP ${allCPs[targetCpId].name}!`); return; } const targetCp = allCPs[targetCpId]; let targetMembersArr = (targetCp.members || "").split(',').map(m => m.trim()).filter(m => m !== ""); targetMembersArr.push(exactPlayerName); if(!confirm(`ΕΠΙΒΕΒΑΙΩΣΗ:\nΝα μεταφερθεί ο ${exactPlayerName} από το ${allCPs[sourceCpId].name} στο ${targetCp.name};`)) return; await db.ref(`cps/${sourceCpId}`).update({ members: sourceMembersArr.join(', ') }); await db.ref(`cps/${targetCpId}`).update({ members: targetMembersArr.join(', ') }); alert(`Η μεταφορά ολοκληρώθηκε!\nΟ ${exactPlayerName} είναι πλέον στο ${targetCp.name}.`); document.getElementById('move-player-name').value = ""; }
+    
     function toggleHistoryStatus() { 
         const cp = allCPs[currentEditID]; 
         if(cp.clan === 'history') { 
-            alert("Παρακαλώ επέλεξε τη νέα ομάδα από το μενού 'CP Clan' στα αριστερά του κουμπιού RESTORE για να επαναφέρεις το CP.");
+            const newClan = prompt("Σε ποια ομάδα; (noldor, kriminalides, caller, external)", "noldor"); 
+            if (newClan === null) return; 
+            const formattedClan = newClan.trim().toLowerCase(); 
+            
+            if (formattedClan === 'external') {
+                if(confirm("Είσαι σίγουρος; Αυτή η ομάδα θα μεταφερθεί ΟΡΙΣΤΙΚΑ στο κάτω πάνελ (External Clans).")) {
+                    const extData = {
+                        name: cp.name || "",
+                        leader: cp.leader || "",
+                        iconUrl: cp.imgUrl || "https://i.ibb.co/SXM1FZx8/attedance-points.png",
+                        description: "Μεταφέρθηκε από τα ενεργά CPs.",
+                        status: "active",
+                        totalPoints: cp.totalPoints || 0,
+                        lootHistory: cp.lootHistory || []
+                    };
+                    db.ref('externalClans/' + currentEditID).set(extData).then(() => {
+                        db.ref('cps/' + currentEditID).remove().then(() => {
+                            alert("Η ομάδα μεταφέρθηκε επιτυχώς στα External Clans (κάτω πάνελ)!");
+                            document.getElementById('edit-section').style.display = 'none';
+                            currentEditID = null;
+                            setViewMode('active');
+                        });
+                    });
+                }
+            } else if (['noldor', 'kriminalides', 'caller'].includes(formattedClan)) {
+                db.ref('cps/' + currentEditID).update({ clan: formattedClan }).then(() => {
+                    alert("Restored επιτυχώς στα CPs!");
+                    document.getElementById('edit-section').style.display = 'none';
+                    currentEditID = null;
+                    setViewMode('active');
+                }); 
+            } else {
+                alert("Λάθος όνομα! Πρέπει να γράψεις ακριβώς μία από τις 4 λέξεις (π.χ. external). Δοκίμασε ξανά.");
+            }
         } else { 
             if(confirm("Move to History?")) db.ref('cps/' + currentEditID).update({ clan: 'history' }).then(() => {
                 alert("Moved to History!");
@@ -1198,7 +918,7 @@
             }); 
         } 
     }
-
+    
     function addMarketLoot() { 
         const loot = document.getElementById('loot-market').value.split('|'); 
         db.ref('cps/' + currentEditID).transaction(cp => { 
@@ -1232,7 +952,7 @@
             clan: clan, 
             totalPoints: 0, 
             members: "", 
-            bossStats: { VAL:0, ANT:0, BAI:0, SIE:0, ZAK:0, FRI:0, AQ:0, ORF:0, COR:0, DPVP:0 } 
+            bossStats: { VAL:0, ANT:0, BAI:0, SIE:0, ZAK:0, FRI:0, AQ:0, ORF:0, COR:0 } 
         };
         if (clan === 'caller') {
             cpData.callerMultiplier = parseInt(document.getElementById('new-caller-multiplier').value) || 3;
@@ -1253,66 +973,6 @@
     function deleteCP() { if(confirm("Delete Forever?")) db.ref('cps/' + currentEditID).remove(); }
     function createExtClan() { const name = document.getElementById('new-ext-name').value.trim(); const icon = document.getElementById('new-ext-icon').value.trim(); if(!name) { alert("Βάλε όνομα!"); return; } const id = name.replace(/\s+/g, '').toLowerCase(); db.ref('externalClans/' + id).set({ name: name, iconUrl: icon || 'https://i.ibb.co/SXM1FZx8/attedance-points.png', leader: 'Pending...', description: 'Alliance agreements pending.', status: 'active', lootHistory: [] }); document.getElementById('new-ext-name').value = ''; document.getElementById('new-ext-icon').value = ''; alert("New Clan Created!"); }
     
-    function createIntClan() {
-        const name = document.getElementById('new-int-name').value.trim();
-        const color = document.getElementById('new-int-color').value;
-        const icon = document.getElementById('new-int-icon').value.trim();
-        if(!name) { alert("Βάλε όνομα Clan!"); return; }
-        const id = name.replace(/\s+/g, '').toLowerCase();
-        db.ref('internalClans/' + id).set({
-            name: name.toUpperCase() + " CLAN",
-            color: color || '#ffffff',
-            iconUrl: icon || 'https://i.ibb.co/SXM1FZx8/attedance-points.png'
-        }).then(() => {
-            document.getElementById('new-int-name').value = '';
-            document.getElementById('new-int-color').value = '#ffffff';
-            document.getElementById('new-int-icon').value = '';
-            alert("✅ Το Internal Clan δημιουργήθηκε επιτυχώς!");
-        });
-    }
-
-    function renderInternalClansList() {
-        const listDiv = document.getElementById('internal-clans-list');
-        if(!listDiv) return;
-        listDiv.innerHTML = "";
-        Object.keys(globalInternalClans).forEach(id => {
-            const clan = globalInternalClans[id];
-            listDiv.innerHTML += `
-                <div style="background: rgba(0,0,0,0.6); border: 1px solid ${clan.color}; border-left: 5px solid ${clan.color}; padding: 10px; border-radius: 5px; display: flex; align-items: center; justify-content: space-between;">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <img src="${clan.iconUrl}" style="width: 25px; height: 25px; object-fit: contain;">
-                        <span style="color: #fff; font-family: 'Cinzel'; font-size: 12px; font-weight: bold;">${clan.name}</span>
-                    </div>
-                    <button class="btn btn-red" style="width: auto; padding: 5px 10px; margin: 0; font-size: 10px;" onclick="deleteIntClan('${id}')">✖ DEL</button>
-                </div>
-            `;
-        });
-    }
-
-    function deleteIntClan(id) {
-        if(confirm(`Είσαι σίγουρος ότι θέλεις να διαγράψεις το Internal Clan '${id}';\nΤα CPs που ανήκουν σε αυτό δεν θα σβηστούν, αλλά ίσως να μην εμφανίζονται σωστά μέχρι να τους αλλάξεις Clan.`)) {
-            db.ref('internalClans/' + id).remove().then(() => alert("✅ Διαγράφηκε επιτυχώς!"));
-        }
-    }
-
-    function updateNewClanSelects() {
-        const selectEl = document.getElementById('new-clan');
-        if(!selectEl) return;
-        let html = "";
-        Object.keys(globalInternalClans).forEach(id => {
-            html += `<option value="${id}">${globalInternalClans[id].name.replace(' CLAN', '')}</option>`;
-        });
-        html += `<option value="caller">Shot Caller (π.χ. TSAKNORRIS - Στρογγυλό εικονίδιο)</option>`;
-        html += `<option value="external">External Clan</option>`;
-        const currentVal = selectEl.value;
-        selectEl.innerHTML = html;
-        if([...selectEl.options].some(o => o.value === currentVal)) {
-            selectEl.value = currentVal;
-        } else if(globalInternalClans['noldor']) {
-            selectEl.value = 'noldor';
-        }
-    }
-    
     function loadExtEdit() { 
         const selVal = document.getElementById('ext-select').value; 
         if(!selVal) { document.getElementById('ext-edit-section').style.display = 'none'; currentExtID = null; return; } 
@@ -1326,7 +986,6 @@
             document.getElementById('ext-points').disabled = false; 
             document.getElementById('ext-stat-inputs').style.display = 'none'; 
             const histBtn = document.getElementById('ext-hist-btn'); histBtn.style.display = 'block'; if(targetData.status === 'history') { histBtn.innerText = "RESTORE"; histBtn.className = "btn btn-green"; } else { histBtn.innerText = "HIST"; histBtn.className = "btn btn-blue"; } 
-            const transferBtn = document.getElementById('ext-transfer-btn'); if(transferBtn) transferBtn.style.display = 'block';
         } else if (selVal.startsWith('cp_')) { 
             const pureId = selVal.replace('cp_', ''); targetData = allCPs[pureId] || {}; 
             
@@ -1335,7 +994,6 @@
             bossKeys.forEach(k => extInitialStats[k] = (targetData.bossStats && targetData.bossStats[k]) ? parseInt(targetData.bossStats[k]) : 0);
 
             document.getElementById('ext-name').value = targetData.name || ""; document.getElementById('ext-leader').value = targetData.leader || targetData.members || ""; document.getElementById('ext-desc-container').style.display = 'none'; document.getElementById('ext-icon-container').style.display = 'none'; document.getElementById('ext-hist-btn').style.display = 'none'; 
-            const transferBtn = document.getElementById('ext-transfer-btn'); if(transferBtn) transferBtn.style.display = 'none';
             document.getElementById('ext-points').value = extInitialPoints; 
             document.getElementById('ext-points').disabled = false; 
 
@@ -1363,43 +1021,6 @@
     
     function toggleExtHistory() { if(!currentExtID || !currentExtID.startsWith('ext_')) return; const pureId = currentExtID.replace('ext_', ''); const clan = allExtClans[pureId] || {}; const newStatus = clan.status === 'history' ? 'active' : 'history'; db.ref('externalClans/' + pureId).update({ status: newStatus }).then(() => { alert("Clan visibility updated!"); loadExtEdit(); }); }
     
-    function transferExtToCP() {
-        if(!currentExtID || !currentExtID.startsWith('ext_')) return; 
-        const pureId = currentExtID.replace('ext_', ''); 
-        const clan = allExtClans[pureId]; 
-        if(!clan) return;
-
-        let availableClans = Object.keys(globalInternalClans).join(' ή ');
-        const newClan = prompt(`Σε ποιο Clan να μεταφερθεί ως CP;\n(${availableClans})`, Object.keys(globalInternalClans)[0] || "noldor");
-        if (!newClan) return;
-        const formattedClan = newClan.trim().toLowerCase();
-        
-        if (globalInternalClans[formattedClan]) {
-            if(confirm(`Είσαι σίγουρος;\nΗ ομάδα "${clan.name}" θα μεταφερθεί ΟΡΙΣΤΙΚΑ στα ενεργά CPs (${formattedClan.toUpperCase()}).`)) {
-                const cpData = {
-                    name: clan.name || "",
-                    leader: clan.leader || "",
-                    imgUrl: clan.iconUrl || "https://i.ibb.co/SXM1FZx8/attedance-points.png",
-                    clan: formattedClan,
-                    totalPoints: clan.totalPoints || 0,
-                    members: "", 
-                    bossStats: { VAL:0, ANT:0, BAI:0, SIE:0, ZAK:0, FRI:0, AQ:0, ORF:0, COR:0, DPVP:0 },
-                    lootHistory: clan.lootHistory || []
-                };
-                db.ref('cps/' + pureId).set(cpData).then(() => {
-                    db.ref('externalClans/' + pureId).remove().then(() => {
-                        alert("Η ομάδα μεταφέρθηκε επιτυχώς στα ενεργά CPs!");
-                        document.getElementById('ext-edit-section').style.display = 'none';
-                        currentExtID = null;
-                        document.getElementById('ext-select').value = "";
-                    });
-                });
-            }
-        } else {
-            alert(`Λάθος όνομα! Πρέπει να γράψεις ένα από τα υπάρχοντα Internal Clans: ${availableClans}`);
-        }
-    }
-
     function addExtMarketLoot() { 
         if(!currentExtID) return; 
         const loot = document.getElementById('ext-loot-market').value.split('|'); 
