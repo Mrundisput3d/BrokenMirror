@@ -1004,6 +1004,17 @@
         } else {
             multRow.style.display = 'none';
         }
+
+        // Populate the new CP Clan dropdown
+        let clanSelectHtml = "";
+        Object.keys(globalInternalClans).forEach(cId => {
+            clanSelectHtml += `<option value="${cId}">${globalInternalClans[cId].name.replace(' CLAN', '')}</option>`;
+        });
+        clanSelectHtml += `<option value="caller">CALLER</option>`;
+        clanSelectHtml += `<option value="external">EXTERNAL</option>`;
+        const clanSel = document.getElementById('edit-cp-clan');
+        clanSel.innerHTML = clanSelectHtml;
+        clanSel.value = cp.clan;
         
         let statsHtml = ""; 
         bossKeys.forEach(k => { 
