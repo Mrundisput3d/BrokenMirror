@@ -371,7 +371,15 @@
 
         <div class="leaders-row" id="dynamic-leaders"></div>
 
-        <div class="main-wrapper" id="dynamic-internal-clans">
+        <div class="main-wrapper">
+            <div class="clan-column">
+                <div class="column-header" style="color:var(--noldor-sky)"><img src="https://i.ibb.co/8LvFNQkC/noldor.png" style="width:25px;"> NOLDOR CLAN</div>
+                <div class="scroll-area" id="noldor-list"></div>
+            </div>
+            <div class="clan-column">
+                <div class="column-header" style="color:var(--krim-red)"><img src="https://i.ibb.co/VYMZjzYr/kriminalides.png" style="width:25px;"> KRIMINALIDES CLAN</div>
+                <div class="scroll-area" id="krim-list"></div>
+            </div>
         </div>
         
         <div class="section-title-wrapper" style="margin-top: 50px;">
@@ -402,7 +410,6 @@
 
         let globalCPData = {}; 
         let globalExternalClans = {}; 
-        let globalInternalClans = {};
         let globalDailyLogs = {};
         // *** FIX: New global to hold archived totals ***
         let globalArchive = {};
@@ -435,16 +442,6 @@
             updateUI();
         });
 
-        db.ref('internalClans/').on('value', (snapshot) => {
-            let data = snapshot.val() || {};
-            let defaults = {
-                noldor: { name: "NOLDOR CLAN", color: "#00d9ff", iconUrl: "https://i.ibb.co/8LvFNQkC/noldor.png" },
-                kriminalides: { name: "KRIMINALIDES CLAN", color: "#ff3333", iconUrl: "https://i.ibb.co/VYMZjzYr/kriminalides.png" }
-            };
-            globalInternalClans = {...defaults, ...data};
-            updateUI();
-        });
-
         db.ref('dailyLogs/').on('value', (snapshot) => {
             globalDailyLogs = snapshot.val() || {};
             updateUI();
@@ -458,23 +455,9 @@
 
         function updateUI() {
             const query = document.getElementById('global-search').value.toLowerCase().trim();
-            
-            // Generate Internal Clan Columns
-            const mainWrapper = document.getElementById('dynamic-internal-clans');
-            let columnsHtml = "";
-            let listsHtmlContent = {};
-            Object.keys(globalInternalClans).forEach(clanId => {
-                const clan = globalInternalClans[clanId];
-                listsHtmlContent[clanId] = "";
-                columnsHtml += `
-                    <div class="clan-column">
-                        <div class="column-header" style="color:${clan.color || '#fff'}"><img src="${clan.iconUrl || 'https://i.ibb.co/SXM1FZx8/attedance-points.png'}" style="width:25px;"> ${clan.name || clanId.toUpperCase()}</div>
-                        <div class="scroll-area" id="list-${clanId}"></div>
-                    </div>
-                `;
-            });
-            mainWrapper.innerHTML = columnsHtml;
-
+            const nList = document.getElementById('noldor-list');
+            const kList = document.getElementById('krim-list');
+            nList.innerHTML = ""; kList.innerHTML = "";
             let dynamicLeadersHtml = ""; 
 
             // ΒΗΜΑ 1: Υπολογισμός "Activity" (Attendances) από τα dailyLogs
@@ -497,36 +480,34 @@
             const sortedIDs = Object.keys(globalCPData).sort((a,b) => (globalCPData[b].totalPoints || 0) - (globalCPData[a].totalPoints || 0));
             
             sortedIDs.forEach(id => {
-                try {
-                    const cp = globalCPData[id];
-                    if(cp.clan === 'history') return;
+                const cp = globalCPData[id];
+                if(cp.clan === 'history') return;
 
-                    let match = false;
-                    if (!query) {
-                        match = true;
-                    } else {
-                        const lootItems = cp.lootHistory ? cp.lootHistory.map(l => l.item).join(" ") : "";
-                        const searchStr = `${cp.name || ""} ${cp.leader || ""} ${cp.members || ""} ${lootItems}`.toLowerCase();
-                        match = searchStr.includes(query);
-                    }
+                let match = false;
+                if (!query) {
+                    match = true;
+                } else {
+                    const lootItems = cp.lootHistory ? cp.lootHistory.map(l => l.item).join(" ") : "";
+                    const searchStr = `${cp.name || ""} ${cp.leader || ""} ${cp.members || ""} ${lootItems}`.toLowerCase();
+                    match = searchStr.includes(query);
+                }
 
-                    if (!match) return;
+                if (!match) return;
 
-                    if(cp.clan === 'caller') {
-                        const role = cp.leader || "CALLER";
-                        const img = cp.imgUrl || "https://i.ibb.co/SXM1FZx8/attedance-points.png";
-                        dynamicLeadersHtml += `
-                            <div class="leader-card" onclick="openCaller('${id}', '${role}', '${img}')">
-                                <div class="img-frame"><img src="${img}" class="leader-img"></div>
-                                <span class="leader-name">${(cp.name || '').toUpperCase()}</span>
-                                <span class="leader-role">${role}</span>
-                            </div>`;
-                        return; 
-                    }
+                if(cp.clan === 'caller') {
+                    const role = cp.leader || "CALLER";
+                    const img = cp.imgUrl || "https://i.ibb.co/SXM1FZx8/attedance-points.png";
+                    dynamicLeadersHtml += `
+                        <div class="leader-card" onclick="openCaller('${id}', '${role}', '${img}')">
+                            <div class="img-frame"><img src="${img}" class="leader-img"></div>
+                            <span class="leader-name">${cp.name.toUpperCase()}</span>
+                            <span class="leader-role">${role}</span>
+                        </div>`;
+                    return; 
+                }
 
-                    let internalClanData = globalInternalClans[cp.clan];
-                let clanColor = internalClanData ? internalClanData.color : '#fff';
-
+                const style = cp.clan === 'noldor' ? 'cp-noldor' : 'cp-krim';
+                
                 let lootHtml = "No history found.";
                 if(cp.lootHistory && cp.lootHistory.length > 0) {
                     lootHtml = cp.lootHistory.map(l => `
@@ -563,13 +544,13 @@
                     let leaderScore = attendanceMap[getSafeName(lName).toUpperCase()] || 0;
                     leaderHtml = `<span class="member-click" onclick="openMemberStats('${lName}')" title="Attendances: ${leaderScore}">${lName}</span>`;
                 }
-
+                
                 const activeClass = (query && match) ? 'active' : '';
 
                 const html = `
-                    <div class="cp-box ${activeClass}" style="border-left: 4px solid ${clanColor}; background: linear-gradient(90deg, ${clanColor}11 0%, rgba(0,0,0,0.5) 100%);">
+                    <div class="cp-box ${style} ${activeClass}">
                         <button class="cp-btn" onclick="this.parentElement.classList.toggle('active')">
-                            <span>${cp.name || 'Unnamed'}</span><span style="color:var(--gold); font-size:0.75rem;">${cp.totalPoints || 0} PTS</span>
+                            <span>${cp.name}</span><span style="color:var(--gold); font-size:0.75rem;">${cp.totalPoints || 0} PTS</span>
                         </button>
                         <div class="cp-content">
                             <div class="roster-section">
@@ -583,18 +564,8 @@
                             <button class="loot-btn" onclick="openCpStats('${id}')">VIEW CP ATTENDANCES</button>
                         </div>
                     </div>`;
-                    if(internalClanData) {
-                        listsHtmlContent[cp.clan] += html;
-                    }
-                } catch(e) {
-                    console.error("Error processing CP " + id, e);
-                }
-            });
-
-            // Populate the lists after building HTML
-            Object.keys(globalInternalClans).forEach(clanId => {
-                const listEl = document.getElementById(`list-${clanId}`);
-                if(listEl) listEl.innerHTML = listsHtmlContent[clanId];
+                if(cp.clan === 'noldor') nList.innerHTML += html;
+                else kList.innerHTML += html;
             });
 
             document.getElementById('dynamic-leaders').innerHTML = dynamicLeadersHtml;
