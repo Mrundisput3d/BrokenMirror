@@ -155,6 +155,10 @@
                 <div style="display:flex; gap:10px; margin-bottom:10px;">
                     <div style="flex:1;"><label style="color:#aaa; font-size:11px;">Name</label><input type="text" id="edit-cp-name" style="font-family:'Cinzel'; color:var(--gold); font-size:1.1rem;"></div>
                     <div style="flex:1;"><label style="color:#aaa; font-size:11px;">Leader / Role</label><input type="text" id="edit-cp-leader" style="font-family:'Cinzel';"></div>
+                    <div style="flex:1;">
+                        <label style="color:#aaa; font-size:11px;">Clan</label>
+                        <select id="edit-cp-clan" style="width:100%; margin:0; padding:10px; font-family:'Cinzel';" onchange="toggleEditCallerMultiplier()"></select>
+                    </div>
                 </div>
                 <div style="margin-bottom:15px;"><label style="color:#aaa; font-size:11px;">Image URL (Μόνο για Shot Callers)</label><input type="text" id="edit-cp-imgUrl" placeholder="https://..."></div>
                 <div id="edit-caller-multiplier-row" style="display:none; background: rgba(212,175,55,0.1); border: 1px solid var(--gold); border-radius: 4px; padding: 10px; margin-bottom:15px;">
@@ -336,13 +340,13 @@
     function logout() { firebase.auth().signOut().then(() => window.location.href = "login.html"); } 
 
     function startDatabaseListeners() {
-        db.ref('clanConfig/').once('value', snap => {
+        db.ref('externalClans/__clanConfig/').once('value', snap => {
             if (!snap.exists() || !snap.val().noldor) {
-                db.ref('clanConfig/noldor').set({ name: "Noldor", color: "#00d9ff", iconUrl: "https://i.ibb.co/8LvFNQkC/noldor.png", order: 1, type: "internal" });
-                db.ref('clanConfig/kriminalides').set({ name: "Kriminalides", color: "#ff3333", iconUrl: "https://i.ibb.co/VYMZjzYr/kriminalides.png", order: 2, type: "internal" });
+                db.ref('externalClans/__clanConfig/noldor').set({ name: "Noldor", color: "#00d9ff", iconUrl: "https://i.ibb.co/8LvFNQkC/noldor.png", order: 1, type: "internal" });
+                db.ref('externalClans/__clanConfig/kriminalides').set({ name: "Kriminalides", color: "#ff3333", iconUrl: "https://i.ibb.co/VYMZjzYr/kriminalides.png", order: 2, type: "internal" });
             }
         });
-        db.ref('clanConfig/').on('value', snap => { globalClanConfig = snap.val() || {}; renderClanDropdown(); renderClanTypeSelect(); });
+        db.ref('externalClans/__clanConfig/').on('value', snap => { globalClanConfig = snap.val() || {}; renderClanDropdown(); renderClanTypeSelect(); renderEditClanDropdown(); });
         db.ref('cps/').on('value', snap => { allCPs = snap.val() || {}; renderSimpleList(); renderExtSelect(); renderMoveCPSelect(); if(currentEditID) loadEdit(currentEditID); if(currentExtID && currentExtID.startsWith('cp_')) loadExtEdit(); });
         db.ref('dailyLogs/').on('value', snap => { globalDailyLogs = snap.val() || {}; });
         db.ref('externalClans/').on('value', snap => { allExtClans = snap.val() || {}; renderExtSelect(); if(currentExtID && currentExtID.startsWith('ext_')) loadExtEdit(); });
@@ -1005,6 +1009,28 @@
         else if (sorted.length > 0) sel.value = sorted[0];
     }
 
+    function renderEditClanDropdown() {
+        const sel = document.getElementById('edit-cp-clan');
+        if(!sel) return;
+        const currentVal = sel.value;
+        let html = '';
+        const sorted = Object.keys(globalClanConfig).sort((a, b) => (globalClanConfig[a].order || 99) - (globalClanConfig[b].order || 99));
+        sorted.forEach(key => {
+            const cfg = globalClanConfig[key];
+            html += `<option value="${key}">${cfg.name || key}</option>`;
+        });
+        html += '<option value="caller">Shot Caller</option>';
+        html += '<option value="external">External Clan</option>';
+        html += '<option value="history">History (Inactive)</option>';
+        sel.innerHTML = html;
+        if (currentVal && sel.querySelector(`option[value="${currentVal}"]`)) sel.value = currentVal;
+    }
+
+    function toggleEditCallerMultiplier() {
+        const clan = document.getElementById('edit-cp-clan').value;
+        document.getElementById('edit-caller-multiplier-row').style.display = clan === 'caller' ? 'block' : 'none';
+    }
+
     function renderClanTypeSelect() {
         const sel = document.getElementById('clan-type-select');
         const currentVal = sel.value;
@@ -1026,7 +1052,7 @@
         if (!name) { alert('Βάλε όνομα clan!'); return; }
         const id = name.replace(/\s+/g, '').toLowerCase();
         const maxOrder = Object.values(globalClanConfig).reduce((max, c) => Math.max(max, c.order || 0), 0);
-        db.ref('clanConfig/' + id).set({
+        db.ref('externalClans/__clanConfig/' + id).set({
             name: name,
             iconUrl: icon || 'https://i.ibb.co/SXM1FZx8/attedance-points.png',
             color: color,
@@ -1062,7 +1088,7 @@
 
     function updateClanType() {
         if (!currentClanTypeID) return;
-        db.ref('clanConfig/' + currentClanTypeID).update({
+        db.ref('externalClans/__clanConfig/' + currentClanTypeID).update({
             name: document.getElementById('edit-clan-type-name').value.trim(),
             iconUrl: document.getElementById('edit-clan-type-icon').value.trim(),
             color: document.getElementById('edit-clan-type-color').value,
@@ -1075,7 +1101,7 @@
         const cfg = globalClanConfig[currentClanTypeID] || {};
         const newType = cfg.type === 'external' ? 'internal' : 'external';
         if (!confirm(`Move "${cfg.name}" to ${newType.toUpperCase()}?`)) return;
-        db.ref('clanConfig/' + currentClanTypeID).update({ type: newType }).then(() => {
+        db.ref('externalClans/__clanConfig/' + currentClanTypeID).update({ type: newType }).then(() => {
             alert('✅ Clan is now ' + newType.toUpperCase() + '!');
             loadClanTypeEdit();
         });
@@ -1091,7 +1117,7 @@
             return;
         }
         if (!confirm(`DELETE clan type "${cfg.name}" permanently?`)) return;
-        db.ref('clanConfig/' + currentClanTypeID).remove().then(() => {
+        db.ref('externalClans/__clanConfig/' + currentClanTypeID).remove().then(() => {
             alert('Clan type deleted!');
             document.getElementById('clan-type-edit-section').style.display = 'none';
             currentClanTypeID = null;
