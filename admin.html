@@ -2,716 +2,1352 @@
 <html lang="el">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Broken Mirror Alliance | Command Center</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;700;900&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
-    
+    <title>BMA | Command Center V22.3 (TikTok & YouTube Support)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <style>
-        :root {
-            --gold: #d4af37; --silver: #c0c0c0; --bronze: #cd7f32;
-            --noldor-sky: #00d9ff; --krim-red: #ff3333;
-            --bg: #0a0c0f;
-        }
+        :root { --gold: #d4af37; --bg: #0a0c0f; --card: #15181c; --red: #ff4444; --green: #28a745; --blue: #3498db; --sky: #00d9ff; }
+        body { background: var(--bg); color: #eee; font-family: 'Open Sans', sans-serif; margin: 0; padding: 20px 20px 100px 20px; font-size: 13px; overflow-y: auto; }
         
-        body, html { 
-            background: var(--bg); 
-            background-image: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('https://i.ibb.co/84cPVVp3/baium.png'); 
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            color: #eee; 
-            font-family: 'Open Sans', sans-serif; 
-            margin: 0; padding: 0;
-            scroll-behavior: smooth;
-        }
-        /* Music Controls */
-        .header-controls { position: absolute; top: 20px; right: 40px; display: flex; gap: 10px; z-index: 100; }
-        .control-btn { color: var(--gold); font-family: 'Cinzel'; border: 1px solid var(--gold); padding: 5px 15px; border-radius: 5px; background: rgba(0,0,0,0.6); font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.3s; backdrop-filter: blur(5px);}
-        .control-btn:hover { background: var(--gold); color: #000; }
-        /* --- 1. HERO SECTION (FULL SCREEN) --- */
-        .hero-section {
-            position: relative;
-            width: 100%;
-            height: 100vh;
-            background: transparent;
-            display: flex;
-            align-items: center;
-            overflow: hidden;
-            border-bottom: 2px solid var(--gold);
-        }
-        .hero-content {
-            position: relative;
-            z-index: 10;
-            padding-left: 8%;
-            max-width: 800px;
-        }
-        .hero-subtitle { font-family: 'Cinzel', serif; color: var(--gold); font-size: 1.2rem; letter-spacing: 4px; margin-bottom: 10px; text-shadow: 0 0 10px rgba(0,0,0,0.8); }
-        .hero-title { font-family: 'Cinzel Decorative', cursive; font-size: 4.5rem; color: #fff; margin: 0; line-height: 1.1; text-shadow: 0 5px 15px rgba(0,0,0,0.8); }
-        .hero-description { font-family: 'Open Sans', sans-serif; color: #ccc; font-size: 1.1rem; margin-top: 20px; margin-bottom: 40px; line-height: 1.6; max-width: 600px; text-shadow: 0 2px 5px rgba(0,0,0,0.8); }
+        .header-container { display: flex; justify-content: space-between; align-items: center; max-width: 1400px; margin: 0 auto 20px; }
+        h1 { font-family: 'Cinzel'; color: var(--gold); margin: 0; flex-grow: 1; text-align: center; }
+        .logout-btn { background: none; border: 1px solid var(--red); color: var(--red); padding: 5px 15px; cursor: pointer; font-family: 'Cinzel'; border-radius: 4px; font-size: 10px; transition: 0.3s; }
+        .logout-btn:hover { background: var(--red); color: white; }
+        .layout { display: grid; grid-template-columns: 330px 1fr; gap: 20px; max-width: 1400px; margin: 0 auto; align-items: start; }
+        .panel { background: var(--card); border: 1px solid #333; padding: 15px; border-radius: 10px; border-top: 3px solid var(--gold); }
         
-        .hero-buttons { display: flex; gap: 20px; }
-        .btn-primary, .btn-secondary {
-            font-family: 'Cinzel', serif; font-weight: bold; font-size: 1rem; padding: 15px 35px; border-radius: 5px; cursor: pointer; text-decoration: none; transition: 0.3s; text-transform: uppercase; letter-spacing: 1px; text-align: center;
-        }
-        .btn-primary { background: var(--gold); color: #000; border: none; box-shadow: 0 0 20px rgba(212,175,55,0.4); }
-        .btn-primary:hover { background: #fff; transform: translateY(-3px); box-shadow: 0 0 30px rgba(255,255,255,0.6); }
-        .btn-secondary { background: rgba(0,0,0,0.5); color: #fff; border: 1px solid #555; backdrop-filter: blur(5px); }
-        .btn-secondary:hover { border-color: #fff; background: rgba(255,255,255,0.1); transform: translateY(-3px); }
-        .hero-bottom-fade { position: absolute; bottom: 0; left: 0; width: 100%; height: 150px; background: linear-gradient(to top, var(--bg), transparent); z-index: 5; pointer-events: none; }
-        /* --- 2. NAVIGATION CARDS --- */
-        .nav-cards-section {
-            max-width: 1400px;
-            margin: -80px auto 60px auto; 
-            padding: 0 20px;
-            position: relative;
-            z-index: 20;
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 25px;
-        }
-        .nav-card {
-            position: relative;
-            height: 240px;
-            border: 1px solid rgba(255,255,255,0.05);
-            border-top: 1px solid rgba(212,175,55,0.3);
-            border-radius: 15px;
-            text-align: center;
-            text-decoration: none;
-            color: #fff;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
-            overflow: hidden;
-            background-size: cover;
-            background-position: center;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            background-color: rgba(0,0,0,0.6);
-        }
-        #card-treasury { background-image: url('https://i.ibb.co/TqNQrNx3/MARKET.png'); }
-        #card-history { background-image: url('https://i.ibb.co/N2t24Pht/FALLEN-HEROES.png'); }
-        #card-warzone { background-image: url('https://i.ibb.co/G3HdK5jw/PVPZONE.png'); }
-        #card-fame { background-image: url('https://i.ibb.co/RGpww9dy/HALLOFFAME.png'); }
-        .nav-card::before { 
-            content: ''; 
-            position: absolute; 
-            top: 0; left: 0; width: 100%; height: 100%; 
-            background: linear-gradient(to top, rgba(10, 12, 15, 0.95) 15%, rgba(10, 12, 15, 0.6) 100%);
-            z-index: 1; 
-            transition: 0.4s; 
-        }
-        .card-content-wrapper {
-            position: relative;
-            z-index: 2;
-            padding: 20px;
-            transform: translateY(35px); 
-            transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
-        }
-        .card-icon svg { 
-            width: 45px; height: 45px; 
-            margin-bottom: 15px; 
-            stroke: var(--gold);
-            filter: drop-shadow(0 0 8px rgba(212,175,55,0.4));
-            transition: 0.4s;
-        }
-        .card-title { 
-            font-family: 'Cinzel', serif; 
-            font-size: 1.1rem; 
-            color: var(--gold); 
-            margin: 0 0 10px 0; 
-            letter-spacing: 1px; 
-            font-weight: 700; 
-            text-shadow: 0 2px 4px rgba(0,0,0,0.9);
-        }
-        .card-desc { 
-            font-size: 0.8rem; 
-            color: #ddd; 
-            line-height: 1.5; 
-            margin: 0; 
-            opacity: 0; 
-            transform: translateY(20px);
-            transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
-        }
-        .nav-card:hover { transform: translateY(-10px); border-color: var(--gold); box-shadow: 0 0 30px rgba(212,175,55,0.3); }
-        .nav-card:hover::before { background: linear-gradient(to top, rgba(10, 12, 15, 0.9) 10%, rgba(10, 12, 15, 0.2) 100%); }
-        .nav-card:hover .card-content-wrapper { transform: translateY(0); }
-        .nav-card:hover .card-desc { opacity: 1; transform: translateY(0); }
-        .nav-card:hover .card-icon svg { transform: scale(1.1); stroke: #fff; }
-        /* --- 3. MAIN DASHBOARD CONTENT --- */
-        .dashboard-container { max-width: 1500px; margin: 0 auto; padding: 0 20px 50px 20px; z-index: 5; position: relative; }
-        .search-container { text-align: center; margin: 0 auto 50px auto; max-width: 600px; position: relative; z-index: 10;}
-        #global-search { 
-            width: 100%; padding: 18px 30px; font-family: 'Cinzel', serif; font-size: 1.1rem;
-            background: rgba(0,0,0,0.7); color: var(--gold); border: 2px solid #444;
-            border-radius: 30px; outline: none; text-align: center; transition: 0.3s;
-            box-sizing: border-box; backdrop-filter: blur(5px);
-        }
-        #global-search:focus { border-color: var(--gold); box-shadow: 0 0 25px rgba(212,175,55,0.3); background: rgba(0,0,0,0.9); }
-        .section-title-wrapper { text-align: center; margin-bottom: 30px; }
-        .section-title { color: #fff; font-family: 'Cinzel'; font-size: 2rem; margin: 0; letter-spacing: 3px; text-transform: uppercase; text-shadow: 0 5px 15px rgba(0,0,0,0.5); }
-        .section-line { width: 100px; height: 2px; background: var(--gold); margin: 10px auto; box-shadow: 0 0 10px var(--gold); }
-        .leaders-row { display: flex; justify-content: center; gap: 40px; margin-bottom: 40px; flex-wrap: wrap; }
-        .leader-card { text-align: center; cursor: pointer; width: 120px; transition: 0.3s; }
-        .leader-card:hover { transform: scale(1.05); }
-        .img-frame { width: 85px; height: 85px; margin: 0 auto; background: #000; border: 2px solid var(--gold); border-radius: 50%; overflow: hidden; box-shadow: 0 0 15px rgba(0,0,0,0.8);}
-        .leader-img { width: 100%; height: 100%; object-fit: contain; }
-        .leader-name { color: var(--gold); font-size: 0.85rem; font-family: 'Cinzel'; display: block; margin-top: 10px; font-weight: bold; }
-        .leader-role { color: #888; font-size: 0.65rem; text-transform: uppercase; display: block; }
-        .main-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 40px; }
-        .clan-column { background: rgba(15, 18, 22, 0.9); height: 750px; display: flex; flex-direction: column; border: 1px solid #333; border-radius: 10px; border-top: 3px solid var(--gold); backdrop-filter: blur(5px);}
-        .column-header { padding: 15px; text-align: center; font-family: 'Cinzel'; font-size: 1.1rem; border-bottom: 1px solid #222; display: flex; align-items: center; justify-content: center; gap: 12px; background: rgba(0,0,0,0.4); border-radius: 10px 10px 0 0;}
-        .scroll-area { overflow-y: auto; padding: 15px; flex-grow: 1; }
+        #cp-list-simple { max-height: 380px; overflow-y: auto; background: rgba(0,0,0,0.4); border: 1px solid #333; border-radius: 5px; padding: 5px; }
+        .detected-cp-row { background: #000; padding: 8px; margin: 4px 0; border-radius: 5px; border: 1px solid #333; }
+        .detected-cp-row input[type="checkbox"] { accent-color: var(--gold); cursor: pointer; }
         
-        .cp-box { margin-bottom: 10px; border-radius: 5px; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s; }
-        .cp-box.active .cp-content { display: block; }
-        .cp-noldor { border-left: 4px solid var(--noldor-sky); background: linear-gradient(90deg, rgba(0,217,255,0.05) 0%, rgba(0,0,0,0.5) 100%); }
-        .cp-krim { border-left: 4px solid var(--krim-red); background: linear-gradient(90deg, rgba(255,51,51,0.05) 0%, rgba(0,0,0,0.5) 100%); }
-        .cp-btn { width: 100%; background: none; border: none; padding: 14px 15px; color: #fff; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 0.9rem; }
-        .cp-content { display: none; background: rgba(0,0,0,0.8); padding: 15px; border-top: 1px solid #333; border-radius: 0 0 5px 5px;}
+        .boss-grid { display: grid; grid-template-columns: repeat(11, 1fr); gap: 6px; margin: 15px 0; }
+        .boss-btn { background: #111; border: 1px solid #444; padding: 10px 2px; text-align: center; cursor: pointer; border-radius: 6px; transition: 0.2s; }
+        .boss-btn:hover { border-color: var(--gold); background: #1a1a1a; }
+        .boss-btn img { width: 28px; display: block; margin: 0 auto 5px; }
+        .boss-btn span { font-size: 0.6rem; color: var(--gold); font-weight: bold; }
+        input[type="text"], input[type="number"], select, textarea { width: 100%; padding: 10px; margin: 5px 0; background: #000; color: #fff; border: 1px solid #444; border-radius: 4px; box-sizing: border-box; }
+        .btn { width: 100%; padding: 12px; border: none; border-radius: 4px; cursor: pointer; font-family: 'Cinzel'; font-weight: bold; margin-top: 10px; }
+        .btn-gold { background: var(--gold); color: #000; }
+        .btn-red { background: var(--red); color: #fff; }
+        .btn-blue { background: var(--blue); color: #fff; }
+        .btn-green { background: var(--green); color: #fff; }
+        .loot-table { width: 100%; border-collapse: collapse; }
+        .loot-table td { padding: 8px; border-bottom: 1px solid #222; font-size: 0.75rem; }
+        .stat-edit-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 15px; }
+        .stat-field { background: #111; padding: 8px; border-radius: 4px; text-align: center; border: 1px solid #333; }
+        .stat-field input { width: 50px; text-align: center; border-color: var(--gold); color: var(--gold); }
+        .filter-tabs { display: flex; gap: 5px; margin-bottom: 10px; }
+        .filter-btn { flex: 1; padding: 5px; font-size: 10px; cursor: pointer; background: #222; border: 1px solid #444; color: #888; font-family: 'Cinzel'; border-radius: 3px; }
+        .filter-btn.active { border-color: var(--gold); color: var(--gold); background: rgba(212,175,55,0.1); }
         
-        .roster-section { background: rgba(255,255,255,0.02); border: 1px solid #333; padding: 12px; border-radius: 5px; margin-bottom: 12px; font-size: 0.8rem; line-height: 1.6; }
-        .leader-item { color: var(--gold); font-weight: bold; font-size: 0.85rem; }
-        .member-click { color: #aaa; cursor: pointer; transition: 0.2s; }
-        .member-click:hover { color: var(--gold); }
+        .external-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px; align-items: start; }
+        #dropzone { border: 2px dashed #444; padding: 20px; text-align: center; background: rgba(0,0,0,0.4); border-radius: 8px; color: #888; margin-bottom: 15px; transition: 0.3s; cursor: pointer; }
+        #dropzone.dragover { border-color: var(--gold); background: rgba(212,175,55,0.1); color: var(--gold); }
+        .queue-item { background: #1a1a1a; border-left: 3px solid var(--blue); padding: 10px; margin-bottom: 10px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; }
+        .queue-item button { padding: 5px 10px; font-size: 10px; margin: 0 0 0 5px; width: auto; }
         
-        .loot-btn { width: 100%; background: rgba(212,175,55,0.1); border: 1px solid #444; color: var(--gold); padding: 10px; font-family: 'Cinzel'; font-size: 0.7rem; cursor: pointer; border-radius: 4px; margin-bottom: 10px; transition: 0.2s;}
-        .loot-btn:hover { background: var(--gold); color: #000; }
-        .loot-panel { display: none; padding: 12px; background: rgba(0,0,0,0.6); margin-bottom: 10px; border-radius: 4px; font-size: 0.75rem; border: 1px solid #222; color: #aaa; max-height: 200px; overflow-y: auto; }
+        #input-count { font-size: 14px; color: var(--bg); background: var(--gold); padding: 5px 12px; border-radius: 6px; font-family: 'Cinzel'; font-weight: bold; border: 1px solid #fff; }
         
-        .other-clans-section { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 20px; }
-        .new-clan-card { background: rgba(15, 18, 22, 0.9); border: 1px solid #333; border-top: 3px solid var(--gold); border-radius: 10px; padding: 25px; text-align: center; cursor: pointer; transition: 0.3s; backdrop-filter: blur(5px);}
-        .new-clan-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
-        .new-clan-icon { width: 60px; height: 60px; margin-bottom: 15px; }
-        .new-clan-name { display: block; font-family: 'Cinzel'; color: #fff; font-size: 1rem; font-weight: bold;}
-        /* MODALS */
-        #caller-modal, #cp-stats-modal, #member-stats-modal, #clan-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 420px; max-width: 90%; background: #0f1216; border: 2px solid var(--gold); border-radius: 15px; padding: 30px; z-index: 9999; text-align: center; box-shadow: 0 0 50px rgba(0,0,0,0.9); box-sizing: border-box;}
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9998; backdrop-filter: blur(8px); }
-        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 15px; }
-        .stat-box { background: #15181c; padding: 8px; border: 1px solid #333; text-align: center; border-radius: 4px; }
-        .boss-icon { width: 24px; height: 24px; margin-bottom: 5px; }
-        .stat-val { font-size: 0.85rem; color: #fff; font-family: 'Cinzel'; display: block; font-weight: bold;}
-        /* --- 4. DEVELOPER FOOTER & DISCORD BUTTON --- */
-        .developer-footer { text-align: center; padding: 30px 20px; background: rgba(0, 0, 0, 0.85); border-top: 1px solid rgba(212,175,55,0.2); font-family: 'Cinzel', serif; color: #888; font-size: 0.85rem; letter-spacing: 1px; position: relative; z-index: 5; margin-top: 40px; }
-        .dev-name { color: var(--gold); font-weight: bold; font-size: 1rem; }
-        .dev-contact { margin-top: 15px; font-size: 0.85rem; font-family: 'Open Sans', sans-serif; color: #aaa; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 10px;}
+        #mass-input { font-family: 'Open Sans', sans-serif; font-size: 15px; background: rgba(0,0,0,0.5); border: 2px dashed #444; color: var(--gold); line-height: 1.5; padding: 15px; }
         
-        .dev-discord-link {
-            display: inline-flex; align-items: center; gap: 8px;
-            color: #fff; background: rgba(88, 101, 242, 0.15); 
-            padding: 6px 15px; border-radius: 8px; font-family: monospace; font-size: 1rem;
-            border: 1px solid rgba(88, 101, 242, 0.5);
-            text-decoration: none; transition: 0.3s;
-        }
-        .dev-discord-link:hover {
-            background: rgba(88, 101, 242, 0.9); 
-            transform: translateY(-3px); box-shadow: 0 5px 15px rgba(88, 101, 242, 0.4);
-            border-color: #fff; color: #fff;
-        }
-        .discord-icon { width: 18px; height: 18px; fill: #fff; }
-        /* --- 5. MOBILE OPTIMIZATION (RESPONSIVE DESIGN) --- */
-        @media (max-width: 1024px) {
-            .nav-cards-section { grid-template-columns: repeat(2, 1fr); margin-top: -40px; }
-        }
-        @media (max-width: 768px) {
-            .header-controls { top: 10px; right: 10px; flex-direction: column; align-items: flex-end; gap: 5px;}
-            .control-btn { padding: 5px 10px; font-size: 0.65rem; }
-            
-            .hero-content { padding: 0 20px; text-align: center; margin: 0 auto; }
-            .hero-title { font-size: 2.5rem; }
-            .hero-subtitle { font-size: 0.9rem; }
-            .hero-description { font-size: 0.95rem; margin-bottom: 25px; text-align: justify;}
-            
-            .hero-buttons { flex-direction: column; width: 100%; gap: 10px; }
-            .btn-primary, .btn-secondary { width: 100%; padding: 12px 20px; box-sizing: border-box; }
-            
-            .nav-cards-section { grid-template-columns: 1fr; margin-top: -20px; }
-            .nav-card { height: 200px; }
-            
-            .main-wrapper { grid-template-columns: 1fr; }
-            .clan-column { height: 600px; }
-            
-            .section-title { font-size: 1.5rem; }
-            #global-search { font-size: 0.9rem; padding: 14px 20px; }
-            
-            #caller-modal, #cp-stats-modal, #member-stats-modal, #clan-modal { padding: 20px; }
-            
-            /* Footer adjustments for mobile */
-            .dev-contact { flex-direction: column; line-height: 1.6; }
-            .dev-discord-link { margin-top: 5px; }
-        }
+        #pending-queue-list { max-height: 350px; overflow-y: auto; padding-right: 5px; }
     </style>
 </head>
 <body>
-    <div class="header-controls">
-        <div class="control-btn" onclick="toggleMusic(event)"><span id="music-icon">🔇</span> <span id="track-name">DION THEME</span></div>
-        <div class="control-btn" onclick="nextTrack(event)">⏭ NEXT</div>
-        <div class="control-btn" id="clock" style="cursor:default;">SERVER TIME: 00:00:00 UTC</div>
+    <div class="header-container">
+        <div style="width:80px"></div> <h1>BMA COMMAND CENTER V22.3</h1>
+        <button class="logout-btn" onclick="logout()">LOGOUT</button>
     </div>
-    <audio id="bg-music" loop><source id="music-source" src="https://www.dropbox.com/scl/fi/ypzqrr336iewt62gncy6u/Lineage-2-Dion-Theme-Song.mp3?rlkey=nl1quliuqleuljgkt5jhqq6hh&st=sb8ij16g&raw=1" type="audio/mpeg"></audio>
-    <div class="modal-overlay" id="overlay" onclick="closeModal()"></div>
-    <div id="caller-modal">
-        <img id="modal-img" src="" style="width:90px; height:90px; border-radius:50%; border:2px solid var(--gold); background:#000; margin-bottom:15px;">
-        <h2 id="modal-name" style="font-family:'Cinzel'; color:var(--gold); margin:0;"></h2>
-        <p id="modal-title" style="color:#888; font-size:0.7rem; margin-bottom:20px; text-transform:uppercase;"></p>
-        <button class="loot-btn" onclick="toggleLeaderLoot()">VIEW LOOT HISTORY</button>
-        <div id="leader-loot-panel" class="loot-panel" style="display:none; text-align:left;">No history found.</div>
-        <button class="loot-btn" id="caller-attendance-btn" style="display:none;">VIEW ATTENDANCES</button>
-        <button onclick="closeModal()" style="margin-top:20px; background:var(--gold); color:#000; border:none; padding:12px; cursor:pointer; font-weight:bold; border-radius:4px; width: 100%; font-family:'Cinzel';">CLOSE</button>
-    </div>
-    <div id="cp-stats-modal">
-        <h2 id="cp-stats-name" style="font-family:'Cinzel'; color:var(--gold); margin:0 0 20px 0; font-size:1.4rem;"></h2>
-        <div class="stat-grid" id="cp-stats-grid"></div>
-        <button onclick="closeModal()" style="margin-top:20px; background:var(--gold); color:#000; border:none; padding:12px; cursor:pointer; font-weight:bold; border-radius:4px; width: 100%; font-family:'Cinzel';">CLOSE</button>
-    </div>
-    <div id="member-stats-modal">
-        <h2 id="member-stats-name" style="font-family:'Cinzel'; color:var(--gold); margin:0 0 5px 0; font-size:1.4rem;"></h2>
-        <p style="color:#888; font-size:0.75rem; margin-bottom:20px; letter-spacing:1px;">PERSONAL ATTENDANCES</p>
-        <div class="stat-grid" id="member-stats-grid"></div>
-        <button onclick="closeModal()" style="margin-top:20px; background:var(--gold); color:#000; border:none; padding:12px; cursor:pointer; font-weight:bold; border-radius:4px; width: 100%; font-family:'Cinzel';">CLOSE</button>
-    </div>
-    <div id="clan-modal">
-        <img id="clan-modal-img" src="" style="width:90px; height:90px; border-radius:10px; border:2px solid var(--gold); background:rgba(0,0,0,0.6); margin-bottom:15px; object-fit:contain; padding:5px;">
-        <h2 id="clan-modal-name" style="font-family:'Cinzel'; color:var(--gold); margin:0 0 15px 0; font-size:1.4rem;"></h2>
-        <div id="clan-modal-content"></div>
-        <button onclick="closeModal()" style="margin-top:15px; background:var(--gold); color:#000; border:none; padding:12px; cursor:pointer; font-weight:bold; border-radius:4px; width: 100%; font-family:'Cinzel';">CLOSE</button>
-    </div>
-    <header class="hero-section">
-        <div class="hero-content">
-            <div class="hero-subtitle">Interlude | Elite Alliance</div>
-            <h1 class="hero-title">BROKEN MIRROR<br>ALLIANCE</h1>
-            <p class="hero-description">
-                Dominance, Unity, and the pursuit of ultimate power. The new era of the BMA Command Center is here. Explore the treasury, track our conquests, and write your name in the Hall of Fame.
-            </p>
-            <div class="hero-buttons">
-                <a href="#data-hub" class="btn-primary">EXPLORE DATA</a>
-                <a href="halloffame.html" class="btn-secondary">VIEW THE LEGENDS</a>
+    <div class="layout">
+        <div class="panel">
+            <h2 style="margin-top:0;">CP / SHOT CALLERS LIST</h2>
+            <div class="filter-tabs">
+                <button class="filter-btn active" id="btn-active" onclick="setViewMode('active')">ACTIVE</button>
+                <button class="filter-btn" id="btn-history" onclick="setViewMode('history')">HISTORY</button>
+                <button class="filter-btn" style="background: rgba(40, 167, 69, 0.2); color: var(--green); border-color: var(--green);" onclick="exportToExcel()">📥 EXCEL</button>
+            </div>
+            <div id="cp-list-simple"></div>
+            
+            <hr style="border-color:#333; margin: 15px 0;">
+            <h3>NEW CP / SHOT CALLER</h3>
+            <input type="text" id="new-name" placeholder="Name (π.χ. ANIMALS ή NIKLAUS)">
+            <input type="text" id="new-leader" placeholder="Leader (ή Role, π.χ. ALLY LEADER)">
+            <input type="text" id="new-imgUrl" placeholder="Image URL (Μόνο για Shot Callers)">
+            <select id="new-clan" onchange="toggleNewCallerMultiplier()">
+                <option value="noldor">Noldor</option>
+                <option value="kriminalides">Kriminalides</option>
+                <option value="caller">Shot Caller (π.χ. TSAKNORRIS - Στρογγυλό εικονίδιο)</option>
+                <option value="external">External Clan</option>
+            </select>
+            <div id="new-caller-multiplier-row" style="display:none; background: rgba(212,175,55,0.1); border: 1px solid var(--gold); border-radius: 4px; padding: 10px; margin: 5px 0;">
+                <label style="color:var(--gold); font-size:11px; font-family:'Cinzel'; display:block; margin-bottom:5px;">⚡ CALLER MULTIPLIER</label>
+                <select id="new-caller-multiplier" style="width:100%; margin:0;">
+                    <option value="1">x1 — Standard</option>
+                    <option value="2">x2 — Double</option>
+                    <option value="3" selected>x3 — Triple (Default)</option>
+                    <option value="4">x4 — Quad</option>
+                    <option value="5">x5 — Penta</option>
+                </select>
+            </div>
+            <button class="btn btn-gold" onclick="createNewCP()">REGISTER</button>
+            <hr style="border-color:#333; margin: 15px 0;">
+            <h3 style="color:var(--blue);">MIGRATE / RENAME</h3>
+            <input type="text" id="old-player-name" placeholder="Παλιό Όνομα">
+            <input type="text" id="new-player-name" placeholder="Νέο Όνομα">
+            <button class="btn btn-blue" onclick="migratePlayerLogs()">MIGRATE & RENAME</button>
+            <hr style="border-color:#333; margin: 15px 0;">
+            <h3 style="color:var(--green);">MOVE MEMBER TO CP</h3>
+            <input type="text" id="move-player-name" placeholder="Όνομα Παίκτη">
+            <select id="move-target-cp">
+                <option value="">-- Επίλεξε Νέο CP --</option>
+            </select>
+            <button class="btn btn-green" onclick="movePlayerToCP()">MOVE MEMBER</button>
+        </div>
+        <div class="panel">
+            <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <h2 style="margin:0; color:var(--gold);">1. LOG EVENT (MEMBER-BOSS LOCK)</h2>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <label style="display:flex; align-items:center; gap:5px; color:#ff4444; font-size:11px; font-weight:bold; cursor:pointer; background:rgba(255,68,68,0.1); padding:4px 8px; border-radius:4px; border:1px solid #ff4444;" title="Απενεργοποίηση προστασίας 12 ωρών (επιτρέπει διπλά log για το ίδιο boss)">
+                        <input type="checkbox" id="disable-protection-cb" style="width:14px; height:14px; margin:0; accent-color:#ff4444;">
+                        DISABLE 12H LOCK
+                    </label>
+                    <span id="input-count">0 NAMES</span>
+                    <button id="undo-btn" class="btn btn-red" style="display:none; width:auto; padding: 5px 15px; margin: 0; font-size: 10px;" onclick="undoLastAction()">↩ UNDO LAST</button>
+                </div>
+            </div>
+            <div id="pending-queue-container" style="display:none; margin-bottom: 15px; padding: 10px; border: 1px solid var(--blue); background: rgba(52, 152, 219, 0.1); border-radius: 5px;">
+                <h3 style="color:var(--blue); margin: 0 0 10px 0;">📥 INBOX: Discord Bot & Desktop Scans</h3>
+                <div id="pending-queue-list"></div>
+            </div>
+            
+            <div id="dropzone">
+                <div style="font-size: 2rem; margin-bottom: 5px;">📂</div>
+                <b>DRAG & DROP Η ΚΑΝΕ PASTE (CTRL+V) ΤΙΣ ΕΙΚΟΝΕΣ ΕΔΩ</b><br>
+                <span style="font-size: 10px;">Αν έκοψες εικόνα με Win+Shift+S, απλά πάτα Ctrl+V οπουδήποτε στη σελίδα!</span>
+                <input type="file" id="file-input" multiple accept="image/*" style="display:none;">
+            </div>
+            <div id="ocr-loading" style="display:none; text-align:center; color:var(--sky); font-weight:bold; font-family:'Cinzel'; margin-bottom:10px;">
+                ⏳ Η Google αναλύει την εικόνα... Περίμενε!
+            </div>
+            <textarea id="mass-input" rows="3" placeholder="Τα ονόματα θα εμφανιστούν εδώ με κενά..." oninput="analyzeAttendance()"></textarea>
+            
+            <div id="detected-list"></div>
+            <div id="unmatched-list"></div>
+            <div class="boss-grid">
+                <div class="boss-btn" onclick="logValidatedEvent('VAL', 3)"><img src="https://i.ibb.co/84gZPVRP/necklace-valakas.png"><span>VAL</span></div>
+                <div class="boss-btn" onclick="logValidatedEvent('ANT', 3)"><img src="https://i.ibb.co/rfqvc6mv/earring-antharas.png"><span>ANT</span></div>
+                <div class="boss-btn" onclick="logValidatedEvent('BAI', 2)"><img src="https://i.ibb.co/XrZkv67h/ring-of-baium.png"><span>BAI</span></div>
+                <div class="boss-btn" onclick="logValidatedEvent('SIE', 3)"><img src="https://i.ibb.co/Txfby6wD/images.png"><span>SIEGE</span></div>
+                <div class="boss-btn" onclick="logValidatedEvent('ZAK', 1)"><img src="https://i.ibb.co/spkC6Gzz/zaken-earring.png"><span>ZAK</span></div>
+                <div class="boss-btn" onclick="logValidatedEvent('FRI', 1)"><img src="https://i.ibb.co/gF4YKGTM/frintezza-necklace.png"><span>FRIN</span></div>
+                <div class="boss-btn" onclick="logValidatedEvent('AQ', 1)"><img src="https://i.ibb.co/rKRtZmBG/ring-of-queen-ant.png"><span>AQ</span></div>
+                <div class="boss-btn" onclick="logValidatedEvent('ORF', 1)"><img src="https://i.ibb.co/j9dDnXwH/earring-orfen.png"><span>ORF</span></div>
+                <div class="boss-btn" onclick="logValidatedEvent('COR', 1)"><img src="https://i.ibb.co/ksv37fNZ/ring-of-.png"><span>CORE</span></div>
+                <div class="boss-btn" onclick="logValidatedEvent('DPVP', 3)"><img src="https://i.ibb.co/G3HdK5jw/PVPZONE.png" style="border-radius: 15px;"><span>D. PVP</span></div>
+                <div class="boss-btn" onclick="addNamesToSlotsManager()" style="border-color: var(--green);"><div style="font-size:24px; margin-bottom:5px;">📋</div><span style="color:var(--green);">SLOTS</span></div>
+            </div>
+            <!-- New Control Bar for Slots Manager -->
+            <div id="slots-controls" style="display:flex; justify-content: space-between; align-items: center; background: rgba(40, 167, 69, 0.1); border: 1px dashed var(--green); padding: 10px; border-radius: 5px; margin-bottom: 15px;">
+                <div style="color:var(--green); font-family:'Cinzel'; font-weight:bold;">
+                    📊 CLAN SLOTS: <span id="slots-counter" style="color:#fff; font-size:16px;">0</span> NAMES SAVED
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <button class="btn btn-green" style="margin:0; width:auto; padding: 8px 15px;" onclick="generateSlotsExcel()">GENERATE EXCEL</button>
+                    <button class="btn btn-red" style="margin:0; width:auto; padding: 8px 15px;" onclick="resetSlotsManager()">RESET</button>
+                </div>
+            </div>
+            <div id="edit-section" style="display:none; border-top:2px solid var(--gold); padding-top:20px; margin-top:20px;">
+                <div style="display:flex; gap:10px; margin-bottom:10px;">
+                    <div style="flex:1;"><label style="color:#aaa; font-size:11px;">Name</label><input type="text" id="edit-cp-name" style="font-family:'Cinzel'; color:var(--gold); font-size:1.1rem;"></div>
+                    <div style="flex:1;"><label style="color:#aaa; font-size:11px;">Leader / Role</label><input type="text" id="edit-cp-leader" style="font-family:'Cinzel';"></div>
+                </div>
+                <div style="margin-bottom:15px;"><label style="color:#aaa; font-size:11px;">Image URL (Μόνο για Shot Callers)</label><input type="text" id="edit-cp-imgUrl" placeholder="https://..."></div>
+                <div id="edit-caller-multiplier-row" style="display:none; background: rgba(212,175,55,0.1); border: 1px solid var(--gold); border-radius: 4px; padding: 10px; margin-bottom:15px;">
+                    <label style="color:var(--gold); font-size:11px; font-family:'Cinzel'; display:block; margin-bottom:5px;">⚡ CALLER MULTIPLIER</label>
+                    <select id="edit-caller-multiplier" style="width:100%; margin:0;" onchange="updateCallerPoints()">
+                        <option value="1">x1 — Standard</option>
+                        <option value="2">x2 — Double</option>
+                        <option value="3">x3 — Triple</option>
+                        <option value="4">x4 — Quad</option>
+                        <option value="5">x5 — Penta</option>
+                    </select>
+                </div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:25px;">
+                    <div>
+                        <label style="color:#aaa; font-size:11px;">Roster</label>
+                        <textarea id="edit-members" rows="8"></textarea>
+                        <h3 style="color:var(--gold);">LOOT HISTORY</h3>
+                        <div style="max-height: 150px; overflow-y: auto; background: #000; border: 1px solid #333;"><table class="loot-table" id="loot-history-table"><tbody id="loot-history-body"></tbody></table></div>
+                    </div>
+                    <div>
+                        <h3 style="color:var(--red); margin:0;">MARKETPLACE</h3>
+                        <select id="loot-market">
+                            <option value="2500|Valakas Necklace">Valakas Necklace (2500)</option>
+                            <option value="1100|Antharas Earring">Antharas Earring (1100)</option>
+                            <option value="950|Baium Ring">Baium Ring (950)</option>
+                            <option value="225|Frintezza Necklace">Frintezza Necklace (225)</option>
+                            <option value="175|Zaken Earring">Zaken Earring (175)</option>
+                            <option value="150|Queen Ant Ring">Queen Ant Ring (150)</option>
+                            <option value="75|Orfen Earring">Orfen Earring (75)</option>
+                            <option value="25|Core Ring">Core Ring (25)</option>
+                        </select>
+                        <button class="btn btn-red" onclick="addMarketLoot()">BUY ITEM</button>
+                        
+                        <label style="display:block; margin-top:20px; color:#aaa; font-size:11px;">Total Points</label>
+                        <input type="number" id="edit-points" style="font-size:1.2rem; color:var(--gold);">
+                        
+                        <div class="stat-edit-grid" id="stat-inputs"></div>
+                        <div style="display:flex; gap:10px; margin-top:20px;">
+                            <button class="btn btn-gold" style="flex:2;" onclick="updateCP()">SAVE ALL DATA</button>
+                            <select id="edit-cp-clan" style="flex:1; margin:0; padding: 10px; background: #007bff; color: #fff; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; text-align: center; font-family: 'Cinzel';" onchange="quickChangeClan(this.value)">
+                            </select>
+                            <button class="btn" id="hist-toggle-btn" onclick="toggleHistoryStatus()">HIST</button>
+                            <button class="btn btn-red" onclick="deleteCP()">DEL</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="hero-bottom-fade"></div>
-    </header>
-    <section class="nav-cards-section">
-        <a href="market.html" class="nav-card" id="card-treasury">
-            <div class="card-content-wrapper">
-                <div class="card-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
-                </div>
-                <h3 class="card-title">ALLIANCE TREASURY</h3>
-                <p class="card-desc">Loot rules, Point Policies & the official BMA Marketplace.</p>
+    </div>
+    
+    <div style="max-width: 1400px; margin: 20px auto;">
+        
+        <div class="panel" style="margin-bottom: 20px; border-top: 3px solid #00d9ff;">
+            <h2 style="color:#00d9ff; margin-top:0;">INTERNAL CLANS MANAGER</h2>
+            <div style="display:flex; gap:10px; padding: 15px; background: #000; border: 1px dashed #444; border-radius: 5px; margin-bottom: 15px;">
+                <input type="text" id="new-int-name" placeholder="New Clan Name (π.χ. SPARTANS)" style="flex:1; margin:0;">
+                <input type="color" id="new-int-color" value="#ffffff" style="width: 50px; padding:0; height:40px; cursor:pointer;" title="Clan Color">
+                <input type="text" id="new-int-icon" placeholder="Icon Image URL" style="flex:1; margin:0;">
+                <button class="btn btn-blue" style="margin:0; width:auto; padding:0 20px; background:#00d9ff; color:#000;" onclick="createIntClan()">ADD INTERNAL CLAN</button>
             </div>
-        </a>
-        <a href="history.html" class="nav-card" id="card-history">
-            <div class="card-content-wrapper">
-                <div class="card-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-                </div>
-                <h3 class="card-title">HALL OF RECORDS</h3>
-                <p class="card-desc">Consult the archives. Fallen heroes and legacy leavers.</p>
+            
+            <div id="internal-clans-list" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px;">
+                <!-- Internal clans populated here -->
             </div>
-        </a>
-        <a href="pvpzone.html" class="nav-card" id="card-warzone">
-            <div class="card-content-wrapper">
-                <div class="card-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                </div>
-                <h3 class="card-title">WAR ZONE</h3>
-                <p class="card-desc">Live PVP Logs and combat statistics from the battlefield.</p>
-            </div>
-        </a>
-        <a href="halloffame.html" class="nav-card" id="card-fame">
-            <div class="card-content-wrapper">
-                <div class="card-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="2 20 22 20 19 6 15 13 12 4 9 13 5 6 2 20"></polygon></svg>
-                </div>
-                <h3 class="card-title">HALL OF FAME</h3>
-                <p class="card-desc">The Immortals. Weekly Warlords and Alliance rankings.</p>
-            </div>
-        </a>
-    </section>
-    <div id="data-hub" class="dashboard-container">
-        <div class="section-title-wrapper">
-            <h2 class="section-title">INTELLIGENCE NETWORK</h2>
-            <div class="section-line"></div>
-        </div>
-        <div class="search-container">
-            <input type="text" id="global-search" placeholder="🔍 Αναζήτηση Member, CP, ή Epic Jewel..." oninput="updateUI()">
-        </div>
-        <div class="leaders-row" id="dynamic-leaders"></div>
-        <div class="main-wrapper" id="dynamic-internal-clans">
         </div>
         
-        <div class="section-title-wrapper" style="margin-top: 50px;">
-            <h2 class="section-title">ALLIANCE PACTS</h2>
-            <div class="section-line"></div>
-        </div>
-        <div class="other-clans-section" id="dynamic-external-clans"></div>
-    </div>
-    <footer class="developer-footer">
-        <div>Designed & Developed by <span class="dev-name">MrUndisputed</span></div>
-        <div class="dev-contact">
-            Looking for a custom web project? Contact me:
-            <a href="https://discordapp.com/users/398924786895683585" target="_blank" class="dev-discord-link" title="Click to view my Discord profile">
-                <svg class="discord-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 127.14 96.36">
-                    <path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77.13,77.13,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.31,60,73.31,53s5-12.74,11.43-12.74S96.3,46,96.19,53,91.13,65.69,84.69,65.69Z"/>
-                </svg>
-                mrundisputedgiwrgos
-            </a>
-        </div>
-    </footer>
-    <script>
-        const firebaseConfig = { apiKey: "AIzaSyDRL8EehxdcgVYJ0LJ1khVYkSJcaCMKRes", authDomain: "brokenmirrordb.firebaseapp.com", databaseURL: "https://brokenmirrordb-default-rtdb.europe-west1.firebasedatabase.app", projectId: "brokenmirrordb" };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-        const bossIcons = { "VAL": "https://i.ibb.co/84gZPVRP/necklace-valakas.png", "ANT": "https://i.ibb.co/rfqvc6mv/earring-antharas.png", "BAI": "https://i.ibb.co/XrZkv67h/ring-of-baium.png", "FRI": "https://i.ibb.co/gF4YKGTM/frintezza-necklace.png", "ZAK": "https://i.ibb.co/spkC6Gzz/zaken-earring.png", "AQ":  "https://i.ibb.co/rKRtZmBG/ring-of-queen-ant.png", "ORF": "https://i.ibb.co/j9dDnXwH/earring-orfen.png", "COR": "https://i.ibb.co/ksv37fNZ/ring-of-.png", "SIE": "https://i.ibb.co/Txfby6wD/images.png", "DPVP": "https://i.ibb.co/G3HdK5jw/PVPZONE.png" };
-        let globalCPData = {}; 
-        let globalExternalClans = {}; 
-        let globalInternalClans = {};
-        let globalDailyLogs = {};
-        // *** FIX: New global to hold archived totals ***
-        let globalArchive = {};
-        function getSafeName(name) {
-            return name.replace(/[.#$\[\]]/g, '_');
-        }
-        function getIconForLoot(itemName) {
-            if(!itemName) return "https://i.ibb.co/SXM1FZx8/attedance-points.png";
-            const upName = itemName.toUpperCase();
-            if(upName.includes("VAL")) return bossIcons.VAL;
-            if(upName.includes("QUEEN") || upName.includes("AQ")) return bossIcons.AQ;
-            if(upName.includes("ANT")) return bossIcons.ANT; 
-            if(upName.includes("BAI")) return bossIcons.BAI;
-            if(upName.includes("FRI")) return bossIcons.FRI;
-            if(upName.includes("ZAK")) return bossIcons.ZAK;
-            if(upName.includes("ORF")) return bossIcons.ORF;
-            if(upName.includes("COR")) return bossIcons.COR;
-            return "https://i.ibb.co/SXM1FZx8/attedance-points.png"; 
-        }
-        db.ref('cps/').on('value', (snapshot) => {
-            globalCPData = snapshot.val() || {}; 
-            updateUI();
-        });
-        db.ref('externalClans/').on('value', (snapshot) => {
-            globalExternalClans = snapshot.val() || {};
-            updateUI();
-        });
-        db.ref('internalClans/').on('value', (snapshot) => {
-            let data = snapshot.val() || {};
-            let defaults = {
-                noldor: { name: "NOLDOR CLAN", color: "#00d9ff", iconUrl: "https://i.ibb.co/8LvFNQkC/noldor.png" },
-                kriminalides: { name: "KRIMINALIDES CLAN", color: "#ff3333", iconUrl: "https://i.ibb.co/VYMZjzYr/kriminalides.png" }
-            };
-            globalInternalClans = {...defaults, ...data};
-            updateUI();
-        });
-        db.ref('dailyLogs/').on('value', (snapshot) => {
-            globalDailyLogs = snapshot.val() || {};
-            updateUI();
-        });
-        // *** FIX: Listen to archive/players/ and merge into attendance totals ***
-        db.ref('archive/players/').on('value', (snapshot) => {
-            globalArchive = snapshot.val() || {};
-            updateUI();
-        });
-        function updateUI() {
-            const query = document.getElementById('global-search').value.toLowerCase().trim();
-            
-            // Generate Internal Clan Columns
-            const mainWrapper = document.getElementById('dynamic-internal-clans');
-            let columnsHtml = "";
-            let listsHtmlContent = {};
-            Object.keys(globalInternalClans).forEach(clanId => {
-                const clan = globalInternalClans[clanId];
-                listsHtmlContent[clanId] = "";
-                columnsHtml += `
-                    <div class="clan-column">
-                        <div class="column-header" style="color:${clan.color || '#fff'}"><img src="${clan.iconUrl || 'https://i.ibb.co/SXM1FZx8/attedance-points.png'}" style="width:25px;"> ${clan.name || clanId.toUpperCase()}</div>
-                        <div class="scroll-area" id="list-${clanId}"></div>
-                    </div>
-                `;
-            });
-            mainWrapper.innerHTML = columnsHtml;
-            let dynamicLeadersHtml = ""; 
-            // ΒΗΜΑ 1: Υπολογισμός "Activity" (Attendances) από τα dailyLogs
-            let attendanceMap = {};
-            Object.values(globalDailyLogs).forEach(dayData => {
-                Object.keys(dayData).forEach(safeName => {
-                    let count = Object.keys(dayData[safeName]).length;
-                    let upperName = safeName.toUpperCase();
-                    attendanceMap[upperName] = (attendanceMap[upperName] || 0) + count;
-                });
-            });
-            // *** FIX: Add archived totals on top of current month logs ***
-            // archive/ is a flat map of { safeName: totalCount }
-            Object.keys(globalArchive).forEach(safeName => {
-                let upperName = safeName.toUpperCase();
-                attendanceMap[upperName] = (attendanceMap[upperName] || 0) + globalArchive[safeName];
-            });
-            const sortedIDs = Object.keys(globalCPData).sort((a,b) => (globalCPData[b].totalPoints || 0) - (globalCPData[a].totalPoints || 0));
-            
-            sortedIDs.forEach(id => {
-                const cp = globalCPData[id];
-                if(cp.clan === 'history') return;
-                let match = false;
-                if (!query) {
-                    match = true;
-                } else {
-                    const lootItems = cp.lootHistory ? cp.lootHistory.map(l => l.item).join(" ") : "";
-                    const searchStr = `${cp.name || ""} ${cp.leader || ""} ${cp.members || ""} ${lootItems}`.toLowerCase();
-                    match = searchStr.includes(query);
-                }
-                if (!match) return;
-                if(cp.clan === 'caller') {
-                    const role = cp.leader || "CALLER";
-                    const img = cp.imgUrl || "https://i.ibb.co/SXM1FZx8/attedance-points.png";
-                    dynamicLeadersHtml += `
-                        <div class="leader-card" onclick="openCaller('${id}', '${role}', '${img}')">
-                            <div class="img-frame"><img src="${img}" class="leader-img"></div>
-                            <span class="leader-name">${cp.name.toUpperCase()}</span>
-                            <span class="leader-role">${role}</span>
-                        </div>`;
-                    return; 
-                }
-                let internalClanData = globalInternalClans[cp.clan];
-                let clanColor = internalClanData ? internalClanData.color : '#fff';
-                let lootHtml = "No history found.";
-                if(cp.lootHistory && cp.lootHistory.length > 0) {
-                    lootHtml = cp.lootHistory.map(l => `
-                        <div style="display:flex; align-items:center; gap:8px; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
-                            <img src="${getIconForLoot(l.item)}" style="width:18px; height:18px; object-fit:contain;">
-                            <span style="color:#888; font-size:0.7rem;">${l.date}</span>
-                            <span style="color:#ddd; flex-grow:1; text-align:left;">${l.item}</span>
-                            <span style="color:#ff4444; font-family:'Cinzel'; font-weight:bold;">-${l.cost}</span>
+        <div class="panel" style="margin-bottom: 20px;">
+            <h2 style="color:var(--blue); margin-top:0;">EXTERNAL CLANS & CALLERS MANAGER</h2>
+            <div style="display:flex; gap:10px; padding: 15px; background: #000; border: 1px dashed #444; border-radius: 5px; margin-bottom: 15px;">
+                <input type="text" id="new-ext-name" placeholder="New Clan Name" style="flex:1; margin:0;">
+                <input type="text" id="new-ext-icon" placeholder="Icon Image URL" style="flex:1; margin:0;">
+                <button class="btn btn-gold" style="margin:0; width:auto; padding:0 20px;" onclick="createExtClan()">ADD CLAN</button>
+            </div>
+            <div style="display:flex; gap:10px; margin-bottom: 15px;">
+                <select id="ext-select" style="flex:1; font-family:'Cinzel';" onchange="loadExtEdit()"><option value="">-- Επιλογή Clan / Caller --</option></select>
+            </div>
+            <div id="ext-edit-section" style="display:none;" class="external-grid">
+                <div>
+                    <div style="display:flex; gap:10px; margin-bottom:10px;">
+                        <div style="flex:1;">
+                            <label style="color:#aaa; font-size:11px;">Clan / Caller Name</label>
+                            <input type="text" id="ext-name" style="font-family:'Cinzel'; color:var(--gold); font-size:1.1rem;">
                         </div>
-                    `).join('');
-                }
-                let membersHtml = 'Roster pending...';
-                if (cp.members) {
-                    let memberArray = cp.members.split(',').map(m => m.trim()).filter(m => m !== '');
+                        <div style="flex:1;">
+                            <label style="color:#aaa; font-size:11px;">Leader Name / Roster</label>
+                            <input type="text" id="ext-leader" style="font-family:'Cinzel';">
+                        </div>
+                    </div>
                     
-                    // Sort roster by total attendance (archive + dailyLogs combined)
-                    memberArray.sort((a, b) => {
-                        let scoreA = attendanceMap[getSafeName(a).toUpperCase()] || 0;
-                        let scoreB = attendanceMap[getSafeName(b).toUpperCase()] || 0;
-                        return scoreB - scoreA;
-                    });
-                    // Build HTML with total attendance in tooltip
-                    membersHtml = memberArray.map(mName => {
-                        let score = attendanceMap[getSafeName(mName).toUpperCase()] || 0;
-                        return `<span class="member-click" onclick="openMemberStats('${mName}')" title="Attendances: ${score}">${mName}</span>`;
-                    }).join(', ');
-                }
-                let leaderHtml = 'Pending...';
-                if (cp.leader) {
-                    let lName = cp.leader.trim();
-                    let leaderScore = attendanceMap[getSafeName(lName).toUpperCase()] || 0;
-                    leaderHtml = `<span class="member-click" onclick="openMemberStats('${lName}')" title="Attendances: ${leaderScore}">${lName}</span>`;
-                }
-                const activeClass = (query && match) ? 'active' : '';
-                const html = `
-                    <div class="cp-box ${activeClass}" style="border-left: 4px solid ${clanColor}; background: linear-gradient(90deg, ${clanColor}11 0%, rgba(0,0,0,0.5) 100%);">
-                        <button class="cp-btn" onclick="this.parentElement.classList.toggle('active')">
-                            <span>${cp.name}</span><span style="color:var(--gold); font-size:0.75rem;">${cp.totalPoints || 0} PTS</span>
-                        </button>
-                        <div class="cp-content">
-                            <div class="roster-section">
-                                <span class="leader-item">👑 ${leaderHtml}</span><br>
-                                <span style="color:#888;">Members: ${membersHtml}</span>
-                            </div>
-                            <button class="loot-btn" onclick="const p=this.nextElementSibling; p.style.display=p.style.display==='block'?'none':'block';">VIEW LOOT HISTORY</button>
-                            <div class="loot-panel" style="${(query && match && cp.lootHistory && cp.lootHistory.some(l => l.item.toLowerCase().includes(query))) ? 'display:block;' : ''}">${lootHtml}</div>
-                            <button class="loot-btn" onclick="openCpStats('${id}')">VIEW CP ATTENDANCES</button>
-                        </div>
-                    </div>`;
-                if(internalClanData) {
-                    listsHtmlContent[cp.clan] += html;
-                }
-            });
-            // Populate the lists after building HTML
-            Object.keys(globalInternalClans).forEach(clanId => {
-                const listEl = document.getElementById(`list-${clanId}`);
-                if(listEl) listEl.innerHTML = listsHtmlContent[clanId];
-            });
-            document.getElementById('dynamic-leaders').innerHTML = dynamicLeadersHtml;
-            let extHtml = "";
-            Object.keys(globalExternalClans).forEach(clanId => {
-                const clan = globalExternalClans[clanId];
-                if(clan.status === 'history') return; 
-                
-                let match = false;
-                if (!query) {
-                    match = true;
-                } else {
-                    const lootItems = clan.lootHistory ? clan.lootHistory.map(l => l.item).join(" ") : "";
-                    const searchStr = `${clan.name || clanId} ${clan.leader || ""} ${lootItems}`.toLowerCase();
-                    match = searchStr.includes(query);
-                }
-                if (!match) return;
-                const cName = clan.name || clanId;
-                const icon = clan.iconUrl || 'https://i.ibb.co/SXM1FZx8/attedance-points.png';
-                
-                extHtml += `
-                    <div class="new-clan-card" onclick="openClanModal('${clanId}')">
-                        <img src="${icon}" class="new-clan-icon">
-                        <span class="new-clan-name">${cName}</span>
+                    <div id="ext-icon-container"><label style="display:block; margin-top:10px; color:#aaa; font-size:11px;">Image URL</label><input type="text" id="ext-icon" placeholder="https://..."></div>
+                    <div id="ext-desc-container">
+                        <label style="display:block; margin-top:10px; color:#aaa; font-size:11px;">Agreements / Description</label>
+                        <textarea id="ext-description" rows="6" style="font-family: monospace; font-size:11px;"></textarea>
                     </div>
-                `;
+                    <label style="display:block; margin-top:10px; color:#aaa; font-size:11px;">Total Points</label>
+                    <input type="number" id="ext-points" style="font-size:1.2rem; color:var(--gold);">
+                    <div id="ext-stat-inputs" class="stat-edit-grid" style="margin-top: 15px;"></div>
+                    <div style="display:flex; gap:10px; margin-top:20px;">
+                        <button class="btn btn-gold" style="flex:2;" onclick="updateExtData()">SAVE DATA</button>
+                        <button class="btn btn-blue" id="ext-transfer-btn" onclick="transferExtToCP()" style="display:none; padding:12px 5px; font-size:11px;">TO CP</button>
+                        <button class="btn" id="ext-hist-btn" onclick="toggleExtHistory()">HIST</button>
+                    </div>
+                </div>
+                <div>
+                    <h3 style="color:var(--red); margin:0;">MARKETPLACE</h3>
+                    <select id="ext-loot-market">
+                        <option value="2500|Valakas Necklace">Valakas Necklace (2500)</option>
+                        <option value="1100|Antharas Earring">Antharas Earring (1100)</option>
+                        <option value="950|Baium Ring">Baium Ring (950)</option>
+                        <option value="225|Frintezza Necklace">Frintezza Necklace (225)</option>
+                        <option value="175|Zaken Earring">Zaken Earring (175)</option>
+                        <option value="150|Queen Ant Ring">Queen Ant Ring (150)</option>
+                        <option value="75|Orfen Earring">Orfen Earring (75)</option>
+                        <option value="25|Core Ring">Core Ring (25)</option>
+                    </select>
+                    <button class="btn btn-red" onclick="addExtMarketLoot()">BUY ITEM</button>
+                    <h3 style="color:var(--gold); margin-top:20px;">LOOT HISTORY</h3>
+                    <div style="max-height: 150px; overflow-y: auto; background: #000; border: 1px solid #333;"><table class="loot-table"><tbody id="ext-loot-history-body"></tbody></table></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="panel">
+            <h2 style="color:var(--gold); margin-top:0;">PVP ZONE MANAGER</h2>
+            <p style="color:#aaa; font-size:11px; margin-top:-10px;">Πρόσθεσε εδώ βίντεο από το YouTube. Θα εμφανιστούν αυτόματα στη σελίδα "PVP Zone".</p>
+            <div style="display:flex; gap:10px; padding: 15px; background: #000; border: 1px dashed var(--gold); border-radius: 5px; margin-bottom: 15px; flex-wrap: wrap;">
+                <input type="text" id="new-vid-title" placeholder="Video Title (π.χ. ADEN SIEGE)" style="flex:1; min-width: 200px;">
+                <input type="text" id="new-vid-url" placeholder="YouTube ή Πλήρες TikTok Link..." style="flex:2; min-width: 200px;">
+                <input type="text" id="new-vid-uploader" placeholder="Uploaded By" style="flex:1; min-width: 150px;">
+                <button class="btn btn-gold" style="margin:0; width:auto; padding:0 20px;" onclick="addVideo()">ADD VIDEO</button>
+            </div>
+            <div id="admin-video-list" style="max-height: 250px; overflow-y: auto; background: rgba(0,0,0,0.4); border: 1px solid #333; border-radius: 5px; padding: 5px;">
+                </div>
+        </div>
+    </div>
+<script>
+    const GOOGLE_VISION_API_KEY = "AIzaSyCAxubXtpx7LSi_qeMsp6isJlDC1rUZ7PU"; 
+    const firebaseConfig = { 
+        apiKey: "AIzaSyDRL8EehxdcgVYJ0LJ1khVYkSJcaCMKRes", 
+        authDomain: "brokenmirrordb.firebaseapp.com",
+        databaseURL: "https://brokenmirrordb-default-rtdb.europe-west1.firebasedatabase.app" 
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    let allCPs = {}, currentEditID = null, globalDailyLogs = {};
+    let allExtClans = {}, currentExtID = null, viewMode = 'active'; 
+    let globalInternalClans = {};
+    const bossKeys = ['VAL', 'ANT', 'BAI', 'SIE', 'ZAK', 'FRI', 'AQ', 'ORF', 'COR', 'DPVP'];
+    const multipliers = { VAL:3, ANT:3, BAI:2, SIE:3, ZAK:1, FRI:1, AQ:1, ORF:1, COR:1, DPVP:3 };
+    let lastAction = null; 
+    let cpInitialPoints = 0; let cpInitialStats = {};
+    let extInitialPoints = 0; let extInitialStats = {};
+    firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+        .then(() => {
+            firebase.auth().onAuthStateChanged((user) => { 
+                if (!user) { window.location.href = "login.html"; } 
+                else { startDatabaseListeners(); }
             });
-            document.getElementById('dynamic-external-clans').innerHTML = extHtml;
+        })
+        .catch((error) => console.error("Σφάλμα Auth Persistence:", error));
+    function logout() { firebase.auth().signOut().then(() => window.location.href = "login.html"); } 
+    function startDatabaseListeners() {
+        db.ref('cps/').on('value', snap => { allCPs = snap.val() || {}; renderSimpleList(); renderExtSelect(); renderMoveCPSelect(); if(currentEditID) loadEdit(currentEditID); if(currentExtID && currentExtID.startsWith('cp_')) loadExtEdit(); });
+        db.ref('dailyLogs/').on('value', snap => { globalDailyLogs = snap.val() || {}; });
+        db.ref('externalClans/').on('value', snap => { allExtClans = snap.val() || {}; renderExtSelect(); if(currentExtID && currentExtID.startsWith('ext_')) loadExtEdit(); });
+        db.ref('internalClans/').on('value', snap => {
+            let data = snap.val();
+            let updates = {};
+            if (!data || !data.noldor) updates['noldor'] = { name: "NOLDOR CLAN", color: "#00d9ff", iconUrl: "https://i.ibb.co/8LvFNQkC/noldor.png" };
+            if (!data || !data.kriminalides) updates['kriminalides'] = { name: "KRIMINALIDES CLAN", color: "#ff3333", iconUrl: "https://i.ibb.co/VYMZjzYr/kriminalides.png" };
+            
+            if (Object.keys(updates).length > 0) {
+                db.ref('internalClans/').update(updates);
+            }
+            globalInternalClans = data || updates;
+            if(data) {
+                globalInternalClans = {...data, ...updates};
+            }
+            
+            renderInternalClansList();
+            updateNewClanSelects();
+        });
+        db.ref('pendingScans/').on('value', snap => {
+            const queueContainer = document.getElementById('pending-queue-container'); 
+            const queueList = document.getElementById('pending-queue-list'); 
+            const scans = snap.val();
+            
+            if(!scans) { queueContainer.style.display = 'none'; return; }
+            queueContainer.style.display = 'block'; queueList.innerHTML = '';
+            
+            Object.keys(scans).forEach(key => { 
+                const scan = scans[key]; 
+                const sender = scan.submittedBy || "Άγνωστος";
+                const notes = scan.userNotes && scan.userNotes !== "Χωρίς περιγραφή" ? `<br><span style="color:var(--sky); font-size:15px; font-weight:bold; font-family:'Cinzel';">📝 ${scan.userNotes}</span>` : "";
+                
+                queueList.innerHTML += `
+                <div class="queue-item" style="flex-direction:column; align-items:flex-start; border-left-color: var(--sky);">
+                    <div style="width:100%; display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <b style="color:#fff;">Από: ${sender}</b> <span style="font-size:10px; color:#aaa;">(${new Date(scan.timestamp).toLocaleString('el-GR')})</span>
+                            ${notes}
+                        </div>
+                        <div>
+                            <button class="btn btn-gold" style="padding: 8px 15px;" onclick="loadPendingScan('${key}')">REVIEW & LOAD</button>
+                            <button class="btn btn-red" onclick="deletePendingScan('${key}')">✖</button>
+                        </div>
+                    </div>
+                </div>`; 
+            });
+        });
+        
+        // Λίστα για τα βίντεο στο Admin Panel
+        db.ref('videos/').on('value', snap => {
+            const vids = snap.val() || {};
+            const list = document.getElementById('admin-video-list');
+            list.innerHTML = '';
+            const sortedVids = Object.keys(vids).map(k => ({key: k, ...vids[k]})).sort((a,b) => b.timestamp - a.timestamp);
+            
+            if(sortedVids.length === 0) { list.innerHTML = "<div style='color:#555; text-align:center; padding:10px;'>Δεν υπάρχουν βίντεο.</div>"; return; }
+            
+            sortedVids.forEach(v => {
+                list.innerHTML += `<div style="display:flex; justify-content:space-between; padding:8px; border-bottom:1px solid #222; align-items:center;">
+                    <div><span style="color:var(--gold); font-weight:bold;">${v.title}</span> <span style="font-size:10px; color:#888;">(Uploaded by: ${v.uploader} | Date: ${v.date})</span></div>
+                    <button class="btn btn-red" style="width:auto; padding:5px 10px; margin:0;" onclick="deleteVideo('${v.key}')">✖ DEL</button>
+                </div>`;
+            });
+        });
+    }
+    // --- VIDEO MANAGER FUNCTIONS ---
+    function addVideo() {
+        const title = document.getElementById('new-vid-title').value.trim();
+        const rawUrl = document.getElementById('new-vid-url').value.trim();
+        const uploader = document.getElementById('new-vid-uploader').value.trim();
+        if(!title || !rawUrl || !uploader) { alert("Παρακαλώ συμπλήρωσε όλα τα πεδία για το βίντεο!"); return; }
+        let embedUrl = "";
+        // 1. Έλεγχος για YouTube
+        const ytRegExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+        const ytMatch = rawUrl.match(ytRegExp);
+        // 2. Έλεγχος για TikTok (Ψάχνει το ID μετά το /video/)
+        const ttRegExp = /tiktok\.com\/.*video\/(\d+)/;
+        const ttMatch = rawUrl.match(ttRegExp);
+        if (ytMatch && ytMatch[2].length === 11) {
+            embedUrl = "https://www.youtube.com/embed/" + ytMatch[2]; // YouTube Embed
+        } else if (ttMatch && ttMatch[1]) {
+            embedUrl = "https://www.tiktok.com/embed/v2/" + ttMatch[1]; // TikTok Embed
+        } else {
+            alert("⚠️ Δεν αναγνωρίστηκε! Βάλε έγκυρο YouTube Link ή ΠΛΗΡΕΣ TikTok Link (π.χ. tiktok.com/@user/video/123...).\nΜην βάζεις τα κοντά links του κινητού (vm.tiktok.com).");
+            return;
         }
-        function openCpStats(cpId) {
-            const cp = globalCPData[cpId];
-            if(!cp) return;
-            document.getElementById('caller-modal').style.display = 'none';
-            document.getElementById('cp-stats-name').innerText = cp.name.toUpperCase() + " ATTENDANCES";
-            document.getElementById('cp-stats-grid').innerHTML = Object.keys(bossIcons).map(b => {
-                const val = (cp.bossStats && cp.bossStats[b]) ? cp.bossStats[b] : 0;
-                return `<div class="stat-box"><img src="${bossIcons[b]}" class="boss-icon"><span class="stat-val">${val}</span></div>`;
-            }).join('');
-            document.getElementById('cp-stats-modal').style.display = 'block';
-            document.getElementById('overlay').style.display = 'block';
+        const date = new Date().toLocaleDateString('el-GR');
+        
+        db.ref('videos/').push({
+            title: title, embedUrl: embedUrl, uploader: uploader, date: date, timestamp: firebase.database.ServerValue.TIMESTAMP
+        }).then(() => {
+            document.getElementById('new-vid-title').value = ''; document.getElementById('new-vid-url').value = ''; document.getElementById('new-vid-uploader').value = '';
+            alert("✅ Το Video προστέθηκε επιτυχώς στη σελίδα PVP Zone!");
+        });
+    }
+    function deleteVideo(key) {
+        if(confirm("Είσαι σίγουρος ότι θέλεις διαγράψεις αυτό το βίντεο;")) { db.ref('videos/' + key).remove(); }
+    }
+    // -------------------------------
+    function getEditDistance(a, b) {
+        if(a.length === 0) return b.length; if(b.length === 0) return a.length; var matrix = [];
+        for(var i = 0; i <= b.length; i++) matrix[i] = [i]; for(var j = 0; j <= a.length; j++) matrix[0][j] = j;
+        for(var i = 1; i <= b.length; i++){ for(var j = 1; j <= a.length; j++){ if(b.charAt(i-1) == a.charAt(j-1)) matrix[i][j] = matrix[i-1][j-1]; else matrix[i][j] = Math.min(matrix[i-1][j-1] + 1, Math.min(matrix[i][j-1] + 1, matrix[i-1][j] + 1)); } }
+        return matrix[b.length][a.length];
+    }
+    function smartFilterText(rawText) {
+        let rawWords = rawText.replace(/[^a-zA-Z0-9_\n ]/g, '').split(/\s+/);
+        let knownNames = new Set();
+        Object.keys(allCPs).forEach(id => {
+            if (allCPs[id].clan === 'history') return;
+            if (allCPs[id].leader) knownNames.add(allCPs[id].leader.toLowerCase().trim());
+            let members = (allCPs[id].members || "").split(',');
+            members.forEach(m => { let cleanM = m.toLowerCase().trim(); if (cleanM) knownNames.add(cleanM); });
+        });
+        let matchedWords = [];
+        rawWords.forEach(word => {
+            let wordLower = word.toLowerCase();
+            if (wordLower.length < 3 || !isNaN(wordLower)) return; 
+            let matched = false;
+            for (let kn of knownNames) {
+                if (wordLower === kn || wordLower.includes(kn) || kn.includes(wordLower)) { matched = true; break; }
+                let allowedDist = kn.length > 5 ? 2 : 1;
+                if (getEditDistance(wordLower, kn) <= allowedDist) { matched = true; break; }
+            }
+            if (matched) { matchedWords.push(word); }
+        });
+        return [...new Set(matchedWords)].join(' ');
+    }
+    function loadPendingScan(key) { 
+        db.ref('pendingScans/' + key).once('value', snap => { 
+            const scan = snap.val(); 
+            if(scan && scan.rawText) { 
+                const currentText = document.getElementById('mass-input').value.trim(); 
+                let cleanScanText = scan.rawText.replace(/\s+/g, ' ').trim();
+                document.getElementById('mass-input').value = currentText ? (currentText + " " + cleanScanText) : cleanScanText; 
+                analyzeAttendance(); 
+                deletePendingScan(key); 
+            } 
+        }); 
+    }
+    function deletePendingScan(key) { db.ref('pendingScans/' + key).remove(); }
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('file-input');
+    dropzone.addEventListener('click', () => fileInput.click());
+    dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('dragover'); });
+    dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+    dropzone.addEventListener('drop', (e) => { e.preventDefault(); dropzone.classList.remove('dragover'); if (e.dataTransfer.files.length > 0) processBulkImages(e.dataTransfer.files); });
+    fileInput.addEventListener('change', (e) => { if (e.target.files.length > 0) processBulkImages(e.target.files); });
+    document.addEventListener('paste', function(e) {
+        const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+        for (let i = 0; i < items.length; i++) {
+            if (items[i].type.indexOf("image") === 0) {
+                const file = items[i].getAsFile();
+                processBulkImages([file]); 
+                break;
+            }
         }
-        function openMemberStats(memberName) {
-            document.getElementById('member-stats-name').innerText = memberName.toUpperCase() + " (LOADING...)";
-            document.getElementById('member-stats-modal').style.display = 'block';
-            document.getElementById('overlay').style.display = 'block';
-            setTimeout(() => {
-                // Start with archived per-boss counts if available
-                // Note: archive only stores total count per player, not per-boss breakdown
-                // So per-boss modal still shows only current month — that is expected behaviour
-                let mStats = { VAL:0, ANT:0, BAI:0, FRI:0, ZAK:0, AQ:0, ORF:0, COR:0, SIE:0, DPVP:0 };
-                const safeSearchName = getSafeName(memberName).toUpperCase();
-                Object.values(globalDailyLogs).forEach(dayData => {
-                    Object.keys(dayData).forEach(logMemberName => {
-                        if(logMemberName.toUpperCase() === safeSearchName) {
-                            const playerBossData = dayData[logMemberName];
-                            Object.keys(playerBossData).forEach(bossId => {
-                                const b = bossId.toUpperCase();
-                                if(b.includes('VAL')) mStats.VAL++;
-                                else if(b.includes('ANT')) mStats.ANT++;
-                                else if(b.includes('BAI')) mStats.BAI++;
-                                else if(b.includes('FRI')) mStats.FRI++;
-                                else if(b.includes('ZAK')) mStats.ZAK++;
-                                else if(b.includes('AQ') || b.includes('QUEEN')) mStats.AQ++;
-                                else if(b.includes('ORF')) mStats.ORF++;
-                                else if(b.includes('COR')) mStats.COR++;
-                                else if(b.includes('SIE')) mStats.SIE++;
-                                else if(b.includes('DPVP') || b.includes('PVP')) mStats.DPVP++;
-                            });
+    });
+    // --- CLAN SLOTS MANAGER LOGIC ---
+    let accumulatedSlotsNames = new Set();
+    function addNamesToSlotsManager() {
+        const inputText = document.getElementById('mass-input').value.trim().toLowerCase();
+        if (!inputText) { alert("Δεν υπάρχει κείμενο στο πλαίσιο!"); return; }
+        
+        let extractedNames = inputText.match(/[a-z0-9_]+/g) || [];
+        if (extractedNames.length === 0) { alert("Δεν βρέθηκαν ονόματα."); return; }
+        let addedCount = 0;
+        extractedNames.forEach(n => {
+            if (n.length > 2) {
+                accumulatedSlotsNames.add(n);
+                addedCount++;
+            }
+        });
+        document.getElementById('slots-counter').innerText = accumulatedSlotsNames.size;
+        
+        document.getElementById('mass-input').value = "";
+        document.getElementById('detected-list').innerHTML = "";
+        document.getElementById('unmatched-list').innerHTML = "";
+        document.getElementById('input-count').innerText = "0 NAMES";
+        
+        alert("✅ Προστέθηκαν " + addedCount + " ονόματα στο Slots Manager!");
+    }
+    function resetSlotsManager() {
+        if(confirm("Είσαι σίγουρος ότι θες να διαγράψεις τα αποθηκευμένα ονόματα;")) {
+            accumulatedSlotsNames.clear();
+            document.getElementById('slots-counter').innerText = "0";
+        }
+    }
+    function generateSlotsExcel() {
+        if (accumulatedSlotsNames.size === 0) { alert("Δεν υπάρχουν αποθηκευμένα ονόματα! Πάτα το κουμπί 'SLOTS' πρώτα."); return; }
+        
+        let extractedNames = Array.from(accumulatedSlotsNames);
+        let columns = {};
+        let cpIds = Object.keys(allCPs).filter(id => globalInternalClans[allCPs[id].clan]);
+        
+        cpIds.forEach(id => {
+            columns[allCPs[id].name] = [];
+        });
+        columns["Not Found"] = [];
+        let matchedInputNames = new Set();
+        cpIds.forEach(id => {
+            let roster = (allCPs[id].members || "").toLowerCase().split(',').map(s=>s.trim()).filter(s=>s);
+            if(allCPs[id].leader) roster.push(allCPs[id].leader.toLowerCase().trim());
+            roster = [...new Set(roster)];
+            roster.forEach(trueName => {
+                let matchedInput = extractedNames.find(n => {
+                    if (n.length < 3) return false;
+                    if (trueName === n || trueName.includes(n)) return true;
+                    let dist = getEditDistance(n, trueName); 
+                    let allowed = trueName.length > 5 ? 2 : 1; 
+                    return dist <= allowed;
+                });
+                
+                if (matchedInput) {
+                    matchedInputNames.add(matchedInput);
+                    // Add the correctly formatted trueName to the column
+                    columns[allCPs[id].name].push(trueName.toUpperCase());
+                }
+            });
+        });
+        // Add unmatched names to 'Not Found'
+        extractedNames.forEach(n => {
+            if (!matchedInputNames.has(n)) {
+                columns["Not Found"].push(n.toUpperCase());
+            }
+        });
+        // Generate CSV
+        let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
+        let colNames = Object.keys(columns);
+        csvContent += colNames.map(c => `"${c}"`).join(",") + "\n";
+        let maxRows = Math.max(...colNames.map(c => columns[c].length));
+        for (let i = 0; i < maxRows; i++) {
+            let row = [];
+            colNames.forEach(c => {
+                row.push(`"${columns[c][i] || ""}"`);
+            });
+            csvContent += row.join(",") + "\n";
+        }
+        // Add Totals Row
+        let totalsRow = [];
+        colNames.forEach(c => {
+            totalsRow.push(`"${columns[c].length}"`);
+        });
+        csvContent += totalsRow.join(",") + "\n";
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "Clan_Slots_Report.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+    async function processBulkImages(files) {
+        document.getElementById('ocr-loading').style.display = 'block';
+        let allExtractedText = ""; let errorOccurred = false;
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            if (!file.type.startsWith('image/')) continue;
+            
+            const base64Data = await new Promise((resolve) => { 
+                const reader = new FileReader(); reader.onloadend = () => resolve(reader.result.split(',')[1]); reader.readAsDataURL(file); 
+            });
+            
+            const requestBody = { requests: [{ image: { content: base64Data }, features: [{ type: "TEXT_DETECTION" }] }] };
+            
+            try {
+                const response = await fetch(`https://vision.googleapis.com/v1/images:annotate?key=${GOOGLE_VISION_API_KEY}`, { 
+                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(requestBody) 
+                });
+                const data = await response.json();
+                if (data.error) { alert("ΣΦΑΛΜΑ GOOGLE API: " + data.error.message); errorOccurred = true; break; }
+                if (data.responses && data.responses[0].fullTextAnnotation) { allExtractedText += data.responses[0].fullTextAnnotation.text + "\n"; }
+            } catch (error) { 
+                alert("Αποτυχία σύνδεσης με τη Google."); errorOccurred = true; break;
+            }
+        }
+        
+        document.getElementById('ocr-loading').style.display = 'none';
+        if (!errorOccurred && allExtractedText !== "") {
+            let smartText = smartFilterText(allExtractedText);
+            if (smartText) {
+                const currentText = document.getElementById('mass-input').value.trim();
+                document.getElementById('mass-input').value = currentText ? (currentText + " " + smartText) : smartText;
+                analyzeAttendance();
+            } else { alert("Το Smart Filter αγνόησε όλο το κείμενο (Δεν βρέθηκε κανένα όνομα)."); }
+        }
+    }
+    function toggleCP(cpId, isChecked) { document.querySelectorAll('.cp-child-' + cpId).forEach(cb => cb.checked = isChecked); }
+    function analyzeAttendance() {
+        const inputField = document.getElementById('mass-input');
+        if (/[\r\n]/.test(inputField.value)) { inputField.value = inputField.value.replace(/[\r\n]+/g, ' '); }
+        const input = inputField.value.toLowerCase();
+        let names = [...new Set(input.match(/[a-z0-9_]+/g) || [])];
+        const listDiv = document.getElementById('detected-list');
+        const unmatchedDiv = document.getElementById('unmatched-list');
+        const countSpan = document.getElementById('input-count');
+        
+        listDiv.innerHTML = ""; unmatchedDiv.innerHTML = ""; countSpan.innerText = names.length + " NAMES";
+        if(names.length === 0) return;
+        let matchedInputNames = new Set(); 
+        Object.keys(allCPs).forEach(id => {
+            if(allCPs[id].clan === 'history') return;
+            let roster = (allCPs[id].members || "").toLowerCase().split(',').map(s=>s.trim()).filter(s=>s);
+            if(allCPs[id].leader) roster.push(allCPs[id].leader.toLowerCase().trim());
+            roster = [...new Set(roster)]; 
+            let foundRealNames = []; let displayNames = [];
+            roster.forEach(trueName => {
+                let matchedInput = names.find(n => {
+                    if (n.length < 3) return false; 
+                    if (trueName === n || trueName.includes(n)) return true; 
+                    let dist = getEditDistance(n, trueName); let allowed = trueName.length > 5 ? 2 : 1; return dist <= allowed;
+                });
+                
+                if (matchedInput) {
+                    matchedInputNames.add(matchedInput); foundRealNames.push(trueName); 
+                    if (matchedInput !== trueName && !trueName.includes(matchedInput)) { displayNames.push(`${trueName.toUpperCase()} <span style="color:#ff4444; font-size:9px;">[ως ${matchedInput.toUpperCase()}]</span>`); } 
+                    else { displayNames.push(trueName.toUpperCase()); }
+                }
+            });
+            
+            if(foundRealNames.length > 0) {
+                let playerHtml = foundRealNames.map((trueName, idx) => {
+                    let displayName = displayNames[idx];
+                    return `<label style="display:inline-flex; align-items:center; margin-right:15px; margin-top:5px; font-size:11px; cursor:pointer; background:#1a1a1a; padding:4px 8px; border-radius:4px; border:1px solid #333;">
+                                <input type="checkbox" class="player-checkbox cp-child-${id}" data-cp="${id}" value="${trueName}" checked style="margin-right:6px; width:14px; height:14px;">
+                                <span style="color:var(--gold);">${displayName}</span>
+                            </label>`;
+                }).join('');
+                listDiv.innerHTML += `
+                <div class="detected-cp-row" style="display:block;">
+                    <div style="border-bottom: 1px solid #222; padding-bottom: 8px; margin-bottom: 8px; display:flex; align-items:center;">
+                        <input type="checkbox" checked onchange="toggleCP('${id}', this.checked)" style="margin-right: 10px; width: 16px; height: 16px;">
+                        <b style="font-size:14px;">${allCPs[id].name}</b> <span style="color:#aaa; font-size:11px; margin-left:8px;">(${foundRealNames.length} matched)</span>
+                    </div>
+                    <div style="padding-left: 26px; display:flex; flex-wrap:wrap;">
+                        ${playerHtml}
+                    </div>
+                </div>`;
+            }
+        });
+        let unmatchedNames = names.filter(n => !matchedInputNames.has(n) && n.length > 2);
+        if(unmatchedNames.length > 0) { unmatchedDiv.innerHTML = `<div style="padding: 8px; border: 1px dashed var(--red); background: rgba(255, 68, 68, 0.1); border-radius: 5px; margin-top: 10px;"><span style="color: var(--red); font-weight: bold;">⚠️ ΔΕΝ ΒΡΕΘΗΚΑΝ ΣΤΗ ΒΑΣΗ (${unmatchedNames.length}):</span> <span style="color: #fff; font-size: 11px;">${unmatchedNames.map(n => n.toUpperCase()).join(', ')}</span></div>`; }
+    }
+    // Η ΝΕΑ ΣΥΝΑΡΤΗΣΗ ΠΟΥ ΕΝΗΜΕΡΩΝΕΙ ΚΑΙ ΤΟΝ ANIMALS TRACKER
+    async function logValidatedEvent(bossId, multiplier) {
+        try {
+            const playerCheckboxes = document.querySelectorAll('.player-checkbox');
+            let checkedPlayersByCp = {};
+            
+            playerCheckboxes.forEach(cb => {
+                if (cb.checked) {
+                    let id = cb.dataset.cp;
+                    if (!checkedPlayersByCp[id]) checkedPlayersByCp[id] = [];
+                    checkedPlayersByCp[id].push(cb.value);
+                }
+            });
+            const d = new Date(); const today = `${d.getDate()}-${d.getMonth()+1}-${d.getFullYear()}`; 
+            const nowMs = Date.now(); const twelveHoursMs = 12 * 60 * 60 * 1000;
+            
+            const disableProtection = document.getElementById('disable-protection-cb') ? document.getElementById('disable-protection-cb').checked : false;
+            const dailySnap = await db.ref(`dailyLogs/${today}`).once('value');
+            const currentDailyLogs = dailySnap.val() || {};
+            
+            const allLogsLocal = globalDailyLogs;
+            let totalUpdated = 0, skippedTotal = 0;
+            let currentAction = { date: today, bossId: bossId, multiplier: multiplier, updates: [] };
+            for (const id in checkedPlayersByCp) {
+                const namesFound = checkedPlayersByCp[id];
+                
+                let eligible = namesFound.filter(name => {
+                    const safeName = name.replace(/[.#$\[\]]/g, '_');
+                    let isLocked = false;
+                    
+                    if (!disableProtection) {
+                        for (let dateKey in allLogsLocal) {
+                            if (allLogsLocal[dateKey][safeName] && allLogsLocal[dateKey][safeName][bossId]) {
+                                let log = allLogsLocal[dateKey][safeName][bossId];
+                                
+                                // ΑΝΤΙ-CHEAT: ΕΛΕΓΧΕΙ ΜΟΝΟ ΤΟ 12ΩΡΟ. 
+                                // Αν έχουν περάσει 12 ώρες, επιτρέπει τη συμμετοχή ακόμα και στην ίδια μέρα!
+                                if (log.timestamp) {
+                                    if (nowMs - log.timestamp < twelveHoursMs) { isLocked = true; break; }
+                                } else if (dateKey === today) { 
+                                    isLocked = true; break; 
+                                }
+                            }
                         }
+                    }
+                    if (isLocked) { skippedTotal++; return false; }
+                    return true;
+                });
+                if (eligible.length === 0) continue; 
+                let alreadyLoggedCount = 0;
+                Object.values(currentDailyLogs).forEach(bossEntry => {
+                    if (bossEntry[bossId] && bossEntry[bossId].cp === id) alreadyLoggedCount++;
+                });
+                let pointsToGive = 0;
+                if (alreadyLoggedCount < 9) {
+                    pointsToGive = Math.max(0, Math.min(eligible.length, 9 - alreadyLoggedCount));
+                }
+                currentAction.updates.push({ cpId: id, names: eligible, pointsCount: pointsToGive });
+                await db.ref('cps/' + id).transaction(cp => {
+                    if(cp) {
+                        let isCaller = cp.clan === 'caller';
+                        let callerMult = parseInt(cp.callerMultiplier) || 3;
+                        let actualMultiplier = isCaller ? (multiplier * callerMult) : multiplier;
+                        if(!cp.bossStats) cp.bossStats = {};
+                        cp.bossStats[bossId] = (parseInt(cp.bossStats[bossId]) || 0) + pointsToGive;
+                        cp.totalPoints = (parseInt(cp.totalPoints) || 0) + (pointsToGive * actualMultiplier);
+                    }
+                    return cp;
+                });
+                for(let name of eligible) {
+                    const safeName = name.replace(/[.#$\[\]]/g, '_');
+                    
+                    // 1. Κανονικό Log για το Alliance Hall of Fame
+                    await db.ref(`dailyLogs/${today}/${safeName}/${bossId}`).set({ 
+                        cp: id, time: new Date().toLocaleTimeString('el-GR'), timestamp: nowMs
+                    });
+                    
+                    // 2. ΑΘΑΝΑΤΟ LOG ΜΟΝΟ ΓΙΑ ΤΟΥΣ ANIMALS (Άμεσος Συγχρονισμός)
+                    if (id.toLowerCase() === 'animals' || (allCPs[id] && allCPs[id].name.toLowerCase() === 'animals')) {
+                        const animalsRef = db.ref(`animalsTracker/${safeName}/${bossId}`);
+                        await animalsRef.transaction(current => (current || 0) + 1);
+                    }
+                }
+                totalUpdated++;
+            }
+            
+            if (totalUpdated > 0) { lastAction = currentAction; document.getElementById('undo-btn').style.display = 'inline-block'; }
+            
+            alert(`✅ ΟΛΟΚΛΗΡΩΘΗΚΕ ΑΣΦΑΛΩΣ!\nCPs: ${totalUpdated}\nΑγνοήθηκαν (κάτω από 12 ώρες): ${skippedTotal}\nΤο όριο τηρήθηκε απόλυτα.`);
+            
+            document.getElementById('mass-input').value = ""; document.getElementById('detected-list').innerHTML = ""; document.getElementById('unmatched-list').innerHTML = ""; document.getElementById('input-count').innerText = "0 NAMES";
+            
+        } catch (error) { alert("⚠️ ΣΦΑΛΜΑ ΒΑΣΗΣ ΔΕΔΟΜΕΝΩΝ: " + error.message); }
+    }
+    // Η ΝΕΑ ΣΥΝΑΡΤΗΣΗ ΠΟΥ ΑΦΑΙΡΕΙ ΚΑΙ ΑΠΟ ΤΟΝ ANIMALS TRACKER
+    async function undoLastAction() {
+        if(!lastAction) return; 
+        if(!confirm("Είσαι σίγουρος ότι θες να ακυρώσεις την τελευταία καταχώρηση (Undo);")) return;
+        
+        try {
+            for(let up of lastAction.updates) {
+                for(let name of up.names) { 
+                    const safeName = name.replace(/[.#$\[\]]/g, '_');
+                    
+                    // 1. Σβήσιμο από τα Daily Logs
+                    await db.ref(`dailyLogs/${lastAction.date}/${safeName}/${lastAction.bossId}`).remove(); 
+                    
+                    // 2. Σβήσιμο από το ΑΘΑΝΑΤΟ LOG των ANIMALS (Αν ήταν Animals)
+                    if (up.cpId.toLowerCase() === 'animals' || (allCPs[up.cpId] && allCPs[up.cpId].name.toLowerCase() === 'animals')) {
+                        const animalsRef = db.ref(`animalsTracker/${safeName}/${lastAction.bossId}`);
+                        await animalsRef.transaction(current => {
+                            let newVal = (current || 0) - 1;
+                            return newVal < 0 ? 0 : newVal;
+                        });
+                    }
+                }
+                await db.ref(`cps/${up.cpId}`).transaction(cp => { 
+                    if(cp) { 
+                        let isCaller = cp.clan === 'caller';
+                        let callerMult = parseInt(cp.callerMultiplier) || 3;
+                        let actualMultiplier = isCaller ? (lastAction.multiplier * callerMult) : lastAction.multiplier;
+                        if(cp.bossStats && cp.bossStats[lastAction.bossId]) { 
+                            cp.bossStats[lastAction.bossId] = (parseInt(cp.bossStats[lastAction.bossId]) || 0) - up.pointsCount; 
+                            if(cp.bossStats[lastAction.bossId] < 0) cp.bossStats[lastAction.bossId] = 0; 
+                        } 
+                        cp.totalPoints = (parseInt(cp.totalPoints) || 0) - (up.pointsCount * actualMultiplier); 
+                    } 
+                    return cp; 
+                });
+            }
+            alert("✅ Ανάκληση (Undo) Επιτυχής! Οι πόντοι και τα logs διαγράφηκαν."); 
+            lastAction = null; document.getElementById('undo-btn').style.display = 'none';
+        } catch(e) { alert("⚠️ Σφάλμα Undo: " + e.message); }
+    }
+    function setViewMode(mode) { viewMode = mode; document.getElementById('btn-active').classList.toggle('active', mode === 'active'); document.getElementById('btn-history').classList.toggle('active', mode === 'history'); renderSimpleList(); }
+    
+    function renderSimpleList() { 
+        const listDiv = document.getElementById('cp-list-simple'); 
+        listDiv.innerHTML = Object.keys(allCPs).filter(id => viewMode === 'history' ? allCPs[id].clan === 'history' : allCPs[id].clan !== 'history').map(id => { 
+            let tag = '';
+            if(allCPs[id].clan === 'caller') tag = ' <span style="color:#aaa; font-size:10px;">[CALLER]</span>';
+            else if(allCPs[id].clan === 'external') tag = ' <span style="color:#aaa; font-size:10px;">[EXTERNAL]</span>';
+            
+            return `<div onclick="loadEdit('${id}')" style="cursor:pointer; padding:8px; border-bottom:1px solid #222;">${allCPs[id].name} ${tag} <span style="float:right; color:var(--gold)">${allCPs[id].totalPoints}</span></div>`; 
+        }).join(''); 
+    }
+    
+    function exportToExcel() { let csvContent = "data:text/csv;charset=utf-8,\uFEFF"; csvContent += "CP / Caller Name,Clan / Role,Leader,Members,Total Points\n"; Object.keys(allCPs).forEach(id => { const cp = allCPs[id]; if (cp.clan === 'history') return; let name = `"${(cp.name || "").replace(/"/g, '""')}"`; let clan = `"${(cp.clan || "").replace(/"/g, '""').toUpperCase()}"`; let leader = `"${(cp.leader || "").replace(/"/g, '""')}"`; let members = `"${(cp.members || "").replace(/"/g, '""')}"`; let points = cp.totalPoints || 0; csvContent += `${name},${clan},${leader},${members},${points}\n`; }); const encodedUri = encodeURI(csvContent); const link = document.createElement("a"); link.setAttribute("href", encodedUri); link.setAttribute("download", "BMA_Rosters_Data.csv"); document.body.appendChild(link); link.click(); document.body.removeChild(link); }
+    function renderMoveCPSelect() { const sel = document.getElementById('move-target-cp'); const currentVal = sel.value; let html = '<option value="">-- Επίλεξε Νέο CP --</option>'; Object.keys(allCPs).forEach(id => { if (allCPs[id].clan !== 'history') { html += `<option value="${id}">${allCPs[id].name} (${allCPs[id].clan.toUpperCase()})</option>`; } }); sel.innerHTML = html; if (currentVal && sel.querySelector(`option[value="${currentVal}"]`)) { sel.value = currentVal; } }
+    
+    function renderExtSelect() { 
+        const sel = document.getElementById('ext-select'); 
+        const currentVal = sel.value; 
+        let html = '<option value="">-- Επιλογή Clan / Caller --</option>'; 
+        
+        html += '<optgroup label="External Clans">'; 
+        Object.keys(allExtClans).forEach(id => { 
+            const clan = allExtClans[id]; 
+            const histTag = clan.status === 'history' ? ' [HISTORY]' : ''; 
+            const cName = clan.name || id; 
+            html += `<option value="ext_${id}">${cName}${histTag}</option>`; 
+        }); 
+        html += '</optgroup>'; 
+        
+        html += '<optgroup label="Callers & Externals (Από CP List)">'; 
+        Object.keys(allCPs).forEach(id => { 
+            if (allCPs[id].clan === 'caller' || allCPs[id].clan === 'external') { 
+                html += `<option value="cp_${id}">${allCPs[id].name} (${allCPs[id].clan.toUpperCase()})</option>`; 
+            } 
+        }); 
+        html += '</optgroup>'; 
+        
+        sel.innerHTML = html; 
+        if (currentVal && sel.querySelector(`option[value="${currentVal}"]`)) { sel.value = currentVal; } 
+    }
+    function recalcEditPoints() {
+        if(!currentEditID) return;
+        const cp = allCPs[currentEditID];
+        const isCaller = cp && cp.clan === 'caller';
+        const callerMult = parseInt(document.getElementById('edit-caller-multiplier')?.value) || parseInt(cp?.callerMultiplier) || 3;
+        let delta = 0;
+        bossKeys.forEach(k => {
+            const el = document.getElementById('inp-' + k);
+            if (!el) return;
+            const currentVal = parseInt(el.value) || 0;
+            const initVal = parseInt(cpInitialStats[k]) || 0;
+            let actualMultiplier = isCaller ? (multipliers[k] * callerMult) : multipliers[k];
+            delta += (currentVal - initVal) * actualMultiplier;
+        });
+        document.getElementById('edit-points').value = cpInitialPoints + delta;
+    }
+    function updateCallerPoints() {
+        if(!currentEditID) return;
+        const cp = allCPs[currentEditID];
+        if (cp && cp.clan === 'caller') {
+            const callerMult = parseInt(document.getElementById('edit-caller-multiplier').value) || 3;
+            let newTotal = 0;
+            bossKeys.forEach(k => {
+                const el = document.getElementById('inp-' + k);
+                const currentVal = parseInt(el?.value) || 0;
+                newTotal += currentVal * (multipliers[k] * callerMult);
+            });
+            if (cp.lootHistory) {
+                cp.lootHistory.forEach(item => { newTotal -= parseInt(item.cost) || 0; });
+            }
+            document.getElementById('edit-points').value = newTotal;
+            cpInitialPoints = newTotal;
+            bossKeys.forEach(k => {
+                cpInitialStats[k] = parseInt(document.getElementById('inp-' + k).value) || 0;
+            });
+        }
+    }
+    function recalcExtPoints() {
+        if(!currentExtID || !currentExtID.startsWith('cp_')) return;
+        const pureId = currentExtID.replace('cp_', '');
+        const cp = allCPs[pureId];
+        const isCaller = cp && cp.clan === 'caller';
+        const callerMult = parseInt(cp?.callerMultiplier) || 3;
+        let delta = 0;
+        bossKeys.forEach(k => {
+            const el = document.getElementById('ext-inp-' + k);
+            if (!el) return;
+            const currentVal = parseInt(el.value) || 0;
+            const initVal = parseInt(extInitialStats[k]) || 0;
+            let actualMultiplier = isCaller ? (multipliers[k] * callerMult) : multipliers[k];
+            delta += (currentVal - initVal) * actualMultiplier;
+        });
+        document.getElementById('ext-points').value = extInitialPoints + delta;
+    }
+    function loadEdit(id) { 
+        currentEditID = id; const cp = allCPs[id]; 
+        
+        cpInitialPoints = parseInt(cp.totalPoints) || 0;
+        cpInitialStats = {};
+        bossKeys.forEach(k => cpInitialStats[k] = (cp.bossStats && cp.bossStats[k]) ? parseInt(cp.bossStats[k]) : 0);
+        
+        document.getElementById('edit-section').style.display = 'block'; 
+        document.getElementById('edit-cp-name').value = cp.name || ""; 
+        document.getElementById('edit-cp-leader').value = cp.leader || ""; 
+        document.getElementById('edit-cp-imgUrl').value = cp.imgUrl || ""; 
+        document.getElementById('edit-members').value = cp.members || ""; 
+        document.getElementById('edit-points').value = cpInitialPoints; 
+        // Show/hide multiplier row based on whether this is a caller
+        const multRow = document.getElementById('edit-caller-multiplier-row');
+        const multSel = document.getElementById('edit-caller-multiplier');
+        if (cp.clan === 'caller') {
+            multRow.style.display = 'block';
+            multSel.value = String(parseInt(cp.callerMultiplier) || 3);
+        } else {
+            multRow.style.display = 'none';
+        }
+        
+        let statsHtml = ""; 
+        bossKeys.forEach(k => { 
+            const val = cpInitialStats[k]; 
+            statsHtml += `<div class="stat-field">${k}<br><input type="number" id="inp-${k}" value="${val}" oninput="recalcEditPoints()"></div>`; 
+        }); 
+        document.getElementById('stat-inputs').innerHTML = statsHtml; 
+        
+        let lootHtml = ""; if(cp.lootHistory) { cp.lootHistory.forEach((item, index) => { lootHtml += `<tr><td>${item.item}</td><td>-${item.cost}</td><td onclick="deleteLoot(${index})" style="color:red; cursor:pointer;">✖</td></tr>`; }); } 
+        document.getElementById('loot-history-body').innerHTML = lootHtml; 
+        
+        const toggleBtn = document.getElementById('hist-toggle-btn'); if(cp.clan === 'history') { toggleBtn.innerText = "RESTORE"; toggleBtn.className = "btn btn-green"; } else { toggleBtn.innerText = "HIST"; toggleBtn.className = "btn btn-blue"; } 
+    }
+    function updateCP() { 
+        const stats = {}; 
+        bossKeys.forEach(k => stats[k] = parseInt(document.getElementById('inp-' + k).value) || 0); 
+        const finalPoints = parseInt(document.getElementById('edit-points').value) || 0;
+        const cp = allCPs[currentEditID];
+        const updatePayload = { 
+            name: document.getElementById('edit-cp-name').value, 
+            leader: document.getElementById('edit-cp-leader').value, 
+            imgUrl: document.getElementById('edit-cp-imgUrl').value, 
+            members: document.getElementById('edit-members').value, 
+            totalPoints: finalPoints, 
+            bossStats: stats 
+        };
+        // Save multiplier only for callers
+        if (cp && cp.clan === 'caller') {
+            updatePayload.callerMultiplier = parseInt(document.getElementById('edit-caller-multiplier').value) || 3;
+        }
+        db.ref('cps/' + currentEditID).update(updatePayload).then(() => alert("Data & Points Saved Successfully!")); 
+    }
+    async function migratePlayerLogs() { 
+        const oldName = document.getElementById('old-player-name').value.trim(); 
+        const newName = document.getElementById('new-player-name').value.trim(); 
+        if(!oldName || !newName) { alert("Συμπλήρωσε τα ονόματα."); return; } 
+        if(!confirm(`Το όνομα ${oldName} θα αλλάξει σε ${newName}. Συνέχεια;`)) return; 
+        
+        let logsMoved = 0; let cpsUpdated = 0; 
+        const safeOldName = oldName.replace(/[.#$\[\]]/g, '_');
+        const safeNewName = newName.replace(/[.#$\[\]]/g, '_');
+        const logsRef = db.ref('dailyLogs'); 
+        const snap = await logsRef.once('value'); 
+        const logs = snap.val() || {}; 
+        for (const date in logs) { 
+            let foundKey = Object.keys(logs[date]).find(k => k.toLowerCase() === safeOldName.toLowerCase() || k.toLowerCase() === oldName.toLowerCase()); 
+            if (foundKey) { 
+                const dataToMove = logs[date][foundKey]; 
+                await db.ref(`dailyLogs/${date}/${safeNewName}`).set(dataToMove); 
+                await db.ref(`dailyLogs/${date}/${foundKey}`).remove(); 
+                logsMoved++; 
+            } 
+        } 
+        
+        for (const cpId in allCPs) { 
+            let updated = false; 
+            let cp = allCPs[cpId]; 
+            if (cp.leader && cp.leader.toLowerCase() === oldName.toLowerCase()) { 
+                cp.leader = newName; updated = true; 
+            } 
+            if (cp.members) { 
+                let membersArr = cp.members.split(',').map(m => m.trim()); 
+                let idx = membersArr.findIndex(m => m.toLowerCase() === oldName.toLowerCase()); 
+                if (idx !== -1) { 
+                    membersArr[idx] = newName; 
+                    cp.members = membersArr.join(', '); 
+                    updated = true; 
+                } 
+            } 
+            if (updated) { 
+                await db.ref(`cps/${cpId}`).update({ leader: cp.leader, members: cp.members }); 
+                cpsUpdated++; 
+            } 
+        } 
+        const archivePlayersRef = db.ref('archive/players');
+        const archivePlayersSnap = await archivePlayersRef.once('value');
+        const archivePlayers = archivePlayersSnap.val() || {};
+        let archiveKey = Object.keys(archivePlayers).find(k => k.toLowerCase() === safeOldName.toLowerCase() || k.toLowerCase() === oldName.toLowerCase());
+        if (archiveKey) {
+            const dataToMove = archivePlayers[archiveKey];
+            await db.ref(`archive/players/${safeNewName}`).set(dataToMove);
+            await db.ref(`archive/players/${archiveKey}`).remove();
+        }
+        const animalsRef = db.ref('animalsTracker');
+        const animalsSnap = await animalsRef.once('value');
+        const animals = animalsSnap.val() || {};
+        let animalsKey = Object.keys(animals).find(k => k.toLowerCase() === safeOldName.toLowerCase() || k.toLowerCase() === oldName.toLowerCase());
+        if (animalsKey) {
+            const dataToMove = animals[animalsKey];
+            await db.ref(`animalsTracker/${safeNewName}`).set(dataToMove);
+            await db.ref(`animalsTracker/${animalsKey}`).remove();
+        }
+        alert(`ΕΠΙΤΥΧΙΑ!\nLogs moved: ${logsMoved} days.\nCPs updated: ${cpsUpdated}.\nArchive & Tracker updated.`); 
+        document.getElementById('old-player-name').value = ""; 
+        document.getElementById('new-player-name').value = ""; 
+    }
+    async function movePlayerToCP() { 
+        const playerName = document.getElementById('move-player-name').value.trim(); 
+        const targetCpId = document.getElementById('move-target-cp').value; 
+        if(!playerName || !targetCpId) { alert("Παρακαλώ συμπλήρωσε το όνομα και διάλεξε το CP προορισμού."); return; } 
+        const searchName = playerName.toLowerCase(); 
+        let sourceCpId = null; 
+        let sourceMembersArr = []; 
+        let exactPlayerName = playerName; 
+        for (const id in allCPs) { 
+            if(allCPs[id].clan === 'history') continue; 
+            if(allCPs[id].leader && allCPs[id].leader.toLowerCase() === searchName) { 
+                alert(`ΠΡΟΣΟΧΗ! Ο ${playerName} είναι LEADER στο CP ${allCPs[id].name}. Πρέπει να αλλάξεις χειροκίνητα τον Leader από το Edit CP.`); 
+                return; 
+            } 
+            let membersArr = (allCPs[id].members || "").split(',').map(m => m.trim()).filter(m => m !== ""); 
+            let idx = membersArr.findIndex(m => m.toLowerCase() === searchName); 
+            if (idx !== -1) { 
+                sourceCpId = id; exactPlayerName = membersArr[idx]; sourceMembersArr = membersArr; sourceMembersArr.splice(idx, 1); break; 
+            } 
+        } 
+        if (!sourceCpId) { alert(`Ο παίκτης ${playerName} δεν βρέθηκε στο Roster κανενός ενεργού CP.`); return; } 
+        if (sourceCpId === targetCpId) { alert(`Ο παίκτης ${exactPlayerName} ανήκει ήδη στο CP ${allCPs[targetCpId].name}!`); return; } 
+        const targetCp = allCPs[targetCpId]; 
+        let targetMembersArr = (targetCp.members || "").split(',').map(m => m.trim()).filter(m => m !== ""); 
+        targetMembersArr.push(exactPlayerName); 
+        if(!confirm(`ΕΠΙΒΕΒΑΙΩΣΗ:\nΝα μεταφερθεί ο ${exactPlayerName} από το ${allCPs[sourceCpId].name} στο ${targetCp.name};`)) return; 
+        await db.ref(`cps/${sourceCpId}`).update({ members: sourceMembersArr.join(', ') }); 
+        await db.ref(`cps/${targetCpId}`).update({ members: targetMembersArr.join(', ') }); 
+        alert(`Η μεταφορά ολοκληρώθηκε!\nΟ ${exactPlayerName} είναι πλέον στο ${targetCp.name}.`); 
+        document.getElementById('move-player-name').value = ""; 
+    }
+    function quickChangeClan(formattedClan) {
+        if(!currentEditID) return;
+        const cp = allCPs[currentEditID];
+        
+        if (formattedClan === 'external') {
+            if(confirm("Είσαι σίγουρος; Αυτή η ομάδα θα μεταφερθεί ΟΡΙΣΤΙΚΑ στο κάτω πάνελ (External Clans).")) {
+                const extData = {
+                    name: cp.name || "",
+                    leader: cp.leader || "",
+                    iconUrl: cp.imgUrl || "https://i.ibb.co/SXM1FZx8/attedance-points.png",
+                    description: "Μεταφέρθηκε από τα ενεργά CPs.",
+                    status: "active",
+                    totalPoints: cp.totalPoints || 0,
+                    lootHistory: cp.lootHistory || []
+                };
+                db.ref('externalClans/' + currentEditID).set(extData).then(() => {
+                    db.ref('cps/' + currentEditID).remove().then(() => {
+                        alert("Η ομάδα μεταφέρθηκε επιτυχώς στα External Clans (κάτω πάνελ)!");
+                        document.getElementById('edit-section').style.display = 'none';
+                        currentEditID = null;
+                        setViewMode('active');
                     });
                 });
-                // Total score shown in the modal title includes archived totals
-                const archiveScore = globalArchive[memberName.toLowerCase()] || globalArchive[safeSearchName.toLowerCase()] || 0;
-                const currentTotal = Object.values(mStats).reduce((a,b) => a+b, 0);
-                const totalAll = currentTotal + archiveScore;
-                document.getElementById('member-stats-name').innerText = memberName.toUpperCase() + " (" + totalAll + " total)";
-                document.getElementById('member-stats-grid').innerHTML = Object.keys(bossIcons).map(b => {
-                    return `<div class="stat-box"><img src="${bossIcons[b]}" class="boss-icon"><span class="stat-val">${mStats[b]}</span></div>`;
-                }).join('');
-            }, 10);
-        }
-        function openCaller(callerId, role, img) {
-            const cp = globalCPData[callerId];
-            if(!cp) return;
-            document.getElementById('modal-name').innerText = cp.name.toUpperCase() + ` (${cp.totalPoints || 0} PTS)`;
-            document.getElementById('modal-title').innerText = role.toUpperCase();
-            document.getElementById('modal-img').src = img;
-            
-            let lootHtml = "No history found.";
-            if(cp.lootHistory && cp.lootHistory.length > 0) {
-                lootHtml = cp.lootHistory.map(l => `
-                    <div style="display:flex; align-items:center; gap:8px; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
-                        <img src="${getIconForLoot(l.item)}" style="width:18px; height:18px; object-fit:contain;">
-                        <span style="color:#888; font-size:0.7rem;">${l.date}</span>
-                        <span style="color:#ddd; flex-grow:1; text-align:left;">${l.item}</span>
-                        <span style="color:#ff4444; font-family:'Cinzel'; font-weight:bold;">-${l.cost}</span>
-                    </div>
-                `).join('');
+            } else {
+                document.getElementById('edit-cp-clan').value = cp.clan;
             }
-            document.getElementById('leader-loot-panel').innerHTML = lootHtml;
-            
-            const attBtn = document.getElementById('caller-attendance-btn');
-            if (role.toUpperCase() === 'ALLY LEADER') attBtn.style.display = 'none';
-            else { attBtn.style.display = 'block'; attBtn.onclick = function() { openCpStats(callerId); }; }
-            
-            document.getElementById('caller-modal').style.display = 'block';
-            document.getElementById('overlay').style.display = 'block';
+        } else if (globalInternalClans[formattedClan] || formattedClan === 'caller') {
+            db.ref('cps/' + currentEditID).update({ clan: formattedClan }).then(() => {
+                alert("Η ομάδα άλλαξε επιτυχώς σε " + formattedClan.toUpperCase() + "!");
+                renderSimpleList();
+            });
+        } else {
+            document.getElementById('edit-cp-clan').value = cp.clan;
         }
-        function openClanModal(clanId) {
-            const extData = globalExternalClans[clanId];
-            if(!extData) return;
-            
-            document.getElementById('clan-modal-name').innerText = (extData.name || clanId).toUpperCase();
-            document.getElementById('clan-modal-img').src = extData.iconUrl || 'https://i.ibb.co/SXM1FZx8/attedance-points.png';
-            
-            const leaderName = extData.leader || "Pending...";
-            const content = extData.description || "Alliance agreements pending.";
-            const formattedContent = content.replace(/\n/g, '<br>');
-            const lootHistory = extData.lootHistory || [];
-            let lootHtml = "No history found.";
-            if(lootHistory.length > 0) {
-                lootHtml = lootHistory.map(l => `
-                    <div style="display:flex; align-items:center; gap:8px; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
-                        <img src="${getIconForLoot(l.item)}" style="width:18px; height:18px; object-fit:contain;">
-                        <span style="color:#888; font-size:0.7rem;">${l.date}</span>
-                        <span style="color:#ddd; flex-grow:1; text-align:left;">${l.item}</span>
-                        <span style="color:#ff4444; font-family:'Cinzel'; font-weight:bold;">-${l.cost}</span>
-                    </div>
-                `).join('');
-            }
-            const finalHtml = `
-                <div style="margin-bottom: 15px; font-size:0.95rem;">
-                    <span style="color:var(--gold); font-weight:bold; font-family:'Cinzel';">👑 LEADER:</span> 
-                    <span style="color:#fff;">${leaderName}</span>
-                </div>
-                <div style="color:#ddd; font-size:0.85rem; line-height:1.6; text-align:justify; margin-bottom:20px; padding: 10px; background:rgba(0,0,0,0.3); border:1px solid #333; border-radius:5px;">
-                    ${formattedContent}
-                </div>
-                <button class="loot-btn" onclick="const p=this.nextElementSibling; p.style.display=p.style.display==='block'?'none':'block';">VIEW LOOT HISTORY</button>
-                <div class="loot-panel" style="display:none; text-align:left;">${lootHtml}</div>
-            `;
-            document.getElementById('clan-modal-content').innerHTML = finalHtml;
-            document.getElementById('clan-modal').style.display = 'block';
-            document.getElementById('overlay').style.display = 'block';
-        }
-        function closeModal() { 
-            document.getElementById('caller-modal').style.display='none'; 
-            document.getElementById('cp-stats-modal').style.display='none'; 
-            document.getElementById('member-stats-modal').style.display='none'; 
-            document.getElementById('clan-modal').style.display='none'; 
-            document.getElementById('overlay').style.display='none'; 
-        }
-        function toggleLeaderLoot() { const p = document.getElementById('leader-loot-panel'); p.style.display = p.style.display==='none'?'block':'none'; }
-        const tracks = [
-            {name:"DION THEME", url:"https://www.dropbox.com/scl/fi/ypzqrr336iewt62gncy6u/Lineage-2-Dion-Theme-Song.mp3?rlkey=nl1quliuqleuljgkt5jhqq6hh&st=sb8ij16g&raw=1"},
-            {name:"HUNTERS THEME", url:"https://www.dropbox.com/scl/fi/75hck498enzot93zt0lg9/Lineage-2-Hunters-Village-Theme.mp3?rlkey=6mu9ic0gavmofkdvduj72270y&st=qr4cvisl&raw=1"},
-            {name:"GIRAN THEME", url:"https://www.dropbox.com/scl/fi/iu8j9wn9wky8fav176ayf/Lineage-2-Giran-Theme.mp3?rlkey=xp1j0upa076sy21tgcta6t9c3&st=0a4ihyhg&raw=1"}
-        ];
-        
-        let currentIdx = 0; 
-        const audio = document.getElementById('bg-music'); 
-        const musicIcon = document.getElementById('music-icon'); 
-        
-        function toggleMusic(e) { 
-            if(e) e.stopPropagation(); 
-            if (audio.paused) { 
-                audio.play(); 
-                musicIcon.innerText="🔊"; 
-            } else { 
-                audio.pause(); 
-                musicIcon.innerText="🔇"; 
+    }
+    function toggleHistoryStatus() { 
+        const cp = allCPs[currentEditID]; 
+        if(cp.clan === 'history') { 
+            alert("Παρακαλώ επέλεξε τη νέα ομάδα από το μενού 'CP Clan' στα αριστερά του κουμπιού RESTORE για να επαναφέρεις το CP.");
+        } else { 
+            if(confirm("Move to History?")) db.ref('cps/' + currentEditID).update({ clan: 'history' }).then(() => {
+                alert("Moved to History!");
+                document.getElementById('edit-section').style.display = 'none';
+                currentEditID = null;
+                setViewMode('history');
+            }); 
+        } 
+    }
+    function addMarketLoot() { 
+        const loot = document.getElementById('loot-market').value.split('|'); 
+        db.ref('cps/' + currentEditID).transaction(cp => { 
+            if(cp) { 
+                if(!cp.lootHistory) cp.lootHistory = []; 
+                cp.lootHistory.push({ item: loot[1], cost: loot[0], date: new Date().toLocaleDateString('el-GR') }); 
+                cp.totalPoints = (parseInt(cp.totalPoints) || 0) - parseInt(loot[0]); 
             } 
+            return cp; 
+        }).then(() => loadEdit(currentEditID)); 
+    }
+    function deleteLoot(idx) { 
+        if(!confirm("Refund points?")) return; 
+        const cp = allCPs[currentEditID]; 
+        const cost = parseInt(cp.lootHistory[idx].cost) || 0;
+        cp.lootHistory.splice(idx, 1); 
+        cp.totalPoints = (parseInt(cp.totalPoints) || 0) + cost; 
+        db.ref('cps/' + currentEditID).update({ lootHistory: cp.lootHistory, totalPoints: cp.totalPoints }).then(() => loadEdit(currentEditID)); 
+    }
+    
+    function createNewCP() { 
+        const n = document.getElementById('new-name').value; 
+        if(!n) return; 
+        const id = n.replace(/\s+/g, '-').toLowerCase(); 
+        const clan = document.getElementById('new-clan').value;
+        const cpData = { 
+            name: n, 
+            leader: document.getElementById('new-leader').value, 
+            imgUrl: document.getElementById('new-imgUrl').value || 'https://i.ibb.co/SXM1FZx8/attedance-points.png', 
+            clan: clan, 
+            totalPoints: 0, 
+            members: "", 
+            bossStats: { VAL:0, ANT:0, BAI:0, SIE:0, ZAK:0, FRI:0, AQ:0, ORF:0, COR:0, DPVP:0 } 
+        };
+        if (clan === 'caller') {
+            cpData.callerMultiplier = parseInt(document.getElementById('new-caller-multiplier').value) || 3;
         }
+        db.ref('cps/' + id).set(cpData).then(() => {
+            document.getElementById('new-name').value = '';
+            document.getElementById('new-leader').value = '';
+            document.getElementById('new-imgUrl').value = '';
+            document.getElementById('new-clan').value = 'noldor';
+            toggleNewCallerMultiplier();
+            alert('✅ ' + n + ' registered successfully!');
+        });
+    }
+    function toggleNewCallerMultiplier() {
+        const clan = document.getElementById('new-clan').value;
+        document.getElementById('new-caller-multiplier-row').style.display = clan === 'caller' ? 'block' : 'none';
+    }
+    function deleteCP() { if(confirm("Delete Forever?")) db.ref('cps/' + currentEditID).remove(); }
+    function createExtClan() { const name = document.getElementById('new-ext-name').value.trim(); const icon = document.getElementById('new-ext-icon').value.trim(); if(!name) { alert("Βάλε όνομα!"); return; } const id = name.replace(/\s+/g, '').toLowerCase(); db.ref('externalClans/' + id).set({ name: name, iconUrl: icon || 'https://i.ibb.co/SXM1FZx8/attedance-points.png', leader: 'Pending...', description: 'Alliance agreements pending.', status: 'active', lootHistory: [] }); document.getElementById('new-ext-name').value = ''; document.getElementById('new-ext-icon').value = ''; alert("New Clan Created!"); }
+    
+    function createIntClan() {
+        const name = document.getElementById('new-int-name').value.trim();
+        const color = document.getElementById('new-int-color').value;
+        const icon = document.getElementById('new-int-icon').value.trim();
+        if(!name) { alert("Βάλε όνομα Clan!"); return; }
+        const id = name.replace(/\s+/g, '').toLowerCase();
+        db.ref('internalClans/' + id).set({
+            name: name.toUpperCase() + " CLAN",
+            color: color || '#ffffff',
+            iconUrl: icon || 'https://i.ibb.co/SXM1FZx8/attedance-points.png'
+        }).then(() => {
+            document.getElementById('new-int-name').value = '';
+            document.getElementById('new-int-color').value = '#ffffff';
+            document.getElementById('new-int-icon').value = '';
+            alert("✅ Το Internal Clan δημιουργήθηκε επιτυχώς!");
+        });
+    }
+    function renderInternalClansList() {
+        const listDiv = document.getElementById('internal-clans-list');
+        if(!listDiv) return;
+        listDiv.innerHTML = "";
+        Object.keys(globalInternalClans).forEach(id => {
+            const clan = globalInternalClans[id];
+            listDiv.innerHTML += `
+                <div style="background: rgba(0,0,0,0.6); border: 1px solid ${clan.color}; border-left: 5px solid ${clan.color}; padding: 10px; border-radius: 5px; display: flex; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <img src="${clan.iconUrl}" style="width: 25px; height: 25px; object-fit: contain;">
+                        <span style="color: #fff; font-family: 'Cinzel'; font-size: 12px; font-weight: bold;">${clan.name}</span>
+                    </div>
+                    <button class="btn btn-red" style="width: auto; padding: 5px 10px; margin: 0; font-size: 10px;" onclick="deleteIntClan('${id}')">✖ DEL</button>
+                </div>
+            `;
+        });
+    }
+    function deleteIntClan(id) {
+        if(confirm(`Είσαι σίγουρος ότι θέλεις να διαγράψεις το Internal Clan '${id}';\nΤα CPs που ανήκουν σε αυτό δεν θα σβηστούν, αλλά ίσως να μην εμφανίζονται σωστά μέχρι να τους αλλάξεις Clan.`)) {
+            db.ref('internalClans/' + id).remove().then(() => alert("✅ Διαγράφηκε επιτυχώς!"));
+        }
+    }
+    function updateNewClanSelects() {
+        const selectEl = document.getElementById('new-clan');
+        if(!selectEl) return;
+        let html = "";
+        Object.keys(globalInternalClans).forEach(id => {
+            html += `<option value="${id}">${globalInternalClans[id].name.replace(' CLAN', '')}</option>`;
+        });
+        html += `<option value="caller">Shot Caller (π.χ. TSAKNORRIS - Στρογγυλό εικονίδιο)</option>`;
+        html += `<option value="external">External Clan</option>`;
+        const currentVal = selectEl.value;
+        selectEl.innerHTML = html;
+        if([...selectEl.options].some(o => o.value === currentVal)) {
+            selectEl.value = currentVal;
+        } else if(globalInternalClans['noldor']) {
+            selectEl.value = 'noldor';
+        }
+    }
+    
+    function loadExtEdit() { 
+        const selVal = document.getElementById('ext-select').value; 
+        if(!selVal) { document.getElementById('ext-edit-section').style.display = 'none'; currentExtID = null; return; } 
+        currentExtID = selVal; document.getElementById('ext-edit-section').style.display = 'grid'; 
+        let targetData = {}; let lootHtml = ""; 
         
-        function nextTrack(e) { 
-            if(e) e.stopPropagation(); 
-            currentIdx = (currentIdx + 1) % tracks.length; 
-            audio.src = tracks[currentIdx].url; 
-            document.getElementById('track-name').innerText = tracks[currentIdx].name; 
-            audio.play(); 
-            musicIcon.innerText="🔊"; 
+        if (selVal.startsWith('ext_')) { 
+            const pureId = selVal.replace('ext_', ''); targetData = allExtClans[pureId] || { name: pureId, leader: '', description: '', iconUrl: '', lootHistory: [] }; 
+            document.getElementById('ext-name').value = targetData.name || pureId; document.getElementById('ext-leader').value = targetData.leader || ""; document.getElementById('ext-description').value = targetData.description || ""; document.getElementById('ext-icon').value = targetData.iconUrl || ""; document.getElementById('ext-desc-container').style.display = 'block'; document.getElementById('ext-icon-container').style.display = 'block'; 
+            document.getElementById('ext-points').value = parseInt(targetData.totalPoints) || 0; 
+            document.getElementById('ext-points').disabled = false; 
+            document.getElementById('ext-stat-inputs').style.display = 'none'; 
+            const histBtn = document.getElementById('ext-hist-btn'); histBtn.style.display = 'block'; if(targetData.status === 'history') { histBtn.innerText = "RESTORE"; histBtn.className = "btn btn-green"; } else { histBtn.innerText = "HIST"; histBtn.className = "btn btn-blue"; } 
+            const transferBtn = document.getElementById('ext-transfer-btn'); if(transferBtn) transferBtn.style.display = 'block';
+        } else if (selVal.startsWith('cp_')) { 
+            const pureId = selVal.replace('cp_', ''); targetData = allCPs[pureId] || {}; 
+            
+            extInitialPoints = parseInt(targetData.totalPoints) || 0;
+            extInitialStats = {};
+            bossKeys.forEach(k => extInitialStats[k] = (targetData.bossStats && targetData.bossStats[k]) ? parseInt(targetData.bossStats[k]) : 0);
+            document.getElementById('ext-name').value = targetData.name || ""; document.getElementById('ext-leader').value = targetData.leader || targetData.members || ""; document.getElementById('ext-desc-container').style.display = 'none'; document.getElementById('ext-icon-container').style.display = 'none'; document.getElementById('ext-hist-btn').style.display = 'none'; 
+            const transferBtn = document.getElementById('ext-transfer-btn'); if(transferBtn) transferBtn.style.display = 'none';
+            document.getElementById('ext-points').value = extInitialPoints; 
+            document.getElementById('ext-points').disabled = false; 
+            let statsHtml = ""; bossKeys.forEach(k => { const val = extInitialStats[k]; statsHtml += `<div class="stat-field">${k}<br><input type="number" id="ext-inp-${k}" value="${val}" oninput="recalcExtPoints()"></div>`; }); 
+            document.getElementById('ext-stat-inputs').innerHTML = statsHtml; document.getElementById('ext-stat-inputs').style.display = 'grid';
+        } 
+        if(targetData.lootHistory) { targetData.lootHistory.forEach((item, index) => { lootHtml += `<tr><td>${item.item}</td><td>-${item.cost}</td><td onclick="deleteExtLoot(${index})" style="color:red; cursor:pointer;">✖</td></tr>`; }); } 
+        document.getElementById('ext-loot-history-body').innerHTML = lootHtml; 
+    }
+    function updateExtData() { 
+        if(!currentExtID) return; 
+        const nameVal = document.getElementById('ext-name').value.trim(); const leaderVal = document.getElementById('ext-leader').value; 
+        if (currentExtID.startsWith('ext_')) { 
+            const pureId = currentExtID.replace('ext_', ''); 
+            const finalPts = parseInt(document.getElementById('ext-points').value) || 0;
+            db.ref('externalClans/' + pureId).update({ name: nameVal, leader: leaderVal, iconUrl: document.getElementById('ext-icon').value, description: document.getElementById('ext-description').value, totalPoints: finalPts }); alert("Clan Data Saved!"); 
+        } else if (currentExtID.startsWith('cp_')) { 
+            const pureId = currentExtID.replace('cp_', ''); 
+            const finalPts = parseInt(document.getElementById('ext-points').value) || 0; 
+            const stats = {}; bossKeys.forEach(k => stats[k] = parseInt(document.getElementById('ext-inp-' + k).value) || 0); 
+            db.ref('cps/' + pureId).update({ name: nameVal, leader: leaderVal, totalPoints: finalPts, bossStats: stats }); alert("Caller Data Saved!"); 
+        } 
+    }
+    
+    function toggleExtHistory() { if(!currentExtID || !currentExtID.startsWith('ext_')) return; const pureId = currentExtID.replace('ext_', ''); const clan = allExtClans[pureId] || {}; const newStatus = clan.status === 'history' ? 'active' : 'history'; db.ref('externalClans/' + pureId).update({ status: newStatus }).then(() => { alert("Clan visibility updated!"); loadExtEdit(); }); }
+    
+    function transferExtToCP() {
+        if(!currentExtID || !currentExtID.startsWith('ext_')) return; 
+        const pureId = currentExtID.replace('ext_', ''); 
+        const clan = allExtClans[pureId]; 
+        if(!clan) return;
+        let availableClans = Object.keys(globalInternalClans).join(' ή ');
+        const newClan = prompt(`Σε ποιο Clan να μεταφερθεί ως CP;\n(${availableClans})`, Object.keys(globalInternalClans)[0] || "noldor");
+        if (!newClan) return;
+        const formattedClan = newClan.trim().toLowerCase();
+        
+        if (globalInternalClans[formattedClan]) {
+            if(confirm(`Είσαι σίγουρος;\nΗ ομάδα "${clan.name}" θα μεταφερθεί ΟΡΙΣΤΙΚΑ στα ενεργά CPs (${formattedClan.toUpperCase()}).`)) {
+                const cpData = {
+                    name: clan.name || "",
+                    leader: clan.leader || "",
+                    imgUrl: clan.iconUrl || "https://i.ibb.co/SXM1FZx8/attedance-points.png",
+                    clan: formattedClan,
+                    totalPoints: clan.totalPoints || 0,
+                    members: "", 
+                    bossStats: { VAL:0, ANT:0, BAI:0, SIE:0, ZAK:0, FRI:0, AQ:0, ORF:0, COR:0, DPVP:0 },
+                    lootHistory: clan.lootHistory || []
+                };
+                db.ref('cps/' + pureId).set(cpData).then(() => {
+                    db.ref('externalClans/' + pureId).remove().then(() => {
+                        alert("Η ομάδα μεταφέρθηκε επιτυχώς στα ενεργά CPs!");
+                        document.getElementById('ext-edit-section').style.display = 'none';
+                        currentExtID = null;
+                        document.getElementById('ext-select').value = "";
+                    });
+                });
+            }
+        } else {
+            alert(`Λάθος όνομα! Πρέπει να γράψεις ένα από τα υπάρχοντα Internal Clans: ${availableClans}`);
         }
-        setInterval(() => { document.getElementById('clock').innerText = "SERVER TIME: " + new Date().toLocaleTimeString('el-GR', {timeZone:'UTC', hour12:false}) + " UTC"; }, 1000);
-    </script>
+    }
+    function addExtMarketLoot() { 
+        if(!currentExtID) return; 
+        const loot = document.getElementById('ext-loot-market').value.split('|'); 
+        const newItem = { item: loot[1], cost: loot[0], date: new Date().toLocaleDateString('el-GR') }; 
+        if (currentExtID.startsWith('ext_')) { 
+            const pureId = currentExtID.replace('ext_', ''); 
+            db.ref('externalClans/' + pureId).transaction(ext => { 
+                if(ext === null) ext = {}; if(!ext.lootHistory) ext.lootHistory = []; ext.lootHistory.push(newItem); 
+                ext.totalPoints = (parseInt(ext.totalPoints) || 0) - parseInt(loot[0]); 
+                return ext; 
+            }).then(() => loadExtEdit()); 
+        } else if (currentExtID.startsWith('cp_')) { 
+            const pureId = currentExtID.replace('cp_', ''); 
+            db.ref('cps/' + pureId).transaction(cp => { 
+                if(cp) { if(!cp.lootHistory) cp.lootHistory = []; cp.lootHistory.push(newItem); cp.totalPoints = (parseInt(cp.totalPoints) || 0) - parseInt(loot[0]); } 
+                return cp; 
+            }).then(() => loadExtEdit()); 
+        } 
+    }
+    
+    function deleteExtLoot(idx) { 
+        if(!confirm("Are you sure you want to delete this loot?")) return; 
+        if (currentExtID.startsWith('ext_')) { 
+            const pureId = currentExtID.replace('ext_', ''); const ext = allExtClans[pureId]; 
+            const cost = parseInt(ext.lootHistory[idx].cost) || 0; ext.lootHistory.splice(idx, 1); 
+            ext.totalPoints = (parseInt(ext.totalPoints) || 0) + cost;
+            db.ref('externalClans/' + pureId).update({ lootHistory: ext.lootHistory, totalPoints: ext.totalPoints }).then(() => loadExtEdit()); 
+        } else if (currentExtID.startsWith('cp_')) { 
+            const pureId = currentExtID.replace('cp_', ''); const cp = allCPs[pureId]; const cost = parseInt(cp.lootHistory[idx].cost) || 0; cp.lootHistory.splice(idx, 1); cp.totalPoints = (parseInt(cp.totalPoints) || 0) + cost; 
+            db.ref('cps/' + pureId).update({ lootHistory: cp.lootHistory, totalPoints: cp.totalPoints }).then(() => loadExtEdit()); 
+        } 
+    }
+    async function cleanOldLogs() {
+        try {
+            const snap = await db.ref('dailyLogs/').once('value'); const logs = snap.val() || {}; const nowMs = Date.now(); const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000; let deletedCount = 0;
+            let pUpdates = {}; let cUpdates = {};
+            for (let dateStr in logs) { 
+                let parts = dateStr.split('-'); 
+                if (parts.length === 3) { 
+                    let logDate = new Date(parts[2], parts[1] - 1, parts[0]).getTime(); 
+                    if (nowMs - logDate > thirtyDaysMs) { 
+                        let dayData = logs[dateStr];
+                        for (let pName in dayData) {
+                            let count = Object.keys(dayData[pName]).length;
+                            pUpdates[pName] = (pUpdates[pName] || 0) + count;
+                            for (let bId in dayData[pName]) {
+                                let cpId = dayData[pName][bId].cp;
+                                if (cpId) cUpdates[cpId] = (cUpdates[cpId] || 0) + 1;
+                            }
+                        }
+                        await db.ref('dailyLogs/' + dateStr).remove(); deletedCount++; 
+                    } 
+                } 
+            }
+            if (deletedCount > 0) { 
+                for(let p in pUpdates) await db.ref(`archive/players/${p}`).transaction(c => (c||0) + pUpdates[p]);
+                for(let c in cUpdates) await db.ref(`archive/cps/${c}`).transaction(c => (c||0) + cUpdates[c]);
+                console.log(`🧹 Auto-Cleanup: Αρχειοθετήθηκαν & διαγράφηκαν ${deletedCount} παλιά logs.`); 
+            }
+        } catch (error) {}
+    }
+    setTimeout(cleanOldLogs, 5000);
+</script>
 </body>
 </html>
