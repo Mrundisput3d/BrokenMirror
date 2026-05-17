@@ -227,6 +227,20 @@
     
     <div style="max-width: 1400px; margin: 20px auto;">
         
+        <div class="panel" style="margin-bottom: 20px; border-top: 3px solid #00d9ff;">
+            <h2 style="color:#00d9ff; margin-top:0;">INTERNAL CLANS MANAGER</h2>
+            <div style="display:flex; gap:10px; padding: 15px; background: #000; border: 1px dashed #444; border-radius: 5px; margin-bottom: 15px;">
+                <input type="text" id="new-int-name" placeholder="New Clan Name (π.χ. SPARTANS)" style="flex:1; margin:0;">
+                <input type="color" id="new-int-color" value="#ffffff" style="width: 50px; padding:0; height:40px; cursor:pointer;" title="Clan Color">
+                <input type="text" id="new-int-icon" placeholder="Icon Image URL" style="flex:1; margin:0;">
+                <button class="btn btn-blue" style="margin:0; width:auto; padding:0 20px; background:#00d9ff; color:#000;" onclick="createIntClan()">ADD INTERNAL CLAN</button>
+            </div>
+            
+            <div id="internal-clans-list" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px;">
+                <!-- Internal clans populated here -->
+            </div>
+        </div>
+        
         <div class="panel" style="margin-bottom: 20px;">
             <h2 style="color:var(--blue); margin-top:0;">EXTERNAL CLANS & CALLERS MANAGER</h2>
             <div style="display:flex; gap:10px; padding: 15px; background: #000; border: 1px dashed #444; border-radius: 5px; margin-bottom: 15px;">
@@ -311,6 +325,7 @@
 
     let allCPs = {}, currentEditID = null, globalDailyLogs = {};
     let allExtClans = {}, currentExtID = null, viewMode = 'active'; 
+    let globalInternalClans = {};
     const bossKeys = ['VAL', 'ANT', 'BAI', 'SIE', 'ZAK', 'FRI', 'AQ', 'ORF', 'COR', 'DPVP'];
     const multipliers = { VAL:3, ANT:3, BAI:2, SIE:3, ZAK:1, FRI:1, AQ:1, ORF:1, COR:1, DPVP:3 };
     let lastAction = null; 
@@ -333,6 +348,14 @@
         db.ref('cps/').on('value', snap => { allCPs = snap.val() || {}; renderSimpleList(); renderExtSelect(); renderMoveCPSelect(); if(currentEditID) loadEdit(currentEditID); if(currentExtID && currentExtID.startsWith('cp_')) loadExtEdit(); });
         db.ref('dailyLogs/').on('value', snap => { globalDailyLogs = snap.val() || {}; });
         db.ref('externalClans/').on('value', snap => { allExtClans = snap.val() || {}; renderExtSelect(); if(currentExtID && currentExtID.startsWith('ext_')) loadExtEdit(); });
+        db.ref('internalClans/').on('value', snap => {
+            globalInternalClans = snap.val() || {
+                noldor: { name: "NOLDOR CLAN", color: "#00d9ff", iconUrl: "https://i.ibb.co/8LvFNQkC/noldor.png" },
+                kriminalides: { name: "KRIMINALIDES CLAN", color: "#ff3333", iconUrl: "https://i.ibb.co/VYMZjzYr/kriminalides.png" }
+            };
+            renderInternalClansList();
+            updateNewClanSelects();
+        });
 
         db.ref('pendingScans/').on('value', snap => {
             const queueContainer = document.getElementById('pending-queue-container'); 
@@ -529,7 +552,7 @@
         let extractedNames = Array.from(accumulatedSlotsNames);
 
         let columns = {};
-        let cpIds = Object.keys(allCPs).filter(id => allCPs[id].clan === 'noldor' || allCPs[id].clan === 'kriminalides');
+        let cpIds = Object.keys(allCPs).filter(id => globalInternalClans[allCPs[id].clan]);
         
         cpIds.forEach(id => {
             columns[allCPs[id].name] = [];
@@ -1076,7 +1099,8 @@
     function toggleHistoryStatus() { 
         const cp = allCPs[currentEditID]; 
         if(cp.clan === 'history') { 
-            const newClan = prompt("Σε ποια ομάδα; (noldor, kriminalides, caller, external)", "noldor"); 
+            let availableClans = Object.keys(globalInternalClans).join(', ');
+            const newClan = prompt(`Σε ποια ομάδα; (${availableClans}, caller, external)`, Object.keys(globalInternalClans)[0] || "noldor"); 
             if (newClan === null) return; 
             const formattedClan = newClan.trim().toLowerCase(); 
             
@@ -1100,7 +1124,7 @@
                         });
                     });
                 }
-            } else if (['noldor', 'kriminalides', 'caller'].includes(formattedClan)) {
+            } else if (globalInternalClans[formattedClan] || formattedClan === 'caller') {
                 db.ref('cps/' + currentEditID).update({ clan: formattedClan }).then(() => {
                     alert("Restored επιτυχώς στα CPs!");
                     document.getElementById('edit-section').style.display = 'none';
@@ -1123,17 +1147,18 @@
     function changeCPClan() {
         if(!currentEditID) return;
         const cp = allCPs[currentEditID];
-        const newClan = prompt("Σε ποια ομάδα να ανήκει; (noldor, kriminalides, caller, external)", cp.clan);
+        let availableClans = Object.keys(globalInternalClans).join(', ');
+        const newClan = prompt(`Σε ποια ομάδα να ανήκει; (${availableClans}, caller, external)`, cp.clan);
         if (!newClan) return;
         const formattedClan = newClan.trim().toLowerCase();
-        if (['noldor', 'kriminalides', 'caller', 'external'].includes(formattedClan)) {
+        if (globalInternalClans[formattedClan] || ['caller', 'external'].includes(formattedClan)) {
             db.ref('cps/' + currentEditID).update({ clan: formattedClan }).then(() => {
                 alert("Η ομάδα άλλαξε επιτυχώς σε " + formattedClan.toUpperCase() + "!");
                 loadEdit(currentEditID);
                 renderSimpleList();
             });
         } else {
-            alert("Λάθος όνομα! Επίλεξε noldor, kriminalides, caller, ή external.");
+            alert(`Λάθος όνομα! Επίλεξε ένα από τα Internal Clans, caller, ή external.`);
         }
     }
 
@@ -1191,6 +1216,66 @@
     function deleteCP() { if(confirm("Delete Forever?")) db.ref('cps/' + currentEditID).remove(); }
     function createExtClan() { const name = document.getElementById('new-ext-name').value.trim(); const icon = document.getElementById('new-ext-icon').value.trim(); if(!name) { alert("Βάλε όνομα!"); return; } const id = name.replace(/\s+/g, '').toLowerCase(); db.ref('externalClans/' + id).set({ name: name, iconUrl: icon || 'https://i.ibb.co/SXM1FZx8/attedance-points.png', leader: 'Pending...', description: 'Alliance agreements pending.', status: 'active', lootHistory: [] }); document.getElementById('new-ext-name').value = ''; document.getElementById('new-ext-icon').value = ''; alert("New Clan Created!"); }
     
+    function createIntClan() {
+        const name = document.getElementById('new-int-name').value.trim();
+        const color = document.getElementById('new-int-color').value;
+        const icon = document.getElementById('new-int-icon').value.trim();
+        if(!name) { alert("Βάλε όνομα Clan!"); return; }
+        const id = name.replace(/\s+/g, '').toLowerCase();
+        db.ref('internalClans/' + id).set({
+            name: name.toUpperCase() + " CLAN",
+            color: color || '#ffffff',
+            iconUrl: icon || 'https://i.ibb.co/SXM1FZx8/attedance-points.png'
+        }).then(() => {
+            document.getElementById('new-int-name').value = '';
+            document.getElementById('new-int-color').value = '#ffffff';
+            document.getElementById('new-int-icon').value = '';
+            alert("✅ Το Internal Clan δημιουργήθηκε επιτυχώς!");
+        });
+    }
+
+    function renderInternalClansList() {
+        const listDiv = document.getElementById('internal-clans-list');
+        if(!listDiv) return;
+        listDiv.innerHTML = "";
+        Object.keys(globalInternalClans).forEach(id => {
+            const clan = globalInternalClans[id];
+            listDiv.innerHTML += `
+                <div style="background: rgba(0,0,0,0.6); border: 1px solid ${clan.color}; border-left: 5px solid ${clan.color}; padding: 10px; border-radius: 5px; display: flex; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <img src="${clan.iconUrl}" style="width: 25px; height: 25px; object-fit: contain;">
+                        <span style="color: #fff; font-family: 'Cinzel'; font-size: 12px; font-weight: bold;">${clan.name}</span>
+                    </div>
+                    <button class="btn btn-red" style="width: auto; padding: 5px 10px; margin: 0; font-size: 10px;" onclick="deleteIntClan('${id}')">✖ DEL</button>
+                </div>
+            `;
+        });
+    }
+
+    function deleteIntClan(id) {
+        if(confirm(`Είσαι σίγουρος ότι θέλεις να διαγράψεις το Internal Clan '${id}';\nΤα CPs που ανήκουν σε αυτό δεν θα σβηστούν, αλλά ίσως να μην εμφανίζονται σωστά μέχρι να τους αλλάξεις Clan.`)) {
+            db.ref('internalClans/' + id).remove().then(() => alert("✅ Διαγράφηκε επιτυχώς!"));
+        }
+    }
+
+    function updateNewClanSelects() {
+        const selectEl = document.getElementById('new-clan');
+        if(!selectEl) return;
+        let html = "";
+        Object.keys(globalInternalClans).forEach(id => {
+            html += `<option value="${id}">${globalInternalClans[id].name.replace(' CLAN', '')}</option>`;
+        });
+        html += `<option value="caller">Shot Caller (π.χ. TSAKNORRIS - Στρογγυλό εικονίδιο)</option>`;
+        html += `<option value="external">External Clan</option>`;
+        const currentVal = selectEl.value;
+        selectEl.innerHTML = html;
+        if([...selectEl.options].some(o => o.value === currentVal)) {
+            selectEl.value = currentVal;
+        } else if(globalInternalClans['noldor']) {
+            selectEl.value = 'noldor';
+        }
+    }
+    
     function loadExtEdit() { 
         const selVal = document.getElementById('ext-select').value; 
         if(!selVal) { document.getElementById('ext-edit-section').style.display = 'none'; currentExtID = null; return; } 
@@ -1247,11 +1332,12 @@
         const clan = allExtClans[pureId]; 
         if(!clan) return;
 
-        const newClan = prompt("Σε ποιο Clan να μεταφερθεί ως CP;\n(noldor ή kriminalides)", "noldor");
+        let availableClans = Object.keys(globalInternalClans).join(' ή ');
+        const newClan = prompt(`Σε ποιο Clan να μεταφερθεί ως CP;\n(${availableClans})`, Object.keys(globalInternalClans)[0] || "noldor");
         if (!newClan) return;
         const formattedClan = newClan.trim().toLowerCase();
         
-        if (['noldor', 'kriminalides'].includes(formattedClan)) {
+        if (globalInternalClans[formattedClan]) {
             if(confirm(`Είσαι σίγουρος;\nΗ ομάδα "${clan.name}" θα μεταφερθεί ΟΡΙΣΤΙΚΑ στα ενεργά CPs (${formattedClan.toUpperCase()}).`)) {
                 const cpData = {
                     name: clan.name || "",
@@ -1273,7 +1359,7 @@
                 });
             }
         } else {
-            alert("Λάθος όνομα! Πρέπει να γράψεις 'noldor' ή 'kriminalides'.");
+            alert(`Λάθος όνομα! Πρέπει να γράψεις ένα από τα υπάρχοντα Internal Clans: ${availableClans}`);
         }
     }
 
