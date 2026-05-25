@@ -203,7 +203,6 @@
                             <button class="btn btn-gold" style="flex:2;" onclick="updateCP()">SAVE ALL DATA</button>
                             <button class="btn btn-blue" onclick="changeCPClan()">CLAN</button>
                             <button class="btn" id="hist-toggle-btn" onclick="toggleHistoryStatus()">HIST</button>
-                            <button class="btn btn-red" onclick="deleteCP()">DEL</button>
                             <div style="display:flex; flex:4; gap:5px;">
                                 <button class="btn btn-secondary" onclick="transferCPToExt()" style="padding:12px 5px; font-size:11px; background:#444;">TO EXT. CLAN</button>
                                 <button class="btn btn-blue" onclick="changeCPClan()">CLAN</button>
@@ -262,10 +261,11 @@
                     <input type="number" id="ext-points" style="font-size:1.2rem; color:var(--gold);">
                     <div id="ext-stat-inputs" class="stat-edit-grid" style="margin-top: 15px;"></div>
                     <div style="display:flex; gap:10px; margin-top:20px;">
-                        <button class="btn btn-gold" style="flex:2;" onclick="updateExtData()">SAVE DATA</button>
-                        <button class="btn btn-blue" id="ext-transfer-btn" onclick="transferExtToCP()" style="display:none; padding:12px 5px; font-size:11px;">TO CP</button>
-                        <button class="btn btn-blue" id="ext-transfer-btn" onclick="transferExtToCP()" style="display:none; padding:12px 5px; font-size:11px;">TO INT. CLAN</button>
+                        <button class="btn btn-gold" style="flex:1.5;" onclick="updateExtData()">SAVE DATA</button>
+                        <button class="btn btn-secondary" id="ext-convert-btn" onclick="convertExternalToInternal()" style="display:none; padding:12px 5px; font-size:11px; background:#444;">MAKE INT. CLAN</button>
+                        <button class="btn btn-blue" id="ext-transfer-btn" onclick="transferExtToCP()" style="display:none; padding:12px 5px; font-size:11px;">TO INT. CP</button>
                         <button class="btn" id="ext-hist-btn" onclick="toggleExtHistory()">HIST</button>
+                        <button class="btn btn-red" onclick="if(confirm('Delete External Clan Forever?')) { db.ref('externalClans/' + currentExtID.replace('ext_', '')).remove(); document.getElementById('ext-edit-section').style.display='none'; }">DEL</button>
                     </div>
                 </div>
                 <div>
@@ -1190,6 +1190,7 @@
             document.getElementById('ext-stat-inputs').style.display = 'none'; 
             const histBtn = document.getElementById('ext-hist-btn'); histBtn.style.display = 'block'; if(targetData.status === 'history') { histBtn.innerText = "RESTORE"; histBtn.className = "btn btn-green"; } else { histBtn.innerText = "HIST"; histBtn.className = "btn btn-blue"; } 
             const transferBtn = document.getElementById('ext-transfer-btn'); if(transferBtn) transferBtn.style.display = 'block';
+            const convertBtn = document.getElementById('ext-convert-btn'); if(convertBtn) convertBtn.style.display = 'block';
         } else if (selVal.startsWith('cp_')) { 
             const pureId = selVal.replace('cp_', ''); targetData = allCPs[pureId] || {}; 
             
@@ -1314,6 +1315,47 @@
             db.ref(`externalClans/__clanConfig/${id}`).remove();
         }
     }
+    function convertInternalToExternal(id) {
+        if(confirm("Μετατροπή αυτού του Internal Clan σε External Clan; (Θα πάει στο κάτω πάνελ)")) {
+            const clanCfg = globalClanConfig[id];
+            const extData = {
+                name: clanCfg.name || id,
+                leader: "Pending...",
+                description: "Transferred from internal clans.",
+                iconUrl: clanCfg.iconUrl || "https://i.ibb.co/SXM1FZx8/attedance-points.png",
+                status: "active",
+                totalPoints: 0,
+                lootHistory: []
+            };
+            db.ref('externalClans/' + id).set(extData).then(() => {
+                db.ref(`externalClans/__clanConfig/${id}`).remove().then(() => {
+                    alert("Μεταφέρθηκε επιτυχώς στα External Clans!");
+                });
+            });
+        }
+    }
+    function convertExternalToInternal() {
+        if(!currentExtID || !currentExtID.startsWith('ext_')) return;
+        const pureId = currentExtID.replace('ext_', '');
+        const clan = allExtClans[pureId];
+        if(!clan) return;
+        if(confirm(`Μετατροπή του External Clan "${clan.name}" σε Internal Clan;\nΘα προστεθεί στο πάνω πάνελ ως Internal.`)) {
+            const configData = {
+                name: clan.name || pureId,
+                type: 'internal',
+                color: '#d4af37',
+                iconUrl: clan.iconUrl || "https://i.ibb.co/SXM1FZx8/attedance-points.png",
+                order: Object.keys(globalClanConfig).length + 1
+            };
+            db.ref(`externalClans/__clanConfig/${pureId}`).set(configData).then(() => {
+                db.ref(`externalClans/${pureId}`).remove().then(() => {
+                    alert("Μετατράπηκε επιτυχώς σε Internal Clan!");
+                    document.getElementById('ext-edit-section').style.display = 'none';
+                    currentExtID = null;
+                });
+            });
+        }
+    }
     function updateClanManagerList() {
         const listDiv = document.getElementById('internal-clans-list');
         if(!listDiv) return;
@@ -1326,7 +1368,10 @@
                         <img src="${globalClanConfig[id].iconUrl || 'https://i.ibb.co/SXM1FZx8/attedance-points.png'}" style="width:20px; height:20px; object-fit:contain;">
                         <b style="color:#fff; font-family:'Cinzel';">${(globalClanConfig[id].name || id).toUpperCase()}</b>
                     </div>
-                    <button class="btn btn-red" style="width:auto; padding:4px 8px; margin:0; font-size:10px;" onclick="deleteInternalClan('${id}')">✖ DEL</button>
+                    <div style="display:flex; gap:5px;">
+                        <button class="btn btn-secondary" style="width:auto; padding:4px 8px; margin:0; font-size:10px; background:#444;" onclick="convertInternalToExternal('${id}')">TO EXT</button>
+                        <button class="btn btn-red" style="width:auto; padding:4px 8px; margin:0; font-size:10px;" onclick="deleteInternalClan('${id}')">✖ DEL</button>
+                    </div>
                 </div>`;
             }
         });
