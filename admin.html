@@ -204,6 +204,12 @@
                             <button class="btn btn-blue" onclick="changeCPClan()">CLAN</button>
                             <button class="btn" id="hist-toggle-btn" onclick="toggleHistoryStatus()">HIST</button>
                             <button class="btn btn-red" onclick="deleteCP()">DEL</button>
+                            <div style="display:flex; flex:4; gap:5px;">
+                                <button class="btn btn-secondary" onclick="transferCPToExt()" style="padding:12px 5px; font-size:11px; background:#444;">TO EXT. CLAN</button>
+                                <button class="btn btn-blue" onclick="changeCPClan()">CLAN</button>
+                                <button class="btn" id="hist-toggle-btn" onclick="toggleHistoryStatus()">HIST</button>
+                                <button class="btn btn-red" onclick="deleteCP()">DEL</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -258,6 +264,7 @@
                     <div style="display:flex; gap:10px; margin-top:20px;">
                         <button class="btn btn-gold" style="flex:2;" onclick="updateExtData()">SAVE DATA</button>
                         <button class="btn btn-blue" id="ext-transfer-btn" onclick="transferExtToCP()" style="display:none; padding:12px 5px; font-size:11px;">TO CP</button>
+                        <button class="btn btn-blue" id="ext-transfer-btn" onclick="transferExtToCP()" style="display:none; padding:12px 5px; font-size:11px;">TO INT. CLAN</button>
                         <button class="btn" id="ext-hist-btn" onclick="toggleExtHistory()">HIST</button>
                     </div>
                 </div>
@@ -1142,6 +1149,31 @@
         document.getElementById('new-caller-multiplier-row').style.display = clan === 'caller' ? 'block' : 'none';
     }
     function deleteCP() { if(confirm("Delete Forever?")) db.ref('cps/' + currentEditID).remove(); }
+    
+    function transferCPToExt() {
+        if(!currentEditID) return;
+        const cp = allCPs[currentEditID];
+        if(!cp) return;
+        if(confirm(`Είσαι σίγουρος; Το CP "${cp.name}" θα αφαιρεθεί από τα CPs και θα μεταφερθεί ΟΡΙΣΤΙΚΑ στα External Clans.`)) {
+            const extData = {
+                name: cp.name || "",
+                leader: cp.leader || "Pending...",
+                description: "Μεταφέρθηκε από τα ενεργά CPs.",
+                iconUrl: cp.imgUrl || "https://i.ibb.co/SXM1FZx8/attedance-points.png",
+                status: "active",
+                totalPoints: cp.totalPoints || 0,
+                lootHistory: cp.lootHistory || []
+            };
+            db.ref('externalClans/' + currentEditID).set(extData).then(() => {
+                db.ref('cps/' + currentEditID).remove().then(() => {
+                    alert("Μεταφέρθηκε επιτυχώς στα External Clans (στο κάτω πάνελ)!");
+                    document.getElementById('edit-section').style.display = 'none';
+                    currentEditID = null;
+                    setViewMode('active');
+                });
+            });
+        }
+    }
     function createExtClan() { const name = document.getElementById('new-ext-name').value.trim(); const icon = document.getElementById('new-ext-icon').value.trim(); if(!name) { alert("Βάλε όνομα!"); return; } const id = name.replace(/\s+/g, '').toLowerCase(); db.ref('externalClans/' + id).set({ name: name, iconUrl: icon || 'https://i.ibb.co/SXM1FZx8/attedance-points.png', leader: 'Pending...', description: 'Alliance agreements pending.', status: 'active', lootHistory: [] }); document.getElementById('new-ext-name').value = ''; document.getElementById('new-ext-icon').value = ''; alert("New Clan Created!"); }
     
     function loadExtEdit() { 
