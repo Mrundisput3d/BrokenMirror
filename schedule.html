@@ -94,6 +94,7 @@
         }
         .next-card .nc-when { color: #cfcfcf; font-size: 0.9rem; margin: 3px 0; }
         .next-card .nc-when b { color: #fff; }
+        .next-card .nc-utc { color: #888; font-size: 0.75rem; letter-spacing: 0.5px; }
         .next-card .nc-count {
             margin-top: 10px; font-family: 'Cinzel'; font-weight: 700;
             font-size: 1.15rem; color: var(--accent);
@@ -126,6 +127,7 @@
         .cat-badge.boss { background: rgba(239, 68, 68, 0.15); color: var(--boss); border: 1px solid rgba(239, 68, 68, 0.4); }
         .cat-badge.siege { background: rgba(59, 130, 246, 0.15); color: var(--siege); border: 1px solid rgba(59, 130, 246, 0.4); }
         .cat-badge.clanhall { background: rgba(34, 197, 94, 0.15); color: var(--clanhall); border: 1px solid rgba(34, 197, 94, 0.4); }
+        .utc-sub { color: #888; font-size: 0.78rem; letter-spacing: 0.5px; }
         .count-cell { font-family: 'Cinzel'; font-weight: 700; color: var(--gold); white-space: nowrap; }
         .count-cell.spawned { color: #777; font-weight: 400; font-style: italic; }
 
@@ -222,10 +224,17 @@
             return parts.join(' ');
         }
         function localDate(ms) {
-            return new Date(ms).toLocaleDateString(undefined, { day: '2-digit', month: '2-digit', year: 'numeric' });
+            const d = new Date(ms);
+            const dd = String(d.getDate()).padStart(2, '0');
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            return `${dd}/${mm}/${d.getFullYear()}`;
         }
         function localTime(ms) {
-            return new Date(ms).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+            return new Date(ms).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', hour12: false });
+        }
+        function utcTime(ms) {
+            // ISO is always UTC + 24h: slice the HH:MM out of it.
+            return new Date(ms).toISOString().substr(11, 5);
         }
 
         db.ref('regroups').on('value', (snap) => {
@@ -243,54 +252,92 @@
             render();
         });
 
-        function render() {
+        let cardTs = { boss: null, siege: null, clanhall: null };
+
+        // Build the three "next-per-category" cards (DOM created once per data change).
+        function buildCards() {
             const now = Date.now();
-            const body = document.getElementById('schedule-body');
             const cards = document.getElementById('next-cards');
-
-            if (!regroupEvents.length) {
-                body.innerHTML = '<tr><td colspan="5" class="loading-text">No spawn timers available.</td></tr>';
-                cards.innerHTML = '';
-                return;
-            }
-
-            // --- next-per-category cards ---
             const nextByCat = {};
             for (const e of regroupEvents) {
                 if (e.ts > now && !nextByCat[e.category]) nextByCat[e.category] = e;
             }
+            cardTs = { boss: null, siege: null, clanhall: null };
             cards.innerHTML = ['boss', 'siege', 'clanhall'].map(cat => {
                 const e = nextByCat[cat];
-                const inner = e
-                    ? `<div class="nc-name">${e.event}</div>
-                       <div class="nc-when"><b>${localDate(e.ts)}</b></div>
-                       <div class="nc-when">${localTime(e.ts)}</div>
-                       <div class="nc-count">${fmtRemaining(e.ts - now) || 'Now'}</div>`
-                    : `<div class="nc-name" style="opacity:.5">—</div>`;
-                return `<div class="next-card ${cat}"><div class="nc-label">${CAT_LABEL[cat]}</div>${inner}</div>`;
+                if (!e) return `<div class="next-card ${cat}"><div class="nc-label">${CAT_LABEL[cat]}</div><div class="nc-name" style="opacity:.5">—</div></div>`;
+                cardTs[cat] = e.ts;
+                return `<div class="next-card ${cat}">
+                    <div class="nc-label">${CAT_LABEL[cat]}</div>
+                    <div class="nc-name">${e.event}</div>
+                    <div class="nc-when"><b>${localDate(e.ts)}</b></div>
+                    <div class="nc-when">${localTime(e.ts)} <span class="nc-utc">(${utcTime(e.ts)} UTC)</span></div>
+                    <div class="nc-count" data-ts="${e.ts}">${fmtRemaining(e.ts - now) || 'Now'}</div>
+                </div>`;
             }).join('');
+        }
 
-            // --- full table ---
-            body.innerHTML = regroupEvents.map(e => {
+        // Build the full table (DOM created once per data change).
+        function buildTable() {
+            const now = Date.now();
+            document.getElementById('schedule-body').innerHTML = regroupEvents.map(e => {
                 const remaining = fmtRemaining(e.ts - now);
                 const past = remaining === null;
                 return `<tr class="${past ? 'past' : ''}">
                     <td data-label="Event"><span class="ev-name">${e.event}</span></td>
                     <td data-label="Type"><span class="cat-badge ${e.category}">${CAT_TAG[e.category]}</span></td>
                     <td data-label="Date">${localDate(e.ts)}</td>
-                    <td data-label="Time">${localTime(e.ts)}</td>
-                    <td data-label="Time Remaining" class="count-cell ${past ? 'spawned' : ''}">${remaining || 'Spawned'}</td>
+                    <td data-label="Time">${localTime(e.ts)} <span class="utc-sub">(${utcTime(e.ts)} UTC)</span></td>
+                    <td data-label="Time Remaining" class="count-cell ${past ? 'spawned' : ''}" data-ts="${e.ts}">${remaining || 'Spawned'}</td>
                 </tr>`;
             }).join('');
+        }
 
-            const note = document.getElementById('updated-note');
-            note.textContent = updatedAt
+        // Full (re)build — only on data change from Firebase.
+        function render() {
+            if (!regroupEvents.length) {
+                document.getElementById('schedule-body').innerHTML = '<tr><td colspan="5" class="loading-text">No spawn timers available.</td></tr>';
+                document.getElementById('next-cards').innerHTML = '';
+                return;
+            }
+            buildCards();
+            buildTable();
+            document.getElementById('updated-note').textContent = updatedAt
                 ? 'Schedule last synced: ' + new Date(updatedAt).toLocaleString()
                 : '';
         }
 
-        // Live countdown — re-render once a second.
-        setInterval(() => { if (regroupEvents.length) render(); }, 1000);
+        // Per-second countdown: update text in place only — no DOM teardown, so a
+        // hovered card is never interrupted. Cards are re-picked only once their
+        // event actually spawns.
+        function tick() {
+            if (!regroupEvents.length) return;
+            const now = Date.now();
+
+            document.querySelectorAll('#schedule-body .count-cell').forEach(cell => {
+                const remaining = fmtRemaining(+cell.dataset.ts - now);
+                if (remaining === null) {
+                    if (!cell.classList.contains('spawned')) {
+                        cell.classList.add('spawned');
+                        cell.closest('tr').classList.add('past');
+                    }
+                    cell.textContent = 'Spawned';
+                } else {
+                    cell.textContent = remaining;
+                }
+            });
+
+            // A displayed "next" event has spawned -> re-pick the cards.
+            if (['boss', 'siege', 'clanhall'].some(c => cardTs[c] !== null && now >= cardTs[c])) {
+                buildCards();
+                return;
+            }
+            document.querySelectorAll('#next-cards .nc-count').forEach(el => {
+                el.textContent = fmtRemaining(+el.dataset.ts - now) || 'Now';
+            });
+        }
+
+        setInterval(tick, 1000);
     </script>
 </body>
 </html>
