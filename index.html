@@ -21,7 +21,7 @@
         body,
         html {
             background: var(--bg);
-            background-image: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), url('https://i.ibb.co/84cPVVp3/baium.png');
+            background-image: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), url('images/baium.png');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -183,19 +183,19 @@
             background-color: rgba(0, 0, 0, 0.6);
         }
         #card-treasury {
-            background-image: url('https://i.ibb.co/TqNQrNx3/MARKET.png');
+            background-image: url('images/market.png');
         }
         #card-history {
-            background-image: url('https://i.ibb.co/N2t24Pht/FALLEN-HEROES.png');
+            background-image: url('images/fallen-heroes.png');
         }
         #card-warzone {
-            background-image: url('https://i.ibb.co/G3HdK5jw/PVPZONE.png');
+            background-image: url('images/pvpzone.png');
         }
         #card-fame {
-            background-image: url('https://i.ibb.co/RGpww9dy/HALLOFFAME.png');
+            background-image: url('images/halloffame.png');
         }
         #card-schedule {
-            background-image: url('respawn.png');
+            background-image: url('images/respawn.png');
         }
         .nav-card::before {
             content: '';
@@ -908,7 +908,7 @@
         const firebaseConfig = { apiKey: "AIzaSyDRL8EehxdcgVYJ0LJ1khVYkSJcaCMKRes", authDomain: "brokenmirrordb.firebaseapp.com", databaseURL: "https://brokenmirrordb-default-rtdb.europe-west1.firebasedatabase.app", projectId: "brokenmirrordb" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-        const bossIcons = { "VAL": "https://i.ibb.co/84gZPVRP/necklace-valakas.png", "ANT": "https://i.ibb.co/rfqvc6mv/earring-antharas.png", "BAI": "https://i.ibb.co/XrZkv67h/ring-of-baium.png", "FRI": "https://i.ibb.co/gF4YKGTM/frintezza-necklace.png", "ZAK": "https://i.ibb.co/spkC6Gzz/zaken-earring.png", "AQ": "https://i.ibb.co/rKRtZmBG/ring-of-queen-ant.png", "ORF": "https://i.ibb.co/j9dDnXwH/earring-orfen.png", "COR": "https://i.ibb.co/ksv37fNZ/ring-of-.png", "SIE": "https://i.ibb.co/Txfby6wD/images.png", "DPVP": "https://i.ibb.co/G3HdK5jw/PVPZONE.png" };
+        const bossIcons = { "VAL": "images/necklace-valakas.png", "ANT": "images/earring-antharas.png", "BAI": "images/ring-of-baium.png", "FRI": "images/frintezza-necklace.png", "ZAK": "images/zaken-earring.png", "AQ": "images/ring-of-queen-ant.png", "ORF": "images/earring-orfen.png", "COR": "images/ring-of-core.png", "SIE": "images/images.png", "DPVP": "images/pvpzone.png" };
         let globalCPData = {};
         let globalExternalClans = {};
         let globalDailyLogs = {};
@@ -930,7 +930,7 @@
             return name.replace(/[.#$\[\]]/g, '_');
         }
         function getIconForLoot(itemName) {
-            if (!itemName) return "https://i.ibb.co/SXM1FZx8/attedance-points.png";
+            if (!itemName) return "images/attedance-points.png";
             const upName = itemName.toUpperCase();
             if (upName.includes("VAL")) return bossIcons.VAL;
             if (upName.includes("QUEEN") || upName.includes("AQ")) return bossIcons.AQ;
@@ -940,7 +940,7 @@
             if (upName.includes("ZAK")) return bossIcons.ZAK;
             if (upName.includes("ORF")) return bossIcons.ORF;
             if (upName.includes("COR")) return bossIcons.COR;
-            return "https://i.ibb.co/SXM1FZx8/attedance-points.png";
+            return "images/attedance-points.png";
         }
         db.ref('cps/').on('value', (snapshot) => {
             globalCPData = snapshot.val() || {};
@@ -1025,7 +1025,7 @@
                 if (!match) return;
                 if (cp.clan === 'caller') {
                     const role = cp.leader || "CALLER";
-                    const img = cp.imgUrl || "https://i.ibb.co/SXM1FZx8/attedance-points.png";
+                    const img = cp.imgUrl || "images/attedance-points.png";
                     dynamicLeadersHtml += `
                         <div class="leader-card" onclick="openCaller('${id}', '${role}', '${img}')">
                             <div class="img-frame"><img src="${img}" class="leader-img"></div>
@@ -1102,7 +1102,7 @@
                 }
                 if (!match) return;
                 const cName = clan.name || clanId;
-                const icon = clan.iconUrl || 'https://i.ibb.co/SXM1FZx8/attedance-points.png';
+                const icon = clan.iconUrl || 'images/attedance-points.png';
                 extHtml += `
                     <div class="new-clan-card" onclick="openClanModal('${clanId}')">
                         <img src="${icon}" class="new-clan-icon">
@@ -1193,7 +1193,7 @@
             const extData = globalExternalClans[clanId];
             if (!extData) return;
             document.getElementById('clan-modal-name').innerText = (extData.name || clanId).toUpperCase();
-            document.getElementById('clan-modal-img').src = extData.iconUrl || 'https://i.ibb.co/SXM1FZx8/attedance-points.png';
+            document.getElementById('clan-modal-img').src = extData.iconUrl || 'images/attedance-points.png';
             const leaderName = extData.leader || "Pending...";
             const content = extData.description || "Alliance agreements pending.";
             const formattedContent = content.replace(/\n/g, '<br>');

@@ -136,16 +136,16 @@
             <div id="detected-list"></div>
             <div id="unmatched-list"></div>
             <div class="boss-grid">
-                <div class="boss-btn" onclick="logValidatedEvent('VAL', 3)"><img src="https://i.ibb.co/84gZPVRP/necklace-valakas.png"><span>VAL</span></div>
-                <div class="boss-btn" onclick="logValidatedEvent('ANT', 3)"><img src="https://i.ibb.co/rfqvc6mv/earring-antharas.png"><span>ANT</span></div>
-                <div class="boss-btn" onclick="logValidatedEvent('BAI', 2)"><img src="https://i.ibb.co/XrZkv67h/ring-of-baium.png"><span>BAI</span></div>
-                <div class="boss-btn" onclick="logValidatedEvent('SIE', 3)"><img src="https://i.ibb.co/Txfby6wD/images.png"><span>SIEGE</span></div>
-                <div class="boss-btn" onclick="logValidatedEvent('ZAK', 1)"><img src="https://i.ibb.co/spkC6Gzz/zaken-earring.png"><span>ZAK</span></div>
-                <div class="boss-btn" onclick="logValidatedEvent('FRI', 1)"><img src="https://i.ibb.co/gF4YKGTM/frintezza-necklace.png"><span>FRIN</span></div>
-                <div class="boss-btn" onclick="logValidatedEvent('AQ', 1)"><img src="https://i.ibb.co/rKRtZmBG/ring-of-queen-ant.png"><span>AQ</span></div>
-                <div class="boss-btn" onclick="logValidatedEvent('ORF', 1)"><img src="https://i.ibb.co/j9dDnXwH/earring-orfen.png"><span>ORF</span></div>
-                <div class="boss-btn" onclick="logValidatedEvent('COR', 1)"><img src="https://i.ibb.co/ksv37fNZ/ring-of-.png"><span>CORE</span></div>
-                <div class="boss-btn" onclick="logValidatedEvent('DPVP', 3)"><img src="https://i.ibb.co/G3HdK5jw/PVPZONE.png" style="border-radius: 15px;"><span>D. PVP</span></div>
+                <div class="boss-btn" onclick="logValidatedEvent('VAL', 3)"><img src="images/necklace-valakas.png"><span>VAL</span></div>
+                <div class="boss-btn" onclick="logValidatedEvent('ANT', 3)"><img src="images/earring-antharas.png"><span>ANT</span></div>
+                <div class="boss-btn" onclick="logValidatedEvent('BAI', 2)"><img src="images/ring-of-baium.png"><span>BAI</span></div>
+                <div class="boss-btn" onclick="logValidatedEvent('SIE', 3)"><img src="images/images.png"><span>SIEGE</span></div>
+                <div class="boss-btn" onclick="logValidatedEvent('ZAK', 1)"><img src="images/zaken-earring.png"><span>ZAK</span></div>
+                <div class="boss-btn" onclick="logValidatedEvent('FRI', 1)"><img src="images/frintezza-necklace.png"><span>FRIN</span></div>
+                <div class="boss-btn" onclick="logValidatedEvent('AQ', 1)"><img src="images/ring-of-queen-ant.png"><span>AQ</span></div>
+                <div class="boss-btn" onclick="logValidatedEvent('ORF', 1)"><img src="images/earring-orfen.png"><span>ORF</span></div>
+                <div class="boss-btn" onclick="logValidatedEvent('COR', 1)"><img src="images/ring-of-core.png"><span>CORE</span></div>
+                <div class="boss-btn" onclick="logValidatedEvent('DPVP', 3)"><img src="images/pvpzone.png" style="border-radius: 15px;"><span>D. PVP</span></div>
                 <div class="boss-btn" onclick="addNamesToSlotsManager()" style="border-color: var(--green);"><div style="font-size:24px; margin-bottom:5px;">📋</div><span style="color:var(--green);">SLOTS</span></div>
             </div>
             <!-- New Control Bar for Slots Manager -->
@@ -1045,7 +1045,7 @@
                     const extData = {
                         name: cp.name || "",
                         leader: cp.leader || "",
-                        iconUrl: cp.imgUrl || "https://i.ibb.co/SXM1FZx8/attedance-points.png",
+                        iconUrl: cp.imgUrl || "images/attedance-points.png",
                         description: "Μεταφέρθηκε από τα ενεργά CPs.",
                         status: "active",
                         totalPoints: cp.totalPoints || 0,
@@ -1126,7 +1126,7 @@
         const cpData = { 
             name: n, 
             leader: document.getElementById('new-leader').value, 
-            imgUrl: document.getElementById('new-imgUrl').value || 'https://i.ibb.co/SXM1FZx8/attedance-points.png', 
+            imgUrl: document.getElementById('new-imgUrl').value || 'images/attedance-points.png', 
             clan: clan, 
             totalPoints: 0, 
             members: "", 
@@ -1159,7 +1159,7 @@
                 name: cp.name || "",
                 leader: cp.leader || "Pending...",
                 description: "Μεταφέρθηκε από τα ενεργά CPs.",
-                iconUrl: cp.imgUrl || "https://i.ibb.co/SXM1FZx8/attedance-points.png",
+                iconUrl: cp.imgUrl || "images/attedance-points.png",
                 status: "active",
                 totalPoints: cp.totalPoints || 0,
                 lootHistory: cp.lootHistory || []
@@ -1174,7 +1174,7 @@
             });
         }
     }
-    function createExtClan() { const name = document.getElementById('new-ext-name').value.trim(); const icon = document.getElementById('new-ext-icon').value.trim(); if(!name) { alert("Βάλε όνομα!"); return; } const id = name.replace(/\s+/g, '').toLowerCase(); db.ref('externalClans/' + id).set({ name: name, iconUrl: icon || 'https://i.ibb.co/SXM1FZx8/attedance-points.png', leader: 'Pending...', description: 'Alliance agreements pending.', status: 'active', lootHistory: [] }); document.getElementById('new-ext-name').value = ''; document.getElementById('new-ext-icon').value = ''; alert("New Clan Created!"); }
+    function createExtClan() { const name = document.getElementById('new-ext-name').value.trim(); const icon = document.getElementById('new-ext-icon').value.trim(); if(!name) { alert("Βάλε όνομα!"); return; } const id = name.replace(/\s+/g, '').toLowerCase(); db.ref('externalClans/' + id).set({ name: name, iconUrl: icon || 'images/attedance-points.png', leader: 'Pending...', description: 'Alliance agreements pending.', status: 'active', lootHistory: [] }); document.getElementById('new-ext-name').value = ''; document.getElementById('new-ext-icon').value = ''; alert("New Clan Created!"); }
     
     function loadExtEdit() { 
         const selVal = document.getElementById('ext-select').value; 
@@ -1240,7 +1240,7 @@
                 const cpData = {
                     name: clan.name || "",
                     leader: clan.leader || "",
-                    imgUrl: clan.iconUrl || "https://i.ibb.co/SXM1FZx8/attedance-points.png",
+                    imgUrl: clan.iconUrl || "images/attedance-points.png",
                     clan: formattedClan,
                     totalPoints: clan.totalPoints || 0,
                     members: "", 
@@ -1302,7 +1302,7 @@
             name: name,
             type: 'internal',
             color: color,
-            iconUrl: icon || 'https://i.ibb.co/SXM1FZx8/attedance-points.png',
+            iconUrl: icon || 'images/attedance-points.png',
             order: Object.keys(globalClanConfig).length + 1
         }).then(() => {
             document.getElementById('new-internal-clan-name').value = '';
@@ -1322,7 +1322,7 @@
                 name: clanCfg.name || id,
                 leader: "Pending...",
                 description: "Transferred from internal clans.",
-                iconUrl: clanCfg.iconUrl || "https://i.ibb.co/SXM1FZx8/attedance-points.png",
+                iconUrl: clanCfg.iconUrl || "images/attedance-points.png",
                 status: "active",
                 totalPoints: 0,
                 lootHistory: []
@@ -1344,7 +1344,7 @@
                 name: clan.name || pureId,
                 type: 'internal',
                 color: '#d4af37',
-                iconUrl: clan.iconUrl || "https://i.ibb.co/SXM1FZx8/attedance-points.png",
+                iconUrl: clan.iconUrl || "images/attedance-points.png",
                 order: Object.keys(globalClanConfig).length + 1
             };
             db.ref(`externalClans/__clanConfig/${pureId}`).set(configData).then(() => {
@@ -1365,7 +1365,7 @@
                 html += `<div style="display:flex; justify-content:space-between; align-items:center; padding:8px; border-bottom:1px solid #222;">
                     <div style="display:flex; align-items:center; gap:10px;">
                         <span style="display:inline-block; width:12px; height:12px; background:${globalClanConfig[id].color || '#d4af37'}; border-radius:50%; border:1px solid #333;"></span>
-                        <img src="${globalClanConfig[id].iconUrl || 'https://i.ibb.co/SXM1FZx8/attedance-points.png'}" style="width:20px; height:20px; object-fit:contain;">
+                        <img src="${globalClanConfig[id].iconUrl || 'images/attedance-points.png'}" style="width:20px; height:20px; object-fit:contain;">
                         <b style="color:#fff; font-family:'Cinzel';">${(globalClanConfig[id].name || id).toUpperCase()}</b>
                     </div>
                     <div style="display:flex; gap:5px;">

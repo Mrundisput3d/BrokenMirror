@@ -11,7 +11,7 @@
         
         body { 
             background: var(--bg); 
-            background-image: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)), url('https://i.ibb.co/FbHYLMCD/BACKGROUND.png');
+            background-image: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)), url('images/background.png');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -68,7 +68,7 @@
 <body>
 
     <div class="top-header">
-        <img src="https://i.ibb.co/6R9q5PGv/ALLIANCE-LOGO.png" class="ally-logo">
+        <img src="images/alliance-logo.png" class="ally-logo">
         <span class="ally-title">1 UNITED POWER ALLIANCE</span>
         <div class="main-nav">
             <a href="index.html" class="nav-btn">DASHBOARD</a>
@@ -96,10 +96,10 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        const bossIcons = { "VAL": "https://i.ibb.co/84gZPVRP/necklace-valakas.png", "ANT": "https://i.ibb.co/rfqvc6mv/earring-antharas.png", "BAI": "https://i.ibb.co/XrZkv67h/ring-of-baium.png", "FRI": "https://i.ibb.co/gF4YKGTM/frintezza-necklace.png", "ZAK": "https://i.ibb.co/spkC6Gzz/zaken-earring.png", "AQ":  "https://i.ibb.co/rKRtZmBG/ring-of-queen-ant.png", "ORF": "https://i.ibb.co/j9dDnXwH/earring-orfen.png", "COR": "https://i.ibb.co/ksv37fNZ/ring-of-.png", "SIE": "https://i.ibb.co/Txfby6wD/images.png" };
+        const bossIcons = { "VAL": "images/necklace-valakas.png", "ANT": "images/earring-antharas.png", "BAI": "images/ring-of-baium.png", "FRI": "images/frintezza-necklace.png", "ZAK": "images/zaken-earring.png", "AQ":  "images/ring-of-queen-ant.png", "ORF": "images/earring-orfen.png", "COR": "images/ring-of-core.png", "SIE": "images/images.png" };
 
         function getIconForLoot(itemName) {
-            if(!itemName) return "https://i.ibb.co/SXM1FZx8/attedance-points.png";
+            if(!itemName) return "images/attedance-points.png";
             const upName = itemName.toUpperCase();
             if(upName.includes("VAL")) return bossIcons.VAL;
             if(upName.includes("QUEEN") || upName.includes("AQ")) return bossIcons.AQ;
@@ -109,7 +109,7 @@
             if(upName.includes("ZAK")) return bossIcons.ZAK;
             if(upName.includes("ORF")) return bossIcons.ORF;
             if(upName.includes("COR")) return bossIcons.COR;
-            return "https://i.ibb.co/SXM1FZx8/attedance-points.png"; 
+            return "images/attedance-points.png"; 
         }
 
         let globalCPs = {};
