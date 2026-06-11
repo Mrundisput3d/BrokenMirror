@@ -1,0 +1,14 @@
+{
+  "name": "brokenmirror-scraper",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "description": "Scrapes the avalanche regroup/respawn schedule and pushes it to Firebase.",
+  "scripts": {
+    "scrape": "node scrape-regroups.js",
+    "push": "node scrape-regroups.js --push"
+  },
+  "dependencies": {
+    "firebase-admin": "^13.0.0"
+  }
+}

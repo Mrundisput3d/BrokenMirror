@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1 UNITED POWER Alliance | Spawn Timers</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;700;900&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+    <style>
+        :root {
+            --gold: #d4af37;
+            --boss: #ef4444;
+            --siege: #3b82f6;
+            --clanhall: #22c55e;
+        }
+        body {
+            background: #0a0c0f;
+            background-image: linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.85)), url('https://i.ibb.co/84cPVVp3/baium.png');
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center;
+            color: #eee;
+            font-family: 'Open Sans', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .top-header { text-align: center; padding-top: 20px; }
+        .ally-logo { width: 110px; filter: drop-shadow(0 0 15px var(--gold)); }
+        .ally-title { font-family: 'Cinzel Decorative', cursive; font-size: 1.8rem; color: var(--gold); display: block; letter-spacing: 2px; margin-bottom: 20px; }
+
+        /* NAVIGATION */
+        .main-nav { display: flex; justify-content: center; gap: 10px; margin-bottom: 30px; flex-wrap: wrap; }
+        .nav-btn { background: rgba(212, 175, 55, 0.1); border: 1px solid var(--gold); color: var(--gold); padding: 8px 15px; font-family: 'Cinzel'; cursor: pointer; transition: 0.3s; font-size: 0.75rem; border-radius: 4px; text-decoration: none; }
+        .nav-btn:hover { background: var(--gold); color: #000; }
+        .nav-btn.active { background: var(--gold); color: #000; }
+
+        .page-wrap { max-width: 1300px; margin: 0 auto; padding: 0 20px 60px; }
+
+        .page-title {
+            text-align: center;
+            font-family: 'Cinzel Decorative', cursive;
+            color: #fff;
+            font-size: 2rem;
+            margin: 10px 0 6px;
+            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
+        }
+        .tz-note { text-align: center; color: #888; font-size: 0.85rem; margin-bottom: 30px; font-family: 'Cinzel'; }
+        .tz-note span { color: var(--gold); }
+
+        /* --- NEXT CARDS --- */
+        .next-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 22px;
+            margin-bottom: 40px;
+        }
+        .next-card {
+            position: relative;
+            border-radius: 14px;
+            padding: 22px 20px;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.55);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            transition: transform 0.3s;
+        }
+        .next-card:hover { transform: translateY(-5px); }
+        .next-card::before {
+            content: '';
+            position: absolute; inset: 0;
+            border-radius: 14px;
+            padding: 2px;
+            background: var(--accent);
+            -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            -webkit-mask-composite: xor; mask-composite: exclude;
+            opacity: 0.8;
+        }
+        .next-card.boss { --accent: var(--boss); }
+        .next-card.siege { --accent: var(--siege); }
+        .next-card.clanhall { --accent: var(--clanhall); }
+        .next-card .nc-label {
+            font-family: 'Cinzel'; font-weight: 700; letter-spacing: 2px;
+            font-size: 0.8rem; text-transform: uppercase; color: var(--accent);
+            margin-bottom: 8px;
+        }
+        .next-card .nc-name {
+            font-family: 'Cinzel Decorative', cursive; font-size: 1.5rem; color: #fff;
+            margin-bottom: 12px; line-height: 1.2;
+        }
+        .next-card .nc-when { color: #cfcfcf; font-size: 0.9rem; margin: 3px 0; }
+        .next-card .nc-when b { color: #fff; }
+        .next-card .nc-count {
+            margin-top: 10px; font-family: 'Cinzel'; font-weight: 700;
+            font-size: 1.15rem; color: var(--accent);
+        }
+
+        /* --- TABLE --- */
+        .table-wrap {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        table.schedule { width: 100%; border-collapse: collapse; }
+        table.schedule thead th {
+            background: rgba(212, 175, 55, 0.12);
+            color: var(--gold);
+            font-family: 'Cinzel'; font-size: 0.8rem; letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 14px 16px; text-align: left;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+        }
+        table.schedule tbody td { padding: 14px 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); font-size: 0.92rem; }
+        table.schedule tbody tr:hover { background: rgba(212, 175, 55, 0.05); }
+        table.schedule tbody tr.past { opacity: 0.4; }
+        .ev-name { font-weight: 600; color: #fff; }
+        .cat-badge {
+            display: inline-block; font-family: 'Cinzel'; font-size: 0.65rem; font-weight: 700;
+            letter-spacing: 1px; text-transform: uppercase; padding: 3px 9px; border-radius: 20px;
+        }
+        .cat-badge.boss { background: rgba(239, 68, 68, 0.15); color: var(--boss); border: 1px solid rgba(239, 68, 68, 0.4); }
+        .cat-badge.siege { background: rgba(59, 130, 246, 0.15); color: var(--siege); border: 1px solid rgba(59, 130, 246, 0.4); }
+        .cat-badge.clanhall { background: rgba(34, 197, 94, 0.15); color: var(--clanhall); border: 1px solid rgba(34, 197, 94, 0.4); }
+        .count-cell { font-family: 'Cinzel'; font-weight: 700; color: var(--gold); white-space: nowrap; }
+        .count-cell.spawned { color: #777; font-weight: 400; font-style: italic; }
+
+        .updated-note { text-align: center; color: #666; font-size: 0.75rem; font-family: 'Cinzel'; margin-top: 20px; }
+        .loading-text { text-align: center; font-family: 'Cinzel'; color: var(--gold); font-size: 1.3rem; padding: 60px 0; }
+
+        @media (max-width: 900px) {
+            .next-cards { grid-template-columns: 1fr; }
+            table.schedule thead { display: none; }
+            table.schedule, table.schedule tbody, table.schedule tr, table.schedule td { display: block; width: 100%; box-sizing: border-box; }
+            table.schedule tr { border-bottom: 2px solid rgba(212, 175, 55, 0.2); padding: 6px 0; }
+            table.schedule td { border: none; padding: 6px 16px; }
+            table.schedule td::before { content: attr(data-label); color: var(--gold); font-family: 'Cinzel'; font-size: 0.7rem; display: block; text-transform: uppercase; letter-spacing: 1px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top-header">
+        <img src="https://i.ibb.co/6R9q5PGv/ALLIANCE-LOGO.png" class="ally-logo">
+        <span class="ally-title">1 UNITED POWER</span>
+
+        <div class="main-nav">
+            <a href="index.html" class="nav-btn">DASHBOARD</a>
+            <a href="history.html" class="nav-btn">LEAVERS HISTORY</a>
+            <a href="pvpzone.html" class="nav-btn">PVP ZONE</a>
+            <a href="schedule.html" class="nav-btn active">SPAWN TIMERS</a>
+            <a href="halloffame.html" class="nav-btn">HALL OF FAME</a>
+        </div>
+    </div>
+
+    <div class="page-wrap">
+        <h1 class="page-title">Spawn &amp; Regroup Schedule</h1>
+        <div class="tz-note">All times shown in your local timezone: <span id="tz-name">—</span></div>
+
+        <div class="next-cards" id="next-cards"></div>
+
+        <div class="table-wrap">
+            <table class="schedule">
+                <thead>
+                    <tr>
+                        <th>Event</th>
+                        <th>Type</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Time Remaining</th>
+                    </tr>
+                </thead>
+                <tbody id="schedule-body">
+                    <tr><td colspan="5" class="loading-text">Loading spawn timers…</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="updated-note" id="updated-note"></div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDRL8EehxdcgVYJ0LJ1khVYkSJcaCMKRes",
+            authDomain: "brokenmirrordb.firebaseapp.com",
+            databaseURL: "https://brokenmirrordb-default-rtdb.europe-west1.firebasedatabase.app"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        let regroupEvents = [];   // [{ event, ts(ms), category }]
+        let updatedAt = null;
+
+        document.getElementById('tz-name').textContent =
+            Intl.DateTimeFormat().resolvedOptions().timeZone || 'local';
+
+        // Boss = anything that isn't a siege or clan hall.
+        function categorize(name) {
+            const n = name.toLowerCase();
+            if (n.startsWith('ch -') || n.startsWith('ch-') || n.includes('clan hall')) return 'clanhall';
+            if (n.startsWith('siege')) return 'siege';
+            return 'boss';
+        }
+        const CAT_LABEL = { boss: 'Next Boss', siege: 'Next Siege', clanhall: 'Next Clan Hall' };
+        const CAT_TAG = { boss: 'Boss', siege: 'Siege', clanhall: 'Clan Hall' };
+
+        function fmtRemaining(ms) {
+            if (ms <= 0) return null;
+            let s = Math.floor(ms / 1000);
+            const d = Math.floor(s / 86400); s %= 86400;
+            const h = Math.floor(s / 3600); s %= 3600;
+            const m = Math.floor(s / 60); s %= 60;
+            const parts = [];
+            if (d) parts.push(d + 'd');
+            if (d || h) parts.push(h + 'h');
+            parts.push(m + 'm');
+            parts.push(s + 's');
+            return parts.join(' ');
+        }
+        function localDate(ms) {
+            return new Date(ms).toLocaleDateString(undefined, { day: '2-digit', month: '2-digit', year: 'numeric' });
+        }
+        function localTime(ms) {
+            return new Date(ms).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+        }
+
+        db.ref('regroups').on('value', (snap) => {
+            const data = snap.val() || {};
+            updatedAt = data.updatedAt || null;
+            const events = data.events || {};
+            regroupEvents = Object.values(events)
+                .filter(e => e && e.respawnTimestamp)
+                .map(e => ({
+                    event: e.event,
+                    ts: e.respawnTimestamp * 1000,
+                    category: categorize(e.event)
+                }))
+                .sort((a, b) => a.ts - b.ts);
+            render();
+        });
+
+        function render() {
+            const now = Date.now();
+            const body = document.getElementById('schedule-body');
+            const cards = document.getElementById('next-cards');
+
+            if (!regroupEvents.length) {
+                body.innerHTML = '<tr><td colspan="5" class="loading-text">No spawn timers available.</td></tr>';
+                cards.innerHTML = '';
+                return;
+            }
+
+            // --- next-per-category cards ---
+            const nextByCat = {};
+            for (const e of regroupEvents) {
+                if (e.ts > now && !nextByCat[e.category]) nextByCat[e.category] = e;
+            }
+            cards.innerHTML = ['boss', 'siege', 'clanhall'].map(cat => {
+                const e = nextByCat[cat];
+                const inner = e
+                    ? `<div class="nc-name">${e.event}</div>
+                       <div class="nc-when"><b>${localDate(e.ts)}</b></div>
+                       <div class="nc-when">${localTime(e.ts)}</div>
+                       <div class="nc-count">${fmtRemaining(e.ts - now) || 'Now'}</div>`
+                    : `<div class="nc-name" style="opacity:.5">—</div>`;
+                return `<div class="next-card ${cat}"><div class="nc-label">${CAT_LABEL[cat]}</div>${inner}</div>`;
+            }).join('');
+
+            // --- full table ---
+            body.innerHTML = regroupEvents.map(e => {
+                const remaining = fmtRemaining(e.ts - now);
+                const past = remaining === null;
+                return `<tr class="${past ? 'past' : ''}">
+                    <td data-label="Event"><span class="ev-name">${e.event}</span></td>
+                    <td data-label="Type"><span class="cat-badge ${e.category}">${CAT_TAG[e.category]}</span></td>
+                    <td data-label="Date">${localDate(e.ts)}</td>
+                    <td data-label="Time">${localTime(e.ts)}</td>
+                    <td data-label="Time Remaining" class="count-cell ${past ? 'spawned' : ''}">${remaining || 'Spawned'}</td>
+                </tr>`;
+            }).join('');
+
+            const note = document.getElementById('updated-note');
+            note.textContent = updatedAt
+                ? 'Schedule last synced: ' + new Date(updatedAt).toLocaleString()
+                : '';
+        }
+
+        // Live countdown — re-render once a second.
+        setInterval(() => { if (regroupEvents.length) render(); }, 1000);
+    </script>
+</body>
+</html>

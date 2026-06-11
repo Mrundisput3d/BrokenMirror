@@ -1,0 +1,14 @@
+# Secrets — never commit the Firebase service account key
+serviceAccountKey.json
+serviceAccount.json
+*serviceAccount*.json
+.env
+
+# Node
+node_modules/
+
+# Local scrape snapshots (--out artifacts); the site reads from Firebase
+regroups.json
+
+# Local IDE
+.idea/

@@ -160,7 +160,7 @@
             position: relative;
             z-index: 20;
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(5, 1fr);
             gap: 25px;
         }
         .nav-card {
@@ -193,6 +193,9 @@
         }
         #card-fame {
             background-image: url('https://i.ibb.co/RGpww9dy/HALLOFFAME.png');
+        }
+        #card-schedule {
+            background-image: url('https://i.ibb.co/84cPVVp3/baium.png');
         }
         .nav-card::before {
             content: '';
@@ -849,6 +852,19 @@
                 </div>
                 <h3 class="card-title">HALL OF FAME</h3>
                 <p class="card-desc">The Immortals. Weekly Warlords and Alliance rankings.</p>
+            </div>
+        </a>
+        <a href="schedule.html" class="nav-card" id="card-schedule">
+            <div class="card-content-wrapper">
+                <div class="card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                </div>
+                <h3 class="card-title">SPAWN TIMERS</h3>
+                <p class="card-desc">Boss, Siege & Clan Hall respawn schedule with live countdowns.</p>
             </div>
         </a>
     </section>
