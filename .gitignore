@@ -12,3 +12,8 @@ regroups.json
 
 # Local IDE
 .idea/
+
+# Temporary local hourly-updater loop (PC only; the VPS uses a systemd timer)
+run-respawn-loop.ps1
+respawn-loop.pid
+scraper.log
