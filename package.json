@@ -4,11 +4,17 @@
   "private": true,
   "type": "commonjs",
   "description": "Scrapes the avalanche regroup/respawn schedule and pushes it to Firebase.",
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
     "scrape": "node scrape-regroups.js",
-    "push": "node scrape-regroups.js --push"
+    "push": "node scrape-regroups.js --push",
+    "bot": "node --env-file=.env discord-bot.js"
   },
   "dependencies": {
+    "@google/genai": "^1.52.0",
+    "discord.js": "^14.26.4",
     "firebase-admin": "^13.0.0"
   }
 }
