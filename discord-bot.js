@@ -2,20 +2,23 @@
 "use strict";
 
 /**
- * BMA OCR Bot — screenshot -> attendance pipeline.
+ * BMA Attendance Bot — screenshot -> attendance pipeline.
  *
- * Members drop Lineage 2 party-panel screenshots in an enabled channel (or
- * reply `!scan` to an existing screenshot). Gemini Vision reads the character
- * names off the panel, we fuzzy-match them against the known CP roster in
- * Firebase, and the submitter picks which names to keep from dropdown menus.
- * The confirmed list is pushed to `pendingScans` for the web Command Center
- * to turn into attendance for epics / sieges / etc.
+ * Members post Lineage 2 screenshots, then someone runs `!scan`. The bot scans
+ * every screenshot posted since the most recent UPDATED divider, reads the
+ * character names off each (party panel / command channel / self bar) with
+ * Gemini Vision, fuzzy-matches them against the known CP roster in Firebase,
+ * and posts one "<link> <caption>: name1, name2" line per screenshot (the
+ * caption is the screenshot message's own text, omitted if it had none) with a
+ * Send to Panel button. Pressing it pushes the names to `pendingScans` (for the
+ * web Command Center) and posts a fresh UPDATED divider so that batch is never
+ * re-scanned.
  *
  * Node 24+ (uses the built-in global fetch). Configuration via env vars:
  *   DISCORD_TOKEN                  Discord bot token (required)
  *   GEMINI_API_KEY                Google Gemini API key (required)
  *   GOOGLE_APPLICATION_CREDENTIALS  Path to the Firebase service-account key
- *                                 (optional; defaults to serviceAccountKey.json)
+ *                                 (optional; defaults to serviceAccount.json)
  *
  * Run with:  node --env-file=.env discord-bot.js
  */
@@ -27,11 +30,9 @@ const {
   GatewayIntentBits,
   Partials,
   ActionRowBuilder,
-  StringSelectMenuBuilder,
   ButtonBuilder,
   ButtonStyle,
   ComponentType,
-  MessageFlags,
 } = require("discord.js");
 const { GoogleGenAI, Type } = require("@google/genai");
 
@@ -45,7 +46,7 @@ const IMAGE_EXTS = ["png", "jpg", "jpeg"];
 const DISCORD_TOKEN = process.env.DISCORD_TOKEN;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const KEY_PATH =
-  process.env.GOOGLE_APPLICATION_CREDENTIALS || "serviceAccountKey.json";
+  process.env.GOOGLE_APPLICATION_CREDENTIALS || "serviceAccount.json";
 
 if (!DISCORD_TOKEN || !GEMINI_API_KEY) {
   console.error(
@@ -77,48 +78,60 @@ const db = admin.database();
 
 const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
 
-const PARTY_SYSTEM_PROMPT = `You are analyzing screenshots from the MMORPG Lineage 2.
+const PARTY_SYSTEM_PROMPT = `You are analyzing screenshots from the MMORPG Lineage 2 to extract character names for attendance tracking.
 
-The user sends images that contain the in-game Party Panel UI.
+An image may contain one or more of these UI elements:
 
-How to recognize a party panel:
-- A compact panel showing party members, typically anchored to the left side of the screen
-- Each row shows: character name, class icon, HP bar (red), MP bar (blue), CP bar (yellow)
-- The panel may also show "Party Match" or other party-related labels — ignore those, focus on the rows with character names
+1) PARTY PANEL — the in-game party panel, a compact panel usually anchored to the left side of the screen. Each row shows: character name, class icon, and HP (red) / MP (blue) / CP (yellow) bars. It may also show a "Party Match" or similar label — ignore the label, read the name rows. Note: the local player does NOT appear in their own party panel — their name is in the self status bar (element 3).
 
-Your task: extract ONLY the character names visible in the party panel rows. Ignore everything else in the image (chat log, NPC nameplates, monsters, other players' nameplates, UI buttons, item labels).
+2) COMMAND CHANNEL INFO window — a larger popup titled "Command Channel Info". It has two sides:
+   - Left: a list of party LEADERS in the command channel (one row per party, with kill/death stat columns).
+   - Right: the currently SELECTED party shown expanded, with a "Leader" box at the top and a "Party Member" list of full character names below it.
+   From this window read ONLY the expanded selected party on the right (the Leader plus every Party Member). IGNORE the left-side leader list and IGNORE all stat columns (K/D, kills, deaths, class icons).
+
+3) SELF / LEADER STATUS BAR — the local player's own character bar (this is the party leader, who is NEVER listed among the party panel members in element 1). It can appear ANYWHERE on screen — bottom-center, top-left, or elsewhere — so do not rely on position. Identify it as a standalone bar (separate from the party panel) showing a level number badge (e.g. "80") next to the character name, with CP, HP, and MP bars and numeric values (e.g. "0/3260"). Read the player's own name from it. Do NOT confuse it with a selected target's nameplate: the self bar is the one showing CP AND HP AND MP bars together with numbers.
+
+Use the EXACT character names as they appear (case-sensitive; preserve underscores, numbers, capitalization). Do not invent names; only include names you can clearly read.
+
+Ignore everything else in the image: chat log, NPC nameplates, monsters, other players' floating nameplates, UI buttons, item labels.
 
 Return JSON only — your output is parsed by a program, so no prose or markdown fences:
-{"names": ["Name1", "Name2", ...]}
+{"partyPanel": ["Name1", ...], "selfName": ["Name1", ...], "commandChannelParty": ["Name1", ...]}
 
-Rules:
-- Use the EXACT character names as they appear (case-sensitive; preserve underscores, numbers, and special characters)
-- Include ALL party members visible in the panel (leader and members together — no separation needed)
-- If the image doesn't contain a party panel, return {"names": []}
-- Do not invent names; only include names you can clearly read in the party panel`;
+- partyPanel: names from UI element 1. Empty array if no party panel is visible.
+- selfName: the local player's name from UI element 3 (usually one name). Empty array if no self status bar is visible.
+- commandChannelParty: names from the expanded selected party on the right of UI element 2. Empty array if no Command Channel Info window is visible.`;
 
 const PARTY_SCHEMA = {
   type: Type.OBJECT,
-  properties: { names: { type: Type.ARRAY, items: { type: Type.STRING } } },
-  required: ["names"],
+  properties: {
+    partyPanel: { type: Type.ARRAY, items: { type: Type.STRING } },
+    selfName: { type: Type.ARRAY, items: { type: Type.STRING } },
+    commandChannelParty: { type: Type.ARRAY, items: { type: Type.STRING } },
+  },
+  required: ["partyPanel", "selfName", "commandChannelParty"],
 };
 
-// Optional one-shot example: if image.png exists next to the script, send it
-// (plus its known answer) ahead of the real screenshot to anchor the model.
+// Optional one-shot example: if discord-bot-reference.png exists next to the
+// script, send it (plus its known answer) ahead of the real screenshot to
+// anchor the model.
 let EXAMPLE_PART = null;
 try {
-  const bytes = fs.readFileSync("image.png");
+  const bytes = fs.readFileSync("discord-bot-reference.png");
   EXAMPLE_PART = {
     image: bytes.toString("base64"),
-    names: [
-      "fidempor12",
-      "iisushristos",
-      "siriusbr",
-      "sunnyleone",
-      "akvan",
-      "grp",
-      "mrundisput3d",
-    ],
+    response: {
+      partyPanel: [
+        "fidempor12",
+        "iisushristos",
+        "siriusbr",
+        "sunnyleone",
+        "akvan",
+        "grp",
+      ],
+      selfName: ["mrundisput3d"],
+      commandChannelParty: [],
+    },
   };
 } catch {
   EXAMPLE_PART = null;
@@ -132,7 +145,14 @@ function mediaTypeFromFilename(filename) {
   return "image/png";
 }
 
-/** Ask Gemini for the character names in a single screenshot. */
+/**
+ * Ask Gemini for the character names in a single screenshot.
+ *
+ * The local player's own name (self status bar) is always included. For the
+ * roster body we use the party panel when one is visible, otherwise fall back
+ * to the expanded selected party from a Command Channel Info window. The
+ * fallback is per image, so a screenshot showing both still prefers the panel.
+ */
 async function extractPartyNames(imageB64, mediaType) {
   const contents = [];
   if (EXAMPLE_PART) {
@@ -145,7 +165,7 @@ async function extractPartyNames(imageB64, mediaType) {
       },
       {
         role: "model",
-        parts: [{ text: JSON.stringify({ names: EXAMPLE_PART.names }) }],
+        parts: [{ text: JSON.stringify(EXAMPLE_PART.response) }],
       }
     );
   }
@@ -161,11 +181,24 @@ async function extractPartyNames(imageB64, mediaType) {
       systemInstruction: PARTY_SYSTEM_PROMPT,
       responseMimeType: "application/json",
       responseSchema: PARTY_SCHEMA,
-      maxOutputTokens: 1024,
+      // Disable "thinking" — it's unnecessary for this extraction and otherwise
+      // eats the output-token budget, truncating the JSON. Then give names room.
+      thinkingConfig: { thinkingBudget: 0 },
+      maxOutputTokens: 2048,
     },
   });
 
-  return JSON.parse(response.text).names || [];
+  if (!response.text) {
+    throw new Error(`empty Gemini response (finishReason: ${
+      response.candidates?.[0]?.finishReason ?? "unknown"
+    })`);
+  }
+  const result = JSON.parse(response.text);
+  const partyPanel = result.partyPanel || [];
+  const selfName = result.selfName || [];
+  const commandChannelParty = result.commandChannelParty || [];
+  const roster = partyPanel.length > 0 ? partyPanel : commandChannelParty;
+  return [...selfName, ...roster];
 }
 
 // --- Fuzzy matching --------------------------------------------------------
@@ -211,7 +244,7 @@ async function loadKnownNames() {
   return known;
 }
 
-/** Keep only OCR'd words that resemble a known roster name. */
+/** Keep only extracted words that resemble a known roster name. */
 function filterToRoster(rawWords, knownNames) {
   const matched = [];
   for (const word of rawWords) {
@@ -244,45 +277,25 @@ const client = new Client({
   partials: [Partials.Message, Partials.Channel],
 });
 
-// Channels where bare screenshots are auto-scanned. Empty on boot; admins
-// toggle per channel with !start / !stop. Resets when the process restarts.
-const activeChannels = new Set();
-
 const validImages = (message) =>
   message.attachments.filter((att) =>
     IMAGE_EXTS.some((ext) => att.name.toLowerCase().endsWith(ext))
   );
 
-const isAdmin = (member) =>
-  Boolean(member?.permissions?.has?.("Administrator"));
+// Posted to the channel after a batch is submitted; also acts as the boundary
+// `!scan` reads up to, so an already-submitted batch is never re-scanned.
+const DIVIDER =
+  "========================================================UPDATED✅ ✅ ✅===========================================================================================";
+
+const isDivider = (message) =>
+  message.author.id === client.user?.id && message.content.includes("UPDATED✅");
 
 /**
- * Reply to `triggerMessage` with the dropdowns + buttons, collect the
- * submitter's picks, and push the confirmed names to `pendingScans`.
+ * Reply with `content` (one "<link> <caption>: name1, name2" line per
+ * screenshot) and a Send to Panel button. Pressing it pushes `names` to
+ * `pendingScans` and posts the UPDATED divider to the channel; Cancel discards.
  */
-async function presentConfirmMenu(triggerMessage, names, userNotes, authorName) {
-  // Discord allows 5 action rows per message: up to 4 select menus (25 options
-  // each) plus 1 row for the buttons -> 100 names max.
-  const capped = names.slice(0, 100);
-  const limitMsg =
-    names.length > 100
-      ? "\n*(⚠️ Found more than 100 names. Showing the first 100.)*"
-      : "";
-
-  const rows = [];
-  for (let i = 0; i < capped.length; i += 25) {
-    const chunk = capped.slice(i, i + 25);
-    const listNo = Math.floor(i / 25) + 1;
-    const totalLists = Math.ceil(capped.length / 25);
-    const menu = new StringSelectMenuBuilder()
-      .setCustomId(`names_${listNo}`)
-      .setPlaceholder(`Pick names (list ${listNo} of ${totalLists})...`)
-      .setMinValues(0)
-      .setMaxValues(chunk.length)
-      .addOptions(chunk.map((name) => ({ label: name, value: name })));
-    rows.push(new ActionRowBuilder().addComponents(menu));
-  }
-
+async function postResult(triggerMessage, content, names, userNotes, authorName) {
   const sendBtn = new ButtonBuilder()
     .setCustomId("confirm_send")
     .setLabel("Send to Panel")
@@ -293,54 +306,37 @@ async function presentConfirmMenu(triggerMessage, names, userNotes, authorName) 
     .setLabel("Cancel")
     .setStyle(ButtonStyle.Danger)
     .setEmoji("❌");
-  rows.push(new ActionRowBuilder().addComponents(sendBtn, cancelBtn));
+  const row = new ActionRowBuilder().addComponents(sendBtn, cancelBtn);
 
-  const reply = await triggerMessage.reply({
-    content:
-      `🎯 **SMART FILTER:** Found **${names.length}** valid name(s)!${limitMsg}\n` +
-      `Open the lists below, **select the ones you want to keep**, and hit Send.`,
-    components: rows,
+  const reply = await triggerMessage.reply({ content, components: [row] });
+
+  const collector = reply.createMessageComponentCollector({
+    componentType: ComponentType.Button,
+    time: 600_000,
   });
 
-  // Track the latest selection of each menu; values arrive per-interaction.
-  const selectionByMenu = new Map();
-  const collector = reply.createMessageComponentCollector({ time: 600_000 });
-
   collector.on("collect", async (interaction) => {
-    if (interaction.componentType === ComponentType.StringSelect) {
-      selectionByMenu.set(interaction.customId, interaction.values);
-      await interaction.deferUpdate();
-      return;
-    }
-
     if (interaction.customId === "confirm_cancel") {
       collector.stop("cancelled");
-      await interaction.update({ content: "❌ Submission cancelled.", components: [] });
+      await interaction.update({ content: `${content}\n❌ Cancelled.`, components: [] });
       return;
     }
 
     // confirm_send
-    const selected = [...selectionByMenu.values()].flat();
-    if (selected.length === 0) {
-      await interaction.reply({
-        content: "⚠️ **Heads up:** pick at least one name first!",
-        flags: MessageFlags.Ephemeral,
-      });
-      return;
-    }
-
     await db.ref("pendingScans").push().set({
-      rawText: selected.join(" "),
+      rawText: names.join(" "),
       userNotes,
       timestamp: Date.now(),
       submittedBy: authorName,
+      channel: triggerMessage.channel.name ?? null,
     });
 
     collector.stop("sent");
     await interaction.update({
-      content: `✅ **Success!** Sent **${selected.length} name(s)** to the Command Center.`,
+      content: `${content}\n✅ Sent **${names.length} name(s)** to the Command Center.`,
       components: [],
     });
+    await triggerMessage.channel.send(DIVIDER);
   });
 
   collector.on("end", async (_collected, reason) => {
@@ -350,28 +346,48 @@ async function presentConfirmMenu(triggerMessage, names, userNotes, authorName) 
   });
 }
 
-/** Run a batch of attachments through Gemini, filter, and prompt for confirmation. */
-async function processImages(triggerMessage, images, userNotes, authorName) {
+/**
+ * Scan every screenshot in `sourceMessages` through Gemini, filter each to the
+ * roster, and post one "<link> screenshot: names" line per screenshot.
+ */
+async function processImages(triggerMessage, sourceMessages) {
   try {
-    const rawWords = [];
-    for (const img of images.values()) {
-      try {
-        const buf = Buffer.from(await (await fetch(img.url)).arrayBuffer());
-        const names = await extractPartyNames(
-          buf.toString("base64"),
-          mediaTypeFromFilename(img.name)
-        );
-        rawWords.push(...names);
-      } catch (err) {
-        console.error(`Gemini extraction error for ${img.name}:`, err);
+    const knownNames = await loadKnownNames();
+    const lines = [];
+    const allNames = new Set();
+
+    for (const src of sourceMessages) {
+      for (const img of validImages(src).values()) {
+        let names = [];
+        try {
+          const buf = Buffer.from(await (await fetch(img.url)).arrayBuffer());
+          const raw = await extractPartyNames(
+            buf.toString("base64"),
+            mediaTypeFromFilename(img.name)
+          );
+          names = filterToRoster(raw, knownNames);
+        } catch (err) {
+          console.error(`Gemini extraction error for ${img.name}:`, err);
+          continue;
+        }
+        if (names.length === 0) continue;
+        // Label each line with the screenshot message's own caption, if any.
+        const caption = src.content.trim();
+        const label = caption ? `${caption}: ` : "";
+        lines.push(`${src.url} ${label}${names.join(", ")}`);
+        for (const n of names) allNames.add(n);
       }
     }
 
-    const knownNames = await loadKnownNames();
-    const finalNames = filterToRoster(rawWords, knownNames);
-
-    if (finalNames.length > 0) {
-      await presentConfirmMenu(triggerMessage, finalNames, userNotes, authorName);
+    if (allNames.size > 0) {
+      const notes = triggerMessage.content.replace(/^!scan/i, "").trim() || "No description";
+      await postResult(
+        triggerMessage,
+        lines.join("\n"),
+        [...allNames],
+        notes,
+        triggerMessage.author.username
+      );
     } else {
       await triggerMessage.reply(
         "❌ Found **NO** name that exists in your roster (CPs)."
@@ -389,74 +405,35 @@ async function processImages(triggerMessage, images, userNotes, authorName) {
 }
 
 client.once("clientReady", () => {
-  console.log("✅ BMA OCR Bot is online but DISABLED everywhere.");
+  console.log("✅ BMA Attendance Bot is online. Write !scan in a channel to scan all screenshots since the last update.");
 });
 
+// !scan — scan every screenshot posted since the most recent UPDATED divider.
 client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
+  if (!message.content.startsWith("!scan")) return;
 
-  if (message.content.startsWith("!stop")) {
-    if (isAdmin(message.member)) {
-      activeChannels.delete(message.channel.id);
-      await message.reply("🛑 **Bot DISABLED for this channel.**");
-    }
-    return;
+  await message.react("⏳");
+
+  const history = await message.channel.messages.fetch({ limit: 100 });
+  const ordered = [...history.values()].sort(
+    (a, b) => a.createdTimestamp - b.createdTimestamp
+  );
+
+  // Walk oldest -> newest, resetting at each divider so only screenshots after
+  // the LAST divider remain.
+  let sources = [];
+  for (const msg of ordered) {
+    if (msg.id === message.id) continue; // skip the !scan command itself
+    if (isDivider(msg)) sources = [];
+    else if (validImages(msg).size > 0) sources.push(msg);
   }
 
-  if (message.content.startsWith("!start")) {
-    if (isAdmin(message.member)) {
-      activeChannels.add(message.channel.id);
-      await message.reply("✅ **Bot ENABLED for this channel!**");
-    }
-    return;
-  }
-
-  // !scan — scan the replied-to message, else the most recent screenshot above.
-  if (message.content.startsWith("!scan")) {
-    await message.react("⏳");
-    let target = null;
-
-    if (message.reference?.messageId) {
-      try {
-        const replied = await message.channel.messages.fetch(
-          message.reference.messageId
-        );
-        if (validImages(replied).size > 0) {
-          target = replied;
-        } else {
-          await message.reply("❌ The message you replied to has no valid image.");
-          await message.reactions.resolve("⏳")?.users.remove(client.user.id);
-          return;
-        }
-      } catch (err) {
-        console.error("Error reading reply:", err);
-      }
-    }
-
-    if (!target) {
-      const history = await message.channel.messages.fetch({ limit: 15 });
-      target = history.find(
-        (msg) => msg.id !== message.id && validImages(msg).size > 0
-      );
-    }
-
-    if (target) {
-      const notes = target.content.trim() || "No description";
-      await processImages(message, validImages(target), notes, target.author.username);
-    } else {
-      await message.reply("❌ Couldn't find any screenshot.");
-      await message.reactions.resolve("⏳")?.users.remove(client.user.id);
-    }
-    return;
-  }
-
-  if (!activeChannels.has(message.channel.id)) return;
-
-  const images = validImages(message);
-  if (images.size > 0) {
-    await message.react("⏳");
-    const notes = message.content.trim() || "No description";
-    await processImages(message, images, notes, message.author.username);
+  if (sources.length > 0) {
+    await processImages(message, sources);
+  } else {
+    await message.reply("❌ No screenshots found since the last update.");
+    await message.reactions.resolve("⏳")?.users.remove(client.user.id);
   }
 });
 

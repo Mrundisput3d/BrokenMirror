@@ -128,7 +128,7 @@
                 <span style="font-size: 10px;">Αν έκοψες εικόνα με Win+Shift+S, απλά πάτα Ctrl+V οπουδήποτε στη σελίδα!</span>
                 <input type="file" id="file-input" multiple accept="image/*" style="display:none;">
             </div>
-            <div id="ocr-loading" style="display:none; text-align:center; color:var(--sky); font-weight:bold; font-family:'Cinzel'; margin-bottom:10px;">
+            <div id="scan-loading" style="display:none; text-align:center; color:var(--sky); font-weight:bold; font-family:'Cinzel'; margin-bottom:10px;">
                 ⏳ Η Google αναλύει την εικόνα... Περίμενε!
             </div>
             <textarea id="mass-input" rows="3" placeholder="Τα ονόματα θα εμφανιστούν εδώ με κενά..." oninput="analyzeAttendance()"></textarea>
@@ -579,7 +579,7 @@
         document.body.removeChild(link);
     }
     async function processBulkImages(files) {
-        document.getElementById('ocr-loading').style.display = 'block';
+        document.getElementById('scan-loading').style.display = 'block';
         let allExtractedText = ""; let errorOccurred = false;
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
@@ -603,7 +603,7 @@
             }
         }
         
-        document.getElementById('ocr-loading').style.display = 'none';
+        document.getElementById('scan-loading').style.display = 'none';
         if (!errorOccurred && allExtractedText !== "") {
             let smartText = smartFilterText(allExtractedText);
             if (smartText) {

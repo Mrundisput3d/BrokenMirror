@@ -29,15 +29,18 @@ Relevant nodes:
 
 ## Discord bot (`discord-bot.js`)
 
-Members post Lineage 2 party-panel screenshots; Gemini Vision extracts the
-character names, they're fuzzy-matched against the active CP roster, and the
-submitter confirms which to keep via dropdown menus. Confirmed names go to
-`pendingScans`.
+Members post Lineage 2 screenshots, then someone runs `!scan`. The bot scans
+every screenshot posted since the most recent `UPDATED` divider, extracts the
+character names (party panel, command-channel selected party, and the self/leader
+status bar) with Gemini Vision, fuzzy-matches them against the active CP roster,
+and posts one `<message-link> <caption>: name1, name2` line per screenshot (the
+caption is the screenshot message's own text, omitted if it had none) with
+a **Send to Panel** button. Pressing it pushes the names to `pendingScans` and
+posts a fresh `UPDATED` divider (so that batch isn't re-scanned); Cancel discards.
 
-Commands (admins only for start/stop):
-- `!start` / `!stop` — enable/disable auto-scanning of screenshots in a channel.
-  The enabled-channel set is in-memory and resets on restart.
-- `!scan` — scan the replied-to message, or the most recent screenshot above.
+Commands:
+- `!scan` — scan every screenshot posted since the last `UPDATED` divider
+  (looks back up to 100 messages).
 
 Run: `npm run bot` (which is `node --env-file=.env discord-bot.js`).
 
@@ -45,10 +48,10 @@ Required env (e.g. in a gitignored `.env`):
 - `DISCORD_TOKEN` — Discord bot token.
 - `GEMINI_API_KEY` — Google Gemini API key.
 - `GOOGLE_APPLICATION_CREDENTIALS` — path to the Firebase service-account key
-  (optional; defaults to `serviceAccountKey.json`).
+  (optional; defaults to `serviceAccount.json`).
 
-Optional: an `image.png` next to the script is used as a one-shot example to
-anchor the Gemini OCR.
+Optional: a `discord-bot-reference.png` next to the script is used as a one-shot
+example to anchor the Gemini name extraction.
 
 > ⚠️ The old Python bot (`discord_bot.py`, now removed) had a live bot token
 > hardcoded in it. That token is compromised — rotate it in the Discord Developer
