@@ -268,6 +268,11 @@ function filterToRoster(rawWords, knownNames) {
 
 // --- Discord ---------------------------------------------------------------
 
+// Timestamped console logging so the bot's progress is visible in the terminal.
+const ts = () => new Date().toISOString().replace("T", " ").slice(0, 19);
+const log = (...args) => console.log(`[${ts()}]`, ...args);
+const logErr = (...args) => console.error(`[${ts()}]`, ...args);
+
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
@@ -277,18 +282,40 @@ const client = new Client({
   partials: [Partials.Message, Partials.Channel],
 });
 
-const validImages = (message) =>
-  message.attachments.filter((att) =>
-    IMAGE_EXTS.some((ext) => att.name.toLowerCase().endsWith(ext))
-  );
+const isImageAttachment = (att) =>
+  IMAGE_EXTS.some((ext) => att.name.toLowerCase().endsWith(ext));
+
+// Image screenshots in a message, INCLUDING forwarded ones. A forward keeps its
+// image in message.messageSnapshots rather than message.attachments, so we scan
+// both. Each entry carries the attachment plus the caption that accompanied it
+// (the forwarded snapshot's own text for forwards, otherwise the message text).
+function screenshotsIn(message) {
+  const shots = [];
+  for (const att of message.attachments.values()) {
+    if (isImageAttachment(att)) shots.push({ att, caption: message.content.trim() });
+  }
+  for (const snap of message.messageSnapshots?.values() ?? []) {
+    for (const att of snap.attachments.values()) {
+      if (isImageAttachment(att)) {
+        shots.push({ att, caption: (snap.content || message.content).trim() });
+      }
+    }
+  }
+  return shots;
+}
 
 // Posted to the channel after a batch is submitted; also acts as the boundary
 // `!scan` reads up to, so an already-submitted batch is never re-scanned.
 const DIVIDER =
   "========================================================UPDATED✅ ✅ ✅===========================================================================================";
 
-const isDivider = (message) =>
-  message.author.id === client.user?.id && message.content.includes("UPDATED✅");
+// A divider is any message with a long "===" run and the word UPDATED, from
+// anyone (members post them by hand too). We deliberately ignore the emoji and
+// spacing so "UPDATED✅✅✅" and "UPDATED ✅ ✅ ✅" both count.
+const isDivider = (message) => {
+  const text = message.content.toUpperCase();
+  return /={10,}/.test(text) && text.includes("UPDATED");
+};
 
 /**
  * Reply with `content` (one "<link> <caption>: name1, name2" line per
@@ -315,9 +342,12 @@ async function postResult(triggerMessage, content, names, userNotes, authorName)
     time: 600_000,
   });
 
+  const channel = `#${triggerMessage.channel.name ?? "dm"}`;
+
   collector.on("collect", async (interaction) => {
     if (interaction.customId === "confirm_cancel") {
       collector.stop("cancelled");
+      log(`${interaction.user.username} cancelled the scan in ${channel}`);
       await interaction.update({ content: `${content}\n❌ Cancelled.`, components: [] });
       return;
     }
@@ -332,6 +362,7 @@ async function postResult(triggerMessage, content, names, userNotes, authorName)
     });
 
     collector.stop("sent");
+    log(`${interaction.user.username} sent ${names.length} name(s) to pendingScans from ${channel}`);
     await interaction.update({
       content: `${content}\n✅ Sent **${names.length} name(s)** to the Command Center.`,
       components: [],
@@ -341,6 +372,7 @@ async function postResult(triggerMessage, content, names, userNotes, authorName)
 
   collector.on("end", async (_collected, reason) => {
     if (reason === "time") {
+      log(`scan result in ${channel} timed out without a choice`);
       await reply.edit({ components: [] }).catch(() => {});
     }
   });
@@ -353,31 +385,39 @@ async function postResult(triggerMessage, content, names, userNotes, authorName)
 async function processImages(triggerMessage, sourceMessages) {
   try {
     const knownNames = await loadKnownNames();
+    const shots = sourceMessages.flatMap((src) =>
+      screenshotsIn(src).map(({ att, caption }) => ({ src, att, caption }))
+    );
+    log(`scanning ${shots.length} screenshot(s) against ${knownNames.size} roster names`);
+
     const lines = [];
     const allNames = new Set();
+    let i = 0;
 
-    for (const src of sourceMessages) {
-      for (const img of validImages(src).values()) {
-        let names = [];
-        try {
-          const buf = Buffer.from(await (await fetch(img.url)).arrayBuffer());
-          const raw = await extractPartyNames(
-            buf.toString("base64"),
-            mediaTypeFromFilename(img.name)
-          );
-          names = filterToRoster(raw, knownNames);
-        } catch (err) {
-          console.error(`Gemini extraction error for ${img.name}:`, err);
-          continue;
-        }
-        if (names.length === 0) continue;
-        // Label each line with the screenshot message's own caption, if any.
-        const caption = src.content.trim();
-        const label = caption ? `${caption}: ` : "";
-        lines.push(`${src.url} ${label}${names.join(", ")}`);
-        for (const n of names) allNames.add(n);
+    for (const { src, att, caption } of shots) {
+      i += 1;
+      let names = [];
+      try {
+        log(`  [${i}/${shots.length}] scanning ${att.name}...`);
+        const buf = Buffer.from(await (await fetch(att.url)).arrayBuffer());
+        const raw = await extractPartyNames(
+          buf.toString("base64"),
+          mediaTypeFromFilename(att.name)
+        );
+        names = filterToRoster(raw, knownNames);
+        log(`  [${i}/${shots.length}] ${att.name}: ${raw.length} read, ${names.length} matched roster`);
+      } catch (err) {
+        logErr(`  [${i}/${shots.length}] ${att.name} failed:`, err.message);
+        continue;
       }
+      if (names.length === 0) continue;
+      // Label each line with the screenshot's accompanying caption, if any.
+      const label = caption ? `${caption}: ` : "";
+      lines.push(`${src.url} ${label}${names.join(", ")}`);
+      for (const n of names) allNames.add(n);
     }
+
+    log(`scan complete: ${allNames.size} unique name(s) across ${lines.length} screenshot(s)`);
 
     if (allNames.size > 0) {
       const notes = triggerMessage.content.replace(/^!scan/i, "").trim() || "No description";
@@ -394,7 +434,7 @@ async function processImages(triggerMessage, sourceMessages) {
       );
     }
   } catch (err) {
-    console.error("Error:", err);
+    logErr("scan failed:", err);
     await triggerMessage.reply(`⚠️ Communication error: ${err.message}`);
   } finally {
     await triggerMessage.reactions
@@ -405,7 +445,7 @@ async function processImages(triggerMessage, sourceMessages) {
 }
 
 client.once("clientReady", () => {
-  console.log("✅ BMA Attendance Bot is online. Write !scan in a channel to scan all screenshots since the last update.");
+  log("✅ BMA Attendance Bot is online. Write !scan in a channel to scan all screenshots since the last update.");
 });
 
 // !scan — scan every screenshot posted since the most recent UPDATED divider.
@@ -413,6 +453,8 @@ client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
   if (!message.content.startsWith("!scan")) return;
 
+  const channel = `#${message.channel.name ?? "dm"}`;
+  log(`!scan from ${message.author.username} in ${channel} — collecting screenshots...`);
   await message.react("⏳");
 
   const history = await message.channel.messages.fetch({ limit: 100 });
@@ -426,12 +468,13 @@ client.on("messageCreate", async (message) => {
   for (const msg of ordered) {
     if (msg.id === message.id) continue; // skip the !scan command itself
     if (isDivider(msg)) sources = [];
-    else if (validImages(msg).size > 0) sources.push(msg);
+    else if (screenshotsIn(msg).length > 0) sources.push(msg);
   }
 
   if (sources.length > 0) {
     await processImages(message, sources);
   } else {
+    log(`no screenshots since last divider in ${channel} — nothing to scan`);
     await message.reply("❌ No screenshots found since the last update.");
     await message.reactions.resolve("⏳")?.users.remove(client.user.id);
   }

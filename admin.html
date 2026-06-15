@@ -354,14 +354,16 @@
             Object.keys(scans).forEach(key => { 
                 const scan = scans[key]; 
                 const sender = scan.submittedBy || "Άγνωστος";
-                const notes = scan.userNotes && scan.userNotes !== "Χωρίς περιγραφή" ? `<br><span style="color:var(--sky); font-size:15px; font-weight:bold; font-family:'Cinzel';">📝 ${scan.userNotes}</span>` : "";
-                
+                const channelLabel = scan.channel ? `<br><span style="color:var(--sky); font-size:15px; font-weight:bold; font-family:'Cinzel';">📡 ${scan.channel}</span>` : "";
+                const hasNotes = scan.userNotes && scan.userNotes !== "Χωρίς περιγραφή" && scan.userNotes !== "No description";
+                const notes = hasNotes ? `<br><span style="color:var(--sky); font-size:15px; font-weight:bold; font-family:'Cinzel';">📝 ${scan.userNotes}</span>` : "";
+
                 queueList.innerHTML += `
                 <div class="queue-item" style="flex-direction:column; align-items:flex-start; border-left-color: var(--sky);">
                     <div style="width:100%; display:flex; justify-content:space-between; align-items:center;">
                         <div>
                             <b style="color:#fff;">Από: ${sender}</b> <span style="font-size:10px; color:#aaa;">(${new Date(scan.timestamp).toLocaleString('el-GR')})</span>
-                            ${notes}
+                            ${channelLabel}${notes}
                         </div>
                         <div>
                             <button class="btn btn-gold" style="padding: 8px 15px;" onclick="loadPendingScan('${key}')">REVIEW & LOAD</button>
