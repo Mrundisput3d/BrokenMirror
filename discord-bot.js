@@ -318,11 +318,12 @@ const isDivider = (message) => {
 };
 
 /**
- * Reply with `content` (one "<link> <caption>: name1, name2" line per
- * screenshot) and a Send to Panel button. Pressing it pushes `names` to
- * `pendingScans` and posts the UPDATED divider to the channel; Cancel discards.
+ * Turn the live status `message` into the result: `content` (one
+ * "<link> <caption>: name1, name2" line per screenshot) plus a Send to Panel
+ * button. Pressing it pushes `names` to `pendingScans` and posts the UPDATED
+ * divider to the channel; Cancel discards.
  */
-async function postResult(triggerMessage, content, names, userNotes, authorName) {
+async function postResult(triggerMessage, message, content, names, userNotes, authorName) {
   const sendBtn = new ButtonBuilder()
     .setCustomId("confirm_send")
     .setLabel("Send to Panel")
@@ -335,9 +336,9 @@ async function postResult(triggerMessage, content, names, userNotes, authorName)
     .setEmoji("❌");
   const row = new ActionRowBuilder().addComponents(sendBtn, cancelBtn);
 
-  const reply = await triggerMessage.reply({ content, components: [row] });
+  await message.edit({ content, components: [row] });
 
-  const collector = reply.createMessageComponentCollector({
+  const collector = message.createMessageComponentCollector({
     componentType: ComponentType.Button,
     time: 600_000,
   });
@@ -373,7 +374,7 @@ async function postResult(triggerMessage, content, names, userNotes, authorName)
   collector.on("end", async (_collected, reason) => {
     if (reason === "time") {
       log(`scan result in ${channel} timed out without a choice`);
-      await reply.edit({ components: [] }).catch(() => {});
+      await message.edit({ components: [] }).catch(() => {});
     }
   });
 }
@@ -383,12 +384,16 @@ async function postResult(triggerMessage, content, names, userNotes, authorName)
  * roster, and post one "<link> screenshot: names" line per screenshot.
  */
 async function processImages(triggerMessage, sourceMessages) {
+  // A live status message the channel can watch; it becomes the final result.
+  let status;
   try {
+    status = await triggerMessage.reply("🔍 Starting scan…");
     const knownNames = await loadKnownNames();
     const shots = sourceMessages.flatMap((src) =>
       screenshotsIn(src).map(({ att, caption }) => ({ src, att, caption }))
     );
     log(`scanning ${shots.length} screenshot(s) against ${knownNames.size} roster names`);
+    await status.edit(`🔍 Found **${shots.length}** screenshot(s). Scanning…`).catch(() => {});
 
     const lines = [];
     const allNames = new Set();
@@ -396,6 +401,9 @@ async function processImages(triggerMessage, sourceMessages) {
 
     for (const { src, att, caption } of shots) {
       i += 1;
+      await status
+        .edit(`🔍 Scanning **${i}/${shots.length}** — \`${att.name}\` · ${allNames.size} name(s) so far`)
+        .catch(() => {});
       let names = [];
       try {
         log(`  [${i}/${shots.length}] scanning ${att.name}...`);
@@ -423,19 +431,20 @@ async function processImages(triggerMessage, sourceMessages) {
       const notes = triggerMessage.content.replace(/^!scan/i, "").trim() || "No description";
       await postResult(
         triggerMessage,
+        status,
         lines.join("\n"),
         [...allNames],
         notes,
         triggerMessage.author.username
       );
     } else {
-      await triggerMessage.reply(
-        "❌ Found **NO** name that exists in your roster (CPs)."
-      );
+      await status.edit("❌ Found **NO** name that exists in your roster (CPs).");
     }
   } catch (err) {
     logErr("scan failed:", err);
-    await triggerMessage.reply(`⚠️ Communication error: ${err.message}`);
+    const msg = `⚠️ Communication error: ${err.message}`;
+    if (status) await status.edit(msg).catch(() => {});
+    else await triggerMessage.reply(msg).catch(() => {});
   } finally {
     await triggerMessage.reactions
       .resolve("⏳")
