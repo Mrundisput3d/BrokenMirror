@@ -200,7 +200,10 @@ async function extractPartyNames(imageB64, mediaType) {
   const selfName = result.selfName || [];
   const commandChannelParty = result.commandChannelParty || [];
   const roster = partyPanel.length > 0 ? partyPanel : commandChannelParty;
-  return [...selfName, ...roster];
+  // hasParty is true only when an actual party panel or command-channel party
+  // was read (a lone self/leader bar doesn't count). The caller uses it to stop
+  // scanning the rest of a multi-image message once one shot shows the party.
+  return { names: [...selfName, ...roster], hasParty: roster.length > 0 };
 }
 
 // --- Fuzzy matching --------------------------------------------------------
@@ -246,12 +249,18 @@ async function loadKnownNames() {
   return known;
 }
 
-/** Keep only extracted words that resemble a known roster name. */
+/**
+ * Split extracted words into ones that resemble a known roster name (`matched`)
+ * and ones that were read clearly but match nobody in Firebase (`unmatched`).
+ * Junk — words under 3 chars or purely numeric — is dropped from both.
+ */
 function filterToRoster(rawWords, knownNames) {
   const matched = [];
+  const unmatched = [];
   for (const word of rawWords) {
     const lower = word.toLowerCase();
     if (lower.length < 3 || /^\d+$/.test(lower)) continue;
+    let hit = false;
     for (const kn of knownNames) {
       const allowedDist = kn.length > 5 ? 2 : 1;
       if (
@@ -261,11 +270,16 @@ function filterToRoster(rawWords, knownNames) {
         editDistance(lower, kn) <= allowedDist
       ) {
         matched.push(word);
+        hit = true;
         break;
       }
     }
+    if (!hit) unmatched.push(word);
   }
-  return [...new Set(matched)];
+  return {
+    matched: [...new Set(matched)],
+    unmatched: [...new Set(unmatched)],
+  };
 }
 
 // --- Discord ---------------------------------------------------------------
@@ -398,35 +412,77 @@ async function processImages(triggerMessage, sourceMessages) {
     await status.edit(`🔍 Found **${shots.length}** screenshot(s). Scanning…`).catch(() => {});
 
     const lines = [];
-    const allNames = new Set();
+    const allNames = new Set(); // unique roster names across the batch (orig case)
+    const seen = new Set(); // matched names lowercased, for cross-shot dedup
+    const seenNotFound = new Set(); // not-found names lowercased, for dedup
+    // Message IDs whose party we've already read. Once a message yields a party
+    // from one of its images, its remaining images are skipped entirely.
+    const resolvedMessages = new Set();
     let i = 0;
 
     for (const { src, att, caption } of shots) {
       i += 1;
+      if (resolvedMessages.has(src.id)) {
+        log(`  [${i}/${shots.length}] skipping ${att.name} — its message already showed a party`);
+        continue;
+      }
       await status
         .edit(`🔍 Scanning **${i}/${shots.length}** — \`${att.name}\` · ${allNames.size} name(s) so far`)
         .catch(() => {});
       let names = [];
+      let notFound = [];
       try {
         log(`  [${i}/${shots.length}] scanning ${att.name}...`);
         const buf = Buffer.from(await (await fetch(att.url)).arrayBuffer());
-        const raw = await extractPartyNames(
+        const { names: raw, hasParty } = await extractPartyNames(
           buf.toString("base64"),
           mediaTypeFromFilename(att.name)
         );
-        names = filterToRoster(raw, knownNames);
-        log(`  [${i}/${shots.length}] ${att.name}: ${raw.length} read, ${names.length} matched roster`);
+        // A party panel / command channel was read off this image — don't scan
+        // any other image from the same message.
+        if (hasParty) resolvedMessages.add(src.id);
+        const filtered = filterToRoster(raw, knownNames);
+        names = filtered.matched;
+        notFound = filtered.unmatched;
+        log(`  [${i}/${shots.length}] ${att.name}: ${raw.length} read, ${names.length} matched roster, ${notFound.length} not found${hasParty ? " (party found)" : ""}`);
       } catch (err) {
         logErr(`  [${i}/${shots.length}] ${att.name} failed:`, err.message);
         continue;
       }
-      if (names.length === 0) continue;
-      // Label each line with the screenshot's accompanying caption, if any, and
-      // a trailing count of the names on that line.
+      // Drop names already captured by an earlier screenshot in this batch, so
+      // the same party shown twice (e.g. the party panel in one shot and the
+      // command channel in the next) is only counted and printed once.
+      const fresh = names.filter((n) => !seen.has(n.toLowerCase()));
+      // Not-found names read off this shot that we haven't already reported (and
+      // that didn't match the roster under any spelling).
+      const freshNotFound = notFound.filter(
+        (n) => !seen.has(n.toLowerCase()) && !seenNotFound.has(n.toLowerCase())
+      );
+      if (fresh.length === 0 && freshNotFound.length === 0) {
+        if (names.length > 0) {
+          log(`  [${i}/${shots.length}] ${att.name}: all ${names.length} name(s) already seen — skipping`);
+        }
+        continue;
+      }
+      for (const n of fresh) {
+        seen.add(n.toLowerCase());
+        allNames.add(n);
+      }
+      for (const n of freshNotFound) seenNotFound.add(n.toLowerCase());
+
+      // One line per screenshot: its caption (if any), the matched names with a
+      // count, then any names read but not in the roster (shown for review only
+      // — they are NOT sent to the panel).
       const label = caption ? `${caption}: ` : "";
-      const count = `(${names.length} ${names.length === 1 ? "person" : "people"})`;
-      lines.push(`${src.url} ${label}${names.join(", ")} ${count}`);
-      for (const n of names) allNames.add(n);
+      let line = `${src.url} ${label}`.trimEnd();
+      if (fresh.length > 0) {
+        const count = `(${fresh.length} ${fresh.length === 1 ? "person" : "people"})`;
+        line += ` ${fresh.join(", ")} ${count}`;
+      }
+      if (freshNotFound.length > 0) {
+        line += ` — ❓ not in roster: ${freshNotFound.join(", ")}`;
+      }
+      lines.push(line);
     }
 
     log(`scan complete: ${allNames.size} unique name(s) across ${lines.length} screenshot(s)`);
@@ -440,6 +496,12 @@ async function processImages(triggerMessage, sourceMessages) {
         [...allNames],
         notes,
         triggerMessage.author.username
+      );
+    } else if (lines.length > 0) {
+      // Names were read but none matched the roster — nothing to send, but show
+      // what was read so a misspelling or a missing roster entry is visible.
+      await status.edit(
+        `❌ Found **NO** name that exists in your roster (CPs).\n${lines.join("\n")}`
       );
     } else {
       await status.edit("❌ Found **NO** name that exists in your roster (CPs).");
