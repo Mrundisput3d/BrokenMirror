@@ -42,6 +42,8 @@ const DB_URL =
   "https://brokenmirrordb-default-rtdb.europe-west1.firebasedatabase.app";
 const GEMINI_MODEL = "gemini-2.5-flash";
 const IMAGE_EXTS = ["png", "jpg", "jpeg"];
+// Only members with this role may run !scan.
+const SCAN_ROLE = process.env.SCAN_ROLE || "Alliance Leader";
 
 const DISCORD_TOKEN = process.env.DISCORD_TOKEN;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
@@ -419,9 +421,11 @@ async function processImages(triggerMessage, sourceMessages) {
         continue;
       }
       if (names.length === 0) continue;
-      // Label each line with the screenshot's accompanying caption, if any.
+      // Label each line with the screenshot's accompanying caption, if any, and
+      // a trailing count of the names on that line.
       const label = caption ? `${caption}: ` : "";
-      lines.push(`${src.url} ${label}${names.join(", ")}`);
+      const count = `(${names.length} ${names.length === 1 ? "person" : "people"})`;
+      lines.push(`${src.url} ${label}${names.join(", ")} ${count}`);
       for (const n of names) allNames.add(n);
     }
 
@@ -461,6 +465,13 @@ client.once("clientReady", () => {
 client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
   if (!message.content.startsWith("!scan")) return;
+
+  // Restrict to members carrying the configured role.
+  if (!message.member?.roles.cache.some((r) => r.name === SCAN_ROLE)) {
+    log(`!scan from ${message.author.username} ignored — missing "${SCAN_ROLE}" role`);
+    await message.reply(`⛔ Only members with the **${SCAN_ROLE}** role can run \`!scan\`.`);
+    return;
+  }
 
   const channel = `#${message.channel.name ?? "dm"}`;
   log(`!scan from ${message.author.username} in ${channel} — collecting screenshots...`);

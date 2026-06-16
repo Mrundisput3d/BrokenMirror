@@ -40,7 +40,8 @@ posts a fresh `UPDATED` divider (so that batch isn't re-scanned); Cancel discard
 
 Commands:
 - `!scan` — scan every screenshot posted since the last `UPDATED` divider
-  (looks back up to 100 messages).
+  (looks back up to 100 messages). Only members with the `SCAN_ROLE` role
+  (default `Alliance Leader`) may run it.
 
 Run: `npm run bot` (which is `node --env-file=.env discord-bot.js`).
 
