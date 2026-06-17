@@ -93,16 +93,19 @@ An image may contain one or more of these UI elements:
 
 3) SELF / LEADER STATUS BAR — the local player's own character bar (this is the party leader, who is NEVER listed among the party panel members in element 1). It can appear ANYWHERE on screen — bottom-center, top-left, or elsewhere — so do not rely on position. Identify it as a standalone bar (separate from the party panel) showing a level number badge (e.g. "80") next to the character name, with CP, HP, and MP bars and numeric values (e.g. "0/3260"). Read the player's own name from it. Do NOT confuse it with a selected target's nameplate: the self bar is the one showing CP AND HP AND MP bars together with numbers.
 
+4) TEAMSPEAK / VOICE-CHAT ROSTER — a screenshot of a voice-chat client (e.g. TeamSpeak) showing a vertical list of connected users, each row a username next to a small speaker / microphone / status icon, usually grouped under a channel-name header row. Read EVERY username row. Ignore channel/server header rows (rows with a folder or channel icon rather than a per-user speaker icon). Strip a leading rank tag written in square brackets ("[ALLY LEADER] Name" -> "Name"); otherwise keep the displayed nickname exactly as shown, including any " - Realname" or " / Alt" suffix.
+
 Use the EXACT character names as they appear (case-sensitive; preserve underscores, numbers, capitalization). Do not invent names; only include names you can clearly read.
 
 Ignore everything else in the image: chat log, NPC nameplates, monsters, other players' floating nameplates, UI buttons, item labels.
 
 Return JSON only — your output is parsed by a program, so no prose or markdown fences:
-{"partyPanel": ["Name1", ...], "selfName": ["Name1", ...], "commandChannelParty": ["Name1", ...]}
+{"partyPanel": ["Name1", ...], "selfName": ["Name1", ...], "commandChannelParty": ["Name1", ...], "teamspeak": ["Name1", ...]}
 
 - partyPanel: names from UI element 1. Empty array if no party panel is visible.
 - selfName: the local player's name from UI element 3 (usually one name). Empty array if no self status bar is visible.
-- commandChannelParty: names from the expanded selected party on the right of UI element 2. Empty array if no Command Channel Info window is visible.`;
+- commandChannelParty: names from the expanded selected party on the right of UI element 2. Empty array if no Command Channel Info window is visible.
+- teamspeak: every username from UI element 4. Empty array if no voice-chat roster is visible.`;
 
 const PARTY_SCHEMA = {
   type: Type.OBJECT,
@@ -110,18 +113,17 @@ const PARTY_SCHEMA = {
     partyPanel: { type: Type.ARRAY, items: { type: Type.STRING } },
     selfName: { type: Type.ARRAY, items: { type: Type.STRING } },
     commandChannelParty: { type: Type.ARRAY, items: { type: Type.STRING } },
+    teamspeak: { type: Type.ARRAY, items: { type: Type.STRING } },
   },
-  required: ["partyPanel", "selfName", "commandChannelParty"],
+  required: ["partyPanel", "selfName", "commandChannelParty", "teamspeak"],
 };
 
-// Optional one-shot example: if discord-bot-reference.png exists next to the
-// script, send it (plus its known answer) ahead of the real screenshot to
-// anchor the model.
-let EXAMPLE_PART = null;
-try {
-  const bytes = fs.readFileSync("discord-bot-reference.png");
-  EXAMPLE_PART = {
-    image: bytes.toString("base64"),
+// Few-shot examples: one reference image per source (party panel, command
+// channel, TeamSpeak roster) with its known answer, sent ahead of the real
+// screenshot to anchor the model. Any missing file is silently skipped.
+const EXAMPLE_SPECS = [
+  {
+    file: "discord-bot-pt-ref.png",
     response: {
       partyPanel: [
         "fidempor12",
@@ -133,10 +135,64 @@ try {
       ],
       selfName: ["mrundisput3d"],
       commandChannelParty: [],
+      teamspeak: [],
     },
-  };
-} catch {
-  EXAMPLE_PART = null;
+  },
+  {
+    file: "discord-bot-cc-ref.png",
+    response: {
+      partyPanel: [],
+      selfName: [],
+      commandChannelParty: [
+        "C0llapse",
+        "UrekMazino",
+        "ElDuende",
+        "PulHack",
+        "Zayens",
+        "BlackMamb4",
+        "AbueloxD",
+      ],
+      teamspeak: [],
+    },
+  },
+  {
+    file: "discord-bot-ts-ref.png",
+    response: {
+      partyPanel: [],
+      selfName: [],
+      commandChannelParty: [],
+      teamspeak: [
+        "MrUndisputed",
+        "AveNida - Lucas",
+        "Belli0N",
+        "Bondziak",
+        "Dunedain / Neth",
+        "grp",
+        "k4ggy",
+        "IMASAI IDOOMDAYI",
+        "LospsiC",
+        "M4NI",
+        "Miqalla",
+        "sand",
+        "SunnyLeone",
+        "Th3Master",
+        "Unqual",
+        "xDrago",
+        "xJin",
+        "Zestrokhalaz",
+      ],
+    },
+  },
+];
+
+const EXAMPLES = [];
+for (const spec of EXAMPLE_SPECS) {
+  try {
+    const bytes = fs.readFileSync(spec.file);
+    EXAMPLES.push({ image: bytes.toString("base64"), response: spec.response });
+  } catch {
+    // Reference image not present — skip it.
+  }
 }
 
 function mediaTypeFromFilename(filename) {
@@ -151,23 +207,22 @@ function mediaTypeFromFilename(filename) {
  * Ask Gemini for the character names in a single screenshot.
  *
  * The local player's own name (self status bar) is always included. For the
- * roster body we use the party panel when one is visible, otherwise fall back
- * to the expanded selected party from a Command Channel Info window. The
- * fallback is per image, so a screenshot showing both still prefers the panel.
+ * roster body we follow a priority per image: party panel, else the expanded
+ * selected party from a Command Channel Info window, else the TeamSpeak voice
+ * roster. The priority is per image, so a screenshot showing more than one
+ * still prefers the highest source.
  */
 async function extractPartyNames(imageB64, mediaType) {
   const contents = [];
-  if (EXAMPLE_PART) {
+  for (const ex of EXAMPLES) {
     contents.push(
       {
         role: "user",
-        parts: [
-          { inlineData: { data: EXAMPLE_PART.image, mimeType: "image/png" } },
-        ],
+        parts: [{ inlineData: { data: ex.image, mimeType: "image/png" } }],
       },
       {
         role: "model",
-        parts: [{ text: JSON.stringify(EXAMPLE_PART.response) }],
+        parts: [{ text: JSON.stringify(ex.response) }],
       }
     );
   }
@@ -199,11 +254,24 @@ async function extractPartyNames(imageB64, mediaType) {
   const partyPanel = result.partyPanel || [];
   const selfName = result.selfName || [];
   const commandChannelParty = result.commandChannelParty || [];
-  const roster = partyPanel.length > 0 ? partyPanel : commandChannelParty;
-  // hasParty is true only when an actual party panel or command-channel party
-  // was read (a lone self/leader bar doesn't count). The caller uses it to stop
-  // scanning the rest of a multi-image message once one shot shows the party.
-  return { names: [...selfName, ...roster], hasParty: roster.length > 0 };
+  const teamspeak = result.teamspeak || [];
+  // Roster body priority per image: party panel, else command channel, else
+  // the TeamSpeak voice roster.
+  const roster =
+    partyPanel.length > 0
+      ? partyPanel
+      : commandChannelParty.length > 0
+      ? commandChannelParty
+      : teamspeak;
+  // hasParty is true only when an actual in-game party panel or command-channel
+  // party was read — NOT a TeamSpeak roster (the lowest-priority fallback) and
+  // NOT a lone self/leader bar. The caller uses it to stop scanning the rest of
+  // a multi-image message, so a TeamSpeak shot never short-circuits a better
+  // in-game party shot in the same message.
+  return {
+    names: [...selfName, ...roster],
+    hasParty: partyPanel.length > 0 || commandChannelParty.length > 0,
+  };
 }
 
 // --- Fuzzy matching --------------------------------------------------------

@@ -31,8 +31,9 @@ Relevant nodes:
 
 Members post Lineage 2 screenshots, then someone runs `!scan`. The bot scans
 every screenshot posted since the most recent `UPDATED` divider, extracts the
-character names (party panel, command-channel selected party, and the self/leader
-status bar) with Gemini Vision, fuzzy-matches them against the active CP roster,
+character names (the self/leader status bar plus one roster source, picked per
+image by priority: party panel → command-channel selected party → TeamSpeak
+voice roster) with Gemini Vision, fuzzy-matches them against the active CP roster,
 and posts one `<message-link> <caption>: name1, name2` line per screenshot (the
 caption is the screenshot message's own text, omitted if it had none) with
 a **Send to Panel** button. Pressing it pushes the names to `pendingScans` and
@@ -63,8 +64,11 @@ Required env (e.g. in a gitignored `.env`):
 - `GOOGLE_APPLICATION_CREDENTIALS` — path to the Firebase service-account key
   (optional; defaults to `serviceAccount.json`).
 
-Optional: a `discord-bot-reference.png` next to the script is used as a one-shot
-example to anchor the Gemini name extraction.
+Optional few-shot anchors next to the script, one per source (any missing file
+is skipped): `discord-bot-pt-ref.png` (party panel), `discord-bot-cc-ref.png`
+(command channel), `discord-bot-ts-ref.png` (TeamSpeak roster). Their expected
+answers are hard-coded in `EXAMPLE_SPECS` — keep the two in sync if you swap an
+image.
 
 > ⚠️ The old Python bot (`discord_bot.py`, now removed) had a live bot token
 > hardcoded in it. That token is compromised — rotate it in the Discord Developer
