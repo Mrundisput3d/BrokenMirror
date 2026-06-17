@@ -128,7 +128,7 @@
                 <span style="font-size: 10px;">Αν έκοψες εικόνα με Win+Shift+S, απλά πάτα Ctrl+V οπουδήποτε στη σελίδα!</span>
                 <input type="file" id="file-input" multiple accept="image/*" style="display:none;">
             </div>
-            <div id="scan-loading" style="display:none; text-align:center; color:var(--sky); font-weight:bold; font-family:'Cinzel'; margin-bottom:10px;">
+            <div id="ocr-loading" style="display:none; text-align:center; color:var(--sky); font-weight:bold; font-family:'Cinzel'; margin-bottom:10px;">
                 ⏳ Η Google αναλύει την εικόνα... Περίμενε!
             </div>
             <textarea id="mass-input" rows="3" placeholder="Τα ονόματα θα εμφανιστούν εδώ με κενά..." oninput="analyzeAttendance()"></textarea>
@@ -146,6 +146,7 @@
                 <div class="boss-btn" onclick="logValidatedEvent('ORF', 1)"><img src="images/earring-orfen.png"><span>ORF</span></div>
                 <div class="boss-btn" onclick="logValidatedEvent('COR', 1)"><img src="images/ring-of-core.png"><span>CORE</span></div>
                 <div class="boss-btn" onclick="logValidatedEvent('DPVP', 3)"><img src="images/pvpzone.png" style="border-radius: 15px;"><span>D. PVP</span></div>
+                <div class="boss-btn" onclick="logValidatedEvent('OLY', 2)"><img src="images/olympiad.png" style="border-radius: 15px;"><span>OLYMPIAD</span></div>
                 <div class="boss-btn" onclick="addNamesToSlotsManager()" style="border-color: var(--green);"><div style="font-size:24px; margin-bottom:5px;">📋</div><span style="color:var(--green);">SLOTS</span></div>
             </div>
             <!-- New Control Bar for Slots Manager -->
@@ -312,8 +313,8 @@
     let allCPs = {}, currentEditID = null, globalDailyLogs = {};
     let allExtClans = {}, currentExtID = null, viewMode = 'active'; 
     let globalClanConfig = {};
-    const bossKeys = ['VAL', 'ANT', 'BAI', 'SIE', 'ZAK', 'FRI', 'AQ', 'ORF', 'COR', 'DPVP'];
-    const multipliers = { VAL:3, ANT:3, BAI:2, SIE:3, ZAK:1, FRI:1, AQ:1, ORF:1, COR:1, DPVP:3 };
+    const bossKeys = ['VAL', 'ANT', 'BAI', 'SIE', 'ZAK', 'FRI', 'AQ', 'ORF', 'COR', 'DPVP', 'OLY'];
+    const multipliers = { VAL:3, ANT:3, BAI:2, SIE:3, ZAK:1, FRI:1, AQ:1, ORF:1, COR:1, DPVP:3, OLY:2 };
     let lastAction = null; 
     let cpInitialPoints = 0; let cpInitialStats = {};
     let extInitialPoints = 0; let extInitialStats = {};
@@ -354,16 +355,14 @@
             Object.keys(scans).forEach(key => { 
                 const scan = scans[key]; 
                 const sender = scan.submittedBy || "Άγνωστος";
-                const channelLabel = scan.channel ? `<br><span style="color:var(--sky); font-size:15px; font-weight:bold; font-family:'Cinzel';">📡 ${scan.channel}</span>` : "";
-                const hasNotes = scan.userNotes && scan.userNotes !== "Χωρίς περιγραφή" && scan.userNotes !== "No description";
-                const notes = hasNotes ? `<br><span style="color:var(--sky); font-size:15px; font-weight:bold; font-family:'Cinzel';">📝 ${scan.userNotes}</span>` : "";
-
+                const notes = scan.userNotes && scan.userNotes !== "Χωρίς περιγραφή" ? `<br><span style="color:var(--sky); font-size:15px; font-weight:bold; font-family:'Cinzel';">📝 ${scan.userNotes}</span>` : "";
+                
                 queueList.innerHTML += `
                 <div class="queue-item" style="flex-direction:column; align-items:flex-start; border-left-color: var(--sky);">
                     <div style="width:100%; display:flex; justify-content:space-between; align-items:center;">
                         <div>
                             <b style="color:#fff;">Από: ${sender}</b> <span style="font-size:10px; color:#aaa;">(${new Date(scan.timestamp).toLocaleString('el-GR')})</span>
-                            ${channelLabel}${notes}
+                            ${notes}
                         </div>
                         <div>
                             <button class="btn btn-gold" style="padding: 8px 15px;" onclick="loadPendingScan('${key}')">REVIEW & LOAD</button>
@@ -581,7 +580,7 @@
         document.body.removeChild(link);
     }
     async function processBulkImages(files) {
-        document.getElementById('scan-loading').style.display = 'block';
+        document.getElementById('ocr-loading').style.display = 'block';
         let allExtractedText = ""; let errorOccurred = false;
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
@@ -605,7 +604,7 @@
             }
         }
         
-        document.getElementById('scan-loading').style.display = 'none';
+        document.getElementById('ocr-loading').style.display = 'none';
         if (!errorOccurred && allExtractedText !== "") {
             let smartText = smartFilterText(allExtractedText);
             if (smartText) {
@@ -1132,7 +1131,7 @@
             clan: clan, 
             totalPoints: 0, 
             members: "", 
-            bossStats: { VAL:0, ANT:0, BAI:0, SIE:0, ZAK:0, FRI:0, AQ:0, ORF:0, COR:0, DPVP:0 } 
+            bossStats: { VAL:0, ANT:0, BAI:0, SIE:0, ZAK:0, FRI:0, AQ:0, ORF:0, COR:0, DPVP:0, OLY:0 } 
         };
         if (clan === 'caller') {
             cpData.callerMultiplier = parseInt(document.getElementById('new-caller-multiplier').value) || 3;
@@ -1246,7 +1245,7 @@
                     clan: formattedClan,
                     totalPoints: clan.totalPoints || 0,
                     members: "", 
-                    bossStats: { VAL:0, ANT:0, BAI:0, SIE:0, ZAK:0, FRI:0, AQ:0, ORF:0, COR:0, DPVP:0 },
+                    bossStats: { VAL:0, ANT:0, BAI:0, SIE:0, ZAK:0, FRI:0, AQ:0, ORF:0, COR:0, DPVP:0, OLY:0 },
                     lootHistory: clan.lootHistory || []
                 };
                 db.ref('cps/' + pureId).set(cpData).then(() => {
