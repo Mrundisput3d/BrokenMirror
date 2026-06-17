@@ -908,7 +908,7 @@
         const firebaseConfig = { apiKey: "AIzaSyDRL8EehxdcgVYJ0LJ1khVYkSJcaCMKRes", authDomain: "brokenmirrordb.firebaseapp.com", databaseURL: "https://brokenmirrordb-default-rtdb.europe-west1.firebasedatabase.app", projectId: "brokenmirrordb" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-        const bossIcons = { "VAL": "images/necklace-valakas.png", "ANT": "images/earring-antharas.png", "BAI": "images/ring-of-baium.png", "FRI": "images/frintezza-necklace.png", "ZAK": "images/zaken-earring.png", "AQ": "images/ring-of-queen-ant.png", "ORF": "images/earring-orfen.png", "COR": "images/ring-of-core.png", "SIE": "images/images.png", "DPVP": "images/pvpzone.png" };
+        const bossIcons = { "VAL": "images/necklace-valakas.png", "ANT": "images/earring-antharas.png", "BAI": "images/ring-of-baium.png", "FRI": "images/frintezza-necklace.png", "ZAK": "images/zaken-earring.png", "AQ": "images/ring-of-queen-ant.png", "ORF": "images/earring-orfen.png", "COR": "images/ring-of-core.png", "SIE": "images/images.png", "DPVP": "images/pvpzone.png", "OLY": "images/olympiad.png" };
         let globalCPData = {};
         let globalExternalClans = {};
         let globalDailyLogs = {};
@@ -1133,7 +1133,7 @@
                 // Start with archived per-boss counts if available
                 // Note: archive only stores total count per player, not per-boss breakdown
                 // So per-boss modal still shows only current month — that is expected behaviour
-                let mStats = { VAL: 0, ANT: 0, BAI: 0, FRI: 0, ZAK: 0, AQ: 0, ORF: 0, COR: 0, SIE: 0, DPVP: 0 };
+                let mStats = { VAL: 0, ANT: 0, BAI: 0, FRI: 0, ZAK: 0, AQ: 0, ORF: 0, COR: 0, SIE: 0, DPVP: 0, OLY: 0 };
                 const safeSearchName = getSafeName(memberName).toUpperCase();
                 Object.values(globalDailyLogs).forEach(dayData => {
                     Object.keys(dayData).forEach(logMemberName => {
@@ -1151,6 +1151,7 @@
                                 else if (b.includes('COR')) mStats.COR++;
                                 else if (b.includes('SIE')) mStats.SIE++;
                                 else if (b.includes('DPVP') || b.includes('PVP')) mStats.DPVP++;
+                                else if (b.includes('OLY')) mStats.OLY++;
                             });
                         }
                     });
