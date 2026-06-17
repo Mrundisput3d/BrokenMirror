@@ -43,7 +43,19 @@ Commands:
   (looks back up to 100 messages). Only members with the `SCAN_ROLE` role
   (default `Alliance Leader`) may run it.
 
-Run: `npm run bot` (which is `node --env-file=.env discord-bot.js`).
+Run (foreground, for local dev): `npm run bot` (which is
+`node --env-file=.env discord-bot.js`).
+
+Run permanently on a VPS with pm2 (`ecosystem.config.js` defines the `bma-bot`
+process, including the `--env-file=.env` flag):
+- `npm run bot:start` — start/reload under pm2 and `pm2 save`.
+- `npm run deploy` — `git pull`, install prod deps, reload, and `pm2 save`.
+- `npm run bot:logs` / `bot:status` / `bot:stop` — manage the running process.
+
+One-time, to make pm2 resurrect the bot after a reboot, run `pm2 startup` and
+execute the `sudo …` line it prints (then `npm run bot:start` to snapshot). Note
+`.env` and `serviceAccount.json` are gitignored, so copy them onto the VPS by
+hand (e.g. `scp`) — `git pull` won't bring them.
 
 Required env (e.g. in a gitignored `.env`):
 - `DISCORD_TOKEN` — Discord bot token.

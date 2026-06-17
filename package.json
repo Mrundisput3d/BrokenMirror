@@ -10,11 +10,17 @@
   "scripts": {
     "scrape": "node scrape-regroups.js",
     "push": "node scrape-regroups.js --push",
-    "bot": "node --env-file=.env discord-bot.js"
+    "bot": "node --env-file=.env discord-bot.js",
+    "bot:start": "pm2 startOrReload ecosystem.config.js && pm2 save",
+    "bot:stop": "pm2 stop bma-bot",
+    "bot:logs": "pm2 logs bma-bot",
+    "bot:status": "pm2 status",
+    "deploy": "git pull && npm install --omit=dev && pm2 startOrReload ecosystem.config.js && pm2 save"
   },
   "dependencies": {
     "@google/genai": "^1.52.0",
     "discord.js": "^14.26.4",
-    "firebase-admin": "^13.0.0"
+    "firebase-admin": "^13.0.0",
+    "pm2": "^7.0.1"
   }
 }
