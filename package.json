@@ -15,7 +15,7 @@
     "bot:stop": "pm2 stop bma-bot",
     "bot:logs": "pm2 logs bma-bot",
     "bot:status": "pm2 status",
-    "deploy": "git pull && npm install --omit=dev && pm2 startOrReload ecosystem.config.js && pm2 save"
+    "deploy": "npm install --omit=dev && pm2 startOrReload ecosystem.config.js && pm2 save"
   },
   "dependencies": {
     "@google/genai": "^1.52.0",

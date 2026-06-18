@@ -50,7 +50,7 @@ Run (foreground, for local dev): `npm run bot` (which is
 Run permanently on a VPS with pm2 (`ecosystem.config.js` defines the `bma-bot`
 process, including the `--env-file=.env` flag):
 - `npm run bot:start` — start/reload under pm2 and `pm2 save`.
-- `npm run deploy` — `git pull`, install prod deps, reload, and `pm2 save`.
+- `npm run deploy` — install prod deps, reload, and `pm2 save` (`git pull` yourself first).
 - `npm run bot:logs` / `bot:status` / `bot:stop` — manage the running process.
 
 One-time, to make pm2 resurrect the bot after a reboot, run `pm2 startup` and

@@ -402,12 +402,36 @@ const isDivider = (message) => {
 };
 
 /**
- * Turn the live status `message` into the result: `content` (one
- * "<link> <caption>: name1, name2" line per screenshot) plus a Send to Panel
- * button. Pressing it pushes `names` to `pendingScans` and posts the UPDATED
- * divider to the channel; Cancel discards.
+ * Pack `lines` into as few strings as possible, each at most `max` characters,
+ * never splitting a line across two chunks. Discord rejects message content over
+ * 2000 chars, so a long scan result has to be spread over several messages.
  */
-async function postResult(triggerMessage, message, content, names, userNotes, authorName) {
+function chunkLines(lines, max = 1900) {
+  const chunks = [];
+  let cur = "";
+  for (const line of lines) {
+    // A single line over the limit can't be packed — hard-truncate it.
+    const piece = line.length > max ? `${line.slice(0, max - 1)}…` : line;
+    if (cur === "") cur = piece;
+    else if (cur.length + 1 + piece.length <= max) cur += `\n${piece}`;
+    else {
+      chunks.push(cur);
+      cur = piece;
+    }
+  }
+  if (cur !== "") chunks.push(cur);
+  return chunks.length > 0 ? chunks : [""];
+}
+
+/**
+ * Turn the live status `message` into the result. `chunks` is the one-line-per-
+ * screenshot output already split to fit Discord's 2000-char limit: the first
+ * chunk reuses the live status message, the rest are posted as follow-up
+ * messages, and only the LAST one carries the Send to Panel / Cancel buttons.
+ * Pressing Send pushes `names` (the whole batch, regardless of how the text was
+ * split) to `pendingScans` and posts the UPDATED divider; Cancel discards.
+ */
+async function postResult(triggerMessage, message, chunks, names, userNotes, authorName) {
   const sendBtn = new ButtonBuilder()
     .setCustomId("confirm_send")
     .setLabel("Send to Panel")
@@ -420,9 +444,17 @@ async function postResult(triggerMessage, message, content, names, userNotes, au
     .setEmoji("❌");
   const row = new ActionRowBuilder().addComponents(sendBtn, cancelBtn);
 
-  await message.edit({ content, components: [row] });
+  // Render every chunk; buttons live only on the last message so a single press
+  // confirms the whole multi-message batch.
+  let lastMessage = message;
+  const lastContent = chunks[chunks.length - 1];
+  for (let idx = 0; idx < chunks.length; idx += 1) {
+    const components = idx === chunks.length - 1 ? [row] : [];
+    if (idx === 0) await message.edit({ content: chunks[0], components });
+    else lastMessage = await triggerMessage.channel.send({ content: chunks[idx], components });
+  }
 
-  const collector = message.createMessageComponentCollector({
+  const collector = lastMessage.createMessageComponentCollector({
     componentType: ComponentType.Button,
     time: 600_000,
   });
@@ -433,7 +465,7 @@ async function postResult(triggerMessage, message, content, names, userNotes, au
     if (interaction.customId === "confirm_cancel") {
       collector.stop("cancelled");
       log(`${interaction.user.username} cancelled the scan in ${channel}`);
-      await interaction.update({ content: `${content}\n❌ Cancelled.`, components: [] });
+      await interaction.update({ content: `${lastContent}\n❌ Cancelled.`, components: [] });
       return;
     }
 
@@ -449,7 +481,7 @@ async function postResult(triggerMessage, message, content, names, userNotes, au
     collector.stop("sent");
     log(`${interaction.user.username} sent ${names.length} name(s) to pendingScans from ${channel}`);
     await interaction.update({
-      content: `${content}\n✅ Sent **${names.length} name(s)** to the Command Center.`,
+      content: `${lastContent}\n✅ Sent **${names.length} name(s)** to the Command Center.`,
       components: [],
     });
     await triggerMessage.channel.send(DIVIDER);
@@ -458,7 +490,7 @@ async function postResult(triggerMessage, message, content, names, userNotes, au
   collector.on("end", async (_collected, reason) => {
     if (reason === "time") {
       log(`scan result in ${channel} timed out without a choice`);
-      await message.edit({ components: [] }).catch(() => {});
+      await lastMessage.edit({ components: [] }).catch(() => {});
     }
   });
 }
@@ -560,7 +592,7 @@ async function processImages(triggerMessage, sourceMessages) {
       await postResult(
         triggerMessage,
         status,
-        lines.join("\n"),
+        chunkLines(lines),
         [...allNames],
         notes,
         triggerMessage.author.username
@@ -568,9 +600,14 @@ async function processImages(triggerMessage, sourceMessages) {
     } else if (lines.length > 0) {
       // Names were read but none matched the roster — nothing to send, but show
       // what was read so a misspelling or a missing roster entry is visible.
-      await status.edit(
-        `❌ Found **NO** name that exists in your roster (CPs).\n${lines.join("\n")}`
-      );
+      const chunks = chunkLines([
+        "❌ Found **NO** name that exists in your roster (CPs).",
+        ...lines,
+      ]);
+      await status.edit(chunks[0]).catch(() => {});
+      for (let idx = 1; idx < chunks.length; idx += 1) {
+        await triggerMessage.channel.send(chunks[idx]).catch(() => {});
+      }
     } else {
       await status.edit("❌ Found **NO** name that exists in your roster (CPs).");
     }
