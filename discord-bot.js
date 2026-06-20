@@ -589,13 +589,20 @@ async function processImages(triggerMessage, sourceMessages) {
       }
       // Drop names already captured by an earlier screenshot in this batch, so
       // the same party shown twice (e.g. the party panel in one shot and the
-      // command channel in the next) is only counted and printed once.
-      const fresh = names.filter((n) => !seen.has(n.toLowerCase()));
+      // command channel in the next) is only counted and printed once. In
+      // Olympiad mode this dedup is OFF: each screenshot is a separate session
+      // (e.g. a different day), so the same player legitimately recurs and every
+      // screenshot must show its full OLYMPIAD roster.
+      const fresh = olympiadOnly
+        ? names
+        : names.filter((n) => !seen.has(n.toLowerCase()));
       // Not-found names read off this shot that we haven't already reported (and
       // that didn't match the roster under any spelling).
-      const freshNotFound = notFound.filter(
-        (n) => !seen.has(n.toLowerCase()) && !seenNotFound.has(n.toLowerCase())
-      );
+      const freshNotFound = olympiadOnly
+        ? notFound
+        : notFound.filter(
+            (n) => !seen.has(n.toLowerCase()) && !seenNotFound.has(n.toLowerCase())
+          );
       if (fresh.length === 0 && freshNotFound.length === 0) {
         if (names.length > 0) {
           log(`  [${i}/${shots.length}] ${att.name}: all ${names.length} name(s) already seen — skipping`);
