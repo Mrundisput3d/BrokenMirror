@@ -531,8 +531,12 @@ async function processImages(triggerMessage, sourceMessages) {
   try {
     status = await triggerMessage.reply("🔍 Starting scan…");
     const knownNames = await loadKnownNames();
-    // In #olympiad-screens we only read the TeamSpeak "OLYMPIAD" channel.
-    const olympiadOnly = triggerMessage.channel.name === OLYMPIAD_CHANNEL;
+    // In #olympiad-screens we only read the TeamSpeak "OLYMPIAD" channel. Match
+    // loosely (substring, case-insensitive) so an emoji or other decoration in
+    // the channel name (e.g. "⚛️・olympiad-screens") still counts.
+    const olympiadOnly = (triggerMessage.channel.name ?? "")
+      .toLowerCase()
+      .includes(OLYMPIAD_CHANNEL.toLowerCase());
     const shots = sourceMessages.flatMap((src) =>
       screenshotsIn(src).map(({ att, caption }) => ({ src, att, caption }))
     );

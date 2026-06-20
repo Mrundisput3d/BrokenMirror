@@ -39,8 +39,10 @@ caption is the screenshot message's own text, omitted if it had none) with
 a **Send to Panel** button. Pressing it pushes the names to `pendingScans` and
 posts a fresh `UPDATED` divider (so that batch isn't re-scanned); Cancel discards.
 
-**Olympiad mode:** when `!scan` is run in the `OLYMPIAD_CHANNEL` (default
-`olympiad-screens`), the bot ignores in-game parties/command-channels/self bars
+**Olympiad mode:** when `!scan` is run in a channel whose name contains
+`OLYMPIAD_CHANNEL` (default `olympiad-screens`; matched as a case-insensitive
+substring so an emoji/decoration in the channel name still counts), the bot
+ignores in-game parties/command-channels/self bars
 entirely and reads ONLY the users sitting under the TeamSpeak channel named
 `OLYMPIAD` (other TeamSpeak channels in the same tree are skipped). Non-TeamSpeak
 screenshots posted there contribute no names.
