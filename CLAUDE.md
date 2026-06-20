@@ -39,6 +39,12 @@ caption is the screenshot message's own text, omitted if it had none) with
 a **Send to Panel** button. Pressing it pushes the names to `pendingScans` and
 posts a fresh `UPDATED` divider (so that batch isn't re-scanned); Cancel discards.
 
+**Olympiad mode:** when `!scan` is run in the `OLYMPIAD_CHANNEL` (default
+`olympiad-screens`), the bot ignores in-game parties/command-channels/self bars
+entirely and reads ONLY the users sitting under the TeamSpeak channel named
+`OLYMPIAD` (other TeamSpeak channels in the same tree are skipped). Non-TeamSpeak
+screenshots posted there contribute no names.
+
 Commands:
 - `!scan` — scan every screenshot posted since the last `UPDATED` divider
   (looks back up to 100 messages). Only members with the `SCAN_ROLE` role
@@ -63,6 +69,9 @@ Required env (e.g. in a gitignored `.env`):
 - `GEMINI_API_KEY` — Google Gemini API key.
 - `GOOGLE_APPLICATION_CREDENTIALS` — path to the Firebase service-account key
   (optional; defaults to `serviceAccount.json`).
+- `SCAN_ROLE` — role allowed to run `!scan` (optional; default `Alliance Leader`).
+- `OLYMPIAD_CHANNEL` — channel name that triggers Olympiad mode (optional;
+  default `olympiad-screens`).
 
 Optional few-shot anchors next to the script, one per source (any missing file
 is skipped): `discord-bot-pt-ref.png` (party panel), `discord-bot-cc-ref.png`

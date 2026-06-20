@@ -44,6 +44,9 @@ const GEMINI_MODEL = "gemini-2.5-flash";
 const IMAGE_EXTS = ["png", "jpg", "jpeg"];
 // Only members with this role may run !scan.
 const SCAN_ROLE = process.env.SCAN_ROLE || "Alliance Leader";
+// In this channel the bot runs in "Olympiad mode": it reads ONLY the users
+// sitting under the TeamSpeak "OLYMPIAD" channel and ignores everything else.
+const OLYMPIAD_CHANNEL = process.env.OLYMPIAD_CHANNEL || "olympiad-screens";
 
 const DISCORD_TOKEN = process.env.DISCORD_TOKEN;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
@@ -96,7 +99,7 @@ An image may contain one or more of these UI elements:
 4) TEAMSPEAK / VOICE-CHAT ROSTER — a screenshot of a voice-chat client (e.g. TeamSpeak) showing a vertical list of connected users grouped under one or more channel-name header rows. Read EVERY user row — do not stop early and do not summarize; the list may be long, so go from the very top row to the very bottom row and return every single one.
    - A user row is any row with a person/client icon on the left followed by a nickname. The per-user icon VARIES a lot (headset, microphone, muted mic with a red slash, muted speaker, away/idle, or just a plain coloured dot) — these are status indicators, NOT a reason to skip the row. Read the nickname from EVERY user row no matter which status icon it shows. A user without a microphone or speaker icon is still a connected user and MUST be included.
    - The ONLY rows to skip are channel/server header rows. These are the group headings users sit under (often bold or spaced-out text, with a channel/folder/flag icon and sometimes a "(n)" user count), e.g. a header like "O L Y M P I A D". Skip those headings only; read all user rows beneath every channel, across all channels, even when the list is nested/indented.
-   - Strip a leading rank tag written in square brackets ("[ALLY LEADER] Name" -> "Name"); otherwise keep the displayed nickname exactly as shown, including any " - Realname" or " / Alt" suffix.
+   - Strip a leading bracketed rank/clan tag, whether or not a space follows it ("[ALLY LEADER] Name" -> "Name", "[LK]Name" -> "Name"); otherwise keep the displayed nickname exactly as shown, including any " - Realname" or " / Alt" suffix.
 
 Use the EXACT character names as they appear (case-sensitive; preserve underscores, numbers, capitalization). Do not invent names; only include names you can clearly read.
 
@@ -109,6 +112,15 @@ Return JSON only — your output is parsed by a program, so no prose or markdown
 - selfName: the local player's name from UI element 3 (usually one name). Empty array if no self status bar is visible.
 - commandChannelParty: names from the expanded selected party on the right of UI element 2. Empty array if no Command Channel Info window is visible.
 - teamspeak: every username from UI element 4. Empty array if no voice-chat roster is visible.`;
+
+// Appended to the system prompt only for scans run in the OLYMPIAD_CHANNEL.
+// There we don't care about in-game parties at all — only who is sitting in the
+// single TeamSpeak channel named "OLYMPIAD", ignoring every other channel.
+const OLYMPIAD_ONLY_DIRECTIVE = `OLYMPIAD-ONLY MODE (this overrides the priorities above for this run):
+- The image is a TeamSpeak / voice-chat window whose server tree contains SEVERAL channels, each a header row with its own users listed beneath it (e.g. "Welcome Room", "OLYMPIAD", "PL Meeting Room", "DAILY & BOSS", "RED CLAN").
+- Read ONLY the users sitting directly under the channel header named "OLYMPIAD" — its row shows the spaced-out text "O L Y M P I A D", usually flanked by medal/trophy icons and often highlighted. Start at the first user row below that header and STOP at the very next channel header; do not cross into the next channel.
+- Put those users (and only those) in the "teamspeak" field, applying the same per-row rules as UI element 4 above (read every user row regardless of its status icon; strip a leading bracketed rank/clan tag like "[LK]").
+- Leave partyPanel, selfName and commandChannelParty as empty arrays — ignore any in-game party panels, command channels or self bars in this mode. If no "OLYMPIAD" channel header is visible, return teamspeak as an empty array.`;
 
 const PARTY_SCHEMA = {
   type: Type.OBJECT,
@@ -215,9 +227,14 @@ function mediaTypeFromFilename(filename) {
  * roster. The priority is per image, so a screenshot showing more than one
  * still prefers the highest source.
  */
-async function extractPartyNames(imageB64, mediaType) {
+async function extractPartyNames(imageB64, mediaType, olympiadOnly = false) {
   const contents = [];
-  for (const ex of EXAMPLES) {
+  // In Olympiad mode only the TeamSpeak example is relevant; the party/command-
+  // channel examples would contradict "leave those fields empty".
+  const examples = olympiadOnly
+    ? EXAMPLES.filter((ex) => ex.response.teamspeak.length > 0)
+    : EXAMPLES;
+  for (const ex of examples) {
     contents.push(
       {
         role: "user",
@@ -238,7 +255,9 @@ async function extractPartyNames(imageB64, mediaType) {
     model: GEMINI_MODEL,
     contents,
     config: {
-      systemInstruction: PARTY_SYSTEM_PROMPT,
+      systemInstruction: olympiadOnly
+        ? `${PARTY_SYSTEM_PROMPT}\n\n${OLYMPIAD_ONLY_DIRECTIVE}`
+        : PARTY_SYSTEM_PROMPT,
       responseMimeType: "application/json",
       responseSchema: PARTY_SCHEMA,
       // Disable "thinking" — it's unnecessary for this extraction and otherwise
@@ -259,6 +278,9 @@ async function extractPartyNames(imageB64, mediaType) {
   const selfName = result.selfName || [];
   const commandChannelParty = result.commandChannelParty || [];
   const teamspeak = result.teamspeak || [];
+  // Olympiad mode: only the OLYMPIAD TeamSpeak channel's members count. No self
+  // bar, no party — and nothing here should short-circuit a multi-image message.
+  if (olympiadOnly) return { names: teamspeak, hasParty: false };
   // Roster body priority per image: party panel, else command channel, else
   // the TeamSpeak voice roster.
   const roster =
@@ -509,10 +531,12 @@ async function processImages(triggerMessage, sourceMessages) {
   try {
     status = await triggerMessage.reply("🔍 Starting scan…");
     const knownNames = await loadKnownNames();
+    // In #olympiad-screens we only read the TeamSpeak "OLYMPIAD" channel.
+    const olympiadOnly = triggerMessage.channel.name === OLYMPIAD_CHANNEL;
     const shots = sourceMessages.flatMap((src) =>
       screenshotsIn(src).map(({ att, caption }) => ({ src, att, caption }))
     );
-    log(`scanning ${shots.length} screenshot(s) against ${knownNames.size} roster names`);
+    log(`scanning ${shots.length} screenshot(s) against ${knownNames.size} roster names${olympiadOnly ? " (Olympiad mode: TeamSpeak OLYMPIAD channel only)" : ""}`);
     await status.edit(`🔍 Found **${shots.length}** screenshot(s). Scanning…`).catch(() => {});
 
     const lines = [];
@@ -540,7 +564,8 @@ async function processImages(triggerMessage, sourceMessages) {
         const buf = Buffer.from(await (await fetch(att.url)).arrayBuffer());
         const { names: raw, hasParty } = await extractPartyNames(
           buf.toString("base64"),
-          mediaTypeFromFilename(att.name)
+          mediaTypeFromFilename(att.name),
+          olympiadOnly
         );
         // A party panel / command channel was read off this image — don't scan
         // any other image from the same message.
