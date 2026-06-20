@@ -93,7 +93,10 @@ An image may contain one or more of these UI elements:
 
 3) SELF / LEADER STATUS BAR — the local player's own character bar (this is the party leader, who is NEVER listed among the party panel members in element 1). It can appear ANYWHERE on screen — bottom-center, top-left, or elsewhere — so do not rely on position. Identify it as a standalone bar (separate from the party panel) showing a level number badge (e.g. "80") next to the character name, with CP, HP, and MP bars and numeric values (e.g. "0/3260"). Read the player's own name from it. Do NOT confuse it with a selected target's nameplate: the self bar is the one showing CP AND HP AND MP bars together with numbers.
 
-4) TEAMSPEAK / VOICE-CHAT ROSTER — a screenshot of a voice-chat client (e.g. TeamSpeak) showing a vertical list of connected users, each row a username next to a small speaker / microphone / status icon, usually grouped under a channel-name header row. Read EVERY username row. Ignore channel/server header rows (rows with a folder or channel icon rather than a per-user speaker icon). Strip a leading rank tag written in square brackets ("[ALLY LEADER] Name" -> "Name"); otherwise keep the displayed nickname exactly as shown, including any " - Realname" or " / Alt" suffix.
+4) TEAMSPEAK / VOICE-CHAT ROSTER — a screenshot of a voice-chat client (e.g. TeamSpeak) showing a vertical list of connected users grouped under one or more channel-name header rows. Read EVERY user row — do not stop early and do not summarize; the list may be long, so go from the very top row to the very bottom row and return every single one.
+   - A user row is any row with a person/client icon on the left followed by a nickname. The per-user icon VARIES a lot (headset, microphone, muted mic with a red slash, muted speaker, away/idle, or just a plain coloured dot) — these are status indicators, NOT a reason to skip the row. Read the nickname from EVERY user row no matter which status icon it shows. A user without a microphone or speaker icon is still a connected user and MUST be included.
+   - The ONLY rows to skip are channel/server header rows. These are the group headings users sit under (often bold or spaced-out text, with a channel/folder/flag icon and sometimes a "(n)" user count), e.g. a header like "O L Y M P I A D". Skip those headings only; read all user rows beneath every channel, across all channels, even when the list is nested/indented.
+   - Strip a leading rank tag written in square brackets ("[ALLY LEADER] Name" -> "Name"); otherwise keep the displayed nickname exactly as shown, including any " - Realname" or " / Alt" suffix.
 
 Use the EXACT character names as they appear (case-sensitive; preserve underscores, numbers, capitalization). Do not invent names; only include names you can clearly read.
 
@@ -239,9 +242,10 @@ async function extractPartyNames(imageB64, mediaType) {
       responseMimeType: "application/json",
       responseSchema: PARTY_SCHEMA,
       // Disable "thinking" — it's unnecessary for this extraction and otherwise
-      // eats the output-token budget, truncating the JSON. Then give names room.
+      // eats the output-token budget, truncating the JSON. Then give names room:
+      // a large TeamSpeak channel can list 50+ users in one shot.
       thinkingConfig: { thinkingBudget: 0 },
-      maxOutputTokens: 2048,
+      maxOutputTokens: 4096,
     },
   });
 
