@@ -541,7 +541,12 @@ async function processImages(triggerMessage, sourceMessages) {
       screenshotsIn(src).map(({ att, caption }) => ({ src, att, caption }))
     );
     log(`scanning ${shots.length} screenshot(s) against ${knownNames.size} roster names${olympiadOnly ? " (Olympiad mode: TeamSpeak OLYMPIAD channel only)" : ""}`);
-    await status.edit(`🔍 Found **${shots.length}** screenshot(s). Scanning…`).catch(() => {});
+    const modeBanner = olympiadOnly
+      ? "🏟️ **Olympiad mode** — reading only the TeamSpeak `OLYMPIAD` channel.\n"
+      : "";
+    await status
+      .edit(`${modeBanner}🔍 Found **${shots.length}** screenshot(s). Scanning…`)
+      .catch(() => {});
 
     const lines = [];
     const allNames = new Set(); // unique roster names across the batch (orig case)
@@ -559,7 +564,7 @@ async function processImages(triggerMessage, sourceMessages) {
         continue;
       }
       await status
-        .edit(`🔍 Scanning **${i}/${shots.length}** — \`${att.name}\` · ${allNames.size} name(s) so far`)
+        .edit(`${modeBanner}🔍 Scanning **${i}/${shots.length}** — \`${att.name}\` · ${allNames.size} name(s) so far`)
         .catch(() => {});
       let names = [];
       let notFound = [];
@@ -620,12 +625,15 @@ async function processImages(triggerMessage, sourceMessages) {
 
     log(`scan complete: ${allNames.size} unique name(s) across ${lines.length} screenshot(s)`);
 
+    // Keep the mode banner on the final message too, as its own header line.
+    const header = modeBanner ? [modeBanner.trimEnd()] : [];
+
     if (allNames.size > 0) {
       const notes = triggerMessage.content.replace(/^!scan/i, "").trim() || "No description";
       await postResult(
         triggerMessage,
         status,
-        chunkLines(lines),
+        chunkLines([...header, ...lines]),
         [...allNames],
         notes,
         triggerMessage.author.username
@@ -634,6 +642,7 @@ async function processImages(triggerMessage, sourceMessages) {
       // Names were read but none matched the roster — nothing to send, but show
       // what was read so a misspelling or a missing roster entry is visible.
       const chunks = chunkLines([
+        ...header,
         "❌ Found **NO** name that exists in your roster (CPs).",
         ...lines,
       ]);
@@ -642,7 +651,7 @@ async function processImages(triggerMessage, sourceMessages) {
         await triggerMessage.channel.send(chunks[idx]).catch(() => {});
       }
     } else {
-      await status.edit("❌ Found **NO** name that exists in your roster (CPs).");
+      await status.edit(`${modeBanner}❌ Found **NO** name that exists in your roster (CPs).`);
     }
   } catch (err) {
     logErr("scan failed:", err);
