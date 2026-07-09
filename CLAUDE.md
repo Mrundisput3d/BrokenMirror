@@ -39,6 +39,22 @@ caption is the screenshot message's own text, omitted if it had none) with
 a **Send to Panel** button. Pressing it pushes the names to `pendingScans` and
 posts a fresh `UPDATED` divider (so that batch isn't re-scanned); Cancel discards.
 
+**Respawn mode:** when `!scan` is run in a channel whose name contains
+`RESPAWN_CHANNEL` (default `respawn-screens`; substring match, so
+`respawn-screens-test` counts too) the bot switches to a different pipeline
+entirely — no roster/attendance. It reads each screenshot as either the in-game
+**Epic-boss respawn table** (Bosses tab: name + Dead/Alive + a `DD.MM.YYYY HH:MM - HH:MM`
+respawn window) or the **castle-siege table** (Castles ranking tab: castle, clan,
+leader, `HH:MM DD.MM.YYYY` siege date). All in-game times are server time
+(GMT+0/UTC). It shows a preview with an **Update Timers** button that merges the
+parsed rows into the `regroups` node the schedule site reads — one child per
+event slug (bosses keyed by name, sieges as `Siege <castle>` so schedule.html's
+categorizer files them under the Sieges tab), so a boss screenshot never wipes
+the sieges and vice-versa. Bosses are stored with the window START as the
+canonical `respawnTimestamp` (what the site counts down to); a boss shown as
+Alive clears its timer. This replaces the now-stale `scrape-regroups.js`
+avalanche scraper as the source of `regroups`.
+
 **Olympiad mode:** when `!scan` is run in a channel whose name contains
 `OLYMPIAD_CHANNEL` (default `olympiad-screens`; matched as a case-insensitive
 substring so an emoji/decoration in the channel name still counts), the bot
@@ -74,6 +90,8 @@ Required env (e.g. in a gitignored `.env`):
 - `SCAN_ROLE` — role allowed to run `!scan` (optional; default `Alliance Leader`).
 - `OLYMPIAD_CHANNEL` — channel name that triggers Olympiad mode (optional;
   default `olympiad-screens`).
+- `RESPAWN_CHANNEL` — channel name that triggers respawn/siege mode (optional;
+  default `respawn-screens`; matched as a case-insensitive substring).
 
 Optional few-shot anchors next to the script, one per source (any missing file
 is skipped): `discord-bot-pt-ref.png` (party panel), `discord-bot-cc-ref.png`

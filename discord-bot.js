@@ -47,6 +47,10 @@ const SCAN_ROLE = process.env.SCAN_ROLE || "Alliance Leader";
 // In this channel the bot runs in "Olympiad mode": it reads ONLY the users
 // sitting under the TeamSpeak "OLYMPIAD" channel and ignores everything else.
 const OLYMPIAD_CHANNEL = process.env.OLYMPIAD_CHANNEL || "olympiad-screens";
+// In this channel `!scan` reads boss-respawn / castle-siege screenshots and
+// updates the `regroups` node the schedule site reads (see processRespawns).
+// Matched as a case-insensitive substring, so "respawn-screens-test" counts too.
+const RESPAWN_CHANNEL = process.env.RESPAWN_CHANNEL || "respawn-screens";
 
 const DISCORD_TOKEN = process.env.DISCORD_TOKEN;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
@@ -299,6 +303,119 @@ async function extractPartyNames(imageB64, mediaType, olympiadOnly = false) {
     hasParty: partyPanel.length > 0 || commandChannelParty.length > 0,
   };
 }
+
+// --- Respawn / siege timers ------------------------------------------------
+//
+// A separate pipeline used only in RESPAWN_CHANNEL: members post screenshots of
+// the in-game Epic-boss respawn table and/or the castle-siege ranking table, and
+// `!scan` reads them with Gemini and merges the timers into the `regroups` node
+// that schedule.html renders. All in-game times are server time (GMT+0/UTC).
+
+const RESPAWN_SYSTEM_PROMPT = `You are reading a screenshot from the MMORPG Lineage 2 client to extract a schedule. A screenshot is ONE of these two tables (or neither):
+
+A) EPIC BOSS RESPAWN TABLE — the "Bosses" tab. Columns: Lvl, Boss name, Status, Respawn, and a Radar button. Each row is a raid boss. Status is "Dead" or "Alive". The Respawn column shows a date then a time window, e.g. "10.07.2026 01:24 - 01:54": the date is DD.MM.YYYY, followed by a start time and an end time, both HH:MM (24-hour). A boss that is "Alive" has no respawn time.
+
+B) CASTLE SIEGE TABLE — the "Castles" ranking tab. Columns: #, Castle name, Clan name, Leader name, Siege date. The Siege date shows a time then a date, e.g. "18:00 12.07.2026": the time is HH:MM (24-hour), followed by the date DD.MM.YYYY.
+
+Read EVERY row of whichever table is shown. Use the values EXACTLY as displayed. Ignore the "Radar" buttons, the Lvl column, the "Server Time" footer, national flags, and any other UI chrome.
+
+Return JSON only (parsed by a program; no prose, no markdown fences):
+{"bosses":[{"name":"","status":"","respawnDate":"","respawnStart":"","respawnEnd":""}],"sieges":[{"castle":"","clan":"","leader":"","siegeDate":"","siegeTime":""}]}
+
+- bosses: one entry per boss row. name = boss name; status = "Dead" or "Alive"; respawnDate = the DD.MM.YYYY part; respawnStart = the first HH:MM; respawnEnd = the second HH:MM (empty string when the boss is Alive or only one time is shown). Empty array if this is NOT the boss table.
+- sieges: one entry per castle row. castle = castle name; clan = clan name; leader = leader name; siegeDate = the DD.MM.YYYY part; siegeTime = the HH:MM part. Empty array if this is NOT the siege table.
+
+Only include rows you can clearly read. Do not invent rows.`;
+
+const RESPAWN_SCHEMA = {
+  type: Type.OBJECT,
+  properties: {
+    bosses: {
+      type: Type.ARRAY,
+      items: {
+        type: Type.OBJECT,
+        properties: {
+          name: { type: Type.STRING },
+          status: { type: Type.STRING },
+          respawnDate: { type: Type.STRING },
+          respawnStart: { type: Type.STRING },
+          respawnEnd: { type: Type.STRING },
+        },
+        required: ["name", "status", "respawnDate", "respawnStart", "respawnEnd"],
+      },
+    },
+    sieges: {
+      type: Type.ARRAY,
+      items: {
+        type: Type.OBJECT,
+        properties: {
+          castle: { type: Type.STRING },
+          clan: { type: Type.STRING },
+          leader: { type: Type.STRING },
+          siegeDate: { type: Type.STRING },
+          siegeTime: { type: Type.STRING },
+        },
+        required: ["castle", "clan", "leader", "siegeDate", "siegeTime"],
+      },
+    },
+  },
+  required: ["bosses", "sieges"],
+};
+
+/** Ask Gemini for the boss/siege rows in a single schedule screenshot. */
+async function extractRespawns(imageB64, mediaType) {
+  const response = await ai.models.generateContent({
+    model: GEMINI_MODEL,
+    contents: [
+      { role: "user", parts: [{ inlineData: { data: imageB64, mimeType: mediaType } }] },
+    ],
+    config: {
+      systemInstruction: RESPAWN_SYSTEM_PROMPT,
+      responseMimeType: "application/json",
+      responseSchema: RESPAWN_SCHEMA,
+      thinkingConfig: { thinkingBudget: 0 },
+      maxOutputTokens: 4096,
+    },
+  });
+  if (!response.text) {
+    throw new Error(`empty Gemini response (finishReason: ${
+      response.candidates?.[0]?.finishReason ?? "unknown"
+    })`);
+  }
+  const result = JSON.parse(response.text);
+  return { bosses: result.bosses || [], sieges: result.sieges || [] };
+}
+
+/** Firebase-key-safe slug (matches scrape-regroups.js so slugs stay stable). */
+function slug(s) {
+  return s
+    .toLowerCase()
+    .replace(/[.$#[\]/]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+/**
+ * Parse an in-game server-time date+time (DD.MM.YYYY, HH:MM — always GMT+0)
+ * into unix seconds (UTC). Returns null if either part is missing/malformed.
+ */
+function parseServerTimeToUnix(dateStr, timeStr) {
+  const d = /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/.exec((dateStr || "").trim());
+  const t = /^(\d{1,2}):(\d{2})$/.exec((timeStr || "").trim());
+  if (!d || !t) return null;
+  const day = +d[1], mon = +d[2], year = +d[3];
+  const hour = +t[1], min = +t[2];
+  if (mon < 1 || mon > 12 || day < 1 || day > 31 || hour > 23 || min > 59) {
+    return null;
+  }
+  return Math.floor(Date.UTC(year, mon - 1, day, hour, min) / 1000);
+}
+
+/** Compact "YYYY-MM-DD HH:MM" (UTC) for the confirmation preview. */
+const fmtUtc = (unixSec) =>
+  new Date(unixSec * 1000).toISOString().slice(0, 16).replace("T", " ");
+/** Just the "HH:MM" (UTC) of a unix time, for a window's end. */
+const fmtHm = (unixSec) => new Date(unixSec * 1000).toISOString().slice(11, 16);
 
 // --- Fuzzy matching --------------------------------------------------------
 
@@ -673,6 +790,211 @@ async function processImages(triggerMessage, sourceMessages) {
   }
 }
 
+/**
+ * Respawn-channel counterpart to processImages. Reads every screenshot since the
+ * last divider as a boss-respawn or castle-siege table, merges the rows into a
+ * slug->event map (later screenshots override earlier ones for the same slug),
+ * and posts a preview with an "Update Timers" button. Pressing it merges the
+ * events into `regroups` (leaving untouched slugs alone) via postRespawnResult.
+ */
+async function processRespawns(triggerMessage, sourceMessages) {
+  let status;
+  try {
+    status = await triggerMessage.reply("🔍 Reading respawn / siege screenshots…");
+    const shots = sourceMessages.flatMap((src) =>
+      screenshotsIn(src).map(({ att, caption }) => ({ src, att, caption }))
+    );
+    log(`respawn scan: ${shots.length} screenshot(s)`);
+    await status
+      .edit(`🔍 Found **${shots.length}** screenshot(s). Reading timers…`)
+      .catch(() => {});
+
+    const events = new Map(); // slug -> event object to write to regroups
+    const deletions = new Set(); // slugs to clear (boss reported Alive / no time)
+    let i = 0;
+    for (const { att } of shots) {
+      i += 1;
+      await status
+        .edit(`🔍 Reading **${i}/${shots.length}** — \`${att.name}\``)
+        .catch(() => {});
+      try {
+        log(`  [${i}/${shots.length}] reading ${att.name}...`);
+        const buf = Buffer.from(await (await fetch(att.url)).arrayBuffer());
+        const parsed = await extractRespawns(
+          buf.toString("base64"),
+          mediaTypeFromFilename(att.name)
+        );
+
+        for (const b of parsed.bosses) {
+          const name = (b.name || "").trim();
+          if (!name) continue;
+          const key = slug(name);
+          if (!key) continue;
+          const alive = /alive/i.test(b.status || "");
+          const startTs = parseServerTimeToUnix(b.respawnDate, b.respawnStart);
+          if (alive || startTs === null) {
+            // Boss is up (or unreadable time): drop any stale timer for it.
+            events.delete(key);
+            deletions.add(key);
+            continue;
+          }
+          let endTs = parseServerTimeToUnix(b.respawnDate, b.respawnEnd);
+          if (endTs !== null && endTs < startTs) endTs += 86400; // crosses midnight
+          deletions.delete(key);
+          events.set(key, {
+            event: name,
+            respawnTimestamp: startTs, // window START — what the site counts to
+            respawnISO: new Date(startTs * 1000).toISOString(),
+            respawnEndTimestamp: endTs,
+            respawnEndISO: endTs !== null ? new Date(endTs * 1000).toISOString() : null,
+            source: "screenshot",
+          });
+        }
+
+        for (const s of parsed.sieges) {
+          const castle = (s.castle || "").trim();
+          if (!castle) continue;
+          const ts = parseServerTimeToUnix(s.siegeDate, s.siegeTime);
+          if (ts === null) continue;
+          // schedule.html categorizes an event as a siege when its name starts
+          // with "siege" — keep that prefix so it lands on the Sieges tab.
+          const eventName = `Siege ${castle}`;
+          const key = slug(eventName);
+          deletions.delete(key);
+          events.set(key, {
+            event: eventName,
+            respawnTimestamp: ts,
+            respawnISO: new Date(ts * 1000).toISOString(),
+            clan: (s.clan || "").trim() || null,
+            leader: (s.leader || "").trim() || null,
+            source: "screenshot",
+          });
+        }
+        log(`  [${i}/${shots.length}] ${att.name}: ${parsed.bosses.length} boss row(s), ${parsed.sieges.length} siege row(s)`);
+      } catch (err) {
+        logErr(`  [${i}/${shots.length}] ${att.name} failed:`, err.message);
+      }
+    }
+
+    if (events.size === 0 && deletions.size === 0) {
+      await status.edit(
+        "❌ Couldn't read any boss respawn or siege schedule from those screenshots."
+      );
+      return;
+    }
+
+    // Preview: bosses first, then sieges, each sorted by time.
+    const items = [...events.values()];
+    const isSiege = (e) => e.event.toLowerCase().startsWith("siege");
+    const bossLines = items
+      .filter((e) => !isSiege(e))
+      .sort((a, b) => a.respawnTimestamp - b.respawnTimestamp)
+      .map(
+        (e) =>
+          `• **${e.event}** — ${fmtUtc(e.respawnTimestamp)}${
+            e.respawnEndTimestamp ? ` – ${fmtHm(e.respawnEndTimestamp)}` : ""
+          }`
+      );
+    const siegeLines = items
+      .filter(isSiege)
+      .sort((a, b) => a.respawnTimestamp - b.respawnTimestamp)
+      .map(
+        (e) =>
+          `• **${e.event}** — ${fmtUtc(e.respawnTimestamp)}${e.clan ? ` · ${e.clan}` : ""}`
+      );
+
+    const lines = ["🕓 All times are **server time (GMT+0)**."];
+    if (bossLines.length) lines.push(`🐉 **Bosses (${bossLines.length})**`, ...bossLines);
+    if (siegeLines.length) lines.push(`🏰 **Sieges (${siegeLines.length})**`, ...siegeLines);
+    if (deletions.size) {
+      lines.push(`🗑️ Clearing (alive / unreadable): ${[...deletions].join(", ")}`);
+    }
+
+    log(`respawn scan complete: ${events.size} timer(s), ${deletions.size} to clear`);
+    await postRespawnResult(
+      triggerMessage,
+      status,
+      chunkLines(lines),
+      events,
+      deletions
+    );
+  } catch (err) {
+    logErr("respawn scan failed:", err);
+    const msg = `⚠️ Error: ${err.message}`;
+    if (status) await status.edit(msg).catch(() => {});
+    else await triggerMessage.reply(msg).catch(() => {});
+  } finally {
+    await triggerMessage.reactions
+      .resolve("⏳")
+      ?.users.remove(client.user.id)
+      .catch(() => {});
+  }
+}
+
+/**
+ * Render the respawn preview `chunks` (buttons on the last one) and, on "Update
+ * Timers", merge `events` into `regroups` — a multi-path update() that writes
+ * only the touched `events/<slug>` children (and clears `deletions`), leaving
+ * every other event intact — then post the UPDATED divider. Cancel discards.
+ */
+async function postRespawnResult(triggerMessage, message, chunks, events, deletions) {
+  const updateBtn = new ButtonBuilder()
+    .setCustomId("respawn_update")
+    .setLabel("Update Timers")
+    .setStyle(ButtonStyle.Success)
+    .setEmoji("✅");
+  const cancelBtn = new ButtonBuilder()
+    .setCustomId("respawn_cancel")
+    .setLabel("Cancel")
+    .setStyle(ButtonStyle.Danger)
+    .setEmoji("❌");
+  const row = new ActionRowBuilder().addComponents(updateBtn, cancelBtn);
+
+  let lastMessage = message;
+  const lastContent = chunks[chunks.length - 1];
+  for (let idx = 0; idx < chunks.length; idx += 1) {
+    const components = idx === chunks.length - 1 ? [row] : [];
+    if (idx === 0) await message.edit({ content: chunks[0], components });
+    else lastMessage = await triggerMessage.channel.send({ content: chunks[idx], components });
+  }
+
+  const collector = lastMessage.createMessageComponentCollector({
+    componentType: ComponentType.Button,
+    time: 600_000,
+  });
+  const channel = `#${triggerMessage.channel.name ?? "dm"}`;
+
+  collector.on("collect", async (interaction) => {
+    if (interaction.customId === "respawn_cancel") {
+      collector.stop("cancelled");
+      log(`${interaction.user.username} cancelled the respawn update in ${channel}`);
+      await interaction.update({ content: `${lastContent}\n❌ Cancelled.`, components: [] });
+      return;
+    }
+
+    // respawn_update — merge only the touched slugs into regroups/events.
+    const updates = { updatedAt: admin.database.ServerValue.TIMESTAMP };
+    for (const [key, val] of events) updates[`events/${key}`] = val;
+    for (const key of deletions) updates[`events/${key}`] = null;
+    await db.ref("regroups").update(updates);
+
+    collector.stop("sent");
+    log(`${interaction.user.username} updated ${events.size} timer(s) (${deletions.size} cleared) in regroups from ${channel}`);
+    await interaction.update({
+      content: `${lastContent}\n✅ Updated **${events.size} timer(s)** on the schedule site.`,
+      components: [],
+    });
+    await triggerMessage.channel.send(DIVIDER);
+  });
+
+  collector.on("end", async (_collected, reason) => {
+    if (reason === "time") {
+      log(`respawn result in ${channel} timed out without a choice`);
+      await lastMessage.edit({ components: [] }).catch(() => {});
+    }
+  });
+}
+
 client.once("clientReady", () => {
   log("✅ BMA Attendance Bot is online. Write !scan in a channel to scan all screenshots since the last update.");
 });
@@ -708,7 +1030,14 @@ client.on("messageCreate", async (message) => {
   }
 
   if (sources.length > 0) {
-    await processImages(message, sources);
+    // In the respawn channel `!scan` updates the schedule timers instead of
+    // attendance. Matched loosely so "respawn-screens-test" (and any emoji
+    // decoration) still triggers it.
+    const respawnMode = (message.channel.name ?? "")
+      .toLowerCase()
+      .includes(RESPAWN_CHANNEL.toLowerCase());
+    if (respawnMode) await processRespawns(message, sources);
+    else await processImages(message, sources);
   } else {
     log(`no screenshots since last divider in ${channel} — nothing to scan`);
     await message.reply("❌ No screenshots found since the last update.");
